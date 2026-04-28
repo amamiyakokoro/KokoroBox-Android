@@ -6,7 +6,7 @@
 
 # YumeBox-MaterialDesign
 
-[![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?label=Release&logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?label=Release&logo=github)]([https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases))
 [![GitHub License](https://img.shields.io/github/license/Yizuka17/YumeBox-MaterialDesign?logo=gnu)](/LICENSE)
 ![Downloads](https://img.shields.io/github/downloads/Yizuka17/YumeBox-MaterialDesign/total)
 
