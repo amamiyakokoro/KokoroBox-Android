@@ -6,9 +6,9 @@
 
 # YumeBox-MaterialDesign
 
-[![Latest release](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
+[![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?logo=android)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest)
 [![GitHub License](https://img.shields.io/github/license/Yizuka17/YumeBox-MaterialDesign?logo=gnu)](/LICENSE)
-![Downloads](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/download/v0.5.1_md3/YumeBox-arm64-v8a-release.apk)
+[![Downloads](https://img.shields.io/github/downloads/Yizuka17/YumeBox-MaterialDesign/total?logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
 
 A Material Design fork of YumeBox, an open-source Android client based on [mihomo](https://github.com/MetaCubeX/mihomo).
 
