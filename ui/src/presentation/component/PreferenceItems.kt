@@ -49,6 +49,7 @@ fun PreferenceArrowItem(
     onClick: () -> Unit,
     summary: String? = null,
     holdDownState: Boolean = false,
+    startAction: @Composable (() -> Unit)? = null,
     endActions: @Composable (RowScope.() -> Unit)? = null,
     bottomAction: @Composable (() -> Unit)? = null,
 ) {
@@ -56,6 +57,7 @@ fun PreferenceArrowItem(
         title = title,
         summary = summary,
         holdDownState = holdDownState,
+        startAction = startAction ?: {},
         endActions = endActions ?: {},
         bottomAction = bottomAction ?: {},
         onClick = onClick,

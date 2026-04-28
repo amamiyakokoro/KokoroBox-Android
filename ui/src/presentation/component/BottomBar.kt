@@ -156,23 +156,23 @@ val LocalBottomBarHazeStyle = compositionLocalOf<HazeStyle?> { null }
 val LocalBottomBarUseLegacyStyle = compositionLocalOf { false }
 
 object MainBottomBarDefaults {
-    val CornerRadius = UiDp.dp28
+    val CornerRadius = UiDp.dp24
     val Shape = SmoothUnevenRoundedCornerShape(
         topStart = CornerRadius,
         topEnd = CornerRadius,
     )
     val BorderWidth = UiDp.dp0_26
     val OutlineHorizontalInset = UiDp.dp0
-    val ItemHeight = UiDp.dp60
-    val IconSize = UiDp.dp26
-    val LabelFontSize = 11.5.sp
-    val IconLabelSpacing = UiDp.dp3
-    val HorizontalPadding = UiDp.dp48
-    val TopPadding = UiDp.dp6
+    val ItemHeight = UiDp.dp64
+    val IconSize = UiDp.dp24
+    val LabelFontSize = 12.sp
+    val IconLabelSpacing = UiDp.dp4
+    val HorizontalPadding = UiDp.dp32
+    val TopPadding = UiDp.dp8
     val FloatingBottomPadding = UiDp.dp12
     val EnterOffset = UiDp.dp68
     val ExitOffset = UiDp.dp84
-    val ModernReservedHeight = UiDp.dp64
+    val ModernReservedHeight = UiDp.dp80
     val LegacyReservedHeight = UiDp.dp68
     val PagerAnimationSpec: AnimationSpec<Float> =
         spring(
@@ -478,7 +478,7 @@ private fun RowScope.BottomBarItem(
             style = TextStyle(
                 color = tint,
                 fontSize = MainBottomBarDefaults.LabelFontSize,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 textAlign = TextAlign.Center,
             ),
         )

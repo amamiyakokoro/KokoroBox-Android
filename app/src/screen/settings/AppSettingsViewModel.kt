@@ -73,9 +73,15 @@ class AppSettingsViewModel(
     fun onThemeModeChange(mode: ThemeMode) = themeMode.set(mode)
     fun onAppLanguageChange(language: AppLanguage) = controller.applyAppLanguage(language)
     fun onColorThemeChange(theme: AppColorTheme) = colorTheme.set(theme)
-    fun onThemeSeedColorChange(argb: Long) = themeSeedColorArgb.set(argb)
+    fun onThemeSeedColorChange(argb: Long) {
+        themeSeedColorArgb.set(argb)
+        colorTheme.set(AppColorTheme.Custom)
+    }
     fun onInvertOnPrimaryColorsChange(enabled: Boolean) = invertOnPrimaryColors.set(enabled)
-    fun resetThemeSeedColor() = themeSeedColorArgb.set(DEFAULT_CUSTOM_THEME_SEED_ARGB)
+    fun resetThemeSeedColor() {
+        themeSeedColorArgb.set(DEFAULT_CUSTOM_THEME_SEED_ARGB)
+        colorTheme.set(AppColorTheme.Custom)
+    }
     fun onBottomBarAutoHideChange(enabled: Boolean) = bottomBarAutoHide.set(enabled)
     fun onBottomBarUseLegacyStyleChange(enabled: Boolean) = bottomBarUseLegacyStyle.set(enabled)
     fun onTopBarBlurEnabledChange(enabled: Boolean) = topBarBlurEnabled.set(enabled)

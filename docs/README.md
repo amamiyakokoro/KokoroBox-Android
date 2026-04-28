@@ -4,22 +4,21 @@
 
 <img src="logo.webp" width="96" alt="YumeBox logo">
 
-# YumeBox
+# YumeBox-MaterialDesign
 
-[![Latest release](https://img.shields.io/github/v/release/YumeLira/YumeBox?label=Release&logo=github)](https://github.com/YumeLira/YumeBox/releases/latest)
-[![GitHub License](https://img.shields.io/github/license/YumeLira/YumeBox?logo=gnu)](/LICENSE)
-![Downloads](https://img.shields.io/github/downloads/YumeLira/YumeBox/total)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d4e3ab7c51254da9959598e34f639e0d)](https://app.codacy.com/gh/YumeLira/YumeBox/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?label=Release&logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest)
+[![GitHub License](https://img.shields.io/github/license/Yizuka17/YumeBox-MaterialDesign?logo=gnu)](/LICENSE)
+![Downloads](https://img.shields.io/github/downloads/Yizuka17/YumeBox-MaterialDesign/total)
 
-An open-source Android client based [mihomo](https://github.com/MetaCubeX/mihomo).
+A Material Design fork of YumeBox, an open-source Android client based on [mihomo](https://github.com/MetaCubeX/mihomo).
 
 </div>
 
 ## Use
 
-YumeBox currently only supports **Android 8.0 (API 26) and above systems**.
+YumeBox-MaterialDesign currently only supports **Android 8.0 (API 26) and above systems**.
 
-Please go to the Release page to download the installation package for the corresponding architecture: [Release](https://github.com/YumeLira/YumeBox/releases) For more information, please visit the official website: [YumeBox](https://yumebox.oom-wg.dev/)
+Please go to the Release page to download the installation package for the corresponding architecture: [Release](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
 Override configuration syntax reference: [override document](https://yumebox.oom-wg.dev/override) If this project is helpful to you, please click Star. This is the motivation for continuous updates.
 
 
@@ -33,7 +32,7 @@ For more discussion and feedback, please join the group: [@OOM_WG](https://t.me/
 
 ### Participate and contribute
 
-If you want to make YumeBox better, please refer to [CONTRIBUTING](CONTRIBUTING.md). If you want to translate YumeBox into more languages, or improve the existing translation, please
+If you want to make YumeBox-MaterialDesign better, please refer to [CONTRIBUTING](CONTRIBUTING.md). If you want to translate YumeBox into more languages, or improve the existing translation, please
 Fork this project and create or update the corresponding translation file in the `locale/lang` directory.
 
 ### Special

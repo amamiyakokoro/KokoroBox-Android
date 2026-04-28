@@ -83,6 +83,7 @@ fun MainScreen(
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val featureViewModel = koinViewModel<FeatureViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
+    val isProxyRunning by homeViewModel.isRunning.collectAsState()
     val bottomBarAutoHideEnabled by appSettingsViewModel.bottomBarAutoHide.state.collectAsState()
     val bottomBarUseLegacyStyle by appSettingsViewModel.bottomBarUseLegacyStyle.state.collectAsState()
     val topBarBlurEnabled by appSettingsViewModel.topBarBlurEnabled.state.collectAsState()
@@ -158,14 +159,16 @@ fun MainScreen(
         handlePageChange(0)
     }
 
+    val mainPagerHazeEnabled = topBarBlurEnabled && (!acgMainUiEnabled || settledMainPage != 0)
+
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalPagerState provides mainPagerState.pagerState,
         LocalMainPagerState provides mainPagerState,
         LocalHandlePageChange provides handlePageChange,
         LocalBottomBarScrollBehavior provides bottomBarScrollBehavior,
-        LocalBottomBarHazeState provides if (topBarBlurEnabled) hazeState else null,
-        LocalBottomBarHazeStyle provides if (topBarBlurEnabled) bottomBarHazeStyle else null,
+        LocalBottomBarHazeState provides if (mainPagerHazeEnabled) hazeState else null,
+        LocalBottomBarHazeStyle provides if (mainPagerHazeEnabled) bottomBarHazeStyle else null,
         LocalBottomBarUseLegacyStyle provides bottomBarUseLegacyStyle,
     ) {
         Scaffold { innerPadding ->
@@ -189,14 +192,14 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .let { modifier ->
-                            if (topBarBlurEnabled) {
+                            if (mainPagerHazeEnabled) {
                                 modifier.hazeSource(state = hazeState)
                             } else {
                                 modifier
                             }
                         },
                     state = mainPagerState.pagerState,
-                    beyondViewportPageCount = 2,
+                    beyondViewportPageCount = if (acgMainUiEnabled) 2 else 1,
                     flingBehavior = pagerFlingBehavior,
                     userScrollEnabled = true,
                     overscrollEffect = null,
@@ -219,6 +222,8 @@ fun MainScreen(
                         panelOpenMode = panelOpenMode,
                         homePageProgress = homeVisibility,
                         selectedPage = settledMainPage,
+                        isProxyRunning = isProxyRunning,
+                        onProxyStartRequested = homeViewModel::startCurrentOrRecommendedProxy,
                     )
                 }
 
@@ -252,6 +257,8 @@ private fun MainRootPageContent(
     panelOpenMode: LinkOpenMode,
     homePageProgress: Float,
     selectedPage: Int,
+    isProxyRunning: Boolean,
+    onProxyStartRequested: () -> Unit,
 ) {
     when (page) {
         0 -> {
@@ -263,7 +270,7 @@ private fun MainRootPageContent(
                     wallpaperBiasX = acgWallpaperBiasX,
                     wallpaperBiasY = acgWallpaperBiasY,
                     isActive = selectedPage == 0,
-                    pageProgress = homePageProgress,
+                    pageProgress = if (selectedPage == 0 || homePageProgress < 0.999f) homePageProgress else 1f,
                 )
             } else {
                 HomePager(
@@ -289,7 +296,9 @@ private fun MainRootPageContent(
                     LinkOpenMode.EXTERNAL_BROWSER -> openUrl(context, panelUrl)
                 }
             },
-            isActive = selectedPage == 1,
+            isPageActive = selectedPage == 1,
+            isProxyRunning = isProxyRunning,
+            onProxyStartRequested = onProxyStartRequested,
         )
 
         2 -> ProfilesPager(mainInnerPadding)

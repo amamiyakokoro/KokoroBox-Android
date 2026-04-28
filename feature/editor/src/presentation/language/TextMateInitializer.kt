@@ -20,7 +20,7 @@
 
 
 
-package com.github.yumelira.yumebox.feature.editor.language
+package com.github.yumelira.yumebox.feature.editor.presentation.language
 
 import android.content.Context
 import io.github.rosemoe.sora.langs.textmate.TextMateLanguage

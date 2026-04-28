@@ -335,6 +335,7 @@ class StatusProvider : ContentProvider() {
         }
 
         @SuppressLint("Deprecated")
+        @Suppress("DEPRECATION")
         private fun queryRunningServiceClassNames(activityManager: ActivityManager): List<String> {
             return activityManager.getRunningServices(Int.MAX_VALUE)
                 .mapNotNull { service ->

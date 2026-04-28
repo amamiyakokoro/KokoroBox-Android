@@ -100,6 +100,16 @@
         </activity-alias>
 
         <meta-data
+                android:name="com.github.yumelira.yumebox.startup_gate.ENABLED"
+                android:value="${startupGateEnabled}"/>
+        <meta-data
+                android:name="com.github.yumelira.yumebox.startup_gate.ENFORCE_SIGNER"
+                android:value="${startupGateEnforceSigner}"/>
+        <meta-data
+                android:name="com.github.yumelira.yumebox.startup_gate.EXPECTED_SIGNER_SHA256"
+                android:value="${startupGateExpectedSignerSha256}"/>
+
+        <meta-data
                 android:name="org.chromium.webapk.shell_apk"
                 android:value=""/>
         <meta-data

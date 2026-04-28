@@ -28,7 +28,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
@@ -102,7 +103,7 @@ internal fun ThemeColorPickerItem(
         mutableStateOf(runCatching { colorFromArgb(themeSeedColorArgb) }.getOrDefault(Color.White))
     }
     val editingThemeSeedHex = remember(themeSeedColorArgb) {
-        mutableStateOf(formatThemeSeedHex(themeSeedColorArgb))
+        mutableStateOf(themeSeedHexFieldValue(themeSeedColorArgb))
     }
 
     BasicComponent(
@@ -113,7 +114,7 @@ internal fun ThemeColorPickerItem(
         onClick = {
             editingThemeSeedColor.value = runCatching { colorFromArgb(themeSeedColorArgb) }
                 .getOrDefault(Color.White)
-            editingThemeSeedHex.value = formatThemeSeedHex(themeSeedColorArgb)
+            editingThemeSeedHex.value = themeSeedHexFieldValue(themeSeedColorArgb)
             if (showBottomSheetInPlace) {
                 showThemeColorPicker.value = true
             } else {
@@ -141,13 +142,11 @@ internal fun ThemeColorPickerItem(
             onDismissRequest = { showThemeColorPicker.value = false },
             onEditingThemeSeedColorChange = {
                 editingThemeSeedColor.value = it
-                editingThemeSeedHex.value = formatThemeSeedHex(colorToArgbLong(it))
+                editingThemeSeedHex.value = themeSeedHexFieldValue(colorToArgbLong(it))
             },
-            onEditingThemeSeedHexChange = { raw ->
-                // 不立即 normalize，让用户自由输入
-                editingThemeSeedHex.value = raw.uppercase()
-                // 尝试解析颜色，成功则更新预览
-                parseThemeHexColorOrNull(raw)?.let {
+            onEditingThemeSeedHexChange = { value ->
+                editingThemeSeedHex.value = normalizeThemeSeedHexInput(value)
+                parseThemeHexColorOrNull(editingThemeSeedHex.value.text)?.let {
                     editingThemeSeedColor.value = it
                 }
             },
@@ -164,10 +163,10 @@ internal fun ThemeColorPickerItem(
 internal fun ThemeColorPickerSheet(
     show: Boolean,
     editingThemeSeedColor: Color,
-    editingThemeSeedHex: String,
+    editingThemeSeedHex: TextFieldValue,
     onDismissRequest: () -> Unit,
     onEditingThemeSeedColorChange: (Color) -> Unit,
-    onEditingThemeSeedHexChange: (String) -> Unit,
+    onEditingThemeSeedHexChange: (TextFieldValue) -> Unit,
     onConfirm: () -> Unit,
     renderInRootScaffold: Boolean = true,
 ) {
@@ -216,6 +215,33 @@ internal fun ThemeColorPickerSheet(
 private fun formatThemeSeedHex(argb: Long): String {
     val rgb = (argb and 0x00FFFFFFL).toString(16).uppercase().padStart(6, '0')
     return "#$rgb"
+}
+
+private fun themeSeedHexFieldValue(argb: Long): TextFieldValue {
+    val text = formatThemeSeedHex(argb)
+    return TextFieldValue(text = text, selection = TextRange(text.length))
+}
+
+private fun normalizeThemeSeedHexInput(input: TextFieldValue): TextFieldValue {
+    val normalizedBody = input.text
+        .removePrefix("#")
+        .removePrefix("0x")
+        .uppercase()
+        .filter { it in '0'..'9' || it in 'A'..'F' }
+        .take(6)
+    val normalizedBeforeCursor = input.text
+        .take(input.selection.start)
+        .removePrefix("#")
+        .removePrefix("0x")
+        .uppercase()
+        .filter { it in '0'..'9' || it in 'A'..'F' }
+        .take(6)
+    val normalizedText = "#$normalizedBody"
+    val cursor = (normalizedBeforeCursor.length + 1).coerceIn(1, normalizedText.length)
+    return TextFieldValue(
+        text = normalizedText,
+        selection = TextRange(cursor),
+    )
 }
 
 private fun parseThemeHexColorOrNull(input: String): Color? {

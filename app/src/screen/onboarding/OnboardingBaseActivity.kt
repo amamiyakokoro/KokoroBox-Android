@@ -24,6 +24,7 @@ package com.github.yumelira.yumebox.screen.onboarding
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -44,6 +45,7 @@ import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformThem
 import com.github.yumelira.yumebox.presentation.theme.YumeTheme
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -58,12 +60,26 @@ internal abstract class OnboardingBaseActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StartupGate.loadPrimary()
+        loadStartupGate()
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
         super.onCreate(savedInstanceState)
+    }
+
+    private fun loadStartupGate() {
+        val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!isDebuggable) {
+            StartupGate.loadPrimary()
+            return
+        }
+
+        runCatching {
+            StartupGate.loadPrimary()
+        }.onFailure { throwable ->
+            Timber.w(throwable, "Skip startup gate native library in debug build")
+        }
     }
 
     protected fun setOnboardingContent(
@@ -95,6 +111,7 @@ private fun OnboardingActivityTheme(
 ) {
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
+    val colorTheme by appSettingsViewModel.colorTheme.state.collectAsState()
     val themeSeedColorArgb by appSettingsViewModel.themeSeedColorArgb.state.collectAsState()
     val invertOnPrimaryColors by appSettingsViewModel.invertOnPrimaryColors.state.collectAsState()
     val pageScale by appSettingsViewModel.pageScale.state.collectAsState()
@@ -108,6 +125,7 @@ private fun OnboardingActivityTheme(
         CompositionLocalProvider(LocalDensity provides scaledDensity) {
             YumeTheme(
                 themeMode = themeMode,
+                colorTheme = colorTheme,
                 themeSeedColorArgb = themeSeedColorArgb,
                 invertOnPrimaryColors = invertOnPrimaryColors,
             ) {

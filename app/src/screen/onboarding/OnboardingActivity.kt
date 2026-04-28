@@ -37,6 +37,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
@@ -119,9 +121,7 @@ private fun OnboardingPagerScreen(
         )
     }
     var editingThemeSeedHex by remember(themeState.themeSeedColorArgb) {
-        mutableStateOf(
-            "#${(themeState.themeSeedColorArgb and 0x00FFFFFFL).toString(16).uppercase().padStart(6, '0')}"
-        )
+        mutableStateOf(onboardingThemeSeedHexFieldValue(themeState.themeSeedColorArgb))
     }
 
     fun navigateTo(page: Int) {
@@ -232,7 +232,7 @@ private fun OnboardingPagerScreen(
                                     runCatching { colorFromArgb(themeState.themeSeedColorArgb) }
                                         .getOrDefault(Color.White)
                                 editingThemeSeedHex =
-                                    "#${(themeState.themeSeedColorArgb and 0x00FFFFFFL).toString(16).uppercase().padStart(6, '0')}"
+                                    onboardingThemeSeedHexFieldValue(themeState.themeSeedColorArgb)
                             }
                             showThemeColorPicker = show
                         },
@@ -260,22 +260,49 @@ private fun OnboardingPagerScreen(
         onDismissRequest = { showThemeColorPicker = false },
         onEditingThemeSeedColorChange = {
             editingThemeSeedColor = it
-            editingThemeSeedHex =
-                "#${(colorToArgbLong(it) and 0x00FFFFFFL).toString(16).uppercase().padStart(6, '0')}"
+            editingThemeSeedHex = onboardingThemeSeedHexFieldValue(colorToArgbLong(it))
         },
-        onEditingThemeSeedHexChange = { raw ->
-            val normalized =
-                "#${raw.uppercase().filter { ch -> ch in '0'..'9' || ch in 'A'..'F' }.take(6)}"
-            editingThemeSeedHex = normalized
-            if (normalized.length == 7) {
-                normalized.removePrefix("#").toLongOrNull(16)?.let {
-                    editingThemeSeedColor = colorFromArgb(0xFF000000L or it)
-                }
+        onEditingThemeSeedHexChange = { value ->
+            editingThemeSeedHex = normalizeOnboardingThemeHexInput(value)
+            editingThemeSeedHex.text.removePrefix("#").toLongOrNull(16)?.let {
+                editingThemeSeedColor = colorFromArgb(0xFF000000L or it)
             }
         },
         onConfirm = {
             themeState.onThemeSeedColorChange(colorToArgbLong(editingThemeSeedColor))
             showThemeColorPicker = false
         },
+    )
+}
+
+private fun onboardingFormatThemeSeedHex(argb: Long): String {
+    val rgb = (argb and 0x00FFFFFFL).toString(16).uppercase().padStart(6, '0')
+    return "#$rgb"
+}
+
+private fun onboardingThemeSeedHexFieldValue(argb: Long): TextFieldValue {
+    val text = onboardingFormatThemeSeedHex(argb)
+    return TextFieldValue(text = text, selection = TextRange(text.length))
+}
+
+private fun normalizeOnboardingThemeHexInput(input: TextFieldValue): TextFieldValue {
+    val normalizedBody = input.text
+        .removePrefix("#")
+        .removePrefix("0x")
+        .uppercase()
+        .filter { it in '0'..'9' || it in 'A'..'F' }
+        .take(6)
+    val normalizedBeforeCursor = input.text
+        .take(input.selection.start)
+        .removePrefix("#")
+        .removePrefix("0x")
+        .uppercase()
+        .filter { it in '0'..'9' || it in 'A'..'F' }
+        .take(6)
+    val normalizedText = "#$normalizedBody"
+    val cursor = (normalizedBeforeCursor.length + 1).coerceIn(1, normalizedText.length)
+    return TextFieldValue(
+        text = normalizedText,
+        selection = TextRange(cursor),
     )
 }

@@ -27,6 +27,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.OpenableColumns
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -304,6 +305,10 @@ internal fun AddProfileSheet(
         }
     }
 
+    BackHandler(enabled = show.value && isDownloading) {
+        // Keep the sheet state consistent while the import job is owned by the ViewModel.
+    }
+
     fun submitProfile() {
         if (selectedTypeIndex == 2 || isDownloading) {
             return
@@ -379,6 +384,7 @@ internal fun AddProfileSheet(
             }
         },
         onDismissRequest = dismissSheet,
+        allowDismiss = !isDownloading,
     ) {
         val stableSheetHeight = remember(stableSheetHeightPx, density) {
             if (stableSheetHeightPx <= 0) UiDp.dp0 else with(density) { stableSheetHeightPx.toDp() }

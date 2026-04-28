@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.R
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.core.bridge.Bridge
@@ -93,12 +92,12 @@ fun AboutScreen(navigator: DestinationsNavigator) {
 
                     Spacer(modifier = Modifier.height(UiDp.dp24))
 
-                    Text(text = "YumeBox", style = MiuixTheme.textStyles.title1)
+                    Text(text = "YumeBox(MD3)", style = MiuixTheme.textStyles.title1)
 
                     Spacer(modifier = Modifier.height(UiDp.dp8))
 
                     Text(
-                        text = "${BuildConfig.VERSION_NAME} ($coreVersion)",
+                        text = "0.5.1 (Material You Build) ($coreVersion)",
                         style = MiuixTheme.textStyles.body1,
                         color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                     )
@@ -108,13 +107,19 @@ fun AboutScreen(navigator: DestinationsNavigator) {
 
                 Card {
                     BasicComponent(
-                        title = "YumeBox",
-                        summary = "An open-source Android client based Mihomo",
+                        title = "YumeBox(Material Design)",
+                        summary = "A Material Design fork of YumeBox, an open-source Android client based on Mihomo",
                     )
                 }
 
                 Title(MLang.About.Section.ProjectLinks)
                 Card {
+                    AboutLinkItem(
+                        title = "YumeBox-MaterialDesign",
+                        url = "https://github.com/Yizuka17/YumeBox-MaterialDesign",
+                        onOpenUrl = { url -> openUrl(context, url) },
+                        showArrow = false,
+                    )
                     AboutLinkItem(
                         title = "YumeBox",
                         url = "https://github.com/YumeLira/YumeBox",

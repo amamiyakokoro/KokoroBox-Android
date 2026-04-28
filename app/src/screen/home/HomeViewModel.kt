@@ -338,6 +338,18 @@ class HomeViewModel(
         }
     }
 
+    fun startCurrentOrRecommendedProxy() {
+        val targetProfile = currentProfile.value ?: recommendedProfile.value
+        val targetProfileId = targetProfile?.uuid?.toString()
+
+        if (targetProfileId.isNullOrBlank()) {
+            showError(MLang.ProfilesVM.Error.ProfileNotExist)
+            return
+        }
+
+        startProxy(profileId = targetProfileId)
+    }
+
     fun onVpnPermissionResult(granted: Boolean) {
         val request = pendingStartRequest ?: return
         if (_pendingTransition.value != PendingTransition.AwaitingPermission) return

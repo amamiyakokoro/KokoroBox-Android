@@ -41,6 +41,9 @@ import kotlin.system.exitProcess
 
 object StartupGate {
     private const val maskBase = 0x39
+    private const val metaEnabled = "com.github.yumelira.yumebox.startup_gate.ENABLED"
+    private const val metaEnforceSigner = "com.github.yumelira.yumebox.startup_gate.ENFORCE_SIGNER"
+    private const val metaExpectedSignerSha256 = "com.github.yumelira.yumebox.startup_gate.EXPECTED_SIGNER_SHA256"
 
     @Volatile
     private var primaryLoaded = false
@@ -50,6 +53,7 @@ object StartupGate {
             (application.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         runCatching {
             val ctx = application.applicationContext
+            if (!isVerificationEnabled(application.packageManager, ctx.packageName)) return
             if (!checkPkg(ctx.packageName)) die()
             if (!checkApkPath(ctx.packageName, application.applicationInfo.sourceDir)) die()
             if (!checkApkV2(application.applicationInfo.sourceDir)) die()
@@ -69,8 +73,12 @@ object StartupGate {
         if (primaryLoaded) return
         synchronized(this) {
             if (primaryLoaded) return
-            System.loadLibrary(unmask(intArrayOf(64, 79, 86, 89)))
-            primaryLoaded = true
+            runCatching {
+                System.loadLibrary(unmask(intArrayOf(64, 79, 86, 89)))
+                primaryLoaded = true
+            }.onFailure { throwable ->
+                Timber.w(throwable, "Skip startup gate native library")
+            }
         }
     }
 
@@ -95,11 +103,49 @@ object StartupGate {
     }
 
     private fun checkSigner(pm: PackageManager, packageName: String): Boolean {
+        val signerPolicy = getSignerPolicy(pm, packageName)
+        if (!signerPolicy.enforceSigner) return true
+
         val digests = getSignerSha256(pm, packageName)
         if (digests.isEmpty()) return false
         val isDebuggable = isDebuggablePackage(pm, packageName)
         if (isDebuggable) return true
-        return digests.any { it == releaseFingerprint() }
+
+        val expectedSigner = signerPolicy.expectedSignerSha256 ?: releaseFingerprint()
+        return digests.any { it.equals(expectedSigner, ignoreCase = true) }
+    }
+
+    private data class SignerPolicy(
+        val enforceSigner: Boolean,
+        val expectedSignerSha256: String?,
+    )
+
+    private fun isVerificationEnabled(pm: PackageManager, packageName: String): Boolean {
+        val appInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        }
+        return appInfo.metaData?.getBoolean(metaEnabled, true) != false
+    }
+
+    private fun getSignerPolicy(pm: PackageManager, packageName: String): SignerPolicy {
+        val appInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        }
+        val metaData = appInfo.metaData
+        val enforceSigner = metaData?.getBoolean(metaEnforceSigner, false) == true
+        val expectedSigner = metaData?.getString(metaExpectedSignerSha256)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+        return SignerPolicy(
+            enforceSigner = enforceSigner,
+            expectedSignerSha256 = expectedSigner,
+        )
     }
 
     private fun isDebuggablePackage(pm: PackageManager, packageName: String): Boolean {

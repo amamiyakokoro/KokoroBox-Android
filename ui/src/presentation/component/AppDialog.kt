@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import top.yukonga.miuix.kmp.layout.DialogDefaults
 import top.yukonga.miuix.kmp.overlay.OverlayDialog
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 object AppDialogDefaults {
     @Composable
@@ -37,13 +39,13 @@ object AppDialogDefaults {
     fun summaryColor(): Color = DialogDefaults.summaryColor()
 
     @Composable
-    fun backgroundColor(): Color = DialogDefaults.backgroundColor()
+    fun backgroundColor(): Color = MiuixTheme.colorScheme.surface
 
     val outsideMargin: DpSize
-        get() = DialogDefaults.outsideMargin
+        get() = DpSize(UiDp.dp24, UiDp.dp24)
 
     val insideMargin: DpSize
-        get() = DialogDefaults.insideMargin
+        get() = DpSize(UiDp.dp24, UiDp.dp20)
 }
 
 @Composable

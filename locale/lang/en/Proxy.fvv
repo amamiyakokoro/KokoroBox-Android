@@ -1,6 +1,6 @@
 <Proxy Page>
 Proxy = {
-    Title = "Nodes"
+    Title = "Proxy"
 
     Mode = {
         Direct = "Direct"

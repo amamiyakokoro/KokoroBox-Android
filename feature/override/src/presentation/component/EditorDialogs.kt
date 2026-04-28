@@ -20,6 +20,8 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -80,7 +82,7 @@ fun JsonTextEditorDialog(
     onDismiss: () -> Unit,
 ) {
 
-    com.github.yumelira.yumebox.feature.editor.component.JsonEditorDialog(
+    com.github.yumelira.yumebox.feature.editor.presentation.component.JsonEditorDialog(
         show = show,
         title = title,
         subtitle = MLang.Override.Editor.JsonBlockSubtitle,
@@ -90,6 +92,7 @@ fun JsonTextEditorDialog(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun StringMapEditorDialog(
     show: Boolean,

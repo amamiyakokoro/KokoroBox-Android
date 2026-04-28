@@ -21,7 +21,6 @@
 package com.github.yumelira.yumebox.screen.about
 
 import androidx.compose.runtime.Composable
-import com.github.yumelira.yumebox.lite.BuildConfig
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.LinkItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
@@ -55,24 +54,36 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 Title("版本")
                 Card {
                     BasicComponent(
-                        title = "YumeBox Lite",
-                        summary = BuildConfig.VERSION_NAME,
+                        title = "YumeBox(MD3) Lite",
+                        summary = "0.5.1 (Material You Build)",
+                    )
+                }
+
+                Title("简介")
+                Card {
+                    BasicComponent(
+                        title = "YumeBox(Material Design) Lite",
+                        summary = "A Material Design fork of YumeBox, an open-source Android client based on Mihomo",
                     )
                 }
 
                 Title("链接")
                 Card {
                     LinkItem(
+                        title = "YumeBox-MaterialDesign",
+                        url = "https://github.com/Yizuka17/YumeBox-MaterialDesign",
+                    )
+                    LinkItem(
                         title = "源码",
                         url = "https://github.com/YumeLira/YumeBox",
                     )
                     LinkItem(
                         title = "许可证",
-                        url = "https://github.com/YumeLira/YumeBox/blob/main/LICENSE",
+                        url = "https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/main/LICENSE",
                     )
                     LinkItem(
                         title = "隐私政策",
-                        url = "https://github.com/YumeLira/YumeBox/blob/main/PRIVACY_POLICY.md",
+                        url = "https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/main/PRIVACY_POLICY.md",
                     )
                 }
             }

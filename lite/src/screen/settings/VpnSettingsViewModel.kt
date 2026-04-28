@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.controller.NetworkSettingsController
+import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.data.model.TunStack
@@ -45,6 +46,8 @@ class VpnSettingsViewModel(
     private val proxyFacade: ProxyFacade,
 ) : ViewModel() {
     val themeMode: Preference<ThemeMode> = appSettingsStore.themeMode
+    val colorTheme: Preference<AppColorTheme> = appSettingsStore.colorTheme
+    val themeSeedColorArgb: Preference<Long> = appSettingsStore.themeAccentColorArgb
     val invertOnPrimaryColors: Preference<Boolean> = appSettingsStore.invertOnPrimaryColors
     val appLanguage: Preference<AppLanguage> = appSettingsStore.appLanguage
     val dnsHijack: Preference<Boolean> = networkSettingsStore.dnsHijack
@@ -66,6 +69,15 @@ class VpnSettingsViewModel(
 
     fun onThemeModeChange(mode: ThemeMode) {
         themeMode.set(mode)
+    }
+
+    fun onColorThemeChange(theme: AppColorTheme) {
+        colorTheme.set(theme)
+    }
+
+    fun onThemeSeedColorChange(argb: Long) {
+        themeSeedColorArgb.set(argb)
+        colorTheme.set(AppColorTheme.Custom)
     }
 
     fun onInvertOnPrimaryColorsChange(enabled: Boolean) {

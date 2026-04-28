@@ -38,7 +38,7 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.controller.OverrideService
 import com.github.yumelira.yumebox.data.store.ProfileBindingProvider
 import com.github.yumelira.yumebox.data.model.ProfileBinding
-import com.github.yumelira.yumebox.feature.editor.language.LanguageScope
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
 import com.github.yumelira.yumebox.presentation.component.LocalNavigator

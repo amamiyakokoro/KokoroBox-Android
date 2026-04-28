@@ -18,15 +18,15 @@
  *
  */
 
-package com.github.yumelira.yumebox.feature.editor.component
+package com.github.yumelira.yumebox.feature.editor.presentation.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.feature.editor.editor.CodeEditor
-import com.github.yumelira.yumebox.feature.editor.editor.rememberConfiguredCodeEditorState
-import com.github.yumelira.yumebox.feature.editor.language.LanguageScope
+import com.github.yumelira.yumebox.feature.editor.presentation.editor.CodeEditor
+import com.github.yumelira.yumebox.feature.editor.presentation.editor.rememberConfiguredCodeEditorState
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.AppDialog
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.presentation.theme.UiDp
@@ -40,7 +40,6 @@ fun CodeEditorDialog(
     subtitle: String? = null,
     value: String?,
     language: LanguageScope = LanguageScope.Json,
-    placeholder: String = "",
     onValueChange: (String?) -> Unit,
     onDismiss: () -> Unit = {},
 ) {

@@ -20,14 +20,14 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Button
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
@@ -46,20 +46,24 @@ fun DialogButtonRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp16),
+        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
     ) {
         TextButton(
             text = cancelText,
             onClick = onCancel,
             modifier = Modifier.weight(1f),
         )
-        TextButton(
-            text = confirmText,
+        Button(
             onClick = onConfirm,
             modifier = Modifier.weight(1f),
             enabled = confirmEnabled,
-            colors = ButtonDefaults.textButtonColorsPrimary(),
-        )
+            colors = ButtonDefaults.buttonColorsPrimary(),
+        ) {
+            Text(
+                text = confirmText,
+                color = MiuixTheme.colorScheme.onPrimary,
+            )
+        }
     }
 }
 

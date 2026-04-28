@@ -166,7 +166,7 @@ private fun bigIntegerToAddressString(
     val sourceStart = max(0, raw.size - byteLength)
     val copyLength = raw.size - sourceStart
     System.arraycopy(raw, sourceStart, normalized, byteLength - copyLength, copyLength)
-    return InetAddress.getByAddress(normalized).hostAddress
+    return requireNotNull(InetAddress.getByAddress(normalized).hostAddress)
 }
 
 private fun rootRouteAddress(bitSize: Int): String {

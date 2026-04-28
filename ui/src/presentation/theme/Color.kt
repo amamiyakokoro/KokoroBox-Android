@@ -49,7 +49,7 @@ private data class ThemePalette(
     val dark: ThemeColors,
 )
 
-const val DEFAULT_THEME_SEED_ARGB: Long = 0xFFFFFFFFL
+const val DEFAULT_THEME_SEED_ARGB: Long = 0xFF138A74L
 const val DEFAULT_CUSTOM_THEME_SEED_ARGB: Long = 0xFF138A74L
 
 data class TrafficColors(
@@ -190,38 +190,38 @@ private fun ThemePalette.toColorScheme(isDark: Boolean) =
 
 private val basePalette = ThemePalette(
     light = ThemeColors(
-        primary = Color(0xFF000000),
+        primary = Color(0xFF006C5C),
         onPrimary = Color.White,
-        primaryVariant = Color(0xFF222222),
-        onPrimaryVariant = Color(0xFFAAAAAA),
-        disabledPrimary = Color(0xFFBDBDBD),
-        disabledOnPrimary = Color(0xFFE0E0E0),
-        disabledPrimaryButton = Color(0xFFBDBDBD),
-        disabledOnPrimaryButton = Color(0xFFEEEEEE),
-        disabledPrimarySlider = Color(0xFFDCDCDC),
-        primaryContainer = Color(0xFFF0F0F0),
-        onPrimaryContainer = Color(0xFF000000),
-        tertiaryContainer = Color(0xFFF8F8F8),
-        onTertiaryContainer = Color(0xFF000000),
-        tertiaryContainerVariant = Color(0xFFF8F8F8),
-        onBackgroundVariant = Color(0xFF000000),
+        primaryVariant = Color(0xFF2A7D70),
+        onPrimaryVariant = Color(0xFF4F635D),
+        disabledPrimary = Color(0xFFC7D0CC),
+        disabledOnPrimary = Color(0xFFE8ECEA),
+        disabledPrimaryButton = Color(0xFFC7D0CC),
+        disabledOnPrimaryButton = Color(0xFFF4F7F5),
+        disabledPrimarySlider = Color(0xFFDCE4E1),
+        primaryContainer = Color(0xFFE0F2EC),
+        onPrimaryContainer = Color(0xFF0B1F1A),
+        tertiaryContainer = Color(0xFFF4F7F5),
+        onTertiaryContainer = Color(0xFF161D1B),
+        tertiaryContainerVariant = Color(0xFFECF2EF),
+        onBackgroundVariant = Color(0xFF3F4946),
     ),
     dark = ThemeColors(
-        primary = Color.White,
-        onPrimary = Color(0xFF000000),
-        primaryVariant = Color(0xFFE0E0E0),
-        onPrimaryVariant = Color(0xFF555555),
-        disabledPrimary = Color(0xFF333333),
-        disabledOnPrimary = Color(0xFF757575),
-        disabledPrimaryButton = Color(0xFF333333),
-        disabledOnPrimaryButton = Color(0xFF757575),
-        disabledPrimarySlider = Color(0xFF444444),
-        primaryContainer = Color(0xFF252525),
-        onPrimaryContainer = Color.White,
-        tertiaryContainer = Color(0xFF1C1C1C),
-        onTertiaryContainer = Color.White,
-        tertiaryContainerVariant = Color(0xFF303030),
-        onBackgroundVariant = Color(0xFFE0E0E0),
+        primary = Color(0xFF7FD7C3),
+        onPrimary = Color(0xFF00382E),
+        primaryVariant = Color(0xFFA4EBDD),
+        onPrimaryVariant = Color(0xFFAEB9B5),
+        disabledPrimary = Color(0xFF2E3835),
+        disabledOnPrimary = Color(0xFF6F7B76),
+        disabledPrimaryButton = Color(0xFF2E3835),
+        disabledOnPrimaryButton = Color(0xFF7E8A85),
+        disabledPrimarySlider = Color(0xFF3B4642),
+        primaryContainer = Color(0xFF1A2B27),
+        onPrimaryContainer = Color(0xFFE0F2EC),
+        tertiaryContainer = Color(0xFF161D1B),
+        onTertiaryContainer = Color(0xFFE2E3E1),
+        tertiaryContainerVariant = Color(0xFF27302D),
+        onBackgroundVariant = Color(0xFFC0CAC6),
     ),
 )
 

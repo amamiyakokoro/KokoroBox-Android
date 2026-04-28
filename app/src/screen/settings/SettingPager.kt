@@ -62,7 +62,6 @@ import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.preference.ArrowPreference
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
@@ -98,12 +97,12 @@ private fun CircularIcon(
                 }
                 .size(componentSizes.settingsIconContainerSize)
                 .clip(RoundedCornerShape(radii.radius16))
-                .background(MiuixTheme.colorScheme.primary),
+                .background(MiuixTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = imageVector,
                 contentDescription = contentDescription,
-                tint = MiuixTheme.colorScheme.onPrimary,
+                tint = MiuixTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
                     .size(componentSizes.settingsIconGlyphSize)
                     .graphicsLayer(
@@ -153,48 +152,32 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
             item {
                 Title(MLang.Settings.Section.UiSettings)
                 Card {
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.UiSettings.App,
                         summary = MLang.Settings.UiSettings.AppSummary,
+                        imageVector = Yume.`Settings-2`,
                         onClick = { navigator.navigate(AppSettingsScreenDestination) { launchSingleTop = true } },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.`Settings-2`, contentDescription = null
-                            )
-                        },
                     )
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.UiSettings.Network,
                         summary = MLang.Settings.UiSettings.NetworkSummary,
+                        imageVector = Yume.`Wifi-cog`,
                         onClick = { navigator.navigate(NetworkSettingsScreenDestination) { launchSingleTop = true } },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.`Wifi-cog`, contentDescription = null
-                            )
-                        },
                     )
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.UiSettings.Override,
                         summary = MLang.Settings.UiSettings.OverrideSummary,
+                        imageVector = Yume.`Git-merge`,
                         onClick = { navigator.navigate(OverrideScreenDestination) { launchSingleTop = true } },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.`Git-merge`, contentDescription = null
-                            )
-                        },
                     )
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.UiSettings.MetaFeatures,
                         summary = MLang.Settings.UiSettings.MetaFeaturesSummary,
+                        imageVector = Yume.Meta,
                         onClick = {
                             navigator.navigate(MetaFeatureScreenDestination) {
                                 launchSingleTop = true
                             }
-                        },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.Meta, contentDescription = null
-                            )
                         },
                     )
                 }
@@ -203,37 +186,25 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                 Title(MLang.Settings.Section.More)
 
                 Card {
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.More.Lab,
                         summary = MLang.Settings.More.LabSummary,
+                        imageVector = Yume.FlaskConical,
                         onClick = {
                             navigator.navigate(FeatureScreenDestination) { launchSingleTop = true }
                         },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.FlaskConical, contentDescription = null
-                            )
-                        },
                     )
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.More.Logs,
                         summary = MLang.Settings.More.LogsSummary,
+                        imageVector = Yume.`Chart-column`,
                         onClick = { navigator.navigate(LogScreenDestination) { launchSingleTop = true } },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.`Chart-column`, contentDescription = null
-                            )
-                        },
                     )
-                    ArrowPreference(
+                    SettingsEntryItem(
                         title = MLang.Settings.More.About,
                         summary = MLang.Settings.More.AboutSummary,
+                        imageVector = Yume.Github,
                         onClick = { navigator.navigate(AboutScreenDestination) { launchSingleTop = true } },
-                        startAction = {
-                            CircularIcon(
-                                imageVector = Yume.Github, contentDescription = null
-                            )
-                        },
                         endActions = {
                             VersionBadge(versionInfo)
                         },
@@ -245,6 +216,28 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
 }
 
 @Composable
+private fun SettingsEntryItem(
+    title: String,
+    summary: String,
+    imageVector: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    endActions: @Composable (RowScope.() -> Unit)? = null,
+) {
+    PreferenceArrowItem(
+        title = title,
+        summary = summary,
+        onClick = onClick,
+        startAction = {
+            CircularIcon(
+                imageVector = imageVector,
+                contentDescription = null,
+            )
+        },
+        endActions = endActions,
+    )
+}
+
+@Composable
 private fun VersionBadge(
     versionInfo: String?
 ) {
@@ -253,7 +246,7 @@ private fun VersionBadge(
     val opacity = AppTheme.opacity
 
     Surface(
-        color = MiuixTheme.colorScheme.primary.copy(alpha = opacity.subtle),
+        color = MiuixTheme.colorScheme.primaryContainer,
         shape = RoundedCornerShape(50),
         modifier = Modifier
             .height(componentSizes.versionBadgeHeight)
@@ -267,7 +260,7 @@ private fun VersionBadge(
             Text(
                 text = versionInfo ?: "Unknown", style = MiuixTheme.textStyles.footnote1.copy(
                     fontSize = 12.sp, fontWeight = FontWeight.Bold
-                ), color = MiuixTheme.colorScheme.primary
+                ), color = MiuixTheme.colorScheme.onPrimaryContainer
             )
         }
     }

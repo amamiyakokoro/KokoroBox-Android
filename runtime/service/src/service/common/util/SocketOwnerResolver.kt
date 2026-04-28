@@ -20,6 +20,7 @@
 
 package com.github.yumelira.yumebox.service.common.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
@@ -54,6 +55,7 @@ class SocketOwnerResolver(
         return "$uid\t$packageName"
     }
 
+    @SuppressLint("NewApi")
     private fun resolveUid(
         protocol: Int,
         source: InetSocketAddress,

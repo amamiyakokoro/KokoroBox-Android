@@ -22,6 +22,7 @@
 
 package com.github.yumelira.yumebox.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -77,6 +78,7 @@ class AutoRestartService : Service() {
         ensureForegroundStarted()
     }
 
+    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         ensureForegroundStarted()
         AutoStartExecutionGate.markStarted(serviceCache)
@@ -110,7 +112,11 @@ class AutoRestartService : Service() {
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 else -> 0
             }
-            startForeground(NOTIFICATION_ID, notification, foregroundFlags)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, notification, foregroundFlags)
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
         }
     }
 

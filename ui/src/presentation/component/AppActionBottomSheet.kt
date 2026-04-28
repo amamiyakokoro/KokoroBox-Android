@@ -41,7 +41,7 @@ import top.yukonga.miuix.kmp.overlay.OverlayBottomSheet
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 object AppBottomSheetDefaults {
-    val insideMargin = DpSize(UiDp.dp32, UiDp.dp16)
+    val insideMargin = DpSize(UiDp.dp24, UiDp.dp16)
 
     @Composable
     fun backgroundColor(): Color = MiuixTheme.colorScheme.surface
@@ -51,7 +51,7 @@ object AppBottomSheetDefaults {
 
     @Composable
     fun actionIconTint(enabled: Boolean): Color = if (enabled) {
-        MiuixTheme.colorScheme.onSurface
+        MiuixTheme.colorScheme.primary
     } else {
         MiuixTheme.colorScheme.onSurface.copy(alpha = AppTheme.opacity.disabled)
     }
@@ -128,10 +128,10 @@ fun AppActionBottomSheet(
     endAction: (@Composable (() -> Unit))? = null,
     backgroundColor: Color = Color.Unspecified,
     enableWindowDim: Boolean = true,
-    cornerRadius: androidx.compose.ui.unit.Dp = BottomSheetDefaults.cornerRadius,
+    cornerRadius: androidx.compose.ui.unit.Dp = UiDp.dp28,
     sheetMaxWidth: androidx.compose.ui.unit.Dp = BottomSheetDefaults.maxWidth,
     onDismissFinished: (() -> Unit)? = null,
-    outsideMargin: DpSize = BottomSheetDefaults.outsideMargin,
+    outsideMargin: DpSize = DpSize(UiDp.dp16, UiDp.dp0),
     insideMargin: DpSize = AppBottomSheetDefaults.insideMargin,
     defaultWindowInsetsPadding: Boolean = true,
     dragHandleColor: Color = Color.Unspecified,

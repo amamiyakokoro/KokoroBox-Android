@@ -22,6 +22,7 @@
 
 package com.github.yumelira.yumebox.service.notification
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -69,6 +70,7 @@ class ServiceNotificationManager(
         return buildRunningNotification()
     }
 
+    @SuppressLint("MissingPermission")
     fun startTrafficUpdate(scope: CoroutineScope): Job {
         return scope.launch(Dispatchers.Default) {
             PollingTimers.ticks(PollingTimerSpecs.ServiceTrafficNotification).collect {

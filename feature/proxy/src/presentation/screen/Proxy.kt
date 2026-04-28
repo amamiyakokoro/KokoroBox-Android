@@ -18,60 +18,81 @@
  *
  */
 
-
 package com.github.yumelira.yumebox.presentation.screen
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.*
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.data.model.ProxySortMode
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
+import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.CenteredText
 import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Chromium
 import com.github.yumelira.yumebox.presentation.icon.yume.Folders
-import com.github.yumelira.yumebox.presentation.icon.yume.`List-chevrons-up-down`
 import com.github.yumelira.yumebox.presentation.icon.yume.Speed
+import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.icon.yume.`List-chevrons-up-down`
+import com.github.yumelira.yumebox.presentation.screen.node.NodeCard
+import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupCard
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
-import com.github.yumelira.yumebox.presentation.screen.node.nodeGridItems
-import com.github.yumelira.yumebox.presentation.screen.node.nodeGroupItems
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.presentation.theme.LocalSpacing
-import com.github.yumelira.yumebox.presentation.util.KeepLazyListTopAnchorOnReorder
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.viewmodel.ProxyViewModel
 import dev.chrisbanes.haze.hazeSource
 import dev.oom_wg.purejoy.mlang.MLang
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.InfiniteProgressIndicator
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.PopupPositionProvider
+import top.yukonga.miuix.kmp.basic.Scaffold
+import top.yukonga.miuix.kmp.basic.ScrollBehavior
+import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-
-private fun LazyListState.isScrolledFromTop(): Boolean {
-    return firstVisibleItemIndex > 0 || firstVisibleItemScrollOffset > 0
-}
 
 @Composable
 fun ProxyPager(
     mainInnerPadding: PaddingValues,
     onNavigateToProviders: (() -> Unit)?,
     onOpenPanel: (() -> Unit)?,
-    isActive: Boolean
+    isPageActive: Boolean,
+    isProxyRunning: Boolean,
+    onProxyStartRequested: (() -> Unit)? = null,
 ) {
     val proxyViewModel = koinViewModel<ProxyViewModel>()
-
     val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsState()
     val testingGroupNames by proxyViewModel.testingGroupNames.collectAsState()
     val testingProxyNames by proxyViewModel.testingProxyNames.collectAsState()
@@ -80,47 +101,35 @@ fun ProxyPager(
     val groupScrollBehavior = MiuixScrollBehavior(snapAnimationSpec = null)
     val topBarHazeState = LocalTopBarHazeState.current
 
-    var showSortPopup by rememberSaveable { mutableStateOf(false) }
-    val onTestDelay = remember { { proxyViewModel.testDelay() } }
-    val groupSelection = rememberProxyGroupSelectionState(
-        proxyGroups = proxyGroups,
-        onRefreshGroup = proxyViewModel::refreshGroup,
-        retainLastKnownGroup = true,
-    )
-    val selectedGroupName = groupSelection.selectedGroupName
-    val displayGroup = groupSelection.displayGroup
-    val fabGroup = displayGroup
-    val isFabTesting = fabGroup?.name?.let(testingGroupNames::contains) == true
-    val coroutineScope = rememberCoroutineScope()
-    val nodeListState = rememberSaveable(selectedGroupName, saver = LazyListState.Saver) {
-        LazyListState()
+    var showSortPopup by remember { mutableStateOf(false) }
+    var selectedGroupName by remember { mutableStateOf<String?>(null) }
+
+    val selectedGroup = remember(proxyGroups, selectedGroupName) {
+        proxyGroups.firstOrNull { it.name == selectedGroupName } ?: proxyGroups.firstOrNull()
     }
+    val effectiveSelectedGroupName = selectedGroup?.name
+    val onTestDelay = remember(effectiveSelectedGroupName, proxyViewModel) {
+        { proxyViewModel.testDelay(effectiveSelectedGroupName) }
+    }
+    val gridState = remember(effectiveSelectedGroupName) { LazyGridState() }
 
-    var fabHidden by rememberSaveable { mutableStateOf(false) }
-
-    val requestSelectedGroupDelayTest = remember(
-        coroutineScope,
-        nodeListState,
-        selectedGroupName,
-        proxyViewModel,
-    ) {
-        {
-            val groupName = selectedGroupName ?: return@remember
-            coroutineScope.launch {
-                if (nodeListState.isScrolledFromTop()) {
-                    nodeListState.scrollToItem(0)
-                }
-                proxyViewModel.testDelay(groupName)
+    LaunchedEffect(proxyGroups, selectedGroupName) {
+        when {
+            proxyGroups.isEmpty() -> selectedGroupName = null
+            selectedGroupName == null || proxyGroups.none { it.name == selectedGroupName } -> {
+                selectedGroupName = proxyGroups.first().name
             }
         }
     }
 
-    BackHandler(enabled = selectedGroupName != null) {
-        groupSelection.clearSelection()
+    LaunchedEffect(sortMode, effectiveSelectedGroupName) {
+        if (sortMode == ProxySortMode.BY_LATENCY) {
+            gridState.scrollToItem(0)
+        }
     }
 
-    LaunchedEffect(isActive) {
-        proxyViewModel.ensureCoreLoaded(isActive, source = "proxy_page")
+    LaunchedEffect(isPageActive) {
+        proxyViewModel.ensureCoreLoaded(isPageActive, source = "proxy_page")
     }
 
     DisposableEffect(proxyViewModel) {
@@ -130,136 +139,52 @@ fun ProxyPager(
     }
 
     Scaffold(
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = selectedGroupName != null && fabGroup != null && !fabHidden && !isFabTesting,
-                enter = scaleIn(
-                    animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
-                    ),
-                    initialScale = AnimationSpecs.Proxy.VisibilityInitialScale,
-                ) + fadeIn(
-                    animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabFadeDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
-                    ),
-                ),
-                exit = scaleOut(
-                    animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
-                    ),
-                    targetScale = AnimationSpecs.Proxy.VisibilityTargetScale,
-                ) + fadeOut(
-                    animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabFadeDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
-                    ),
-                ),
-                label = "proxy_test_fab_visibility",
-            ) {
-                FloatingActionButton(
-                    modifier = Modifier.padding(end = UiDp.dp20, bottom = UiDp.dp85),
-                    onClick = {
-                        if (fabGroup == null) return@FloatingActionButton
-                        requestSelectedGroupDelayTest()
-                    },
-                ) {
-                    Icon(
-                        imageVector = Yume.Speed,
-                        contentDescription = MLang.Proxy.Action.Test,
-                        tint = MiuixTheme.colorScheme.onPrimary,
-                    )
-                }
-            }
-        },
         topBar = {
             ProxyTopBar(
                 title = MLang.Proxy.Title,
                 scrollBehavior = groupScrollBehavior,
-                showBack = false,
-                onBack = {},
                 onNavigateToProviders = onNavigateToProviders,
                 onOpenPanel = onOpenPanel,
-                onTestDelay = if (selectedGroupName == null) onTestDelay else null,
+                onTestDelay = if (effectiveSelectedGroupName != null) onTestDelay else null,
                 showSortPopup = showSortPopup,
                 onShowSortPopupChange = { showSortPopup = it },
                 sortMode = sortMode,
                 onSortSelected = proxyViewModel::setSortMode,
             )
         },
-    ) {
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .let { mod -> if (topBarHazeState != null) mod.hazeSource(state = topBarHazeState) else mod }
+                .let { modifier -> if (topBarHazeState != null) modifier.hazeSource(state = topBarHazeState) else modifier }
         ) {
-            AnimatedContent(
-                targetState = selectedGroupName,
-                transitionSpec = {
-                    if (targetState != null) {
-                        (slideInHorizontally(
-                            animationSpec = tween(durationMillis = 340, easing = AnimationSpecs.Legacy),
-                            initialOffsetX = { it },
-                        ) + fadeIn(animationSpec = tween(durationMillis = 140))) togetherWith
-                            (slideOutHorizontally(
-                                animationSpec = tween(durationMillis = 300, easing = AnimationSpecs.Legacy),
-                                targetOffsetX = { -it / 3 },
-                            ) + fadeOut(animationSpec = tween(durationMillis = 140)))
-                    } else {
-                        (slideInHorizontally(
-                            animationSpec = tween(durationMillis = 300, easing = AnimationSpecs.Legacy),
-                            initialOffsetX = { -it / 3 },
-                        ) + fadeIn(animationSpec = tween(durationMillis = 140))) togetherWith
-                            (slideOutHorizontally(
-                                animationSpec = tween(durationMillis = 340, easing = AnimationSpecs.Legacy),
-                                targetOffsetX = { it },
-                            ) + fadeOut(animationSpec = tween(durationMillis = 140)))
-                    }
-                },
-                label = "proxy_content_slide",
-            ) { targetGroupName ->
-                if (targetGroupName == null) {
-                    if (proxyGroups.isEmpty()) {
-                        CenteredText(
-                            firstLine = MLang.Proxy.Empty.NoNodes,
-                            secondLine = MLang.Proxy.Empty.Hint,
-                        )
-                    } else {
-                        ProxyContent(
-                            proxyGroups = proxyGroups,
-                            scrollBehavior = groupScrollBehavior,
-                            innerPadding = it,
-                            mainInnerPadding = mainInnerPadding,
-                            testingGroupNames = testingGroupNames,
-                            onGroupClick = groupSelection.selectGroup,
-                        )
-                    }
-                } else {
-                    val currentGroup = groupSelection.selectedGroup ?: displayGroup
-                    NodeListPage(
-                        group = currentGroup,
-                        sortMode = sortMode,
-                        testingGroupNames = testingGroupNames,
-                        testingProxyNames = testingProxyNames,
-                        mainInnerPadding = mainInnerPadding,
-                        outerInnerPadding = it,
-                        scrollBehavior = groupScrollBehavior,
-                        listState = nodeListState,
-                        onSelectProxy = { groupName, proxyName ->
-                            proxyViewModel.selectProxy(groupName, proxyName)
-                        },
-                        onTestDelay = requestSelectedGroupDelayTest,
-                        onTestProxyDelay = { proxyName ->
-                            currentGroup?.name?.let { groupName ->
-                                proxyViewModel.testProxyDelay(groupName, proxyName)
-                            }
-                        },
-                        onScrollDirectionChanged = { hidden -> fabHidden = hidden },
-                        singleNodeTestEnabled = singleNodeTest,
-                    )
-                }
+            if (proxyGroups.isEmpty()) {
+                CenteredText(
+                    firstLine = MLang.Proxy.Empty.NoNodes,
+                    secondLine = MLang.Proxy.Empty.Hint,
+                )
+            } else {
+                ProxySurfboardContent(
+                    proxyGroups = proxyGroups,
+                    selectedGroup = selectedGroup,
+                    selectedGroupName = effectiveSelectedGroupName,
+                    testingGroupNames = testingGroupNames,
+                    testingProxyNames = testingProxyNames,
+                    gridState = gridState,
+                    innerPadding = innerPadding,
+                    mainInnerPadding = mainInnerPadding,
+                    onGroupSelected = { selectedGroupName = it },
+                    onSelectProxy = proxyViewModel::selectProxy,
+                    onProxyStartRequested = onProxyStartRequested,
+                    isProxyRunning = isProxyRunning,
+                    onTestDelay = onTestDelay,
+                    onTestProxyDelay = { proxyName ->
+                        effectiveSelectedGroupName?.let { groupName ->
+                            proxyViewModel.testProxyDelay(groupName, proxyName)
+                        }
+                    },
+                    singleNodeTestEnabled = singleNodeTest,
+                )
             }
         }
     }
@@ -269,8 +194,6 @@ fun ProxyPager(
 private fun ProxyTopBar(
     title: String,
     scrollBehavior: ScrollBehavior,
-    showBack: Boolean,
-    onBack: () -> Unit,
     onNavigateToProviders: (() -> Unit)?,
     onOpenPanel: (() -> Unit)?,
     onTestDelay: (() -> Unit)?,
@@ -279,122 +202,106 @@ private fun ProxyTopBar(
     sortMode: ProxySortMode,
     onSortSelected: (ProxySortMode) -> Unit,
 ) {
-    TopBar(
-        title = title,
-        scrollBehavior = scrollBehavior,
-        navigationIconPadding = UiDp.dp24,
-        actionIconPadding = UiDp.dp24,
-        navigationIcon = {
-        Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
-            if (showBack) {
-                IconButton(
-                    onClick = onBack,
-            ) {
-                Icon(MiuixIcons.Back, contentDescription = MLang.Component.Navigation.Back)
-            }
-            } else {
-                if (onNavigateToProviders != null) {
-                    IconButton(
-                        onClick = onNavigateToProviders,
-                    ) {
-                        Icon(
-                            Yume.Folders,
-                            contentDescription = MLang.Providers.Title,
-                        )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        TopBar(
+            title = "",
+            scrollBehavior = scrollBehavior,
+            navigationIconPadding = UiDp.dp12,
+            actionIconPadding = UiDp.dp12,
+            titlePadding = UiDp.dp12,
+            enableHaze = false,
+            navigationIcon = {
+                Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
+                    if (onNavigateToProviders != null) {
+                        IconButton(onClick = onNavigateToProviders) {
+                            Icon(Yume.Folders, contentDescription = MLang.Providers.Title)
+                        }
+                    }
+                    if (onOpenPanel != null) {
+                        IconButton(onClick = onOpenPanel) {
+                            Icon(Yume.Chromium, contentDescription = MLang.Proxy.Action.Panel)
+                        }
                     }
                 }
-                if (onOpenPanel != null) {
+            },
+            actions = {
+                if (onTestDelay != null) {
                     IconButton(
-                        onClick = onOpenPanel,
+                        modifier = Modifier.padding(end = UiDp.dp12),
+                        onClick = onTestDelay,
                     ) {
-                        Icon(Yume.Chromium, contentDescription = MLang.Proxy.Action.Panel)
+                        Icon(Yume.Speed, contentDescription = MLang.Proxy.Action.Test)
                     }
                 }
-            }
-        }
-    }, actions = {
-        if (onTestDelay != null) {
-            IconButton(
-                modifier = Modifier.padding(end = UiDp.dp12),
-                onClick = { onTestDelay.invoke() }
-            ) {
-                Icon(Yume.Speed, contentDescription = MLang.Proxy.Action.Test)
-            }
-        }
-        Box {
-            IconButton(
-                onClick = { onShowSortPopupChange(true) },
-            ) {
-                Icon(
-                    Yume.`List-chevrons-up-down`,
-                    contentDescription = MLang.Proxy.Action.Sort,
-                )
-            }
-            NodeSortPopup(
-                show = showSortPopup,
-                onDismiss = { onShowSortPopupChange(false) },
-                sortMode = sortMode,
-                alignment = PopupPositionProvider.Align.BottomEnd,
-                onSortSelected = onSortSelected,
-            )
-        }
-    })
+                Box {
+                    IconButton(onClick = { onShowSortPopupChange(true) }) {
+                        Icon(Yume.`List-chevrons-up-down`, contentDescription = MLang.Proxy.Action.Sort)
+                    }
+                    NodeSortPopup(
+                        show = showSortPopup,
+                        onDismiss = { onShowSortPopupChange(false) },
+                        sortMode = sortMode,
+                        alignment = PopupPositionProvider.Align.BottomEnd,
+                        onSortSelected = onSortSelected,
+                    )
+                }
+            },
+        )
+        Text(
+            text = title,
+            modifier = Modifier.align(Alignment.Center),
+            style = MiuixTheme.textStyles.title4,
+            color = MiuixTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @Composable
-private fun NodeListPage(
-    group: ProxyGroupInfo?,
-    sortMode: ProxySortMode,
+private fun ProxySurfboardContent(
+    proxyGroups: List<ProxyGroupInfo>,
+    selectedGroup: ProxyGroupInfo?,
+    selectedGroupName: String?,
     testingGroupNames: Set<String>,
     testingProxyNames: Set<String>,
+    gridState: LazyGridState,
+    innerPadding: PaddingValues,
     mainInnerPadding: PaddingValues,
-    outerInnerPadding: PaddingValues,
-    scrollBehavior: ScrollBehavior,
-    listState: LazyListState,
-    onSelectProxy: (groupName: String, proxyName: String) -> Unit,
+    onGroupSelected: (String) -> Unit,
+    onSelectProxy: (String, String) -> Unit,
+    onProxyStartRequested: (() -> Unit)?,
+    isProxyRunning: Boolean,
     onTestDelay: () -> Unit,
-    onTestProxyDelay: (proxyName: String) -> Unit,
-    onScrollDirectionChanged: (Boolean) -> Unit,
-    singleNodeTestEnabled: Boolean = true,
+    onTestProxyDelay: (String) -> Unit,
+    singleNodeTestEnabled: Boolean,
 ) {
-    if (group == null) {
-        CenteredText(
-            firstLine = MLang.Proxy.Empty.NoNodes,
-            secondLine = MLang.Proxy.Empty.Hint,
-        )
-        return
-    }
     val spacing = LocalSpacing.current
-    val isTesting = testingGroupNames.contains(group.name)
-    val listItemKeys = remember(group.proxies) { group.proxies.map { it.name } }
+    val selectedName = selectedGroupName ?: selectedGroup?.name
+    val isTesting = selectedName?.let(testingGroupNames::contains) == true
 
-    KeepLazyListTopAnchorOnReorder(
-        listState = listState,
-        itemKeys = listItemKeys,
-        enabled = sortMode == ProxySortMode.BY_LATENCY,
-        scrollToTopOnEnabled = true,
-    )
-
-    LaunchedEffect(isTesting) {
-        if (isTesting && listState.isScrolledFromTop()) {
-            listState.animateScrollToItem(0)
-        }
-    }
-
-    ScreenLazyColumn(
-        lazyListState = listState,
-        scrollBehavior = scrollBehavior,
-        innerPadding = outerInnerPadding,
-        enableGlobalScroll = true,
-        onScrollDirectionChanged = onScrollDirectionChanged,
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = gridState,
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-                    start = UiDp.dp12,
-                    end = UiDp.dp12,
-                    top = outerInnerPadding.calculateTopPadding() + UiDp.dp20,
+            start = UiDp.dp12,
+            end = UiDp.dp12,
+            top = innerPadding.calculateTopPadding() + UiDp.dp8,
             bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
         ),
+        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+        verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
     ) {
-        item(key = "__refresh_indicator__") {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            ProxyGroupTabSection(
+                groups = proxyGroups,
+                selectedGroupName = selectedName,
+                onGroupSelected = onGroupSelected,
+            )
+        }
+
+        item(span = { GridItemSpan(maxLineSpan) }) {
             AnimatedVisibility(
                 visible = isTesting,
                 enter = expandVertically(
@@ -409,13 +316,11 @@ private fun NodeListPage(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = UiDp.dp12),
+                        .padding(top = UiDp.dp4, bottom = UiDp.dp6),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(UiDp.dp6),
                 ) {
-                    InfiniteProgressIndicator(
-                        modifier = Modifier.size(UiDp.dp24),
-                    )
+                    InfiniteProgressIndicator(modifier = Modifier.size(UiDp.dp24))
                     Text(
                         text = MLang.Proxy.Testing.InProgress,
                         style = MiuixTheme.textStyles.subtitle,
@@ -425,52 +330,194 @@ private fun NodeListPage(
             }
         }
 
-        nodeGridItems(
-            proxies = group.proxies,
-            selectedProxyName = group.now,
-            onProxyClick = { proxyName ->
-                if (group.type == Proxy.Type.Selector) {
-                    onSelectProxy(group.name, proxyName)
-                } else {
-                    onTestDelay()
-                }
-            },
-            isDelayTesting = isTesting,
-            testingProxyNames = testingProxyNames,
-            onSingleNodeTestClick = { onTestProxyDelay(it) },
-            outerHorizontalPadding = UiDp.dp0,
-                            itemVerticalPadding = UiDp.dp6,
-            singleNodeTestEnabled = singleNodeTestEnabled,
-        )
+        if (selectedGroup == null) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                CenteredText(
+                    firstLine = MLang.Proxy.Empty.NoNodes,
+                    secondLine = MLang.Proxy.Empty.Hint,
+                )
+            }
+        } else {
+            items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
+                NodeCard(
+                    proxy = proxy,
+                    isSelected = proxy.name == selectedGroup.now,
+                    onClick = {
+                        if (!isProxyRunning) {
+                            onProxyStartRequested?.invoke()
+                        } else if (selectedGroup.type == com.github.yumelira.yumebox.core.model.Proxy.Type.Selector) {
+                            onSelectProxy(selectedGroup.name, it)
+                        } else {
+                            onTestDelay()
+                        }
+                    },
+                    isDelayTesting = isTesting,
+                    isThisProxyTesting = proxy.name in testingProxyNames,
+                    onSingleNodeTestClick = onTestProxyDelay,
+                    showCountryFlag = true,
+                    singleNodeTestEnabled = singleNodeTestEnabled,
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun ProxyContent(
-    proxyGroups: List<ProxyGroupInfo>,
-    scrollBehavior: ScrollBehavior,
-    innerPadding: PaddingValues,
-    mainInnerPadding: PaddingValues,
-    onGroupClick: (ProxyGroupInfo) -> Unit,
-    testingGroupNames: Set<String>,
+private fun ProxyGroupTabSection(
+    groups: List<ProxyGroupInfo>,
+    selectedGroupName: String?,
+    onGroupSelected: (String) -> Unit,
 ) {
-    val spacing = LocalSpacing.current
-    ScreenLazyColumn(
-        scrollBehavior = scrollBehavior,
-        innerPadding = innerPadding,
-        enableGlobalScroll = true,
-        contentPadding = PaddingValues(
-                    start = UiDp.dp12,
-                    end = UiDp.dp12,
-                    top = innerPadding.calculateTopPadding() + UiDp.dp20,
-            bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
-        ),
+    ProxyGroupTabs(
+        groups = groups,
+        selectedGroupName = selectedGroupName,
+        onGroupSelected = onGroupSelected,
+    )
+}
+
+@Composable
+private fun ProxyGroupTabs(
+    groups: List<ProxyGroupInfo>,
+    selectedGroupName: String?,
+    onGroupSelected: (String) -> Unit,
+) {
+    var showAllGroups by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
     ) {
-        nodeGroupItems(
-            groups = proxyGroups,
-            onGroupClick = onGroupClick,
-            testingGroupNames = testingGroupNames,
-                            itemVerticalPadding = UiDp.dp6,
+        LazyRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+            verticalAlignment = Alignment.CenterVertically,
+            contentPadding = PaddingValues(start = UiDp.dp0, end = UiDp.dp4),
+        ) {
+            items(items = groups, key = { it.name }) { group ->
+                ProxyGroupTab(
+                    title = group.name,
+                    selected = group.name == selectedGroupName,
+                    modifier = Modifier.widthIn(min = 84.dp),
+                    onClick = { onGroupSelected(group.name) },
+                )
+            }
+        }
+        IconButton(onClick = { showAllGroups = true }) {
+            Icon(
+                imageVector = Yume.chevron,
+                contentDescription = MLang.Proxy.Title,
+                tint = MiuixTheme.colorScheme.onSurfaceVariantActions,
+                modifier = Modifier.rotate(90f),
+            )
+        }
+    }
+
+    AppActionBottomSheet(
+        show = showAllGroups,
+        title = MLang.Proxy.Title,
+        onDismissRequest = { showAllGroups = false },
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 420.dp),
+            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+            verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
+            contentPadding = PaddingValues(bottom = UiDp.dp16),
+        ) {
+            items(items = groups, key = { it.name }) { group ->
+                NodeGroupCard(
+                    group = group,
+                    isDelayTesting = false,
+                    isSelected = group.name == selectedGroupName,
+                    showTrailingIndicator = false,
+                    onClick = {
+                        onGroupSelected(group.name)
+                        showAllGroups = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProxyGroupTab(
+    title: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(18.dp)
+    val colorScheme = MiuixTheme.colorScheme
+    val activeColor = colorScheme.primary
+    val defaultColor = colorScheme.onSurface
+    val transition = updateTransition(targetState = selected, label = "proxy_group_tab_selection")
+    val animatedContainerColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 220) },
+        label = "proxy_group_tab_container",
+    ) { isSelected ->
+        if (isSelected) activeColor.copy(alpha = 0.16f) else Color.Transparent
+    }
+    val animatedTextColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 220) },
+        label = "proxy_group_tab_text",
+    ) { isSelected ->
+        if (isSelected) activeColor else defaultColor
+    }
+    val animatedIndicatorColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 220) },
+        label = "proxy_group_tab_indicator",
+    ) { isSelected ->
+        if (isSelected) activeColor else colorScheme.onSurface.copy(alpha = 0.10f)
+    }
+    val animatedIndicatorHeight by transition.animateDp(
+        transitionSpec = { tween(durationMillis = 220) },
+        label = "proxy_group_tab_indicator_height",
+    ) { isSelected ->
+        if (isSelected) UiDp.dp4 else UiDp.dp3
+    }
+    val animatedScale by transition.animateFloat(
+        transitionSpec = { tween(durationMillis = 220) },
+        label = "proxy_group_tab_scale",
+    ) { isSelected ->
+        if (isSelected) 1f else 0.985f
+    }
+
+    Column(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = animatedScale
+                scaleY = animatedScale
+            }
+            .height(UiDp.dp44)
+            .clip(shape)
+            .background(animatedContainerColor)
+            .clickable(onClick = onClick)
+            .padding(horizontal = UiDp.dp12, vertical = UiDp.dp6),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = title,
+            style = MiuixTheme.textStyles.body2,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            color = animatedTextColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = UiDp.dp8)
+                .height(animatedIndicatorHeight)
+                .clip(RoundedCornerShape(50.dp))
+                .background(animatedIndicatorColor),
         )
     }
 }
+
+

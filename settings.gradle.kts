@@ -82,7 +82,7 @@ gropify {
             excludeKeys(
                 "signing.store.password",
                 "signing.key.password",
-                "signing.store.path",
+                "signing.store.file",
                 "signing.key.alias",
             )
         }

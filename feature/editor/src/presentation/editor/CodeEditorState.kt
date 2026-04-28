@@ -20,14 +20,14 @@
 
 
 
-package com.github.yumelira.yumebox.feature.editor.editor
+package com.github.yumelira.yumebox.feature.editor.presentation.editor
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.github.yumelira.yumebox.feature.editor.diagnostic.JsonDiagnosticsProvider
-import com.github.yumelira.yumebox.feature.editor.format.CodeFormatter
-import com.github.yumelira.yumebox.feature.editor.language.LanguageScope
+import com.github.yumelira.yumebox.feature.editor.presentation.diagnostic.JsonDiagnosticsProvider
+import com.github.yumelira.yumebox.feature.editor.presentation.format.CodeFormatter
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import io.github.rosemoe.sora.widget.CodeEditor
 
 class CodeEditorState(
@@ -67,14 +67,17 @@ class CodeEditorState(
         refreshHistoryState()
     }
 
-    fun syncContentFromEditor() {
+    fun syncContentFromEditor(): Boolean {
+        var changed = false
         editor?.text?.toString()?.let { editorContent ->
             if (content != editorContent) {
                 content = editorContent
                 isModified = true
+                changed = true
             }
         }
         refreshHistoryState()
+        return changed
     }
 
     fun resetModified() {
@@ -96,8 +99,14 @@ class CodeEditorState(
     fun canRedo(): Boolean = canRedoState
 
     internal fun refreshHistoryState() {
-        canUndoState = editor?.canUndo() == true
-        canRedoState = editor?.canRedo() == true
+        val nextCanUndo = editor?.canUndo() == true
+        val nextCanRedo = editor?.canRedo() == true
+        if (canUndoState != nextCanUndo) {
+            canUndoState = nextCanUndo
+        }
+        if (canRedoState != nextCanRedo) {
+            canRedoState = nextCanRedo
+        }
     }
 
     fun format(): Boolean {
@@ -125,7 +134,6 @@ class CodeEditorState(
             }
             LanguageScope.Yaml,
             LanguageScope.Text -> {
-
                 editor.diagnostics = null
             }
         }

@@ -173,7 +173,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
-                title = "YumeBox Lite",
+                title = "YumeBox(MD3) Lite",
                 scrollBehavior = scrollBehavior,
             )
         },

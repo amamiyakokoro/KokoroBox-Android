@@ -20,14 +20,15 @@
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
+import org.gradle.api.tasks.Sync
 
 plugins {
-    id("com.android.application") version "9.0.0-alpha06" apply false
-    id("com.android.library") version "9.0.0-alpha06" apply false
+    id("com.android.application") version "9.2.0" apply false
+    id("com.android.library") version "9.2.0" apply false
     kotlin("plugin.serialization") version "2.2.10" apply false
     kotlin("plugin.compose") version "2.3.10" apply false
     id("org.jetbrains.compose") version "1.10.3" apply false
-    id("com.google.devtools.ksp") version "2.2.10-2.0.2" apply false
+    id("com.google.devtools.ksp") version "2.3.2" apply false
     id("com.mikepenz.aboutlibraries.plugin.android") version "14.0.0-b03" apply false
 }
 
@@ -39,6 +40,34 @@ val androidJvm = providers.gradleProperty("android.jvm")
     .orElse("17")
     .get()
 val androidNdkVersion = providers.gradleProperty("android.ndkVersion").orNull.orEmpty()
+
+val arm64V8aAbi = "arm64-v8a"
+val releaseArm64V8aOutputDir = layout.buildDirectory.dir("outputs/release-arm64-v8a")
+val requestedTaskNames = gradle.startParameter.taskNames
+val forcedBuildAbi = when {
+    requestedTaskNames.any { it.contains("Arm64V8a", ignoreCase = true) } -> arm64V8aAbi
+    else -> providers.gradleProperty("android.injected.build.abi").orNull
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+}
+
+extra["forcedBuildAbi"] = forcedBuildAbi
+
+tasks.register("assembleReleaseArm64V8a") {
+    group = "build"
+    description = "Build the app release APK for arm64-v8a only."
+    dependsOn(":app:assembleRelease")
+}
+
+tasks.register<Sync>("packageReleaseArm64V8a") {
+    group = "build"
+    description = "Build and copy the arm64-v8a release APK to build/outputs/release-arm64-v8a/."
+    dependsOn("assembleReleaseArm64V8a")
+    from(layout.projectDirectory.dir("app/build/outputs/apk/release")) {
+        include("*-$arm64V8aAbi-release.apk")
+    }
+    into(releaseArm64V8aOutputDir)
+}
 
 subprojects {
     pluginManager.withPlugin("com.android.application") {

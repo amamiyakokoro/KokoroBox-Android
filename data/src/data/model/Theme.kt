@@ -33,5 +33,6 @@ enum class AppLanguage {
 }
 
 enum class AppColorTheme {
-    ClassicMonochrome,
+    MonetDynamic,
+    Custom,
 }

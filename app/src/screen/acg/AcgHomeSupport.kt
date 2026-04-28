@@ -22,6 +22,8 @@ package com.github.yumelira.yumebox.screen.acg
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,13 +36,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.github.yumelira.yumebox.data.model.ProxyMode
@@ -63,12 +68,18 @@ private val acgOpacity = Opacity()
 
 internal object AcgUi {
     object Shape {
-        val hero = RoundedCornerShape(acgSpacing.space28)
+        val hero = RoundedCornerShape(
+            topStart = acgSpacing.space28,
+            topEnd = acgSpacing.space28,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp,
+        )
         val launchButton = RoundedCornerShape(acgRadii.full)
+        val sidebarIconButton = RoundedCornerShape(20.dp)
     }
 
     object Sidebar {
-        const val fraction = 0.25f
+        val Fraction = 0.25f
         val contentOverlap = acgSpacing.space28
         val innerHorizontalPadding = acgSpacing.space12
         val visibleOpticalOffset = -acgSpacing.space4
@@ -81,16 +92,18 @@ internal object AcgUi {
         val modeFontSize = 15.sp
         val dividerWidth = acgSizes.settingsIconGlyphSize
         val dividerHeight = acgSpacing.space2
-        val iconSpacing = acgSpacing.space32 + acgSpacing.space6
-        val iconPillHorizontalPadding = acgSpacing.space14
-        val iconPillVerticalPadding = acgSpacing.space18
-        val iconSize = acgSpacing.space28
+        val iconSpacing = acgSpacing.space20
+        val iconPillHorizontalPadding = acgSpacing.space10
+        val iconPillVerticalPadding = acgSpacing.space10
+        val iconSize = UiDp.dp22
+        val iconContainerSize = UiDp.dp48
         val modeLetterSpacing = 1.4.sp
-        const val iconPillAlpha = 0.14f
+        val IconPillAlpha = 0.10f
+        val IconButtonPressedAlpha = 0.18f
         val digitLetterSpacing = 1.6.sp
-        const val timeAlpha = 0.96f
-        const val dividerAlpha = 0.62f
-        const val iconAlpha = 0.88f
+        val TimeAlpha = 0.92f
+        val DividerAlpha = 0.42f
+        val IconAlpha = 0.88f
         val collapsedVisibleWidth = acgSpacing.space8
     }
 
@@ -100,11 +113,11 @@ internal object AcgUi {
         val trafficRowGap = acgSpacing.space28
         val trafficBottomInset = acgSpacing.space12
         val runtimeInfoTopGap = acgSpacing.space16
-        val delayWidth = acgSizes.nodeDelayColumnWidth
+        val delayWidth = UiDp.dp44
         val belowHeroTopGap = acgSpacing.space8
         val belowHeroContentGap = acgSpacing.space12
         val infoPlaceholderAlpha = acgOpacity.surfaceSoft
-        val infoRowMinHeight = acgSpacing.space24
+        val infoRowMinHeight = acgSpacing.space32 + acgSpacing.space8
         val infoPlaceholderNodeWidth = acgSizes.homeIdleTopPadding - acgSpacing.space8
     }
 
@@ -113,7 +126,7 @@ internal object AcgUi {
         val fixedWidth = acgSizes.homeIdleTopPadding + acgSpacing.space4
         val horizontalPadding = acgSizes.settingsIconGlyphSize
         val verticalPadding = acgSpacing.space14 + acgSpacing.space2 / 2
-        const val pressedScale = 0.94f
+        val PressedScale = 0.94f
     }
 
     object Quote {
@@ -131,8 +144,9 @@ internal object AcgUi {
     }
 
     object Info {
-        val trailingPadding = acgSpacing.space16
+        val trailingPadding = acgSpacing.space12
         val blockGap = acgSpacing.space8
+        val contentGap = acgSpacing.space6
     }
 }
 
@@ -181,6 +195,7 @@ private fun AcgSidebarValueStack(
     topValue: String,
     bottomValue: String,
 ) {
+    val contentColor = MiuixTheme.colorScheme.onSurface
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -191,7 +206,7 @@ private fun AcgSidebarValueStack(
             modifier = Modifier
                 .width(AcgUi.Sidebar.dividerWidth)
                 .height(AcgUi.Sidebar.dividerHeight)
-                .background(Color.White.copy(alpha = AcgUi.Sidebar.dividerAlpha)),
+                .background(contentColor.copy(alpha = AcgUi.Sidebar.DividerAlpha)),
         )
         AcgSidebarTimeValue(value = bottomValue)
     }
@@ -201,10 +216,11 @@ private fun AcgSidebarValueStack(
 private fun AcgSidebarIconRail(
     icons: List<AcgSidebarIconItem>,
 ) {
+    val colorScheme = MiuixTheme.colorScheme
     Column(
         modifier = Modifier
             .clip(AcgUi.Shape.launchButton)
-            .background(Color.White.copy(alpha = AcgUi.Sidebar.iconPillAlpha))
+            .background(colorScheme.surface.copy(alpha = AcgUi.Sidebar.IconPillAlpha))
             .padding(
                 horizontal = AcgUi.Sidebar.iconPillHorizontalPadding,
                 vertical = AcgUi.Sidebar.iconPillVerticalPadding,
@@ -222,18 +238,39 @@ private fun AcgSidebarIconRail(
 private fun AcgSidebarIconItemView(
     item: AcgSidebarIconItem,
 ) {
-    Icon(
-        imageVector = item.icon,
-        contentDescription = null,
-        tint = Color.White.copy(alpha = AcgUi.Sidebar.iconAlpha),
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val colorScheme = MiuixTheme.colorScheme
+    val containerColor = if (isPressed) {
+        colorScheme.surface.copy(alpha = AcgUi.Sidebar.IconButtonPressedAlpha)
+    } else {
+        Color.Transparent
+    }
+    val iconTint = colorScheme.onSurface.copy(alpha = AcgUi.Sidebar.IconAlpha)
+
+    Box(
         modifier = Modifier
-            .size(AcgUi.Sidebar.iconSize)
+            .size(AcgUi.Sidebar.iconContainerSize)
+            .graphicsLayer {
+                scaleX = if (isPressed) 0.94f else 1f
+                scaleY = if (isPressed) 0.94f else 1f
+            }
+            .clip(AcgUi.Shape.sidebarIconButton)
+            .background(containerColor)
             .clickable(
-                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                interactionSource = interactionSource,
                 indication = null,
                 onClick = item.onClick,
             ),
-    )
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = item.icon,
+            contentDescription = null,
+            tint = iconTint,
+            modifier = Modifier.size(AcgUi.Sidebar.iconSize),
+        )
+    }
 }
 
 @Composable
@@ -249,7 +286,7 @@ private fun AcgSidebarModeText(
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             letterSpacing = AcgUi.Sidebar.modeLetterSpacing,
         ),
-        color = Color.White.copy(alpha = 0.96f),
+        color = MiuixTheme.colorScheme.primary.copy(alpha = 0.92f),
     )
 }
 
@@ -263,7 +300,7 @@ private fun AcgSidebarTimeValue(value: String) {
     ) {
         Text(
             text = value,
-            color = Color.White.copy(alpha = AcgUi.Sidebar.timeAlpha),
+            color = MiuixTheme.colorScheme.onSurface.copy(alpha = AcgUi.Sidebar.TimeAlpha),
             style = MiuixTheme.textStyles.title1,
             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
             fontSize = 37.sp,

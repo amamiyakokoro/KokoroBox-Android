@@ -45,12 +45,19 @@ internal fun openProfileConfigPreview(
     onReadFailed: (String) -> Unit,
     onPreviewPrepared: (String, ((String) -> Unit)?) -> Unit,
 ) {
-    if (!targetFile.exists()) {
+    val configFile = if (targetFile.exists()) {
+        targetFile
+    } else {
+        val runtimeFile = targetFile.parentFile?.resolve("runtime.yaml")
+        if (runtimeFile?.exists() == true) runtimeFile else null
+    }
+
+    if (configFile == null) {
         onReadFailed(missingMessage)
         return
     }
 
-    val configContent = runCatching { targetFile.readText() }.getOrElse {
+    val configContent = runCatching { configFile.readText() }.getOrElse {
         onReadFailed(it.message ?: "Failed to read profile")
         return
     }
@@ -58,7 +65,7 @@ internal fun openProfileConfigPreview(
     val saveCallback = if (editable) {
         { updatedContent: String ->
             runCatching {
-                targetFile.writeText(updatedContent)
+                configFile.writeText(updatedContent)
             }
                 .getOrElse {
                     throw IllegalStateException(it.message ?: MLang.ProfilesPage.SettingsDialog.SaveFailed, it)

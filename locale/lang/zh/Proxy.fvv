@@ -1,6 +1,6 @@
 <Proxy Page>
 Proxy = {
-    Title = "节点"
+    Title = "代理"
 
     Mode = {
         Direct = "直连"

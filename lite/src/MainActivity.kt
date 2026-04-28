@@ -94,6 +94,7 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             val themeMode by appSettingsStorage.themeMode.state.collectAsState()
+            val colorTheme by appSettingsStorage.colorTheme.state.collectAsState()
             val themeSeedColorArgb by appSettingsStorage.themeAccentColorArgb.state.collectAsState()
             val invertOnPrimaryColors by appSettingsStorage.invertOnPrimaryColors.state.collectAsState()
             val pendingImportValue by pendingImportUrl.collectAsState()
@@ -110,6 +111,7 @@ class MainActivity : FragmentActivity() {
             ProvideAndroidPlatformTheme {
                 YumeTheme(
                     themeMode = themeMode,
+                    colorTheme = colorTheme,
                     themeSeedColorArgb = themeSeedColorArgb,
                     invertOnPrimaryColors = invertOnPrimaryColors,
                 ) {

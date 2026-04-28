@@ -181,6 +181,7 @@ fun HomePager(
                     SpeedChart(
                         speedHistory = speedHistory,
                         isRunning = isRunning,
+                        animateIdle = isActive,
                         onClick = {
                             navigator.navigate(TrafficStatisticsScreenDestination) {
                                 launchSingleTop = true

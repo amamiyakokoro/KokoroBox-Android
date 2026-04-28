@@ -22,6 +22,7 @@ package com.github.yumelira.yumebox.screen.acg
 
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -54,15 +55,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.resize.Precision
 import com.github.panpf.sketch.resize.Scale
-import com.github.panpf.sketch.util.Size
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
 import com.github.yumelira.yumebox.core.util.PollingTimers
+import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.domain.model.TrafficData
@@ -95,7 +95,7 @@ fun AcgHomePage(
 ) {
     val homeViewModel = koinViewModel<HomeViewModel>()
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
-    val context = LocalContext.current
+    val context: Context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -108,6 +108,7 @@ fun AcgHomePage(
     val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsState(initial = false)
     val selectedServerName by homeViewModel.selectedServerName.collectAsState()
     val selectedServerPing by homeViewModel.selectedServerPing.collectAsState()
+    val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsState()
     val trafficNow by homeViewModel.trafficNow.collectAsState()
     val proxyMode by homeViewModel.proxyMode.collectAsState()
     val runtimeSnapshot by homeViewModel.runtimeSnapshot.collectAsState()
@@ -187,7 +188,12 @@ fun AcgHomePage(
         ThemeMode.Auto -> systemDark
     }
     val wallpaperBackdrop = rememberLayerBackdrop()
-    val contentSurface = if (isDarkHomeSurface) MiuixTheme.colorScheme.surface else Color.White
+    val contentSurface = if (isDarkHomeSurface) {
+        MiuixTheme.colorScheme.surface
+    } else {
+        MiuixTheme.colorScheme.background
+    }
+    val heroBlendColor = if (isDarkHomeSurface) Color.Black else contentSurface
     val handlePageChange = LocalHandlePageChange.current
     val sidebarIcons = remember {
         listOf(
@@ -226,25 +232,28 @@ fun AcgHomePage(
     }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val sidebarWidth = maxWidth * AcgUi.Sidebar.fraction
+        val sidebarWidth = maxWidth * AcgUi.Sidebar.Fraction
         val contentStart = (sidebarWidth - AcgUi.Sidebar.contentOverlap).coerceAtLeast(UiDp.dp0)
         val collapsedVisibleWidth = AcgUi.Sidebar.collapsedVisibleWidth
         val heroHeight = maxHeight * 0.66f
+        val heroMaxWidth = maxWidth - (AcgUi.Hero.containerHorizontalInset * 2)
+        val heroBottomBlendSolidHeight = 56.dp
+        val heroBottomBlendGradientHeight = 90.dp
+        val heroBottomBlendTotalHeight = heroBottomBlendSolidHeight + heroBottomBlendGradientHeight
         val clampedPageProgress = pageProgress.coerceIn(0f, 1f)
         val clampedSidebarProgress = sidebarProgress.coerceIn(0f, 1f)
         val effectiveSidebarProgress = clampedSidebarProgress * animatedSidebarToggleProgress
-        val swipePressProgress = FastOutSlowInEasing.transform(1f - clampedPageProgress)
         val sidebarVisibleWidth =
             lerpDp(collapsedVisibleWidth, contentStart, effectiveSidebarProgress)
         val contentPanelStart = lerpDp(UiDp.dp0, contentStart, effectiveSidebarProgress)
         val sidebarOffset = lerpDp((-56).dp, UiDp.dp0, effectiveSidebarProgress)
         val sidebarAlpha = lerpFloat(0.78f, 1f, effectiveSidebarProgress) * clampedPageProgress
         val contentCorner = lerpDp(UiDp.dp0, UiDp.dp30, effectiveSidebarProgress)
-        // 仅在页面横向滑动时缩放，避免侧栏展开/收起过程出现尺寸变化感
+        val swipePressProgress = FastOutSlowInEasing.transform(1f - clampedPageProgress)
         val heroImageScale = if (clampedPageProgress >= 0.999f) {
             1f
         } else {
-            lerpFloat(1f, 0.965f, swipePressProgress)
+            lerpFloat(1f, 0.972f, swipePressProgress)
         }
         val sidebarBlurReady by remember(
             effectiveSidebarProgress
@@ -310,6 +319,7 @@ fun AcgHomePage(
                         top = statusBarTop,
                     )
                     .fillMaxHeight(0.66f)
+                    .background(contentSurface)
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = {
@@ -331,17 +341,30 @@ fun AcgHomePage(
                     wallpaperBiasX = wallpaperBiasX,
                     wallpaperBiasY = wallpaperBiasY,
                     qualityMode = AcgWallpaperQualityMode.Foreground,
+                    stableRequestWidth = heroMaxWidth,
+                    stableRequestHeight = heroHeight,
                     modifier = Modifier.matchParentSize(),
                 )
-                Spacer(
+
+                Box(
                     modifier = Modifier
-                        .matchParentSize()
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .height(heroBottomBlendTotalHeight)
                         .background(
                             brush = Brush.verticalGradient(
                                 colorStops = arrayOf(
                                     0.0f to Color.Transparent,
-                                    0.64f to Color.Transparent,
-                                    0.80f to contentSurface.copy(alpha = 0.90f),
+                                    0.03f to heroBlendColor.copy(alpha = 0.03f),
+                                    0.08f to heroBlendColor.copy(alpha = 0.10f),
+                                    0.14f to heroBlendColor.copy(alpha = 0.22f),
+                                    0.22f to heroBlendColor.copy(alpha = 0.42f),
+                                    0.32f to heroBlendColor.copy(alpha = 0.60f),
+                                    0.44f to heroBlendColor.copy(alpha = 0.70f),
+                                    0.58f to heroBlendColor.copy(alpha = 0.80f),
+                                    0.74f to heroBlendColor.copy(alpha = 0.90f),
+                                    0.88f to heroBlendColor.copy(alpha = 0.97f),
+                                    0.96f to heroBlendColor.copy(alpha = 0.995f),
                                     1.0f to contentSurface,
                                 )
                             )
@@ -371,6 +394,7 @@ fun AcgHomePage(
                         AcgHomeInfoPanel(
                             serverName = selectedServerName.takeIf { isRunning },
                             serverPing = selectedServerPing.takeIf { isRunning },
+                            ipMonitoringState = if (isRunning) ipMonitoringState else IpMonitoringState.Loading,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -421,11 +445,13 @@ private fun AcgWallpaperBackground(
     wallpaperBiasX: Float = 0f,
     wallpaperBiasY: Float = 0f,
     qualityMode: AcgWallpaperQualityMode = AcgWallpaperQualityMode.Foreground,
+    stableRequestWidth: androidx.compose.ui.unit.Dp? = null,
+    stableRequestHeight: androidx.compose.ui.unit.Dp? = null,
     modifier: Modifier = Modifier,
 ) {
     val clampedZoom = wallpaperZoom.coerceIn(1f, 5f)
-    val model = wallpaperUri.ifBlank { "file:///android_asset/wallpaper.jpg" }
-    val context = LocalContext.current
+    val model: String = wallpaperUri.ifBlank { "file:///android_asset/wallpaper.jpg" }
+    val context: Context = LocalContext.current
     val density = LocalDensity.current
 
     val imageBounds by produceState<Pair<Int, Int>?>(initialValue = null, model) {
@@ -452,21 +478,32 @@ private fun AcgWallpaperBackground(
         val containerWidthPx = with(density) { maxWidth.toPx() }.coerceAtLeast(1f)
         val containerHeightPx = with(density) { maxHeight.toPx() }.coerceAtLeast(1f)
 
-        // 背景模糊层使用低质量采样，内容主图优先原图画质
-        val requestWidth = kotlin.math.ceil(containerWidthPx * 1.2f).toInt()
-        val requestHeight = kotlin.math.ceil(containerHeightPx * 1.2f).toInt()
+        val sampleMultiplier = if (qualityMode == AcgWallpaperQualityMode.BackgroundBlur) 0.75f else 1.35f
+        val stableWidthPx = stableRequestWidth?.let { with(density) { it.toPx() } } ?: 0f
+        val stableHeightPx = stableRequestHeight?.let { with(density) { it.toPx() } } ?: 0f
+        val requestBaseWidthPx = maxOf(containerWidthPx, stableWidthPx)
+        val requestBaseHeightPx = maxOf(containerHeightPx, stableHeightPx)
+        val targetRequestWidth = kotlin.math.ceil(requestBaseWidthPx * sampleMultiplier).toInt().coerceAtLeast(1)
+        val targetRequestHeight = kotlin.math.ceil(requestBaseHeightPx * sampleMultiplier).toInt().coerceAtLeast(1)
+        var maxRequestWidth by remember(model, qualityMode) { mutableIntStateOf(targetRequestWidth) }
+        var maxRequestHeight by remember(model, qualityMode) { mutableIntStateOf(targetRequestHeight) }
+
+        SideEffect {
+            if (targetRequestWidth > maxRequestWidth) {
+                maxRequestWidth = targetRequestWidth
+            }
+            if (targetRequestHeight > maxRequestHeight) {
+                maxRequestHeight = targetRequestHeight
+            }
+        }
 
         val painter = rememberAsyncImagePainter(
             request = ImageRequest(context, model) {
                 scale(Scale.CENTER_CROP)
-                memoryCachePolicy(CachePolicy.DISABLED)
-                downloadCachePolicy(CachePolicy.DISABLED)
-                resultCachePolicy(CachePolicy.DISABLED)
+                size(maxRequestWidth, maxRequestHeight)
                 if (qualityMode == AcgWallpaperQualityMode.BackgroundBlur) {
-                    size(requestWidth, requestHeight)
                     precision(Precision.LESS_PIXELS)
                 } else {
-                    size(Size.Origin)
                     precision(Precision.EXACTLY)
                 }
             }
@@ -492,8 +529,12 @@ private fun AcgWallpaperBackground(
             contentScale = ContentScale.Crop,
             alignment = BiasAlignment(viewportLayout.biasX, viewportLayout.biasY),
             modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxSize(),
+                .matchParentSize()
+                .graphicsLayer {
+                    scaleX = 1.04f
+                    scaleY = 1.04f
+                    translationY = 2f
+                },
         )
     }
 }

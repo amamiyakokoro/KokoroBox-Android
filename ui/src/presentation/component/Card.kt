@@ -20,23 +20,27 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.theme.horizontalPadding
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CardColors
 import top.yukonga.miuix.kmp.basic.CardDefaults
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
-    cornerRadius: Int = 20,
+    cornerRadius: Int = 24,
     insideMargin: PaddingValues = PaddingValues(UiDp.dp0),
     applyHorizontalPadding: Boolean = true,
-    colors: CardColors = CardDefaults.defaultColors(),
+    colors: CardColors = CardDefaults.defaultColors(
+        color = MiuixTheme.colorScheme.surfaceVariant,
+    ),
     content: @Composable () -> Unit,
 ) {
     Card(

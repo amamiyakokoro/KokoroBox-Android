@@ -18,6 +18,8 @@
  *
  */
 
+@file:Suppress("unused")
+
 package com.github.yumelira.yumebox.presentation.util
 
 import androidx.compose.runtime.Composable
@@ -25,7 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.github.yumelira.yumebox.feature.editor.language.LanguageScope
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import kotlinx.serialization.json.JsonElement
 
 object OverrideStructuredEditorStore {

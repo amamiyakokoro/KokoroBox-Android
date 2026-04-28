@@ -12,7 +12,7 @@ import (
 	C "github.com/metacubex/mihomo/constant"
 )
 
-// Proxy 代理结构体（本地定义，避免依赖 tunnel 包）
+// Proxy describes a preview proxy.
 type Proxy struct {
 	Name     string `json:"name"`
 	Title    string `json:"title"`
@@ -21,7 +21,7 @@ type Proxy struct {
 	Delay    int    `json:"delay"`
 }
 
-// ProxyGroup 代理组结构体（本地定义，避免依赖 tunnel 包）
+// ProxyGroup describes a preview proxy group.
 type ProxyGroup struct {
 	Name    string   `json:"name"`
 	Type    string   `json:"type"`
@@ -61,8 +61,8 @@ func buildProxyGroupsFromParsed(
 			Name:    name,
 			Type:    proxy.Type().String(),
 			Now:     group.Now(),
-			Icon:    group.Icon(),
-			Hidden:  group.Hidden(),
+			Icon:    proxyGroupIcon(group),
+			Hidden:  false,
 			Proxies: convertPreviewProxies(group.Proxies(), pattern),
 		})
 	}
@@ -70,6 +70,20 @@ func buildProxyGroupsFromParsed(
 	return result
 }
 
+func proxyGroupIcon(group outboundgroup.ProxyGroup) string {
+	switch g := group.(type) {
+	case *outboundgroup.Selector:
+		return g.Icon
+	case *outboundgroup.URLTest:
+		return g.Icon
+	case *outboundgroup.LoadBalance:
+		return g.Icon
+	case *outboundgroup.Fallback:
+		return g.Icon
+	default:
+		return ""
+	}
+}
 func convertPreviewProxies(
 	proxies []C.Proxy,
 	uiSubtitlePattern *regexp2.Regexp,

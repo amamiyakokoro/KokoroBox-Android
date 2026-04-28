@@ -23,8 +23,8 @@
 package com.github.yumelira.yumebox.screen.navigation
 
 import androidx.compose.runtime.Composable
-import com.github.yumelira.yumebox.feature.editor.language.LanguageScope
-import com.github.yumelira.yumebox.feature.editor.screen.ConfigPreviewScreen
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
+import com.github.yumelira.yumebox.feature.editor.presentation.screen.ConfigPreviewScreen
 import com.github.yumelira.yumebox.presentation.screen.*
 import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
 import com.github.yumelira.yumebox.presentation.viewmodel.OverrideConfigViewModel

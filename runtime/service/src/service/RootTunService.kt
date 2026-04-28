@@ -22,6 +22,7 @@
 
 package com.github.yumelira.yumebox.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -59,6 +60,7 @@ class RootTunService : BaseService() {
         createChannel()
     }
 
+    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> {

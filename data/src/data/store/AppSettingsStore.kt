@@ -34,7 +34,7 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
 
     val themeMode by enumFlow(ThemeMode.Auto)
     val appLanguage by enumFlow(AppLanguage.System)
-    val colorTheme by enumFlow(AppColorTheme.ClassicMonochrome)
+    val colorTheme by enumFlow(AppColorTheme.MonetDynamic)
     val themeAccentColorArgb by longFlow(0xFF138A74L)
     val invertOnPrimaryColors by boolFlow(false)
     val automaticRestart by boolFlow(false)
@@ -43,7 +43,7 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val excludeFromRecents by boolFlow(false)
     val showTrafficNotification by boolFlow(true)
     val bottomBarAutoHide by boolFlow(true)
-    val bottomBarUseLegacyStyle by boolFlow(true)
+    val bottomBarUseLegacyStyle by boolFlow(false)
     val topBarBlurEnabled by boolFlow(false)
     val acgMainUiEnabled by boolFlow(false)
     val acgWallpaperUri by strFlow("")

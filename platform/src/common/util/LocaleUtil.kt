@@ -18,15 +18,12 @@
  *
  */
 
-
-
 package com.github.yumelira.yumebox.common.util
 
-import java.util.*
+import java.util.Locale
 
 object LocaleUtil {
 
-    private val NORMALIZED_REGION_CODES = setOf("TW")
     @Volatile
     private var currentLocaleOverride: Locale? = null
 
@@ -42,23 +39,14 @@ object LocaleUtil {
     }
 
     fun normalizeRegionCode(countryCode: String?): String? {
-        if (countryCode == null) return null
-        if (!isChineseLocale()) return countryCode
-
-        val upperCode = countryCode.uppercase()
-        return if (upperCode in NORMALIZED_REGION_CODES) "CN" else countryCode
+        return countryCode
     }
 
     fun normalizeFlagUrl(
         countryCode: String,
         baseUrl: String = "https://hatscripts.github.io/circle-flags/flags/"
     ): String {
-        val normalizedCode = if (isChineseLocale()) {
-            val upperCode = countryCode.uppercase()
-            if (upperCode in NORMALIZED_REGION_CODES) "cn" else countryCode.lowercase()
-        } else {
-            countryCode.lowercase()
-        }
+        val normalizedCode = countryCode.lowercase(Locale.ROOT)
         return "${baseUrl}${normalizedCode}.svg"
     }
 }

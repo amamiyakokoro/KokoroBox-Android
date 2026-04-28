@@ -38,7 +38,10 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +52,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.yumelira.yumebox.common.util.LocaleUtil
 import com.github.yumelira.yumebox.common.util.formatBytesForDisplay
+import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
@@ -193,21 +198,23 @@ internal fun AcgLaunchButton(
     onClick: () -> Unit,
 ) {
     val spacing = AppTheme.spacing
+    val colorScheme = MiuixTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isRunning = controlState == HomeProxyControlState.Running
-    val background = if (isRunning) {
-        MiuixTheme.colorScheme.primary
-    } else {
-        MiuixTheme.colorScheme.onBackground
+    val background = when {
+        !enabled -> colorScheme.primaryContainer.copy(alpha = 0.48f)
+        isRunning -> colorScheme.primary
+        else -> colorScheme.primaryContainer
     }
-    val contentColor = if (isRunning) {
-        MiuixTheme.colorScheme.onPrimary
-    } else {
-        MiuixTheme.colorScheme.background
+    val contentColor = when {
+        !enabled -> colorScheme.onPrimaryContainer.copy(alpha = 0.56f)
+        isRunning -> colorScheme.onPrimary
+        else -> colorScheme.onPrimaryContainer
     }
+    val containerAlpha = if (enabled) 1f else 0.88f
     val pressScale by animateFloatAsState(
-        targetValue = if (isPressed && enabled) AcgUi.Button.pressedScale else 1f,
+        targetValue = if (isPressed && enabled) AcgUi.Button.PressedScale else 1f,
         animationSpec = spring(
             dampingRatio = 0.42f,
             stiffness = 520f,
@@ -220,6 +227,7 @@ internal fun AcgLaunchButton(
             .graphicsLayer {
                 scaleX = pressScale
                 scaleY = pressScale
+                alpha = containerAlpha
             }
             .width(AcgUi.Button.fixedWidth)
             .clip(AcgUi.Shape.launchButton)
@@ -385,10 +393,15 @@ private fun AcgTrafficItem(
 internal fun AcgHomeInfoPanel(
     serverName: String?,
     serverPing: Int?,
+    ipMonitoringState: IpMonitoringState,
     modifier: Modifier = Modifier,
 ) {
     val flaggedNode = remember(serverName) { serverName?.let(::extractFlaggedName) }
     val resolvedNodeName = flaggedNode?.displayName ?: serverName.orEmpty().ifBlank { "" }
+    val externalIp = (ipMonitoringState as? IpMonitoringState.Success)?.externalIp
+    var isIpVisible by rememberSaveable(externalIp?.ip) { mutableStateOf(false) }
+    val resolvedExitIp = externalIp?.ip?.let { ipAddress -> buildAcgDisplayIpValue(ipAddress, isIpVisible) }
+    val resolvedExitCountryCode = externalIp?.countryCode?.let(LocaleUtil::normalizeRegionCode)
     val resolvedPing = serverPing
         ?.takeIf { it in 1..1000 }
         ?.let { ping -> MLang.Home.NodeInfo.DelayValue.format(ping) }
@@ -397,17 +410,31 @@ internal fun AcgHomeInfoPanel(
             .fillMaxWidth()
             .heightIn(min = AcgUi.Hero.infoRowMinHeight),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
     ) {
         if (resolvedNodeName.isNotBlank()) {
             AcgInfoBlock(
                 value = resolvedNodeName,
+                supportingValue = resolvedExitIp,
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = AcgUi.Info.trailingPadding),
+                supportingValueFontFamily = FontFamily.Monospace,
+                supportingValueColor = MiuixTheme.colorScheme.onBackground.copy(alpha = 0.74f),
+                supportingValueClickable = resolvedExitIp != null,
+                onSupportingValueClick = {
+                    if (resolvedExitIp != null) {
+                        isIpVisible = !isIpVisible
+                    }
+                },
                 leading = {
                     flaggedNode?.countryCode?.let { countryCode ->
                         CountryFlagCircle(countryCode = countryCode, size = AppTheme.spacing.space16)
+                    }
+                },
+                supportingLeading = {
+                    resolvedExitCountryCode?.let { countryCode ->
+                        AcgSupportingCountryBadge(countryCode = countryCode)
                     }
                 },
             )
@@ -422,7 +449,9 @@ internal fun AcgHomeInfoPanel(
         if (resolvedPing != null) {
             AcgInfoBlock(
                 value = resolvedPing,
-                modifier = Modifier.width(AcgUi.Hero.delayWidth),
+                modifier = Modifier
+                    .width(AcgUi.Hero.delayWidth)
+                    .padding(top = 1.dp),
                 valueColor = when {
                     serverPing < 500 -> AppTheme.colors.acg.pingExcellent
                     else -> AppTheme.colors.acg.pingWarning
@@ -439,27 +468,144 @@ private fun AcgInfoBlock(
     modifier: Modifier = Modifier,
     valueColor: Color = MiuixTheme.colorScheme.onBackground,
     valueFontFamily: FontFamily? = null,
+    supportingLabel: String? = null,
+    supportingValue: String? = null,
+    supportingLabelColor: Color = MiuixTheme.colorScheme.onBackground.copy(alpha = 0.52f),
+    supportingValueColor: Color = MiuixTheme.colorScheme.onBackground.copy(alpha = 0.68f),
+    supportingValueFontFamily: FontFamily? = null,
+    supportingValueClickable: Boolean = false,
+    onSupportingValueClick: (() -> Unit)? = null,
     alignEnd: Boolean = false,
     leading: (@Composable () -> Unit)? = null,
+    supportingLeading: (@Composable () -> Unit)? = null,
 ) {
-    Row(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(
-            space = AcgUi.Info.blockGap,
-            alignment = if (alignEnd) Alignment.End else Alignment.Start,
-        ),
+        horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(AcgUi.Info.contentGap),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(
+                space = AcgUi.Info.blockGap,
+                alignment = if (alignEnd) Alignment.End else Alignment.Start,
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = if (alignEnd) Modifier else Modifier.fillMaxWidth(),
+        ) {
+            leading?.invoke()
+            Text(
+                text = value,
+                color = valueColor,
+                style = MiuixTheme.textStyles.body1,
+                fontWeight = FontWeight.Medium,
+                fontFamily = valueFontFamily,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+            )
+                    }
+        if (!supportingValue.isNullOrBlank()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = if (supportingValueClickable && onSupportingValueClick != null) {
+                    Modifier.clickable(onClick = onSupportingValueClick)
+                } else {
+                    Modifier
+                },
+            ) {
+                supportingLeading?.invoke()
+                supportingLabel?.takeIf { it.isNotBlank() }?.let { label ->
+                    Text(
+                        text = label,
+                        color = supportingLabelColor,
+                        style = MiuixTheme.textStyles.footnote2,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Clip,
+                    )
+                }
+                Text(
+                    text = supportingValue,
+                    color = supportingValueColor,
+                    style = MiuixTheme.textStyles.footnote1,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = supportingValueFontFamily,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AcgSupportingCountryBadge(countryCode: String) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        leading?.invoke()
+        CountryFlagCircle(
+            countryCode = countryCode,
+            size = 12.dp,
+        )
         Text(
-            text = value,
-            color = valueColor,
-            style = MiuixTheme.textStyles.body1,
-            fontWeight = FontWeight.Medium,
-            fontFamily = valueFontFamily,
+            text = countryCode,
+            color = MiuixTheme.colorScheme.primary.copy(alpha = 0.92f),
+            style = MiuixTheme.textStyles.footnote2,
+            fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Clip,
-            modifier = if (alignEnd) Modifier else Modifier.weight(1f),
         )
+    }
+}
+
+private fun buildAcgDisplayIpValue(
+    ipAddress: String,
+    isIpVisible: Boolean,
+): String {
+    return if (ipAddress.contains(":")) {
+        formatAcgIpv6Address(ipAddress = ipAddress, isIpVisible = isIpVisible)
+    } else {
+        if (isIpVisible) ipAddress else maskAcgIpv4Address(ipAddress)
+    }
+}
+
+private fun maskAcgIpv4Address(ipAddress: String): String {
+    val segments = ipAddress.split(".")
+    if (segments.size != 4) {
+        return "****"
+    }
+    return buildString {
+        append(segments[0])
+        append(".")
+        append(segments[1])
+        append(".")
+        append("*".repeat(segments[2].length.coerceAtLeast(1)))
+        append(".")
+        append(segments[3])
+    }
+}
+
+private fun formatAcgIpv6Address(
+    ipAddress: String,
+    isIpVisible: Boolean,
+): String {
+    val visibleSegments = ipAddress.split(":").filter { it.isNotBlank() }
+    if (visibleSegments.isEmpty()) {
+        return "****"
+    }
+    if (!isIpVisible) {
+        return when {
+            visibleSegments.size == 1 -> "${visibleSegments.first()}:****"
+            visibleSegments.size == 2 -> "${visibleSegments[0]}:${"*".repeat(visibleSegments[1].length.coerceAtLeast(4))}"
+            else -> "${visibleSegments[0]}:${visibleSegments[1]}:****"
+        }
+    }
+
+    val visiblePrefix = visibleSegments.take(3)
+    return if (visibleSegments.size > 4) {
+        "${visiblePrefix.joinToString(":")}..."
+    } else {
+        visiblePrefix.joinToString(":")
     }
 }

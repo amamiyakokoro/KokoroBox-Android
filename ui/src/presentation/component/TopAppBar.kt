@@ -20,14 +20,14 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
@@ -36,7 +36,6 @@ import dev.chrisbanes.haze.hazeEffect
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 import top.yukonga.miuix.kmp.basic.SmallTopAppBar
 import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.basic.TopAppBarDefaults
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 val LocalTopBarHazeState = compositionLocalOf<HazeState?> { null }
@@ -59,24 +58,36 @@ private fun Modifier.topBarHazeEffect(
 }
 
 @Composable
+private fun defaultTopBarContainerColor(): Color {
+    return MiuixTheme.colorScheme.surface
+}
+
+@Composable
 fun TopBar(
     title: String,
     scrollBehavior: ScrollBehavior,
     modifier: Modifier = Modifier,
-    titlePadding: Dp = TopAppBarDefaults.TitlePadding,
-    navigationIconPadding: Dp = UiDp.dp24,
-    actionIconPadding: Dp = UiDp.dp24,
+    titlePadding: Dp = UiDp.dp16,
+    navigationIconPadding: Dp = UiDp.dp16,
+    actionIconPadding: Dp = UiDp.dp16,
+    containerColor: Color = Color.Unspecified,
+    enableHaze: Boolean = false,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     val hazeState = LocalTopBarHazeState.current
     val hazeStyle = LocalTopBarHazeStyle.current
-    val hazeEnabled = hazeState != null && hazeStyle != null
+    val hazeEnabled = enableHaze && hazeState != null && hazeStyle != null
+    val resolvedContainerColor = if (containerColor == Color.Unspecified) {
+        defaultTopBarContainerColor()
+    } else {
+        containerColor
+    }
 
     TopAppBar(
         title = title,
-        modifier = modifier.topBarHazeEffect(hazeState, hazeStyle),
-        color = if (hazeEnabled) Color.Transparent else MiuixTheme.colorScheme.surface,
+        modifier = if (hazeEnabled) modifier.topBarHazeEffect(hazeState, hazeStyle) else modifier,
+        color = resolvedContainerColor,
         titlePadding = titlePadding,
         navigationIconPadding = navigationIconPadding,
         actionIconPadding = actionIconPadding,
@@ -91,20 +102,27 @@ fun SmallTopBar(
     title: String,
     scrollBehavior: ScrollBehavior,
     modifier: Modifier = Modifier,
-    titlePadding: Dp = TopAppBarDefaults.TitlePadding,
-    navigationIconPadding: Dp = UiDp.dp24,
-    actionIconPadding: Dp = UiDp.dp24,
+    titlePadding: Dp = UiDp.dp16,
+    navigationIconPadding: Dp = UiDp.dp16,
+    actionIconPadding: Dp = UiDp.dp16,
+    containerColor: Color = Color.Unspecified,
+    enableHaze: Boolean = false,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     val hazeState = LocalTopBarHazeState.current
     val hazeStyle = LocalTopBarHazeStyle.current
-    val hazeEnabled = hazeState != null && hazeStyle != null
+    val hazeEnabled = enableHaze && hazeState != null && hazeStyle != null
+    val resolvedContainerColor = if (containerColor == Color.Unspecified) {
+        defaultTopBarContainerColor()
+    } else {
+        containerColor
+    }
 
     SmallTopAppBar(
         title = title,
-        modifier = modifier.topBarHazeEffect(hazeState, hazeStyle),
-        color = if (hazeEnabled) Color.Transparent else MiuixTheme.colorScheme.surface,
+        modifier = if (hazeEnabled) modifier.topBarHazeEffect(hazeState, hazeStyle) else modifier,
+        color = resolvedContainerColor,
         titlePadding = titlePadding,
         navigationIconPadding = navigationIconPadding,
         actionIconPadding = actionIconPadding,

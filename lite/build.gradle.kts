@@ -29,6 +29,13 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val signingPropsFile = rootProject.file("signing.properties")
+val signingFileProps = if (signingPropsFile.exists()) {
+    Properties().apply { signingPropsFile.inputStream().use(::load) }
+} else {
+    null
+}
+
 val appAbiList =
     gropify.abi.app.list.split(',').map { it.trim() }.filter { it.isNotEmpty() }
 
@@ -42,7 +49,7 @@ android {
         targetSdk = gropify.android.targetSdk
         versionCode = gropify.project.version.code
         versionName = gropify.project.version.name
-        manifestPlaceholders["appName"] = "${gropify.project.name} Lite"
+        manifestPlaceholders["appName"] = "${gropify.project.name}(MD3) Lite"
     }
 
     compileOptions {
@@ -123,14 +130,30 @@ android {
     }
 
     signingConfigs {
-        val keystore = rootProject.file("signing.properties")
-        if (keystore.exists()) {
+        val resolvedStoreFilePath = providers.gradleProperty("signing.store.file").orNull
+            ?: signingFileProps?.getProperty("signing.store.file")
+            ?: signingFileProps?.getProperty("keystore.file")
+            ?: rootProject.file("release.keystore").takeIf { it.exists() }?.absolutePath
+        val resolvedStorePassword = providers.gradleProperty("signing.store.password").orNull
+            ?: signingFileProps?.getProperty("signing.store.password")
+            ?: signingFileProps?.getProperty("keystore.password")
+        val resolvedKeyAlias = providers.gradleProperty("signing.key.alias").orNull
+            ?: signingFileProps?.getProperty("signing.key.alias")
+            ?: signingFileProps?.getProperty("key.alias")
+        val resolvedKeyPassword = providers.gradleProperty("signing.key.password").orNull
+            ?: signingFileProps?.getProperty("signing.key.password")
+            ?: signingFileProps?.getProperty("key.password")
+
+        if (!resolvedStoreFilePath.isNullOrBlank() &&
+            !resolvedStorePassword.isNullOrBlank() &&
+            !resolvedKeyAlias.isNullOrBlank() &&
+            !resolvedKeyPassword.isNullOrBlank()
+        ) {
             create("release") {
-                val prop = Properties().apply { keystore.inputStream().use(::load) }
-                storeFile = rootProject.file("release.keystore")
-                storePassword = prop.getProperty("keystore.password")!!
-                keyAlias = prop.getProperty("key.alias")!!
-                keyPassword = prop.getProperty("key.password")!!
+                storeFile = rootProject.file(resolvedStoreFilePath)
+                storePassword = resolvedStorePassword
+                keyAlias = resolvedKeyAlias
+                keyPassword = resolvedKeyPassword
             }
         }
     }

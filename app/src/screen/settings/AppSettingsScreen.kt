@@ -48,8 +48,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.yumelira.yumebox.common.util.AppIconHelper
 import com.github.yumelira.yumebox.common.util.BiometricHelper
-import com.github.yumelira.yumebox.common.util.LocaleUtil
 import com.github.yumelira.yumebox.common.util.toast
+import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.presentation.component.Card
@@ -117,7 +117,6 @@ fun AppSettingsScreen(
 private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
     val automaticRestart by viewModel.automaticRestart.state.collectAsState()
     val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsState()
-    val isChineseLocale = remember { LocaleUtil.isChineseLocale() }
 
     Title(MLang.AppSettings.Section.Behavior)
     Card {
@@ -133,21 +132,13 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
             checked = autoUpdateCurrentProfileOnStart,
             onCheckedChange = viewModel::onAutoUpdateCurrentProfileOnStartChange,
         )
-        if (isChineseLocale) {
-            PreferenceSwitchItem(
-                title = MLang.AppSettings.Behavior.OneChinaTitle,
-                summary = MLang.AppSettings.Behavior.OneChinaSummary,
-                checked = true,
-                onCheckedChange = { },
-                enabled = false,
-            )
-        }
     }
 }
 
 @Composable
 private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
     val themeMode by viewModel.themeMode.state.collectAsState()
+    val colorTheme by viewModel.colorTheme.state.collectAsState()
     val appLanguage by viewModel.appLanguage.state.collectAsState()
     val themeSeedColorArgb by viewModel.themeSeedColorArgb.state.collectAsState()
     val invertOnPrimaryColors by viewModel.invertOnPrimaryColors.state.collectAsState()
@@ -170,10 +161,32 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             values = ThemeMode.entries,
             onValueChange = viewModel::onThemeModeChange,
         )
-        ThemeColorPickerItem(
-            themeSeedColorArgb = themeSeedColorArgb,
-            onThemeSeedColorChange = viewModel::onThemeSeedColorChange,
+        PreferenceEnumItem(
+            title = MLang.AppSettings.Interface.ColorThemeModeTitle,
+            summary = MLang.AppSettings.Interface.ColorThemeModeSummary,
+            currentValue = colorTheme,
+            items = listOf(
+                MLang.AppSettings.Interface.ColorThemeModeMonet,
+                MLang.AppSettings.Interface.ColorThemeModeCustom,
+            ),
+            values = listOf(
+                AppColorTheme.MonetDynamic,
+                AppColorTheme.Custom,
+            ),
+            onValueChange = viewModel::onColorThemeChange,
         )
+        if (colorTheme == AppColorTheme.Custom) {
+            ThemeColorPickerItem(
+                themeSeedColorArgb = themeSeedColorArgb,
+                onThemeSeedColorChange = viewModel::onThemeSeedColorChange,
+            )
+        } else {
+            PreferenceValueItem(
+                title = MLang.AppSettings.Interface.ColorThemePickerTitle,
+                summary = MLang.AppSettings.Interface.ColorThemeDynamicSummary,
+                onClick = { },
+            )
+        }
         PreferenceSwitchItem(
             title = MLang.AppSettings.Interface.ThemeColorPolarityInvertTitle,
             summary = MLang.AppSettings.Interface.ThemeColorPolarityInvertSummary,

@@ -19,31 +19,35 @@
  */
 
 
-package com.github.yumelira.yumebox.feature.editor.screen
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.foundation.layout.*
+package com.github.yumelira.yumebox.feature.editor.presentation.screen
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.feature.editor.editor.CodeEditor
-import com.github.yumelira.yumebox.feature.editor.editor.rememberConfiguredCodeEditorState
-import com.github.yumelira.yumebox.feature.editor.format.CodeFormatter
-import com.github.yumelira.yumebox.feature.editor.language.LanguageScope
+import com.github.yumelira.yumebox.feature.editor.presentation.component.NativeTextEditor
+import com.github.yumelira.yumebox.feature.editor.presentation.format.CodeFormatter
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.SmallTopBar
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.ArrowLeft
-import com.github.yumelira.yumebox.presentation.icon.yume.ArrowRight
 import com.github.yumelira.yumebox.presentation.icon.yume.ListCollapse
 import com.github.yumelira.yumebox.presentation.icon.yume.Save
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import top.yukonga.miuix.kmp.basic.*
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun ConfigPreviewScreen(
@@ -54,7 +58,6 @@ fun ConfigPreviewScreen(
     onSave: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
-    var isSaving by remember { mutableStateOf(false) }
 
     val formattedContent = remember(initialContent, language) {
         if (language == LanguageScope.Json) {
@@ -63,12 +66,9 @@ fun ConfigPreviewScreen(
             initialContent
         }
     }
-
-    val editorState = rememberConfiguredCodeEditorState(
-        initialContent = formattedContent,
-        language = language,
-        readOnly = false,
-    )
+    var content by remember(formattedContent, language) { mutableStateOf(formattedContent) }
+    val isModified = content != formattedContent
+    val canSave = onSave != null && isModified
     val scrollBehavior = MiuixScrollBehavior()
 
     Scaffold(
@@ -77,39 +77,34 @@ fun ConfigPreviewScreen(
                 title = title,
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
-                    Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
-                        IconButton(
-                            onClick = { editorState.undo() },
-                            enabled = editorState.canUndo()
-                        ) { Icon(Yume.ArrowLeft, null) }
-                        IconButton(
-                            onClick = { editorState.redo() },
-                            enabled = editorState.canRedo()
-                        ) { Icon(Yume.ArrowRight, null) }
+                    IconButton(onClick = { navigator.navigateUp() }) {
+                        Icon(Yume.ArrowLeft, contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(
                         modifier = Modifier.padding(end = UiDp.dp12),
-                        onClick = { editorState.format() }
+                        onClick = {
+                            val formatted = CodeFormatter.format(content, language)
+                            if (formatted != null && formatted != content) {
+                                content = formatted
+                            }
+                        }
                     ) {
                         Icon(Yume.ListCollapse, contentDescription = "Format")
                     }
                     IconButton(
                         onClick = {
-                            if (isSaving || onSave == null) return@IconButton
-                            isSaving = true
+                            val save = onSave ?: return@IconButton
                             runCatching {
-                                onSave(editorState.content)
+                                save(content)
                             }.onSuccess {
-                                editorState.resetModified()
                                 navigator.navigateUp()
                             }.onFailure {
                                 context.toast(it.message ?: "保存失败")
                             }
-                            isSaving = false
                         },
-                        enabled = onSave != null && editorState.isModified && !isSaving
+                        enabled = canSave
                     ) {
                         Icon(Yume.Save, contentDescription = "Save")
                     }
@@ -117,10 +112,21 @@ fun ConfigPreviewScreen(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            CodeEditor(
-                state = editorState,
-                modifier = Modifier.fillMaxSize()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MiuixTheme.colorScheme.background)
+                .padding(paddingValues),
+        ) {
+            NativeTextEditor(
+                value = content,
+                onValueChange = { newContent ->
+                    if (newContent != content) {
+                        content = newContent
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+                readOnly = onSave == null,
             )
         }
     }

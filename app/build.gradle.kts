@@ -32,8 +32,49 @@ plugins {
 }
 
 
-val appAbiList =
-    gropify.abi.app.list.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+val signingPropsFile = rootProject.file("signing.properties")
+val signingFileProps = if (signingPropsFile.exists()) {
+    Properties().apply { signingPropsFile.inputStream().use(::load) }
+} else {
+    null
+}
+
+val injectedAbi = (
+    rootProject.extra.properties["forcedBuildAbi"] as? String
+        ?: providers.gradleProperty("android.injected.build.abi").orNull
+)?.trim()?.takeIf { it.isNotEmpty() }
+
+val appAbiList = injectedAbi
+    ?.split(',')
+    ?.map { it.trim() }
+    ?.filter { it.isNotEmpty() }
+    ?.takeIf { it.isNotEmpty() }
+    ?: gropify.abi.app.list.split(',')
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+
+val isSingleAbiPackage = injectedAbi != null
+val startupGateEnabled = providers.gradleProperty("startupGate.enabled").orNull
+    ?.trim()
+    ?.ifEmpty { null }
+    ?: signingFileProps?.getProperty("startupGate.enabled")
+        ?.trim()
+        ?.ifEmpty { null }
+    ?: "false"
+val startupGateEnforceSigner = providers.gradleProperty("startupGate.enforceSigner").orNull
+    ?.trim()
+    ?.ifEmpty { null }
+    ?: signingFileProps?.getProperty("startupGate.enforceSigner")
+        ?.trim()
+        ?.ifEmpty { null }
+    ?: "false"
+val startupGateExpectedSignerSha256 = providers.gradleProperty("startupGate.expectedSignerSha256").orNull
+    ?.trim()
+    ?.ifEmpty { "" }
+    ?: signingFileProps?.getProperty("startupGate.expectedSignerSha256")
+        ?.trim()
+        ?.ifEmpty { "" }
+    ?: ""
 
 val geoFilesAssetsDir = rootProject.layout.buildDirectory.dir("generated/assets/geo")
 
@@ -45,7 +86,16 @@ android {
         targetSdk = gropify.android.targetSdk
         versionCode = gropify.project.version.code
         versionName = gropify.project.version.name
-        manifestPlaceholders["appName"] = gropify.project.name
+        manifestPlaceholders["appName"] = "${gropify.project.name}(MD3)"
+        manifestPlaceholders["startupGateEnabled"] = startupGateEnabled
+        manifestPlaceholders["startupGateEnforceSigner"] = startupGateEnforceSigner
+        manifestPlaceholders["startupGateExpectedSignerSha256"] = startupGateExpectedSignerSha256
+
+        if (isSingleAbiPackage) {
+            ndk {
+                abiFilters += appAbiList
+            }
+        }
     }
 
     compileOptions {
@@ -109,10 +159,11 @@ android {
     splits {
         abi {
             //noinspection WrongGradleMethod
-            isEnable = gradle.startParameter.taskNames.none { it.contains("bundle", ignoreCase = true) }
+            isEnable = !isSingleAbiPackage &&
+                gradle.startParameter.taskNames.none { it.contains("bundle", ignoreCase = true) }
             reset()
             include(*appAbiList.toTypedArray())
-            isUniversalApk = true
+            isUniversalApk = false
         }
     }
 
@@ -124,14 +175,30 @@ android {
     }
 
     signingConfigs {
-        val keystore = rootProject.file("signing.properties")
-        if (keystore.exists()) {
+        val resolvedStoreFilePath = providers.gradleProperty("signing.store.file").orNull
+            ?: signingFileProps?.getProperty("signing.store.file")
+            ?: signingFileProps?.getProperty("keystore.file")
+            ?: rootProject.file("release.keystore").takeIf { it.exists() }?.absolutePath
+        val resolvedStorePassword = providers.gradleProperty("signing.store.password").orNull
+            ?: signingFileProps?.getProperty("signing.store.password")
+            ?: signingFileProps?.getProperty("keystore.password")
+        val resolvedKeyAlias = providers.gradleProperty("signing.key.alias").orNull
+            ?: signingFileProps?.getProperty("signing.key.alias")
+            ?: signingFileProps?.getProperty("key.alias")
+        val resolvedKeyPassword = providers.gradleProperty("signing.key.password").orNull
+            ?: signingFileProps?.getProperty("signing.key.password")
+            ?: signingFileProps?.getProperty("key.password")
+
+        if (!resolvedStoreFilePath.isNullOrBlank() &&
+            !resolvedStorePassword.isNullOrBlank() &&
+            !resolvedKeyAlias.isNullOrBlank() &&
+            !resolvedKeyPassword.isNullOrBlank()
+        ) {
             create("release") {
-                val prop = Properties().apply { keystore.inputStream().use(::load) }
-                storeFile = rootProject.file("release.keystore")
-                storePassword = prop.getProperty("keystore.password")!!
-                keyAlias = prop.getProperty("key.alias")!!
-                keyPassword = prop.getProperty("key.password")!!
+                storeFile = rootProject.file(resolvedStoreFilePath)
+                storePassword = resolvedStorePassword
+                keyAlias = resolvedKeyAlias
+                keyPassword = resolvedKeyPassword
             }
         }
     }
@@ -146,9 +213,10 @@ android {
     androidComponents {
         onVariants { variant ->
             variant.outputs.forEach { output ->
-                val abiName = output.filters.find {
+                val splitAbiName = output.filters.find {
                     it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
-                }?.identifier ?: "universal"
+                }?.identifier
+                val abiName = injectedAbi ?: splitAbiName ?: "universal"
                 val buildTypeName = variant.buildType ?: "release"
                 output.versionName.set(gropify.project.version.name)
                 (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
@@ -195,7 +263,6 @@ dependencies {
 
     val mmkv64 = gropify.dep.version.mmkv64
     val mmkv32 = gropify.dep.version.mmkv32
-    val injectedAbi = findProperty("android.injected.build.abi") as? String
     val mmkvVersion = if (injectedAbi in listOf("arm64-v8a", "x86_64")) mmkv64 else mmkv32
     //noinspection NewerVersionAvailable
     implementation("com.tencent:mmkv:$mmkvVersion")

@@ -47,12 +47,14 @@ class ProxySheetActivity : ComponentActivity() {
 
         setContent {
             val themeMode by appSettingsStorage.themeMode.state.collectAsState()
+            val colorTheme by appSettingsStorage.colorTheme.state.collectAsState()
             val themeSeedColorArgb by appSettingsStorage.themeAccentColorArgb.state.collectAsState()
             val invertOnPrimaryColors by appSettingsStorage.invertOnPrimaryColors.state.collectAsState()
 
             ProvideAndroidPlatformTheme {
                 YumeTheme(
                     themeMode = themeMode,
+                    colorTheme = colorTheme,
                     themeSeedColorArgb = themeSeedColorArgb,
                     invertOnPrimaryColors = invertOnPrimaryColors,
                 ) {

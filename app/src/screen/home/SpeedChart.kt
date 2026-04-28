@@ -53,7 +53,8 @@ fun SpeedChart(
     speedHistory: List<Long>,
     isRunning: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    animateIdle: Boolean = true,
 ) {
     val componentSizes = AppTheme.sizes
     val opacity = AppTheme.opacity
@@ -61,19 +62,25 @@ fun SpeedChart(
     val fractions = remember(speedHistory) {
         buildSpeedChartFractions(speedHistory = speedHistory)
     }
-    val idleTransition = rememberInfiniteTransition(label = "speed_chart_idle")
-    val idlePhase by idleTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = SPEED_CHART_IDLE_SCROLL_DURATION_MS,
-                easing = LinearEasing
+    val shouldAnimateIdle = animateIdle && !isRunning
+    val idlePhase = if (shouldAnimateIdle) {
+        val idleTransition = rememberInfiniteTransition(label = "speed_chart_idle")
+        val phase by idleTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = SPEED_CHART_IDLE_SCROLL_DURATION_MS,
+                    easing = LinearEasing
+                ),
+                repeatMode = RepeatMode.Restart
             ),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "speed_chart_idle_phase"
-    )
+            label = "speed_chart_idle_phase"
+        )
+        phase
+    } else {
+        0f
+    }
 
     Canvas(
         modifier = modifier

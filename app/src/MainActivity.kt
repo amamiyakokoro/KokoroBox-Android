@@ -25,6 +25,7 @@ package com.github.yumelira.yumebox
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -71,6 +72,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.qualifier.named
@@ -104,7 +106,7 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        StartupGate.loadPrimary()
+        loadStartupGate()
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -135,6 +137,7 @@ class MainActivity : FragmentActivity() {
         setContent {
             val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
             val themeMode = appSettingsViewModel.themeMode.state.collectAsState().value
+            val colorTheme = appSettingsViewModel.colorTheme.state.collectAsState().value
             val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsState().value
             val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsState().value
             val excludeFromRecents = appSettingsViewModel.excludeFromRecents.state.collectAsState().value
@@ -164,6 +167,7 @@ class MainActivity : FragmentActivity() {
                 CompositionLocalProvider(LocalDensity provides scaledDensity) {
                     YumeTheme(
                         themeMode = themeMode,
+                        colorTheme = colorTheme,
                         themeSeedColorArgb = themeSeedColorArgb,
                         invertOnPrimaryColors = invertOnPrimaryColors,
                     ) {
@@ -232,6 +236,20 @@ class MainActivity : FragmentActivity() {
             } finally {
                 AutoStartSessionGate.finishForegroundAutoActions(markHandled = handled)
             }
+        }
+    }
+
+    private fun loadStartupGate() {
+        val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!isDebuggable) {
+            StartupGate.loadPrimary()
+            return
+        }
+
+        runCatching {
+            StartupGate.loadPrimary()
+        }.onFailure { throwable ->
+            Timber.w(throwable, "Skip startup gate native library in debug build")
         }
     }
 
