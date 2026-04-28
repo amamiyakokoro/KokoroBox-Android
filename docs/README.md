@@ -35,6 +35,10 @@ YumeBox-MaterialDesign keeps the core capabilities of the original project while
 - **Statistics, privacy, and lightweight build**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; supports YumeBox Lite, adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
 - **Stability and performance optimization**: improves startup blocking, runtime state freezes, dialog stutters, notification content, package size, background UI release, and many interaction details for a smoother and more fault-tolerant daily experience.
 
+## Roadmap
+
+Future updates will continue to improve personalization and content-driven experiences. Planned ideas include an option to extract theme colors from the ACG image selected by the user, allowing the home page, cards, navigation bar, and other UI elements to change dynamically with the artwork; daily web-based updates for ACG images and hitokoto-style quotes, with more flexible image sources, caching strategies, and manual refresh controls; and continuous improvements to the theme system, configuration editor, runtime status display, and lightweight builds, so YumeBox-MaterialDesign can keep evolving toward being more usable, polished, and fun.
+
 ## Feedback and Suggestions
 
 If you encounter a bug, please submit it on the Issues page:
