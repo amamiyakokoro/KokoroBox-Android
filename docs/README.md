@@ -41,10 +41,6 @@ v0.5.2 continues to narrow the legacy UI boundary: normal screens now prefer Jet
 
 This theme refactor follows the Monet / dynamic-color setting recommendations summarized in `chat-export-2026-04-28_22-27-47.md`: use wallpaper or system colors as inspiration, keep readability as the baseline, map colors through Material roles, and give users enough but not excessive control. No proxy core/runtime kernel code was changed; the changes are limited to UI, settings, and theme derivation:
 
-- Color styles: Tonal Spot, Vibrant, Expressive, Neutral, and Monochrome.
-- Color intensity / vibrancy: default 45%, with 35%–55% recommended for daily UI; dark theme is intentionally more restrained.
-- Contrast: Standard, Medium, and High, prioritizing readable text, buttons, and containers.
-- Semantic colors: error, warning, latency, traffic, and other functional colors remain static instead of being freely dynamic.
 - ACG home: the existing wallpaper, sidebar, launch button, and quote layout are preserved; it only follows the global theme tokens in a restrained way.
 
 References include Android / Material documentation and related open-source implementations:
