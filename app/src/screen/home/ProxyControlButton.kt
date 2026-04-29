@@ -30,6 +30,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.common.AppConstants
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Play
@@ -45,11 +51,6 @@ import com.github.yumelira.yumebox.presentation.icon.yume.Square
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun ProxyControlButton(
@@ -65,9 +66,6 @@ fun ProxyControlButton(
     val scaleAnim = remember { Animatable(1f) }
     val cornerRadius = AppConstants.UI.BUTTON_CORNER_RADIUS
     val buttonWidthFraction = 0.3f
-
-    MiuixTheme.colorScheme.surface
-    MiuixTheme.colorScheme.onSurface
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -110,19 +108,19 @@ fun ProxyControlButton(
             modifier = Modifier
                 .fillMaxWidth(buttonWidthFraction)
                 .scale(scaleAnim.value)
+                .heightIn(min = UiDp.dp36)
                 .shadow(
                     elevation = UiDp.dp1,
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius),
+                    shape = RoundedCornerShape(cornerRadius),
                     clip = false
                 )
                 .border(
                     width = UiDp.dp0_2,
-                    color = MiuixTheme.colorScheme.outline,
+                    color = MaterialTheme.colorScheme.outline,
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius)
                 ),
-            colors = ButtonDefaults.buttonColors(MiuixTheme.colorScheme.background),
-            cornerRadius = cornerRadius,
-            minHeight = UiDp.dp36
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
+            shape = RoundedCornerShape(cornerRadius),
         ) {
             AnimatedContent(
                 targetState = isRunning,
@@ -155,7 +153,7 @@ fun ProxyControlButton(
                 Icon(
                     imageVector = if (running) Yume.Square else Yume.Play,
                     contentDescription = null,
-                    tint = MiuixTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -166,7 +164,7 @@ fun ProxyControlButton(
 private fun HintText(text: String) {
     Text(
         text = text,
-        style = MiuixTheme.textStyles.body2,
-        color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }

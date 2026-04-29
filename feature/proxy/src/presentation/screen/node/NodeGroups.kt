@@ -93,7 +93,6 @@ internal fun NodeGroupCard(
     showTrailingIndicator: Boolean = true,
 ) {
     val spacing = AppTheme.spacing
-    val sizes = AppTheme.sizes
     val palette = rememberProxySelectionPalette(selected = isSelected)
 
     val proxiesByName = remember(group.proxies) {
@@ -119,12 +118,12 @@ internal fun NodeGroupCard(
     NodeSelectableCard(
         isSelected = isSelected,
         onClick = onCardClick,
-        modifier = modifier.heightIn(min = 148.dp),
-        paddingVertical = sizes.nodeCardPaddingVertical,
+        modifier = modifier.heightIn(min = 156.dp),
+        paddingVertical = spacing.space12,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(spacing.space10),
+            verticalArrangement = Arrangement.spacedBy(spacing.space12),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -168,7 +167,7 @@ internal fun NodeGroupCard(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
             ) {
                 currentNode.countryCode?.let { countryCode ->
-                    CountryFlagCircle(countryCode = countryCode, size = UiDp.dp20)
+                    CountryFlagCircle(countryCode = countryCode, size = UiDp.dp18)
                 }
                 Text(
                     text = currentNodeName,

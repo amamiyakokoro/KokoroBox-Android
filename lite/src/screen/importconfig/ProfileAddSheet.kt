@@ -44,6 +44,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -69,15 +72,11 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
+import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.InfiniteProgressIndicator
-import top.yukonga.miuix.kmp.basic.SpinnerEntry
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.preference.WindowSpinnerPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.io.File
 import java.util.UUID
 import kotlin.math.max
@@ -361,11 +360,11 @@ internal fun AddProfileSheet(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                         ) {
-                            InfiniteProgressIndicator(modifier = Modifier.size(32.dp))
+                            CircularProgressIndicator(modifier = Modifier.size(32.dp))
                             Text(
                                 text = downloadProgress?.message ?: MLang.ProfilesVM.Progress.Preparing,
-                                style = MiuixTheme.textStyles.body1,
-                                color = MiuixTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
                                 maxLines = 2,
@@ -381,13 +380,14 @@ internal fun AddProfileSheet(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         Card {
-                            WindowSpinnerPreference(
+                            YumeMd3DropdownPreference(
                                 title = MLang.ProfilesPage.Type.Title,
                                 items = listOf(
-                                    SpinnerEntry(title = MLang.ProfilesPage.Type.Subscription),
-                                    SpinnerEntry(title = MLang.ProfilesPage.Type.LocalFile),
+                                    MLang.ProfilesPage.Type.Subscription,
+                                    MLang.ProfilesPage.Type.LocalFile,
                                 ),
                                 selectedIndex = selectedTypeIndex,
+                                enabled = profileToEdit == null,
                                 onSelectedIndexChange = {
                                     if (profileToEdit == null) {
                                         selectedTypeIndex = it
@@ -400,18 +400,19 @@ internal fun AddProfileSheet(
                             )
                         }
 
-                        TextField(
+                        YumeMd3OutlinedTextField(
                             value = name,
                             onValueChange = {
                                 name = it
                                 error = ""
                             },
                             label = MLang.ProfilesPage.Input.ProfileName,
+                            singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
 
                         if (selectedTypeIndex == 0) {
-                            TextField(
+                            YumeMd3OutlinedTextField(
                                 value = url,
                                 onValueChange = {
                                     url = it
@@ -424,10 +425,11 @@ internal fun AddProfileSheet(
                                 modifier = Modifier.fillMaxWidth(),
                             )
                         } else {
-                            TextField(
+                            YumeMd3OutlinedTextField(
                                 value = fileName,
                                 onValueChange = { },
                                 label = MLang.ProfilesPage.Input.SelectFile,
+                                singleLine = true,
                                 readOnly = true,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -443,8 +445,8 @@ internal fun AddProfileSheet(
                         if (error.isNotEmpty()) {
                             Text(
                                 text = error,
-                                color = MiuixTheme.colorScheme.error,
-                                style = MiuixTheme.textStyles.body2,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         }
                     }

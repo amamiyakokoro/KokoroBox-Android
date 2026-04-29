@@ -124,29 +124,19 @@ class ProxyViewModel(
             setLoading(true)
             clearError()
             val currentGroups = proxyGroups.value
-            val testingTargets: Set<String> = if (groupName != null) {
-                setOf(groupName)
-            } else {
-                currentGroups.mapTo(linkedSetOf()) { it.name }
-            }
+            val targetGroupName = groupName ?: currentGroups.firstOrNull()?.name
+            val testingTargets: Set<String> = targetGroupName?.let(::setOf).orEmpty()
             if (testingTargets.isNotEmpty()) {
                 _testingGroupNames.update { it + testingTargets }
             }
 
             val result = runCatching {
-                if (groupName != null) {
-                    showMessage(MLang.Proxy.Testing.Group.format(groupName))
-                    proxyFacade.healthCheck(groupName)
+                if (targetGroupName != null) {
+                    showMessage(MLang.Proxy.Testing.Group.format(targetGroupName))
+                    proxyFacade.healthCheck(targetGroupName)
                     PollingTimers.awaitTick(PollingTimerSpecs.ProxyHealthcheckRefresh)
-                    proxyFacade.refreshProxyGroup(groupName)
+                    proxyFacade.refreshProxyGroup(targetGroupName)
                     showMessage(MLang.Proxy.Testing.RequestSent)
-                } else {
-                    showMessage(MLang.Proxy.Testing.All)
-                    proxyFacade.healthCheckAll()
-                    if (currentGroups.isNotEmpty()) {
-                        PollingTimers.awaitTick(PollingTimerSpecs.ProxyHealthcheckRefresh)
-                        proxyFacade.refreshProxyGroups()
-                    }
                 }
             }
 
@@ -167,12 +157,17 @@ class ProxyViewModel(
         proxyDisplaySettingsStore.sortMode.set(mode)
     }
 
-    fun selectProxy(groupName: String, proxyName: String) {
+    fun selectProxy(
+        groupName: String,
+        proxyName: String,
+        onSuccess: (() -> Unit)? = null,
+    ) {
         viewModelScope.launch {
             runCatching {
                 val success = proxyFacade.selectProxy(groupName, proxyName)
                 if (success) {
                     showMessage(MLang.Proxy.Selection.Switched.format(proxyName))
+                    onSuccess?.invoke()
                 } else {
                     showError(MLang.Proxy.Selection.Failed)
                 }

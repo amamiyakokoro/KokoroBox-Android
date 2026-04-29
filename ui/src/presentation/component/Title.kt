@@ -22,10 +22,15 @@
 
 package com.github.yumelira.yumebox.presentation.component
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.horizontalPadding
 import com.github.yumelira.yumebox.presentation.theme.topPadding
-import top.yukonga.miuix.kmp.basic.SmallTitle
 
 /**
  * App-level wrapper around Miuix `Title`.
@@ -33,8 +38,13 @@ import top.yukonga.miuix.kmp.basic.SmallTitle
  */
 @Composable
 fun Title(text: String) {
-    SmallTitle(
-        modifier = Modifier.topPadding(),
+    Text(
         text = text,
+        modifier = Modifier
+            .horizontalPadding(left = AppTheme.spacing.screenHorizontal)
+            .topPadding()
+            .padding(bottom = UiDp.dp8),
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
     )
 }

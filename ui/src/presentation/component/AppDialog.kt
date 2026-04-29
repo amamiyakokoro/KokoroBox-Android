@@ -26,26 +26,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import top.yukonga.miuix.kmp.layout.DialogDefaults
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3Dialog
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DialogDefaults
 
 object AppDialogDefaults {
     @Composable
-    fun titleColor(): Color = DialogDefaults.titleColor()
+    fun titleColor(): Color = YumeMd3DialogDefaults.titleColor()
 
     @Composable
-    fun summaryColor(): Color = DialogDefaults.summaryColor()
+    fun summaryColor(): Color = YumeMd3DialogDefaults.summaryColor()
 
     @Composable
-    fun backgroundColor(): Color = MiuixTheme.colorScheme.surface
+    fun backgroundColor(): Color = YumeMd3DialogDefaults.backgroundColor()
 
     val outsideMargin: DpSize
-        get() = DpSize(UiDp.dp24, UiDp.dp24)
+        get() = YumeMd3DialogDefaults.outsideMargin
 
     val insideMargin: DpSize
-        get() = DpSize(UiDp.dp24, UiDp.dp20)
+        get() = YumeMd3DialogDefaults.insideMargin
 }
 
 @Composable
@@ -66,7 +64,7 @@ fun AppDialog(
     renderInRootScaffold: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    OverlayDialog(
+    YumeMd3Dialog(
         show = show,
         modifier = modifier,
         title = title,

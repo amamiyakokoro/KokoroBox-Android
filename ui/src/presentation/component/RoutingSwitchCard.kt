@@ -26,6 +26,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.key
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,9 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.state.IntColorDrawableStateImage
-import top.yukonga.miuix.kmp.basic.Switch
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.github.panpf.sketch.AsyncImage as SketchAsyncImage
 
 @Composable
@@ -129,8 +129,8 @@ private fun RoutingSwitchRow(
         }
         Text(
             text = title,
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
         Switch(
@@ -149,7 +149,7 @@ private fun RoutingIcon(
     val spacing = AppTheme.spacing
 
     val context = LocalContext.current
-    val placeholderColorInt = MiuixTheme.colorScheme.onSurface.copy(alpha = opacity.subtle).toArgb()
+    val placeholderColorInt = MaterialTheme.colorScheme.onSurface.copy(alpha = opacity.subtle).toArgb()
     val request = remember(iconUrl, placeholderColorInt, context) {
         iconUrl?.takeIf(String::isNotBlank)?.let { url ->
             ImageRequest(context, url) {

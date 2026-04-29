@@ -23,6 +23,8 @@ package com.github.yumelira.yumebox.screen.settings.component
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,17 +33,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.yumelira.yumebox.data.model.ThemeMode
+import com.github.yumelira.yumebox.miuix.YumeMiuixColorPicker
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.EnumSelector
+import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
+import androidx.compose.material3.Icon as MaterialIcon
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Palette
 import com.github.yumelira.yumebox.presentation.theme.colorFromArgb
 import com.github.yumelira.yumebox.presentation.theme.colorToArgbLong
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun ThemeModeAndColorItems(
@@ -106,7 +109,7 @@ internal fun ThemeColorPickerItem(
         mutableStateOf(themeSeedHexFieldValue(themeSeedColorArgb))
     }
 
-    BasicComponent(
+    PreferenceListItem(
         title = MLang.AppSettings.Interface.ColorThemeTitle,
         summary = MLang.AppSettings.Interface.ColorThemeCustomSummary.format(
             formatThemeSeedHex(themeSeedColorArgb)
@@ -125,7 +128,7 @@ internal fun ThemeColorPickerItem(
             val previewColor = remember(themeSeedColorArgb) {
                 runCatching { colorFromArgb(themeSeedColorArgb) }.getOrDefault(Color.White)
             }
-            Icon(
+            MaterialIcon(
                 Yume.Palette,
                 tint = previewColor,
                 contentDescription = null,
@@ -195,15 +198,15 @@ internal fun ThemeColorPickerSheet(
                     .navigationBarsPadding()
                     .imePadding(),
             ) {
-                ColorPicker(
+                YumeMiuixColorPicker(
                     color = editingThemeSeedColor,
                     onColorChanged = onEditingThemeSeedColorChange,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                TextField(
+                OutlinedTextField(
                     value = editingThemeSeedHex,
                     onValueChange = onEditingThemeSeedHexChange,
-                    label = MLang.AppSettings.Interface.ColorThemeCodeLabel,
+                    label = { Text(MLang.AppSettings.Interface.ColorThemeCodeLabel) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = UiDp.dp8),

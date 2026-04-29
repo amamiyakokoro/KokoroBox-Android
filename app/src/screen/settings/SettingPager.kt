@@ -26,6 +26,11 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -57,12 +62,6 @@ import com.ramcosta.composedestinations.generated.destinations.NetworkSettingsSc
 import com.ramcosta.composedestinations.generated.destinations.OverrideScreenDestination
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 private fun CircularIcon(
@@ -97,12 +96,12 @@ private fun CircularIcon(
                 }
                 .size(componentSizes.settingsIconContainerSize)
                 .clip(RoundedCornerShape(radii.radius16))
-                .background(MiuixTheme.colorScheme.primaryContainer),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = imageVector,
                 contentDescription = contentDescription,
-                tint = MiuixTheme.colorScheme.onPrimaryContainer,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
                     .size(componentSizes.settingsIconGlyphSize)
                     .graphicsLayer(
@@ -119,7 +118,6 @@ private fun CircularIcon(
 @Composable
 fun SettingPager(mainInnerPadding: PaddingValues) {
     val viewModel = koinViewModel<SettingViewModel>()
-    val scrollBehavior = MiuixScrollBehavior()
     val navigator = LocalNavigator.current
     val context = LocalContext.current
 
@@ -140,12 +138,12 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.Settings.Title, scrollBehavior = scrollBehavior)
+            TopBar(title = MLang.Settings.Title)
         },
     ) { innerPadding ->
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainInnerPadding),
         ) {
 
@@ -246,7 +244,7 @@ private fun VersionBadge(
     val opacity = AppTheme.opacity
 
     Surface(
-        color = MiuixTheme.colorScheme.primaryContainer,
+        color = MaterialTheme.colorScheme.primaryContainer,
         shape = RoundedCornerShape(50),
         modifier = Modifier
             .height(componentSizes.versionBadgeHeight)
@@ -258,9 +256,12 @@ private fun VersionBadge(
             horizontalArrangement = Arrangement.spacedBy(spacing.space8)
         ) {
             Text(
-                text = versionInfo ?: "Unknown", style = MiuixTheme.textStyles.footnote1.copy(
-                    fontSize = 12.sp, fontWeight = FontWeight.Bold
-                ), color = MiuixTheme.colorScheme.onPrimaryContainer
+                text = versionInfo ?: "Unknown",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }

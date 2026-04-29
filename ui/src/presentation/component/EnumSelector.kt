@@ -18,12 +18,10 @@
  *
  */
 
-
-
 package com.github.yumelira.yumebox.presentation.component
 
 import androidx.compose.runtime.Composable
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3EnumSelector
 
 @Composable
 fun <T> EnumSelector(
@@ -34,17 +32,12 @@ fun <T> EnumSelector(
     values: List<T>,
     onValueChange: (T) -> Unit,
 ) {
-    val selectedIndex = values.indexOf(currentValue).coerceAtLeast(0)
-
-    WindowDropdownPreference(
+    YumeMd3EnumSelector(
         title = title,
         summary = summary,
+        currentValue = currentValue,
         items = items,
-        selectedIndex = selectedIndex,
-        onSelectedIndexChange = { index ->
-            if (index >= 0 && index < values.size) {
-                onValueChange(values[index])
-            }
-        },
+        values = values,
+        onValueChange = onValueChange,
     )
 }

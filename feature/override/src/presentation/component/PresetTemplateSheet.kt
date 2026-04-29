@@ -32,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.officialMrsPresetIconUrl
 import com.github.yumelira.yumebox.data.util.OverridePresetItem
 import com.github.yumelira.yumebox.data.util.OverridePresetRegion
@@ -43,9 +42,6 @@ import com.github.yumelira.yumebox.data.util.orderedServicePresetItems
 import com.github.yumelira.yumebox.data.util.sortPresetItems
 import com.github.yumelira.yumebox.data.util.sortPresetRegions
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.SmallTitle
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun OverridePresetTemplateSheet(
@@ -113,10 +109,9 @@ fun OverridePresetTemplateSheet(
                             .padding(horizontal = UiDp.dp16, vertical = UiDp.dp14),
                         verticalArrangement = Arrangement.spacedBy(UiDp.dp4),
                     ) {
-                        Text(
+                        AppText(
                             text = MLang.Override.Draft.PresetApplySummary,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                            style = MiuixTheme.textStyles.body2,
+                            color = appOnSurfaceVariantColor(),
                         )
                     }
                 }
@@ -152,10 +147,7 @@ fun OverridePresetTemplateSheet(
                     },
                     applyHorizontalPadding = false,
                     titleContent = { title ->
-                        SmallTitle(
-                            text = title,
-                            insideMargin = PaddingValues(horizontal = UiDp.dp16, vertical = UiDp.dp8),
-                        )
+                        OverridePresetTemplateGroupTitle(title)
                     },
                 )
             }
@@ -172,10 +164,7 @@ fun OverridePresetTemplateSheet(
                     itemTitle = OverridePresetRegion::displayName,
                     applyHorizontalPadding = false,
                     titleContent = { title ->
-                        SmallTitle(
-                            text = title,
-                            insideMargin = PaddingValues(horizontal = UiDp.dp16, vertical = UiDp.dp8),
-                        )
+                        OverridePresetTemplateGroupTitle(title)
                     },
                 )
             }
@@ -192,10 +181,7 @@ fun OverridePresetTemplateSheet(
                     itemTitle = OverridePresetRegion::displayName,
                     applyHorizontalPadding = false,
                     titleContent = { title ->
-                        SmallTitle(
-                            text = title,
-                            insideMargin = PaddingValues(horizontal = UiDp.dp16, vertical = UiDp.dp8),
-                        )
+                        OverridePresetTemplateGroupTitle(title)
                     },
                 )
             }
@@ -210,10 +196,7 @@ fun OverridePresetTemplateSheet(
                     itemTitle = OverridePresetItem::title,
                     applyHorizontalPadding = false,
                     titleContent = { title ->
-                        SmallTitle(
-                            text = title,
-                            insideMargin = PaddingValues(horizontal = UiDp.dp16, vertical = UiDp.dp8),
-                        )
+                        OverridePresetTemplateGroupTitle(title)
                     },
                 )
             }
@@ -228,15 +211,21 @@ fun OverridePresetTemplateSheet(
                     itemTitle = OverridePresetItem::title,
                     applyHorizontalPadding = false,
                     titleContent = { title ->
-                        SmallTitle(
-                            text = title,
-                            insideMargin = PaddingValues(horizontal = UiDp.dp16, vertical = UiDp.dp8),
-                        )
+                        OverridePresetTemplateGroupTitle(title)
                     },
                 )
             }
         }
     }
+}
+
+@Composable
+private fun OverridePresetTemplateGroupTitle(title: String) {
+    AppText(
+        text = title,
+        color = appOnSurfaceVariantColor(),
+        modifier = Modifier.padding(horizontal = UiDp.dp16, vertical = UiDp.dp8),
+    )
 }
 
 private fun <T> toggleSelection(

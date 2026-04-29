@@ -45,6 +45,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
     implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")
     implementation("io.insert-koin:koin-android:${gropify.dep.version.koin}")
@@ -54,7 +55,5 @@ dependencies {
     implementation("org.apache.commons:commons-compress:${gropify.dep.version.commonsCompress}")
     implementation("com.caoccao.javet:javet-node-android:${gropify.dep.version.javetNodeAndroid}")
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
-    implementation("top.yukonga.miuix.kmp:miuix-ui:${gropify.dep.version.miuix}")
-    implementation("top.yukonga.miuix.kmp:miuix-preference:${gropify.dep.version.miuix}")
 }
 

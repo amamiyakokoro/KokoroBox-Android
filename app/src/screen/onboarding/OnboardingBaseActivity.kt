@@ -31,6 +31,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -46,9 +49,6 @@ import com.github.yumelira.yumebox.presentation.theme.YumeTheme
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 internal abstract class OnboardingBaseActivity : ComponentActivity() {
 
@@ -129,10 +129,12 @@ private fun OnboardingActivityTheme(
                 themeSeedColorArgb = themeSeedColorArgb,
                 invertOnPrimaryColors = invertOnPrimaryColors,
             ) {
-                Scaffold { _ ->
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ) { _ ->
                     Surface(
                         modifier = Modifier.fillMaxSize(),
-                        color = MiuixTheme.colorScheme.surface,
+                        color = MaterialTheme.colorScheme.surface,
                         content = content,
                     )
                 }
@@ -140,3 +142,4 @@ private fun OnboardingActivityTheme(
         }
     }
 }
+

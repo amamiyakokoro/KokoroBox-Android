@@ -18,16 +18,17 @@
  *
  */
 
-
-
 package com.github.yumelira.yumebox.presentation.component
 
 import android.content.Context
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.github.yumelira.yumebox.common.util.openUrl
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.preference.ArrowPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.chevron
 
 @Composable
 fun LinkItem(
@@ -36,17 +37,20 @@ fun LinkItem(
     showArrow: Boolean = false,
     context: Context = LocalContext.current,
 ) {
-    if (showArrow) {
-        ArrowPreference(
-            title = title,
-            summary = url,
-            onClick = { openUrl(context, url) }
-        )
-    } else {
-        BasicComponent(
-            title = title,
-            summary = url,
-            onClick = { openUrl(context, url) }
-        )
-    }
+    YumeMd3PreferenceItem(
+        title = title,
+        summary = url,
+        onClick = { openUrl(context, url) },
+        trailingContent = if (showArrow) {
+            {
+                Icon(
+                    imageVector = Yume.chevron,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        } else {
+            null
+        },
+    )
 }

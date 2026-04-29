@@ -48,6 +48,7 @@ import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
 import com.github.yumelira.yumebox.service.root.RootTunStateStore
 import com.github.yumelira.yumebox.service.root.RootTunStatus
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
+import com.github.yumelira.yumebox.service.runtime.records.SelectionDao
 import com.github.yumelira.yumebox.service.runtime.state.RuntimeOwner
 import com.github.yumelira.yumebox.service.runtime.state.RuntimePhase
 import com.github.yumelira.yumebox.service.runtime.state.RuntimeSnapshot
@@ -353,6 +354,10 @@ class ProxyFacade(
 
     suspend fun selectProxy(group: String, proxyName: String): Boolean {
         Timber.d("Select proxy: group=$group proxy=$proxyName")
+        if (!_runtimeSnapshot.value.running) {
+            return selectProxyForNextStart(group, proxyName)
+        }
+
         val ok = if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
             RootTunController.patchSelector(appContext, group, proxyName)
         } else {
@@ -371,6 +376,23 @@ class ProxyFacade(
             scheduleRuntimeProxyGroupsRefresh(PROXY_SELECT_FULL_REFRESH_DELAY_MS)
         }
         return ok
+    }
+
+    private suspend fun selectProxyForNextStart(group: String, proxyName: String): Boolean {
+        if (group.isBlank() || proxyName.isBlank()) return false
+        if (_proxyGroups.value.isEmpty()) {
+            refreshProxyGroups()
+        }
+        val targetGroup = _proxyGroups.value.firstOrNull { it.name == group } ?: return false
+        if (targetGroup.type != Proxy.Type.Selector) return false
+        if (targetGroup.proxies.none { it.name == proxyName }) return false
+
+        connectCurrentBackend()
+        val activeProfile = ServiceClient.profile().queryActive() ?: return false
+        SelectionDao.upsertManualSelection(activeProfile.uuid, group, proxyName)
+        val updatedGroups = updateCachedProxyGroup(targetGroup.copy(now = proxyName))
+        publishProxyGroups(updatedGroups, cacheForPreview = true)
+        return true
     }
 
     suspend fun healthCheck(group: String) {
@@ -1165,7 +1187,26 @@ class ProxyFacade(
             .queryProfileProxyGroups(excludeNotSelectable = false)
             .map(::toProxyGroupInfo)
 
-        return groups
+        return applyStoredSelectionsToPreviewGroups(activeProfile, groups)
+    }
+
+    private fun applyStoredSelectionsToPreviewGroups(
+        profile: Profile,
+        groups: List<ProxyGroupInfo>,
+    ): List<ProxyGroupInfo> {
+        if (groups.isEmpty()) return groups
+        val selections = SelectionDao.querySelections(profile.uuid)
+            .associate { it.proxy.trim() to it.selected.trim() }
+            .filterKeys(String::isNotBlank)
+            .filterValues(String::isNotBlank)
+        if (selections.isEmpty()) return groups
+
+        return groups.map { group ->
+            val selectedProxy = selections[group.name] ?: return@map group
+            if (group.type != Proxy.Type.Selector) return@map group
+            if (group.proxies.none { it.name == selectedProxy }) return@map group
+            group.copy(now = selectedProxy)
+        }
     }
 
     private fun backfillPreviewCache(groups: List<ProxyGroupInfo>) {

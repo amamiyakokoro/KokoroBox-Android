@@ -23,9 +23,10 @@
 package com.github.yumelira.yumebox.screen.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.state.ToggleableState
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.model.GeoFileType
 import com.github.yumelira.yumebox.core.model.GeoXItem
@@ -43,17 +44,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.preference.ArrowPreference
 import java.io.File
 
 @Composable
 @Destination<RootGraph>
 fun MetaFeatureScreen(navigator: DestinationsNavigator) {
-    val scrollBehavior = MiuixScrollBehavior()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val downloadClient: SubStoreDownloadClient = koinInject()
@@ -64,19 +59,17 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
         topBar = {
             TopBar(
                 title = MLang.MetaFeature.Title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
                 Title(MLang.MetaFeature.Section.ConnectionAndTraffic)
                 Card {
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = MLang.Connection.Title,
                         summary = MLang.Connection.Summary,
                         onClick = {
@@ -85,7 +78,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                             }
                         },
                     )
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = MLang.TrafficStatistics.Title,
                         summary = MLang.TrafficStatistics.EntrySummary,
                         onClick = {
@@ -99,7 +92,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             item {
                 Title(MLang.MetaFeature.Section.CustomRouting)
                 Card {
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = MLang.MetaFeature.CustomRouting.Title,
                         summary = MLang.MetaFeature.CustomRouting.Summary,
                         onClick = {
@@ -113,7 +106,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             item {
                 Title(MLang.MetaFeature.Section.GeoXUpdate)
                 Card {
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = MLang.MetaFeature.GeoX.OnlineUpdateTitle,
                         summary = MLang.MetaFeature.GeoX.OnlineUpdateSummary,
                         onClick = { showGeoXDownloadSheet.value = true },
@@ -166,14 +159,12 @@ private fun GeoXDownloadSheet(
         content = {
             Column {
                 geoXItems.forEach { item ->
-                    BasicComponent(
+                    PreferenceListItem(
                         title = item.title,
                         endActions = {
                             Checkbox(
-                                state = ToggleableState(selectedItems[item.type] ?: false),
-                                onClick = {
-                                    selectedItems[item.type] = !(selectedItems[item.type] ?: false)
-                                }
+                                checked = selectedItems[item.type] ?: false,
+                                onCheckedChange = { checked -> selectedItems[item.type] = checked }
                             )
                         },
                         onClick = {

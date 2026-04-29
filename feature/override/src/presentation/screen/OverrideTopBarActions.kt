@@ -27,9 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
+import com.github.yumelira.yumebox.presentation.component.AppIcon
+import com.github.yumelira.yumebox.presentation.component.AppIconButton
 
 @Composable
 internal fun RowScope.OverrideTopBarAction(
@@ -38,11 +37,11 @@ internal fun RowScope.OverrideTopBarAction(
     spacedFromNext: Boolean = false,
     onClick: () -> Unit,
 ) {
-    IconButton(
+    AppIconButton(
         modifier = if (spacedFromNext) Modifier.padding(end = UiDp.dp12) else Modifier,
         onClick = onClick,
     ) {
-        Icon(
+        AppIcon(
             imageVector = icon,
             contentDescription = contentDescription,
         )

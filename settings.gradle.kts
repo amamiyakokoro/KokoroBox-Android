@@ -105,6 +105,7 @@ include(
     ":platform",
     ":locale",
     ":ui",
+    ":ui-miuix",
     ":data",
     ":extension",
     ":app",

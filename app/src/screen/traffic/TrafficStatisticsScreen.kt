@@ -25,11 +25,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +59,8 @@ import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.TrafficDonutChart
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.Delete
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -60,16 +68,11 @@ import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Delete
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Destination<RootGraph>
 @Composable
 fun TrafficStatisticsScreen() {
     val viewModel = koinViewModel<TrafficStatisticsViewModel>()
-    val scrollBehavior = MiuixScrollBehavior()
     val context = LocalContext.current
     val spacing = AppTheme.spacing
     val componentSizes = AppTheme.sizes
@@ -83,7 +86,6 @@ fun TrafficStatisticsScreen() {
         topBar = {
             TopBar(
                 title = MLang.TrafficStatistics.Title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     IconButton(
                         onClick = {
@@ -92,9 +94,9 @@ fun TrafficStatisticsScreen() {
                         },
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Delete,
+                            imageVector = Yume.Delete,
                             contentDescription = MLang.TrafficStatistics.Action.Clear,
-                            tint = MiuixTheme.colorScheme.onSurface,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
@@ -103,7 +105,6 @@ fun TrafficStatisticsScreen() {
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
@@ -148,8 +149,8 @@ fun TrafficStatisticsScreen() {
                                 ) {
                                     Text(
                                         text = formatBytes(activeSummary.total),
-                                        style = MiuixTheme.textStyles.title4,
-                                        color = MiuixTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
@@ -158,8 +159,8 @@ fun TrafficStatisticsScreen() {
                                         } else {
                                             MLang.TrafficStatistics.Summary.WeekTraffic
                                         },
-                                        style = MiuixTheme.textStyles.footnote1,
-                                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.Center,
                                     )
                                 }
@@ -205,8 +206,8 @@ fun TrafficStatisticsScreen() {
                         ) {
                             Text(
                                 text = MLang.TrafficStatistics.Section.EmptyApps,
-                                style = MiuixTheme.textStyles.body2,
-                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -276,13 +277,13 @@ private fun TrafficMetricLine(
     ) {
         Text(
             text = label,
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium,
         )
         Text(
             text = value,
-            style = MiuixTheme.textStyles.body1,
+            style = MaterialTheme.typography.bodyLarge,
             color = valueColor,
             fontWeight = FontWeight.SemiBold,
         )
@@ -321,8 +322,8 @@ private fun AppTrafficRow(
             ) {
                 Text(
                     text = usage.appName,
-                    style = MiuixTheme.textStyles.body1,
-                    color = MiuixTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
@@ -330,8 +331,8 @@ private fun AppTrafficRow(
                         formatBytes(usage.totalDownload),
                         formatBytes(usage.totalUpload),
                     ),
-                    style = MiuixTheme.textStyles.footnote1,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Column(
@@ -340,14 +341,14 @@ private fun AppTrafficRow(
             ) {
                 Text(
                     text = formatBytes(usage.totalBytes),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
                     text = "%.1f%%".format(share * 100),
-                    style = MiuixTheme.textStyles.footnote1,
-                    color = MiuixTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -376,7 +377,7 @@ private fun AppIconBadge(
         ) {
             Text(
                 text = "?",
-                style = MiuixTheme.textStyles.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 color = semanticColors.traffic.unattributed,
                 fontWeight = FontWeight.Bold,
             )
@@ -415,13 +416,13 @@ private fun AppIconBadge(
         modifier = Modifier
             .size(componentSizes.iconBadgeMedium)
             .clip(RoundedCornerShape(radii.radius12))
-            .background(MiuixTheme.colorScheme.primary.copy(alpha = opacity.subtleStrong)),
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtleStrong)),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = appName.take(1).ifBlank { "?" },
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
         )
     }

@@ -72,15 +72,16 @@ import com.github.yumelira.yumebox.presentation.icon.ShellIcons
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
+import com.github.yumelira.yumebox.screen.home.displayableExternalIp
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.github.yumelira.yumebox.miuix.YumeMiuixTheme
+import com.github.yumelira.yumebox.miuix.rememberYumeMiuixLayerBackdrop
+import com.github.yumelira.yumebox.miuix.yumeMiuixLayerBackdrop
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.blur.layerBackdrop
-import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun AcgHomePage(
@@ -115,9 +116,18 @@ fun AcgHomePage(
     val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
     val acgHomeQuote by appSettingsViewModel.acgHomeQuote.state.collectAsState()
     val acgHomeQuoteAuthor by appSettingsViewModel.acgHomeQuoteAuthor.state.collectAsState()
+    val acgDailyQuoteEnabled by appSettingsViewModel.acgDailyQuoteEnabled.state.collectAsState()
+    val acgDailyQuote by appSettingsViewModel.acgDailyQuote.state.collectAsState()
+    val acgDailyQuoteAuthor by appSettingsViewModel.acgDailyQuoteAuthor.state.collectAsState()
     val sidebarExpanded by appSettingsViewModel.acgSidebarExpanded.state.collectAsState()
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+    LaunchedEffect(acgDailyQuoteEnabled) {
+        if (acgDailyQuoteEnabled) {
+            appSettingsViewModel.refreshDailyAcgQuoteIfNeeded()
+        }
+    }
 
     LaunchedEffect(Unit) {
         homeViewModel.refreshProxyMode()
@@ -181,17 +191,18 @@ fun AcgHomePage(
     val trafficData = remember(trafficNow, isRunning) {
         if (isRunning) TrafficData.from(trafficNow) else TrafficData.ZERO
     }
+    val hasDisplayableExternalIp = ipMonitoringState.displayableExternalIp() != null
     val systemDark = isSystemInDarkTheme()
     val isDarkHomeSurface = when (themeMode) {
         ThemeMode.Dark -> true
         ThemeMode.Light -> false
         ThemeMode.Auto -> systemDark
     }
-    val wallpaperBackdrop = rememberLayerBackdrop()
+    val wallpaperBackdrop = rememberYumeMiuixLayerBackdrop()
     val contentSurface = if (isDarkHomeSurface) {
-        MiuixTheme.colorScheme.surface
+        YumeMiuixTheme.colorScheme.surface
     } else {
-        MiuixTheme.colorScheme.background
+        YumeMiuixTheme.colorScheme.background
     }
     val heroBlendColor = if (isDarkHomeSurface) Color.Black else contentSurface
     val handlePageChange = LocalHandlePageChange.current
@@ -202,10 +213,17 @@ fun AcgHomePage(
             AcgSidebarIconItem(ShellIcons.OpenSettings) { handlePageChange(3) },
         )
     }
-    val quote = AcgQuote(
-        text = acgHomeQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault },
-        author = acgHomeQuoteAuthor.ifBlank { MLang.AppSettings.Experimental.AcgQuoteAuthorDefault },
-    )
+    val quote = if (acgDailyQuoteEnabled) {
+        AcgQuote(
+            text = acgDailyQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault },
+            author = acgDailyQuoteAuthor,
+        )
+    } else {
+        AcgQuote(
+            text = acgHomeQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault },
+            author = acgHomeQuoteAuthor.ifBlank { MLang.AppSettings.Experimental.AcgQuoteAuthorDefault },
+        )
+    }
     val animatedSidebarToggleProgress by animateFloatAsState(
         targetValue = if (sidebarExpanded) 1f else 0f,
         animationSpec = tween(
@@ -272,7 +290,7 @@ fun AcgHomePage(
             qualityMode = AcgWallpaperQualityMode.BackgroundBlur,
             modifier = Modifier
                 .matchParentSize()
-                .layerBackdrop(wallpaperBackdrop),
+                .yumeMiuixLayerBackdrop(wallpaperBackdrop),
         )
 
         AcgSidebarDecoration(
@@ -372,7 +390,7 @@ fun AcgHomePage(
                 )
 
                 AnimatedVisibility(
-                    visible = isRunning,
+                    visible = isRunning || hasDisplayableExternalIp,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxWidth()
@@ -394,7 +412,7 @@ fun AcgHomePage(
                         AcgHomeInfoPanel(
                             serverName = selectedServerName.takeIf { isRunning },
                             serverPing = selectedServerPing.takeIf { isRunning },
-                            ipMonitoringState = if (isRunning) ipMonitoringState else IpMonitoringState.Loading,
+                            ipMonitoringState = ipMonitoringState,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -415,7 +433,7 @@ fun AcgHomePage(
             ) {
                 AcgQuoteText(
                     quote = quote,
-                    color = MiuixTheme.colorScheme.onBackground,
+                    color = YumeMiuixTheme.colorScheme.onBackground,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

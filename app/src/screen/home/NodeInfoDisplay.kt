@@ -28,13 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.util.extractFlaggedName
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun NodeInfoDisplay(
@@ -63,8 +63,8 @@ fun NodeInfoDisplay(
         ) {
             Text(
                 text = MLang.Home.NodeInfo.Node,
-                style = MiuixTheme.textStyles.footnote1.copy(fontSize = 12.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(spacing.space4))
             if (hasKnownNode) {
@@ -81,8 +81,8 @@ fun NodeInfoDisplay(
                     }
                     Text(
                         text = flagged?.displayName ?: serverName.orEmpty(),
-                        style = MiuixTheme.textStyles.body1.copy(lineHeight = 20.sp),
-                        color = MiuixTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -90,8 +90,8 @@ fun NodeInfoDisplay(
             } else {
                 Text(
                     text = MLang.Home.NodeInfo.Unknown,
-                    style = MiuixTheme.textStyles.body1.copy(lineHeight = 20.sp),
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.height(INFO_TEXT_HEIGHT)
                 )
             }
@@ -103,8 +103,8 @@ fun NodeInfoDisplay(
         ) {
             Text(
                 text = MLang.Home.NodeInfo.Delay,
-                style = MiuixTheme.textStyles.footnote1.copy(fontSize = 12.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(spacing.space4))
             PingValue(ping = serverPing)
@@ -124,15 +124,15 @@ private fun PingValue(ping: Int?) {
         }
         Text(
             text = MLang.Home.NodeInfo.DelayValue.format(ping),
-            style = MiuixTheme.textStyles.body1.copy(lineHeight = 20.sp),
+            style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
             color = color,
             modifier = Modifier.height(INFO_TEXT_HEIGHT)
         )
     } else {
         Text(
             text = "--",
-            style = MiuixTheme.textStyles.body1.copy(lineHeight = 20.sp),
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.height(INFO_TEXT_HEIGHT)
         )
     }

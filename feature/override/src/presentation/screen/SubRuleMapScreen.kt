@@ -29,10 +29,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.*
 import com.github.yumelira.yumebox.presentation.util.*
@@ -41,14 +40,7 @@ import dev.oom_wg.purejoy.mlang.MLang
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.Scaffold
 
 private const val SubRuleReorderHeaderCount = 2
 
@@ -61,7 +53,6 @@ fun OverrideSubRuleMapEditorScreen(
         onConfirm: (OverrideSubRuleGroupDraft) -> Unit,
     ) -> Unit,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = OverrideStructuredEditorStore.subRuleGroupEditorTitle.ifBlank { MLang.Override.Structured.SubRules.Title }
     val availableModes = OverrideStructuredEditorStore.subRuleGroupEditorAvailableModes
@@ -116,7 +107,6 @@ fun OverrideSubRuleMapEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     if (isDeleteMode) {
                         OverrideTopBarAction(
@@ -167,7 +157,7 @@ fun OverrideSubRuleMapEditorScreen(
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             modifier = Modifier.fillMaxWidth(),
             lazyListState = listState,
@@ -175,7 +165,7 @@ fun OverrideSubRuleMapEditorScreen(
         ) {
             item(key = "modifier-card") {
                 Card {
-                    WindowDropdownPreference(
+                    YumeMd3DropdownPreference(
                         title = MLang.Override.Editor.Mode.Title,
                         items = availableModes.map(OverrideListEditorMode::label),
                         selectedIndex = selectedModeIndex,
@@ -292,17 +282,17 @@ private fun ReorderableCollectionItemScope.SubRuleGroupCard(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
+                AppIcon(
                     imageVector = Yume.List,
                     contentDescription = MLang.Override.Editor.DragToSort,
-                    tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    
                 )
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(
+                    AppText(
                         text = title,
-                        style = MiuixTheme.textStyles.body1,
+                        
                     )
                 }
                 Box(
@@ -310,15 +300,15 @@ private fun ReorderableCollectionItemScope.SubRuleGroupCard(
                     contentAlignment = Alignment.Center,
                 ) {
                     if (isDeleteMode) {
-                        Checkbox(
-                            state = ToggleableState(isSelected),
-                            onClick = { onSelectedChange(!isSelected) },
+                        AppCheckbox(
+                            checked = isSelected,
+                            onCheckedChange = onSelectedChange,
                         )
                     } else {
-                        Icon(
+                        AppIcon(
                             imageVector = Yume.chevron,
                             contentDescription = MLang.Override.Editor.Edit,
-                            tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            
                         )
                     }
                 }

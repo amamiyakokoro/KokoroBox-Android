@@ -25,8 +25,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Save
 import com.github.yumelira.yumebox.presentation.util.OverrideExtraFieldDraft
@@ -36,16 +36,12 @@ import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorSto
 import com.github.yumelira.yumebox.presentation.util.rememberCurrentReferenceCatalog
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
+import androidx.compose.material3.Scaffold
 
 @Composable
 fun OverrideProxyGroupDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = remember {
         OverrideStructuredEditorStore.proxyGroupDraftEditorTitle.ifBlank { MLang.Override.Editor.ProxyGroup }
@@ -167,13 +163,12 @@ fun OverrideProxyGroupDraftEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
             onScrollDirectionChanged = saveFabController::onScrollDirectionChanged,
@@ -185,7 +180,7 @@ fun OverrideProxyGroupDraftEditorScreen(
                 ) {
                     OverrideSection(MLang.Override.Draft.BasicInfo) {
                         OverrideSelectorCard {
-                            WindowDropdownPreference(
+                            YumeMd3DropdownPreference(
                                 title = MLang.Override.Editor.RuleType,
                                 items = OverrideProxyGroupTypePresets,
                                 selectedIndex = selectedPresetIndex,
@@ -231,7 +226,7 @@ fun OverrideProxyGroupDraftEditorScreen(
                     }
                     OverrideSection(MLang.Override.Editor.MemberSource) {
                         OverrideSelectorCard {
-                            ArrowPreference(
+                            PreferenceArrowItem(
                                 title = MLang.Override.ProxyGroup.Field.Proxies,
                                 onClick = {
                                     showProxySelector = true

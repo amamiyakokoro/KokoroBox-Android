@@ -20,12 +20,16 @@
 
 
 package com.github.yumelira.yumebox.screen.onboarding
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,15 +51,11 @@ import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
 import com.github.yumelira.yumebox.screen.settings.component.ThemeModeSelectorItem
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun StartupHeroShell(
@@ -246,7 +246,7 @@ internal fun TermsContent(
     onAcceptedChange: (Boolean) -> Unit,
     onPrivacySheetRequest: () -> Unit,
 ) {
-    val colorScheme = MiuixTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val linkStyle = remember(colorScheme.primary) {
         SpanStyle(
             color = colorScheme.primary,
@@ -293,8 +293,8 @@ internal fun TermsContent(
         ) {
             Text(
                 text = annotatedText,
-                style = MiuixTheme.textStyles.body2.copy(
-                    color = MiuixTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 24.sp,
                 ),
             )
@@ -305,8 +305,8 @@ internal fun TermsContent(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
                 Checkbox(
-                    state = androidx.compose.ui.state.ToggleableState(accepted),
-                    onClick = { onAcceptedChange(!accepted) },
+                    checked = accepted,
+                    onCheckedChange = onAcceptedChange,
                 )
                 Column(
                     modifier = Modifier.weight(1f),
@@ -314,8 +314,8 @@ internal fun TermsContent(
                 ) {
                     Text(
                         text = MLang.Onboarding.Privacy.Accept.Title,
-                        style = MiuixTheme.textStyles.body1.copy(fontWeight = FontWeight.Medium),
-                        color = MiuixTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -425,19 +425,19 @@ private fun ColumnScope.DetailHeadline(
         RevealBlock(delayMillis = 50) {
             Text(
                 text = title,
-                style = MiuixTheme.textStyles.title2.copy(
+                style = MaterialTheme.typography.headlineSmall.copy(
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                color = MiuixTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
             )
         }
         RevealBlock(delayMillis = 110) {
             Text(
                 text = subtitle,
-                style = MiuixTheme.textStyles.body2.copy(lineHeight = 22.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 22.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
         }

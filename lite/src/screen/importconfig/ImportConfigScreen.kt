@@ -41,10 +41,10 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 
 @Destination<RootGraph>
 @Composable
@@ -72,8 +72,6 @@ fun ImportConfigScreen(
     var importUrlFromScheme by rememberSaveable { mutableStateOf<String?>(null) }
 
     val pendingImportUrl by MainActivity.pendingImportUrl.collectAsState()
-    val urlProfiles = remember(profiles) { profiles.filter { it.type == Profile.Type.Url } }
-    val scrollBehavior = MiuixScrollBehavior()
 
     LaunchedEffect(prefillUrl) {
         if (prefillUrl.isNotBlank()) {
@@ -112,10 +110,10 @@ fun ImportConfigScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
                 title = MLang.ProfilesPage.Title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     IconButton(
                         enabled = !isDownloading,
@@ -145,7 +143,6 @@ fun ImportConfigScreen(
             val lazyListState = rememberLazyListState()
             ScreenLazyColumn(
                 lazyListState = lazyListState,
-                scrollBehavior = scrollBehavior,
                 innerPadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding()),
                 topPadding = 20.dp,
             ) {

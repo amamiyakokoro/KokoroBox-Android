@@ -4,21 +4,21 @@
 
 <img src="logo.webp" style="width: 96px;" alt="logo">
 
-## YumeBox-MaterialDesign
+## YumeBox MD3
 
 [![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?label=Release&logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest)
 [![GitHub License](https://img.shields.io/github/license/Yizuka17/YumeBox-MaterialDesign?logo=gnu)](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/Yizuka17/YumeBox-MaterialDesign/total?logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
 
-**基于 [YumeBox](https://github.com/YumeRiMoe/YumeBox) 的 Material Design 分支，一个基于 [mihomo](https://github.com/MetaCubeX/mihomo) 内核的开源 Android 客户端。**
+**YumeBox MD3 是基于 [YumeBox](https://github.com/YumeRiMoe/YumeBox) 的 Material Design 3 / Material You 分支，一个基于 [mihomo](https://github.com/MetaCubeX/mihomo) 内核的开源 Android 客户端。**
 
 </div>
 
 ## 使用
 
-YumeBox-MaterialDesign 目前仅支持 **Android 8.0（API 26）及以上系统**。
+YumeBox MD3 目前仅支持 **Android 8.0（API 26）及以上系统**。
 
-请前往 Release 页面下载对应架构的安装包：[Release](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
+请前往 Release 页面下载 arm64-v8a release 安装包：[Release](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
 
 更多内容可访问官网：[YumeBox](https://yumebox.oom-wg.dev/)
 
@@ -26,18 +26,45 @@ YumeBox-MaterialDesign 目前仅支持 **Android 8.0（API 26）及以上系统*
 
 ## 相较原项目的主要改进
 
-YumeBox-MaterialDesign 在保留原项目核心能力的基础上，围绕界面体验、配置管理、运行方式和稳定性进行了持续改进：
+YumeBox MD3 在保留原项目核心能力的基础上，围绕界面体验、配置管理、运行方式和稳定性进行了持续改进：
 
-- **Material Design / Material You 体验**：重构并优化多个页面，加入动态取色、深色主题适配、导航栏与 Topbar 模糊效果、更顺滑的页面跳转和列表排序动画。
+- **Material Design 3 / Material You 体验**：重构并优化多个页面，当前主体界面已基本完成 MD3 化，加入动态取色、深色主题适配、导航栏与 Topbar 模糊效果、更顺滑的页面跳转和列表排序动画；主题设置中新增莫奈风格、彩度/活力与对比度调节，默认保持可读性优先的 Tonal Spot 体验。
 - **更强的覆写与配置能力**：引入全新的覆写系统，支持多配置切换、叠加应用、可视化编辑、预设分流模板、运行时配置预览，以及 `start`、`end`、`merge`、`force` 等后缀修饰符；同时加入基于 Rust 的覆写解析与配置编辑器语法检查/部分补全。
 - **代理运行与节点管理增强**：支持 Root Tun（无需 VPN，但需要 Root 权限）、单节点与代理组测速、节点排序动画、节点标签与图标/旗帜显示、节点选择持久化，并优化代理启动流程和部分 bridge 实现。
 - **订阅、导入与外部控制优化**：支持修改订阅链接、链接预览、配置排序、外部链接在 App 内打开并快速导入，优化外部控制器、Web 面板和通知栏快捷节点切换体验。
 - **统计、隐私与轻量化**：新增连接页面和更完善的流量统计（包含 App 流量统计，需要开启查找进程），支持 YumeBox Lite，加入语言切换与隐私设置，并移除 Sentry 跟踪器和 EMAS 推送更新。
 - **稳定性与性能优化**：优化启动阻塞、运行时状态卡死、弹窗卡顿、通知栏内容、打包体积、后台释放 UI 与多处交互细节，提升日常使用的流畅度与容错能力。
 
+## 设计与资料参考
+
+v0.5.2 继续收敛旧 UI 边界，普通页面优先使用 Jetpack Compose Material 3 组件与项目内 MD3 组件；Miuix 仅作为少量遗留/兼容边界保留，后续会继续减少直接依赖。
+
+本次主题重构参考了 `chat-export-2026-04-28_22-27-47.md` 中关于莫奈动态取色的设置建议：以壁纸/系统源色为灵感、以可读性为底线、以 Material 色彩角色为结构，并为用户保留适度控制权。实现侧没有改动代理内核，仅在 UI / 设置 / 主题派生层增加：
+
+- 取色风格：Tonal Spot、Vibrant、Expressive、Neutral、Monochrome。
+- 彩度 / 活力：默认 45%，推荐日常 UI 使用 35%–55%，深色主题自动克制。
+- 对比度：标准、中等、高，优先保证文字、按钮与容器色可读。
+- 语义色：错误、警告、延迟、流量等功能色继续保持静态，不随动态取色任意漂移。
+- ACG 首页：保留原有壁纸、侧栏、启动按钮与一言布局，仅随全局主题令牌做克制协调，不改变首页设计。
+
+参考资料包括 Android / Material 官方文档与相关开源实现：
+
+- [Material You design - Android Open Source Project](https://source.android.com/docs/core/display/material)
+- [Dynamic color - Android Open Source Project](https://source.android.com/docs/core/display/dynamic-color)
+- [Enable users to personalize their color experience in your app - Android Developers](https://developer.android.com/develop/ui/views/theming/dynamic-colors)
+- [Material 3 color system: how the system works](https://m3.material.io/styles/color/system/how-the-system-works)
+- [Material 3 color roles](https://m3.material.io/styles/color/roles)
+- [material-foundation/material-color-utilities](https://github.com/material-foundation/material-color-utilities)
+- [Jetpack Compose Material 3](https://developer.android.com/jetpack/androidx/releases/compose-material3)
+- [Haze](https://github.com/chrisbanes/haze)
+- [Compose Reorderable](https://github.com/Calvin-LL/Reorderable)
+- [AboutLibraries](https://github.com/mikepenz/AboutLibraries)
+
 ## 未来展望
 
-后续计划继续强化个性化与内容联动体验，例如加入根据用户选取的 ACG 图片自动提取主题色的选项，让首页、卡片、导航栏等界面元素能够随图片动态变化；支持从网页每日更新 ACG 图片与一言内容，提供更灵活的图片源、缓存策略和手动刷新能力；同时会继续完善主题系统、配置编辑体验、运行状态展示与轻量化构建，让 YumeBox-MaterialDesign 在可用、好看和好玩的方向上持续演进。
+当前阶段的重点已经从“迁移到 MD3”转向“把 MD3 体验打磨稳定”。后续会继续清理少量遗留 UI 边界，逐步减少对兼容层的直接依赖，让普通页面的组件、动效、间距、色彩和无障碍表现更接近完整的 Material Design 3 / Material You 体验。
+
+在个性化方面，会继续完善动态取色与 ACG 内容联动：优化从用户选择壁纸中提取主题色的效果，补充更灵活的图片源、缓存策略、手动刷新和每日内容更新，让首页、卡片、导航栏等界面元素能够在保证可读性的前提下随内容自然变化。同时也会持续改进配置编辑、运行状态展示、流量统计、轻量化构建与稳定性，让 YumeBox MD3 在可用、好看和好玩的方向上继续演进。
 
 ## 反馈与建议
 
@@ -50,7 +77,7 @@ YumeBox-MaterialDesign 在保留原项目核心能力的基础上，围绕界面
 
 ## 参与贡献
 
-如果您希望将 YumeBox-MaterialDesign 变得更好，请参阅 [CONTRIBUTING](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/CONTRIBUTING.md)。如果希望将 YumeBox 翻译为更多语言，或改进现有翻译，请 Fork 本项目，并在 `locale/lang` 目录下创建或更新对应的翻译文件。
+如果您希望将 YumeBox MD3 变得更好，请参阅 [CONTRIBUTING](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/CONTRIBUTING.md)。如果希望将 YumeBox 翻译为更多语言，或改进现有翻译，请 Fork 本项目，并在 `locale/lang` 目录下创建或更新对应的翻译文件。
 
 ## 特别
 

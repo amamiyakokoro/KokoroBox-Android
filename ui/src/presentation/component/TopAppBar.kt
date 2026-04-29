@@ -22,6 +22,12 @@
 package com.github.yumelira.yumebox.presentation.component
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBar as MaterialTopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar as MaterialCenterAlignedTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
@@ -33,10 +39,6 @@ import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
-import top.yukonga.miuix.kmp.basic.ScrollBehavior
-import top.yukonga.miuix.kmp.basic.SmallTopAppBar
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 val LocalTopBarHazeState = compositionLocalOf<HazeState?> { null }
 val LocalTopBarHazeStyle = compositionLocalOf<HazeStyle?> { null }
@@ -59,17 +61,18 @@ private fun Modifier.topBarHazeEffect(
 
 @Composable
 private fun defaultTopBarContainerColor(): Color {
-    return MiuixTheme.colorScheme.surface
+    return MaterialTheme.colorScheme.surface
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
     title: String,
-    scrollBehavior: ScrollBehavior,
+    @Suppress("UNUSED_PARAMETER") scrollBehavior: Any? = null,
     modifier: Modifier = Modifier,
-    titlePadding: Dp = UiDp.dp16,
-    navigationIconPadding: Dp = UiDp.dp16,
-    actionIconPadding: Dp = UiDp.dp16,
+    @Suppress("UNUSED_PARAMETER") titlePadding: Dp = UiDp.dp16,
+    @Suppress("UNUSED_PARAMETER") navigationIconPadding: Dp = UiDp.dp16,
+    @Suppress("UNUSED_PARAMETER") actionIconPadding: Dp = UiDp.dp16,
     containerColor: Color = Color.Unspecified,
     enableHaze: Boolean = false,
     navigationIcon: @Composable () -> Unit = {},
@@ -84,27 +87,35 @@ fun TopBar(
         containerColor
     }
 
-    TopAppBar(
-        title = title,
+    MaterialTopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        },
         modifier = if (hazeEnabled) modifier.topBarHazeEffect(hazeState, hazeStyle) else modifier,
-        color = resolvedContainerColor,
-        titlePadding = titlePadding,
-        navigationIconPadding = navigationIconPadding,
-        actionIconPadding = actionIconPadding,
         navigationIcon = navigationIcon,
         actions = actions,
-        scrollBehavior = scrollBehavior,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = resolvedContainerColor,
+            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmallTopBar(
     title: String,
-    scrollBehavior: ScrollBehavior,
+    @Suppress("UNUSED_PARAMETER") scrollBehavior: Any? = null,
     modifier: Modifier = Modifier,
-    titlePadding: Dp = UiDp.dp16,
-    navigationIconPadding: Dp = UiDp.dp16,
-    actionIconPadding: Dp = UiDp.dp16,
+    @Suppress("UNUSED_PARAMETER") titlePadding: Dp = UiDp.dp16,
+    @Suppress("UNUSED_PARAMETER") navigationIconPadding: Dp = UiDp.dp16,
+    @Suppress("UNUSED_PARAMETER") actionIconPadding: Dp = UiDp.dp16,
     containerColor: Color = Color.Unspecified,
     enableHaze: Boolean = false,
     navigationIcon: @Composable () -> Unit = {},
@@ -119,15 +130,22 @@ fun SmallTopBar(
         containerColor
     }
 
-    SmallTopAppBar(
-        title = title,
+    MaterialCenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        },
         modifier = if (hazeEnabled) modifier.topBarHazeEffect(hazeState, hazeStyle) else modifier,
-        color = resolvedContainerColor,
-        titlePadding = titlePadding,
-        navigationIconPadding = navigationIconPadding,
-        actionIconPadding = actionIconPadding,
         navigationIcon = navigationIcon,
         actions = actions,
-        scrollBehavior = scrollBehavior,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = resolvedContainerColor,
+            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
     )
 }

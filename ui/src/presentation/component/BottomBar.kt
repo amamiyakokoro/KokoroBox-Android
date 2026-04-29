@@ -37,6 +37,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Icon as MaterialIcon
+import androidx.compose.material3.Text as MaterialText
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -294,29 +300,10 @@ private fun ModernBottomBarContent(
 ) {
     val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val mainPagerState = LocalMainPagerState.current
-    val hazeState = LocalBottomBarHazeState.current
-    val hazeStyle = LocalBottomBarHazeStyle.current
     val page by remember(mainPagerState) {
         derivedStateOf { mainPagerState.selectedPage }
     }
     val bottomBarVisible = isVisible && (bottomBarScrollBehavior?.isBottomBarVisible ?: true)
-    val hazeEnabled = hazeState != null && hazeStyle != null
-    val opacity = AppTheme.opacity
-    val colorScheme = MiuixTheme.colorScheme
-    val isDarkSurface = colorScheme.background.luminance() < 0.5f
-    val outlineColor = if (isDarkSurface) {
-        White.copy(alpha = opacity.brightOutline)
-    } else {
-        Black.copy(alpha = opacity.mutedStrong)
-    }
-    val selectedColor = colorScheme.primary
-    val unselectedColor = colorScheme.onSurface.copy(alpha = opacity.secondaryText)
-    val barSurfaceColor = colorScheme.background
-    val barSurfaceAlpha = if (hazeEnabled) {
-        opacity.elevatedSurface
-    } else {
-        1f
-    }
 
     val handlePageChange = LocalHandlePageChange.current
     val onItemClick: (Int) -> Unit = { index ->
@@ -352,37 +339,30 @@ private fun ModernBottomBarContent(
             targetOffsetY = { fullHeight -> (fullHeight * 1.08f).toInt() },
         ),
     ) {
-        val barShape = MainBottomBarDefaults.Shape
-        val surfaceModifier = Modifier
-            .fillMaxWidth()
-            .clip(barShape)
-            .then(
-                if (hazeEnabled) {
-                    Modifier.bottomBarHazeEffect(hazeState, hazeStyle)
-                } else {
-                    Modifier
-                }
-            )
-            .background(barSurfaceColor.copy(alpha = barSurfaceAlpha))
-            .bottomBarOutline(
-                shape = barShape,
-                color = outlineColor,
-                edgeFadeAlpha = opacity.lightOverlay,
-                middleFadeAlpha = opacity.accent,
-            )
-
-        BottomBarLayout(
-            modifier = surfaceModifier,
+        NavigationBar(
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            tonalElevation = UiDp.dp3,
         ) {
             BottomBarDestination.entries.forEachIndexed { index, destination ->
-                BottomBarItem(
+                NavigationBarItem(
                     selected = page == index,
                     onClick = { onItemClick(index) },
-                    icon = destination.icon,
-                    label = destination.label,
+                    icon = {
+                        MaterialIcon(
+                            imageVector = destination.icon,
+                            contentDescription = destination.label,
+                        )
+                    },
+                    label = { MaterialText(destination.label) },
                     enabled = bottomBarVisible,
-                    selectedColor = selectedColor,
-                    unselectedColor = unselectedColor,
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
                 )
             }
         }

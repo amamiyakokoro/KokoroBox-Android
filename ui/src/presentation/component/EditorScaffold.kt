@@ -20,6 +20,7 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
+
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,17 +29,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.ScrollBehavior
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 data class EditorAction(
     val icon: ImageVector,
@@ -49,7 +48,6 @@ data class EditorAction(
 @Composable
 fun EditorScaffold(
     title: String,
-    scrollBehavior: ScrollBehavior,
     actions: List<EditorAction>,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
@@ -57,9 +55,8 @@ fun EditorScaffold(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
                 actions = {
-                    actions.forEachIndexed { index, action ->
+                    actions.forEach { action ->
                         IconButton(
                             onClick = action.onClick,
                         ) {
@@ -111,8 +108,8 @@ fun EditorListItem(
         ) {
             Text(
                 text = "$index.",
-                style = MiuixTheme.textStyles.body1,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.width(UiDp.dp40),
             )
             Column(
@@ -123,21 +120,22 @@ fun EditorListItem(
             ) {
                 Text(
                     text = title,
-                    style = MiuixTheme.textStyles.body1,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 summary?.takeIf { it.isNotBlank() }?.let {
                     Text(
                         text = it,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
             trailingText?.takeIf { it.isNotBlank() }?.let {
                 Text(
                     text = it,
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(end = UiDp.dp8),
                 )
             }
@@ -148,7 +146,7 @@ fun EditorListItem(
                 Icon(
                     imageVector = deleteIcon,
                     contentDescription = deleteContentDescription,
-                    tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

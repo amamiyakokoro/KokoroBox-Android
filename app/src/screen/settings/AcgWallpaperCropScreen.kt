@@ -22,8 +22,9 @@ package com.github.yumelira.yumebox.screen.settings
 
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
+import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -36,8 +37,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemGestures
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -53,8 +57,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
+import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.resize.Precision
@@ -65,11 +70,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.max
@@ -105,7 +105,7 @@ fun AcgWallpaperCropScreen(
     val imageBounds by produceState<Pair<Int, Int>?>(initialValue = null, wallpaperUri) {
         value = withContext(Dispatchers.IO) {
             runCatching {
-                context.contentResolver.openInputStream(Uri.parse(wallpaperUri))?.use { input ->
+                context.contentResolver.openInputStream(wallpaperUri.toUri())?.use { input ->
                     val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                     BitmapFactory.decodeStream(input, null, options)
                     if (options.outWidth > 0 && options.outHeight > 0) {
@@ -117,13 +117,17 @@ fun AcgWallpaperCropScreen(
             }.getOrNull()
         }
     }
+    val wallpaperSeedColorArgb by produceState(initialValue = DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB, wallpaperUri) {
+        value = withContext(Dispatchers.IO) {
+            extractDominantWallpaperColorArgb(context, wallpaperUri) ?: DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
+        }
+    }
 
-    Scaffold { innerPadding ->
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-        ) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+    ) {
             val containerWidthPx = with(density) { maxWidth.toPx() }.coerceAtLeast(1f)
             val containerHeightPx = with(density) { maxHeight.toPx() }.coerceAtLeast(1f)
             val painterIntrinsic = painter.intrinsicSize
@@ -196,9 +200,13 @@ fun AcgWallpaperCropScreen(
                     .fillMaxWidth()
                     .height(UiDp.dp52)
                     .clip(RoundedCornerShape(UiDp.dp12)),
-                colors = ButtonDefaults.buttonColorsPrimary(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
                 onClick = {
                     viewModel.onAcgWallpaperUriChange(wallpaperUri)
+                    viewModel.onAcgWallpaperSeedColorChange(wallpaperSeedColorArgb)
                     viewModel.onAcgWallpaperCropChange(
                         zoom = 1f,
                         biasX = viewportLayout.biasX,
@@ -209,9 +217,68 @@ fun AcgWallpaperCropScreen(
             ) {
                 Text(
                     text = MLang.AppSettings.Button.Apply,
-                    color = MiuixTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                 )
             }
-        }
     }
 }
+
+private fun extractDominantWallpaperColorArgb(
+    context: android.content.Context,
+    wallpaperUri: String,
+): Long? = runCatching {
+    val uri = wallpaperUri.toUri()
+    val bounds = context.contentResolver.openInputStream(uri)?.use { input ->
+        BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+            BitmapFactory.decodeStream(input, null, this)
+        }
+    } ?: return@runCatching null
+
+    val maxSide = max(bounds.outWidth, bounds.outHeight).coerceAtLeast(1)
+    val sampleSize = (maxSide / 160).coerceAtLeast(1)
+    val bitmap = context.contentResolver.openInputStream(uri)?.use { input ->
+        BitmapFactory.decodeStream(
+            input,
+            null,
+            BitmapFactory.Options().apply {
+                inSampleSize = sampleSize
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+            },
+        )
+    } ?: return@runCatching null
+
+    try {
+        var redSum = 0L
+        var greenSum = 0L
+        var blueSum = 0L
+        var weightSum = 0L
+        val pixels = IntArray(bitmap.width * bitmap.height)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        pixels.forEach { color ->
+            val alpha = AndroidColor.alpha(color)
+            if (alpha < 180) return@forEach
+            val red = AndroidColor.red(color)
+            val green = AndroidColor.green(color)
+            val blue = AndroidColor.blue(color)
+            val maxChannel = maxOf(red, green, blue)
+            val minChannel = minOf(red, green, blue)
+            val saturationWeight = (maxChannel - minChannel).coerceAtLeast(16)
+            val brightnessWeight = (255 - kotlin.math.abs(142 - maxChannel)).coerceAtLeast(32)
+            val weight = saturationWeight * brightnessWeight
+            redSum += red.toLong() * weight
+            greenSum += green.toLong() * weight
+            blueSum += blue.toLong() * weight
+            weightSum += weight.toLong()
+        }
+        if (weightSum <= 0L) return@runCatching null
+        AndroidColor.argb(
+            255,
+            (redSum / weightSum).toInt().coerceIn(0, 255),
+            (greenSum / weightSum).toInt().coerceIn(0, 255),
+            (blueSum / weightSum).toInt().coerceIn(0, 255),
+        ).toLong() and 0xFFFFFFFFL
+    } finally {
+        bitmap.recycle()
+    }
+}.getOrNull()

@@ -82,11 +82,9 @@ jobs:
         shell: bash
         run: |
           set -eu
-          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            test -f "jniLibs/${abi}/libclash.so"
-            test -f "jniLibs/${abi}/liboverride.so"
-            test -f "jniLibs/${abi}/libbridge.so"
-          done
+          test -f "jniLibs/arm64-v8a/libclash.so"
+          test -f "jniLibs/arm64-v8a/liboverride.so"
+          test -f "jniLibs/arm64-v8a/libbridge.so"
           test -f "build/generated/assets/geo/geoip.metadb.xz"
           test -f "build/generated/assets/geo/geosite.dat.xz"
           test -f "build/generated/assets/geo/ASN.mmdb.xz"
@@ -107,12 +105,13 @@ jobs:
           kotlin scripts/generate-locale.main.kts .
           test -f "locale/build/generated/fytxt/kotlin/commonMain/kotlin/fytxt.kt"
 
-      - name: Build Release APKs
+      - name: Build arm64-v8a Release APK
         shell: bash
         run: |
           set -eu
           chmod +x gradlew
           ./gradlew --no-daemon \
+            -Pandroid.injected.build.abi=arm64-v8a \
             -Pupdate.channel="${{ inputs.channel }}" \
             -Pupdate.tag="${{ inputs.release_tag }}" \
             -Pupdate.metaAssetName="${{ inputs.meta_asset_name }}" \
@@ -122,5 +121,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.raw_apk_artifact_name }}
-          path: ${{ inputs.module }}/build/outputs/apk/release/*.apk
+          path: ${{ inputs.module }}/build/outputs/apk/release/*arm64-v8a*release*.apk
           if-no-files-found: error

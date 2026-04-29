@@ -26,14 +26,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private val SelectionSheetListMaxHeight = UiDp.dp420
 
@@ -236,13 +231,12 @@ private fun SelectionAddCustomCard(
     onClick: () -> Unit,
 ) {
     Card(applyHorizontalPadding = false) {
-        BasicComponent(
+        PreferenceListItem(
             title = title,
             endActions = {
-                Icon(
+                AppIcon(
                     imageVector = Yume.`Badge-plus`,
                     contentDescription = title,
-                    tint = MiuixTheme.colorScheme.onSurfaceVariantActions,
                 )
             },
             onClick = onClick,
@@ -266,12 +260,12 @@ private fun SelectionValueListCard(
                 items = items,
                 key = { itemValue -> itemValue },
             ) { itemValue ->
-                BasicComponent(
+                PreferenceListItem(
                     title = itemValue,
                     endActions = {
-                        Checkbox(
-                            state = ToggleableState(itemValue in selectedValues),
-                            onClick = { onItemClick(itemValue) },
+                        AppCheckbox(
+                            checked = itemValue in selectedValues,
+                            onCheckedChange = { onItemClick(itemValue) },
                         )
                     },
                     onClick = { onItemClick(itemValue) },
@@ -318,7 +312,7 @@ private fun OverrideSelectionInputDialog(
             errorText?.let { message ->
                 OverrideFieldAssistText(
                     text = message,
-                    color = MiuixTheme.colorScheme.error,
+                    color = appErrorColor(),
                 )
             }
         },

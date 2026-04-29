@@ -19,10 +19,18 @@
  */
 
 
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.github.yumelira.yumebox.presentation.screen.node
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import android.annotation.SuppressLint
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,12 +42,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -48,14 +60,12 @@ import com.github.yumelira.yumebox.data.model.normalizeProxySheetHeightFraction
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
 import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeStyle
+import com.github.yumelira.yumebox.presentation.component.Md3ELoading
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.chrisbanes.haze.HazeProgressive
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
-import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.InfiniteProgressIndicator
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.overScrollHorizontal
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 
@@ -84,6 +94,7 @@ private fun Modifier.nodeTabHaze(state: HazeState?, style: HazeStyle?): Modifier
     }
 }
 
+@Suppress("unused")
 @Composable
 internal fun NodeTabs(
     groups: List<ProxyGroupInfo>,
@@ -107,7 +118,7 @@ internal fun NodeTabs(
         modifier = Modifier
             .fillMaxWidth()
             .nodeTabHaze(hazeState, hazeStyle)
-            .background(MiuixTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .overScrollHorizontal(),
         contentPadding = PaddingValues(start = UiDp.dp14, end = UiDp.dp14, top = UiDp.dp10, bottom = UiDp.dp10),
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
@@ -115,32 +126,60 @@ internal fun NodeTabs(
     ) {
         itemsIndexed(groups, key = { _, group -> group.name }) { index, group ->
             val selected = index == selectedIndex
-            val background = if (selected) {
-                MiuixTheme.colorScheme.primary
-            } else {
-                MiuixTheme.colorScheme.surface
-            }
-            val textColor = if (selected) {
-                MiuixTheme.colorScheme.onPrimary
-            } else {
-                MiuixTheme.colorScheme.onSurface
+            val motionScheme = MaterialTheme.motionScheme
+            val selectionScaleX = remember { Animatable(1f) }
+            val background = animateColorAsState(
+                targetValue = if (selected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer
+                },
+                animationSpec = motionScheme.fastEffectsSpec(),
+                label = "node_tab_background",
+            ).value
+            val textColor = animateColorAsState(
+                targetValue = if (selected) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                animationSpec = motionScheme.fastEffectsSpec(),
+                label = "node_tab_text",
+            ).value
+            LaunchedEffect(selected) {
+                if (selected) {
+                    selectionScaleX.snapTo(1f)
+                    selectionScaleX.animateTo(1.06f, animationSpec = motionScheme.fastSpatialSpec())
+                    selectionScaleX.animateTo(1f, animationSpec = motionScheme.defaultSpatialSpec())
+                } else {
+                    selectionScaleX.animateTo(1f, animationSpec = motionScheme.fastSpatialSpec())
+                }
             }
 
             Box(
                 modifier = Modifier
+                    .graphicsLayer {
+                        scaleX = selectionScaleX.value
+                        scaleY = 1f
+                    }
                     .clip(RoundedCornerShape(UiDp.dp999))
-                    .background(background)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = { onSelect(index) },
-                    )
-                    .padding(horizontal = UiDp.dp11, vertical = UiDp.dp6),
+                    ),
+                contentAlignment = Alignment.Center,
             ) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(background),
+                )
                 Text(
                     text = group.name,
+                    modifier = Modifier.padding(horizontal = UiDp.dp11, vertical = UiDp.dp6),
                     color = textColor,
-                    style = MiuixTheme.textStyles.footnote1,
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
@@ -224,29 +263,21 @@ fun NodeSheetContent(
             AnimatedVisibility(
                 visible = isDelayTesting,
                 enter = expandVertically(
-                    animationSpec = tween(durationMillis = 200),
+                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
                     expandFrom = Alignment.Top,
                 ) + fadeIn(animationSpec = tween(durationMillis = 150)),
                 exit = shrinkVertically(
-                    animationSpec = tween(durationMillis = 200),
+                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
                     shrinkTowards = Alignment.Top,
                 ) + fadeOut(animationSpec = tween(durationMillis = 150)),
             ) {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = UiDp.dp12),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(UiDp.dp6),
+                        .padding(vertical = UiDp.dp8),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    InfiniteProgressIndicator(
-                        modifier = Modifier.size(UiDp.dp24),
-                    )
-                    Text(
-                        text = MLang.Proxy.Testing.InProgress,
-                        style = MiuixTheme.textStyles.footnote1,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                    )
+                    Md3ELoading()
                 }
             }
         }

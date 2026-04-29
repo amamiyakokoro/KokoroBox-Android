@@ -38,8 +38,8 @@ class IntentController(
 ) : KoinComponent {
 
     companion object {
-        private const val ACTION_START_CLASH = "com.github.yumelira.yumebox.action.START_CLASH"
-        private const val ACTION_STOP_CLASH = "com.github.yumelira.yumebox.action.STOP_CLASH"
+        private const val ACTION_START_CLASH_SUFFIX = ".action.START_CLASH"
+        private const val ACTION_STOP_CLASH_SUFFIX = ".action.STOP_CLASH"
     }
 
     private val proxyFacade: ProxyFacade by inject()
@@ -47,10 +47,10 @@ class IntentController(
     private val networkSettingsStorage: NetworkSettingsStore by inject()
 
     fun handleIntent(intent: Intent?) {
-        intent?.let { safeIntent ->
-            when (safeIntent.action) {
-                ACTION_START_CLASH -> handleStartClash()
-                ACTION_STOP_CLASH -> handleStopClash()
+        intent?.action?.let { action ->
+            when {
+                action.endsWith(ACTION_START_CLASH_SUFFIX) -> handleStartClash()
+                action.endsWith(ACTION_STOP_CLASH_SUFFIX) -> handleStopClash()
                 else -> {
                 }
             }

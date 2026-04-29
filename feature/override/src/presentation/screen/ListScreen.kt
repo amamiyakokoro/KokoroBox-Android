@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of YumeBox.
  *
  * YumeBox is free software: you can redistribute it and/or modify
@@ -27,6 +27,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +39,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -45,6 +47,9 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.model.OverrideConfig
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3FilledButton
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.*
 import com.github.yumelira.yumebox.presentation.theme.Spacing
@@ -55,24 +60,12 @@ import org.koin.androidx.compose.koinViewModel
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme
 
 private val OverrideConfigItemGap = Spacing().space12
 
 @Composable
 fun OverrideListScreen(
-    navigator: DestinationsNavigator,
+    @Suppress("UNUSED_PARAMETER") navigator: DestinationsNavigator,
     onEditConfig: (String) -> Unit,
     onOpenCodeEditor: (configId: String, configName: String) -> Unit = { _, _ -> },
 ) {
@@ -83,7 +76,6 @@ fun OverrideListScreen(
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val scrollBehavior = MiuixScrollBehavior()
 
     val showCreateDialog = remember { mutableStateOf(false) }
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -213,6 +205,7 @@ fun OverrideListScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             OverrideAnimatedFab(
                 controller = createFabController,
@@ -225,13 +218,11 @@ fun OverrideListScreen(
         topBar = {
             TopBar(
                 title = MLang.Override.Title,
-                scrollBehavior = scrollBehavior
             )
         },
     ) { paddingValues ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(paddingValues, mainLikePadding),
             lazyListState = listState,
             onScrollDirectionChanged = createFabController::onScrollDirectionChanged,
@@ -257,20 +248,14 @@ fun OverrideListScreen(
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                             ) {
-                                Button(
+                                YumeMd3TextButton(
+                                    text = MLang.Override.Action.New,
                                     onClick = { showCreateDialog.value = true },
-                                ) {
-                                    Text(MLang.Override.Action.New)
-                                }
-                                Button(
+                                )
+                                YumeMd3FilledButton(
+                                    text = MLang.Override.Action.Import,
                                     onClick = { importConfigLauncher.launch("*/*") },
-                                    colors = ButtonDefaults.buttonColorsPrimary(),
-                                ) {
-                                    Text(
-                                        text = MLang.Override.Action.Import,
-                                        color = colorScheme.background,
-                                    )
-                                }
+                                )
                             }
                         }
                     }
@@ -372,7 +357,7 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val colorScheme = colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val accentTintColor = colorScheme.primary
     val descriptionText = config.description?.takeIf(String::isNotBlank) ?: MLang.Override.Card.NoDescription
 
@@ -394,20 +379,24 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
                 ) {
-                    Text(
+                    AppText(
                         text = config.name,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight(550),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight(550),
+                        ),
                         color = colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Text(
+                    AppText(
                         text = descriptionText,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                        color = colorScheme.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -438,59 +427,24 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(
+                AppIconLabelButton(
                     modifier = Modifier.padding(end = UiDp.dp8),
-                    backgroundColor = colorScheme.primary.copy(alpha = 0.1f),
-                    minHeight = UiDp.dp35,
-                    minWidth = UiDp.dp35,
+                    text = MLang.Override.Card.EditButton,
+                    imageVector = Yume.Edit,
+                    contentDescription = MLang.Override.Card.Edit,
                     onClick = onEdit,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = UiDp.dp10),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(UiDp.dp2),
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(UiDp.dp20),
-                            imageVector = Yume.Edit,
-                            tint = accentTintColor,
-                            contentDescription = MLang.Override.Card.Edit,
-                        )
-                        Text(
-                            modifier = Modifier.padding(end = UiDp.dp3),
-                            text = MLang.Override.Card.EditButton,
-                            color = accentTintColor,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 15.sp,
-                        )
-                    }
-                }
+                    containerColor = colorScheme.primary.copy(alpha = 0.1f),
+                    contentColor = accentTintColor,
+                )
 
-                IconButton(
-                    backgroundColor = colorScheme.secondaryContainer.copy(alpha = 0.78f),
-                    minHeight = UiDp.dp35,
-                    minWidth = UiDp.dp35,
+                AppIconLabelButton(
+                    text = MLang.Override.Card.DeleteButton,
+                    imageVector = Yume.Delete,
+                    contentDescription = MLang.Override.Card.Delete,
                     onClick = onDelete,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = UiDp.dp10),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(UiDp.dp20),
-                            imageVector = Yume.Delete,
-                            tint = colorScheme.onSurface.copy(alpha = 0.85f),
-                            contentDescription = MLang.Override.Card.Delete,
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = UiDp.dp4, end = UiDp.dp3),
-                            text = MLang.Override.Card.DeleteButton,
-                            color = colorScheme.onSurface.copy(alpha = 0.85f),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 15.sp,
-                        )
-                    }
-                }
+                    containerColor = colorScheme.secondaryContainer.copy(alpha = 0.78f),
+                    contentColor = colorScheme.onSurface.copy(alpha = 0.85f),
+                )
             }
         }
     }
@@ -498,10 +452,11 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
 
 @Composable
 private fun OverrideConfigStateIndicator(inUse: Boolean) {
+    val colorScheme = MaterialTheme.colorScheme
     val tint = if (inUse) {
         colorScheme.primary
     } else {
-        colorScheme.onSurfaceVariantSummary
+        colorScheme.onSurfaceVariant
     }
 
     OverrideStatusBadge(
@@ -550,28 +505,30 @@ private fun CreateConfigDialog(
         Column(
             verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
         ) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = MLang.Override.Dialog.Create.Name
+                label = MLang.Override.Dialog.Create.Name,
+                modifier = Modifier.fillMaxWidth(),
             )
 
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = MLang.Override.Dialog.Create.Description
+                label = MLang.Override.Dialog.Create.Description,
+                modifier = Modifier.fillMaxWidth(),
             )
 
             Card(applyHorizontalPadding = false) {
-                BasicComponent(
+                PreferenceListItem(
                     title = MLang.Override.Action.ImportFile,
                     summary = MLang.Override.Dialog.Create.ImportHint,
                     startAction = {
-                        Icon(
+                        AppIcon(
                             modifier = Modifier.padding(end = UiDp.dp16),
                             imageVector = Yume.Share,
                             contentDescription = MLang.Override.Action.ImportFile,
-                            tint = colorScheme.onBackground,
+                            tint = MaterialTheme.colorScheme.onBackground,
                         )
                     },
                     onClick = {
@@ -617,23 +574,12 @@ private fun DeleteConfirmDialog(
         Row(
             horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
         ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onDismiss,
-            ) {
-                Text(MLang.Override.Dialog.Button.Cancel)
-            }
-
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColorsPrimary(),
-            ) {
-                Text(
-                    text = MLang.Override.Dialog.Button.Delete,
-                    color = colorScheme.onPrimary,
-                )
-            }
+            DialogButtonRow(
+                onCancel = onDismiss,
+                onConfirm = onConfirm,
+                cancelText = MLang.Override.Dialog.Button.Cancel,
+                confirmText = MLang.Override.Dialog.Button.Delete,
+            )
         }
     }
 }
@@ -655,22 +601,16 @@ private fun EditOptionsDialog(
         Column(
             verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
         ) {
-            Button(
+            YumeMd3FilledButton(
+                text = MLang.Override.Dialog.EditOptions.VisualEditor,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onVisualEdit,
-                colors = ButtonDefaults.buttonColorsPrimary(),
-            ) {
-                Text(
-                    text = MLang.Override.Dialog.EditOptions.VisualEditor,
-                    color = colorScheme.onPrimary,
-                )
-            }
-            Button(
+            )
+            YumeMd3TextButton(
+                text = MLang.Override.Dialog.EditOptions.CodeEditor,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onCodeEditor,
-            ) {
-                Text(MLang.Override.Dialog.EditOptions.CodeEditor)
-            }
+            )
         }
     }
 }

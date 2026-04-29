@@ -48,7 +48,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -154,7 +153,6 @@ fun ProxySheetContent(
                         show = showSortPopup.value,
                         onDismiss = { showSortPopup.value = false },
                         sortMode = sortMode,
-                        alignment = PopupPositionProvider.Align.BottomStart,
                         onSortSelected = proxyViewModel::setSortMode,
                     )
                 }
@@ -176,7 +174,12 @@ fun ProxySheetContent(
             )
         },
         onDismissRequest = {
-            dismissSheet()
+            showSortPopup.value = false
+            if (selectedGroup != null) {
+                groupSelection.clearSelection()
+            } else {
+                dismissSheet()
+            }
         },
         enableWindowDim = true,
         insideMargin = DpSize(UiDp.dp16, UiDp.dp16),

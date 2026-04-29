@@ -20,50 +20,71 @@
 
 package com.github.yumelira.yumebox.screen.about
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.LinkItem
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
-fun AboutScreen(navigator: DestinationsNavigator) {
-    val scrollBehavior = MiuixScrollBehavior()
-
+fun AboutScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNavigator) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = "关于 Lite", scrollBehavior = scrollBehavior)
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "关于 Lite",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
-        ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
-            innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
                 Title("版本")
                 Card {
-                    BasicComponent(
-                        title = "YumeBox(MD3) Lite",
-                        summary = "0.5.1 (Material You Build)",
+                    YumeMd3PreferenceItem(
+                        title = "YumeBox MD3 Lite",
+                        summary = "0.5.2 (Material You Build)",
+                        showDivider = false,
                     )
                 }
 
                 Title("简介")
                 Card {
-                    BasicComponent(
-                        title = "YumeBox(Material Design) Lite",
-                        summary = "A Material Design fork of YumeBox, an open-source Android client based on Mihomo",
+                    YumeMd3PreferenceItem(
+                        title = "YumeBox MD3 Lite",
+                        summary = "A Material Design 3 / Material You fork of YumeBox, an open-source Android client based on Mihomo",
+                        showDivider = false,
                     )
                 }
 

@@ -32,6 +32,8 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,11 +53,14 @@ import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
 import com.github.yumelira.yumebox.data.store.FeatureStore
+import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
 import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeStyle
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
 import com.github.yumelira.yumebox.presentation.component.rememberStartupBiometricGateState
+import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
+import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
 import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
 import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
 import com.github.yumelira.yumebox.presentation.theme.YumeTheme
@@ -76,8 +81,6 @@ import timber.log.Timber
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.qualifier.named
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 class MainActivity : FragmentActivity() {
 
@@ -139,6 +142,17 @@ class MainActivity : FragmentActivity() {
             val themeMode = appSettingsViewModel.themeMode.state.collectAsState().value
             val colorTheme = appSettingsViewModel.colorTheme.state.collectAsState().value
             val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsState().value
+            val acgWallpaperSeedColorArgb = appSettingsViewModel.acgWallpaperSeedColorArgb.state.collectAsState().value
+            val acgWallpaperUri = appSettingsViewModel.acgWallpaperUri.state.collectAsState().value
+            val effectiveThemeSeedColorArgb = if (colorTheme == AppColorTheme.AcgWallpaper) {
+                if (acgWallpaperUri.isBlank() && acgWallpaperSeedColorArgb == DEFAULT_CUSTOM_THEME_SEED_ARGB) {
+                    DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
+                } else {
+                    acgWallpaperSeedColorArgb
+                }
+            } else {
+                themeSeedColorArgb
+            }
             val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsState().value
             val excludeFromRecents = appSettingsViewModel.excludeFromRecents.state.collectAsState().value
             val topBarBlurEnabled = appSettingsViewModel.topBarBlurEnabled.state.collectAsState().value
@@ -168,13 +182,13 @@ class MainActivity : FragmentActivity() {
                     YumeTheme(
                         themeMode = themeMode,
                         colorTheme = colorTheme,
-                        themeSeedColorArgb = themeSeedColorArgb,
+                        themeSeedColorArgb = effectiveThemeSeedColorArgb,
                         invertOnPrimaryColors = invertOnPrimaryColors,
                     ) {
                         if (!biometricGateState.isAuthenticated) {
                             Surface(
                                 modifier = Modifier.fillMaxSize(),
-                                color = MiuixTheme.colorScheme.surface,
+                                color = MaterialTheme.colorScheme.surface,
                             ) {
                                 StartupBiometricContent(
                                     isAuthenticating = biometricGateState.isAuthenticating,
@@ -185,7 +199,7 @@ class MainActivity : FragmentActivity() {
                             }
                         } else {
                             val topBarHazeState = remember { HazeState() }
-                            val topBarBackground = MiuixTheme.colorScheme.surface
+                            val topBarBackground = MaterialTheme.colorScheme.surface
                             val topBarHazeStyle = remember(topBarBackground) {
                                 HazeStyle(
                                     backgroundColor = topBarBackground,
@@ -199,7 +213,7 @@ class MainActivity : FragmentActivity() {
                                 LocalTopBarHazeStyle provides if (topBarBlurEnabled) topBarHazeStyle else null,
                             ) {
                                 Surface(
-                                    modifier = Modifier.fillMaxSize(), color = MiuixTheme.colorScheme.surface
+                                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
                                 ) {
                                     DestinationsNavHost(
                                         navGraph = NavGraphs.root,
@@ -320,3 +334,4 @@ class MainActivity : FragmentActivity() {
         }
     }
 }
+

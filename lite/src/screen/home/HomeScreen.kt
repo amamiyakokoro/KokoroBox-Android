@@ -45,6 +45,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -63,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.util.formatBytesPerSecond
 import com.github.yumelira.yumebox.util.showToast
 import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
@@ -84,14 +90,6 @@ import com.ramcosta.composedestinations.generated.destinations.NodesScreenDestin
 import com.ramcosta.composedestinations.generated.destinations.VpnSettingsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.BasicComponentDefaults
-import top.yukonga.miuix.kmp.basic.CardDefaults
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private object HomeCardTokens {
     const val topCardCorner = 20
@@ -113,7 +111,6 @@ private object HomeCardTokens {
 fun HomeScreen(navigator: DestinationsNavigator) {
     val viewModel = koinViewModel<HomeViewModel>()
     val context = LocalContext.current
-    val scrollBehavior = MiuixScrollBehavior()
 
     val currentProfile by viewModel.currentProfile.collectAsState()
     val controlState by viewModel.controlState.collectAsState()
@@ -171,16 +168,15 @@ fun HomeScreen(navigator: DestinationsNavigator) {
     val showProxyCard = controlState != HomeControlState.Idle
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
-                title = "YumeBox(MD3) Lite",
-                scrollBehavior = scrollBehavior,
+                title = "YumeBox MD3 Lite",
             )
         },
     ) { innerPadding ->
         val pagePadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding())
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = pagePadding,
             contentPadding = PaddingValues(
                 start = 24.dp,
@@ -278,14 +274,14 @@ private fun StatusCard(
 ) {
     val isRunning = controlState == HomeControlState.Running
     val background = if (isRunning) {
-        MiuixTheme.colorScheme.primary
+        MaterialTheme.colorScheme.primary
     } else {
-        MiuixTheme.colorScheme.onBackground
+        MaterialTheme.colorScheme.inverseSurface
     }
     val contentColor = if (isRunning) {
-        MiuixTheme.colorScheme.onPrimary
+        MaterialTheme.colorScheme.onPrimary
     } else {
-        MiuixTheme.colorScheme.background
+        MaterialTheme.colorScheme.inverseOnSurface
     }
     val secondaryColor = contentColor.copy(alpha = 0.78f)
 
@@ -293,7 +289,7 @@ private fun StatusCard(
         modifier = Modifier.fillMaxWidth(),
         applyHorizontalPadding = false,
         cornerRadius = HomeCardTokens.topCardCorner,
-        colors = CardDefaults.defaultColors(color = background),
+        colors = CardDefaults.cardColors(containerColor = background),
     ) {
         val interactionSource = remember { MutableInteractionSource() }
         Row(
@@ -331,7 +327,7 @@ private fun StatusCard(
                 Text(
                     text = statusTitle(controlState),
                     color = contentColor,
-                    style = MiuixTheme.textStyles.body1,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -339,7 +335,7 @@ private fun StatusCard(
                 Text(
                     text = trafficText,
                     color = secondaryColor,
-                    style = MiuixTheme.textStyles.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -358,14 +354,14 @@ private fun TopEntryCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val titleColor = if (enabled) {
-        MiuixTheme.colorScheme.onBackground
+        MaterialTheme.colorScheme.onSurface
     } else {
-        MiuixTheme.colorScheme.disabledOnSecondaryVariant
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     }
     val endColor = if (enabled) {
-        MiuixTheme.colorScheme.onSurfaceVariantSummary
+        MaterialTheme.colorScheme.onSurfaceVariant
     } else {
-        MiuixTheme.colorScheme.disabledOnSecondaryVariant
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     }
 
     Card(
@@ -400,7 +396,8 @@ private fun TopEntryCard(
                 text = title,
                 modifier = Modifier.weight(1f),
                 color = titleColor,
-                style = MiuixTheme.textStyles.body1,
+                style = MaterialTheme.typography.bodyLarge,
+
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -409,7 +406,7 @@ private fun TopEntryCard(
                 text = endText,
                 modifier = Modifier.widthIn(max = 132.dp),
                 color = endColor,
-                style = MiuixTheme.textStyles.footnote1,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -428,11 +425,10 @@ private fun ArrowCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         applyHorizontalPadding = false,
-        colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface),
-        ) {
-        ArrowPreference(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        PreferenceArrowItem(
             title = title,
-            titleColor = BasicComponentDefaults.titleColor(),
             startAction = {
                 Box(
                     modifier = Modifier.width(HomeCardTokens.smallCardIconSlot),
@@ -442,9 +438,9 @@ private fun ArrowCard(
                         imageVector = icon,
                         contentDescription = null,
                         tint = if (enabled) {
-                            MiuixTheme.colorScheme.onBackground
+                            MaterialTheme.colorScheme.onSurface
                         } else {
-                            MiuixTheme.colorScheme.disabledOnSecondaryVariant
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                         },
                         modifier = Modifier.size(20.dp),
                     )
@@ -456,16 +452,15 @@ private fun ArrowCard(
                         text = endText,
                         modifier = Modifier.widthIn(max = 140.dp),
                         color = if (enabled) {
-                            MiuixTheme.colorScheme.onSurfaceVariantSummary
+                            MaterialTheme.colorScheme.onSurfaceVariant
                         } else {
-                            MiuixTheme.colorScheme.disabledOnSecondaryVariant
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                         },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
             },
-            enabled = enabled,
             onClick = onClick,
         )
     }

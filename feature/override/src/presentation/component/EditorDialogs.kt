@@ -20,28 +20,29 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
+
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.github.yumelira.yumebox.presentation.theme.UiDp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.util.decodeObjectFields
 import com.github.yumelira.yumebox.presentation.util.encodeObjectFields
 import com.github.yumelira.yumebox.presentation.util.jsonElementToEditorValue
 import com.github.yumelira.yumebox.presentation.util.toOrderedJsonElementMap
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.util.UUID
 
 @Composable
@@ -208,8 +209,8 @@ fun JsonObjectListEditorDialog(
         ) {
             Text(
                 text = MLang.Override.Editor.ObjectListHint,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
             )
             Spacer(modifier = Modifier.height(UiDp.dp12))
             LazyColumn(
@@ -228,7 +229,7 @@ fun JsonObjectListEditorDialog(
                         Text(
                             text = objectCardSubtitle(fields),
                             fontSize = 13.sp,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = UiDp.dp4),
                         )
                         Spacer(modifier = Modifier.height(UiDp.dp10))
@@ -300,11 +301,13 @@ fun JsonObjectListEditorDialog(
                     editingIndex = drafts.lastIndex
                     showItemEditor.value = true
                 },
-                colors = ButtonDefaults.buttonColorsPrimary(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
                 Text(
                     text = MLang.Override.Editor.AddObject,
-                        color = MiuixTheme.colorScheme.onPrimary,
                 )
             }
             Spacer(modifier = Modifier.height(UiDp.dp24))
@@ -362,8 +365,8 @@ fun JsonObjectMapEditorDialog(
         ) {
             Text(
                 text = MLang.Override.Editor.ProviderMapHint,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
             )
             Spacer(modifier = Modifier.height(UiDp.dp12))
             LazyColumn(
@@ -382,7 +385,7 @@ fun JsonObjectMapEditorDialog(
                         Text(
                             text = objectCardSubtitle(draft.second),
                             fontSize = 13.sp,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = UiDp.dp4),
                         )
                         Spacer(modifier = Modifier.height(UiDp.dp10))
@@ -420,11 +423,13 @@ fun JsonObjectMapEditorDialog(
                     editingIndex = drafts.lastIndex
                     showItemEditor.value = true
                 },
-                colors = ButtonDefaults.buttonColorsPrimary(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
                 Text(
                     text = MLang.Override.Editor.NewProvider,
-                        color = MiuixTheme.colorScheme.onPrimary,
                 )
             }
             Spacer(modifier = Modifier.height(UiDp.dp24))
@@ -491,8 +496,8 @@ fun SubRulesEditorDialog(
         ) {
             Text(
                 text = MLang.Override.Editor.SubRuleGroupHint,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline,
             )
             Spacer(modifier = Modifier.height(UiDp.dp12))
             LazyColumn(
@@ -526,11 +531,13 @@ fun SubRulesEditorDialog(
                     drafts.add("" to emptyList())
                     itemKeys.add(newEditorItemKey())
                 },
-                colors = ButtonDefaults.buttonColorsPrimary(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
                 Text(
                     text = MLang.Override.Editor.AddSubRuleGroup,
-                        color = MiuixTheme.colorScheme.onPrimary,
                 )
             }
             Spacer(modifier = Modifier.height(UiDp.dp24))
@@ -590,14 +597,14 @@ private fun JsonObjectFieldsDialog(
         onDismissRequest = { show.value = false },
     ) {
         if (initialKey != null) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = keyText,
                 onValueChange = { keyText = it },
                 label = MLang.Override.Editor.KeyName,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-        TextField(
+        YumeMd3OutlinedTextField(
             value = rawJson,
             onValueChange = { rawJson = it },
             label = MLang.Override.Editor.ObjectJsonPlaceholder,
@@ -663,7 +670,7 @@ private fun StringMapEntryItem(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
     ) {
-        TextField(
+        YumeMd3OutlinedTextField(
             value = keyText,
             onValueChange = {
                 keyText = it
@@ -672,7 +679,7 @@ private fun StringMapEntryItem(
             label = keyPlaceholder,
             modifier = Modifier.weight(1f),
         )
-        TextField(
+        YumeMd3OutlinedTextField(
             value = valueText,
             onValueChange = {
                 valueText = it
@@ -697,7 +704,7 @@ private fun SubRuleEntryCard(
     Card(
         insideMargin = androidx.compose.foundation.layout.PaddingValues(UiDp.dp12),
     ) {
-        TextField(
+        YumeMd3OutlinedTextField(
             value = nameText,
             onValueChange = {
                 nameText = it
@@ -710,7 +717,7 @@ private fun SubRuleEntryCard(
         Text(
             text = if (rulesCount == 0) MLang.Override.Draft.NoRules else MLang.Override.Editor.RulesConfiguredInline.format(rulesCount),
             fontSize = 13.sp,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.height(UiDp.dp8))
         Row(

@@ -38,10 +38,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.material3.MaterialTheme
 import com.github.yumelira.yumebox.common.AppConstants
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.TrafficChartConfig
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private const val SPEED_CHART_SAMPLE_LIMIT = AppConstants.Limits.SPEED_HISTORY_SIZE
 private const val SPEED_CHART_IDLE_SCROLL_DURATION_MS = 900
@@ -58,7 +58,7 @@ fun SpeedChart(
 ) {
     val componentSizes = AppTheme.sizes
     val opacity = AppTheme.opacity
-    val chartColor = MiuixTheme.colorScheme.primary
+    val chartColor = MaterialTheme.colorScheme.primary
     val fractions = remember(speedHistory) {
         buildSpeedChartFractions(speedHistory = speedHistory)
     }

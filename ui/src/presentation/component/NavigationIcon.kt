@@ -28,6 +28,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -40,10 +42,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.dropUnlessResumed
 import com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
-import top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme
 
 @Composable
 fun NavigationBackIcon(
@@ -77,7 +77,7 @@ fun NavigationBackIcon(
         Icon(
             imageVector = MiuixIcons.Back,
             contentDescription = contentDescription,
-            tint = colorScheme.onBackground,
+            tint = MaterialTheme.colorScheme.onBackground,
         )
     }
 }

@@ -30,6 +30,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,10 +52,6 @@ import com.github.yumelira.yumebox.presentation.icon.yume.*
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun TrafficDisplay(
@@ -114,8 +114,8 @@ private fun DownloadSection(
         ) {
             Text(
                 text = "DOWNLOAD",
-                style = MiuixTheme.textStyles.footnote1.copy(fontSize = 14.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             ProfileModeBadge(profileName = profileName, tunnelMode = tunnelMode)
@@ -137,7 +137,7 @@ private fun ProfileModeBadge(
     val opacity = AppTheme.opacity
 
     Surface(
-        color = MiuixTheme.colorScheme.primary.copy(alpha = opacity.subtle),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtle),
         shape = RoundedCornerShape(50),
         modifier = Modifier.height(componentSizes.statusCapsuleHeight)
     ) {
@@ -148,26 +148,26 @@ private fun ProfileModeBadge(
         ) {
             Text(
                 text = profileName ?: MLang.Home.Traffic.NoProfile,
-                style = MiuixTheme.textStyles.footnote1.copy(
+                style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                color = MiuixTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary
             )
 
             Box(
                 modifier = Modifier
                     .size(spacing.space4)
-                    .background(MiuixTheme.colorScheme.primary, CircleShape)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
             )
 
             Text(
                 text = tunnelMode.toDisplayName(),
-                style = MiuixTheme.textStyles.footnote1.copy(
+                style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                color = MiuixTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -182,19 +182,19 @@ private fun SpeedValue(speed: Long) {
     Row(verticalAlignment = Alignment.Bottom) {
         Text(
             text = value,
-            style = MiuixTheme.textStyles.headline1.copy(
+            style = MaterialTheme.typography.headlineLarge.copy(
                 fontSize = AppConstants.UI.TRAFFIC_FONT_SIZE,
                 lineHeight = AppConstants.UI.TRAFFIC_FONT_SIZE,
                 letterSpacing = AppConstants.UI.TRAFFIC_LETTER_SPACING
             ),
-            color = MiuixTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = unit,
-            style = MiuixTheme.textStyles.title2.copy(
+            style = MaterialTheme.typography.titleLarge.copy(
                 fontSize = AppConstants.UI.TRAFFIC_UNIT_FONT_SIZE
             ),
-            color = MiuixTheme.colorScheme.primary.copy(alpha = opacity.medium),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = opacity.medium),
             modifier = Modifier.padding(bottom = spacing.space14, start = spacing.space8)
         )
     }
@@ -220,13 +220,13 @@ private fun UploadSection(
         ) {
             Text(
                 text = "UPLOAD",
-                style = MiuixTheme.textStyles.footnote1.copy(fontSize = 14.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 14.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "$value $unit",
-                style = MiuixTheme.textStyles.title2.copy(fontSize = 20.sp),
-                color = MiuixTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -259,7 +259,7 @@ private fun ProxyTypeCapsule(proxyMode: ProxyMode) {
     val componentSizes = AppTheme.sizes
     val opacity = AppTheme.opacity
 
-    val primary = MiuixTheme.colorScheme.primary
+    val primary = MaterialTheme.colorScheme.primary
     Surface(
         color = primary.copy(alpha = opacity.subtle),
         shape = RoundedCornerShape(50),
@@ -286,7 +286,7 @@ private fun ProxyTypeCapsule(proxyMode: ProxyMode) {
                     ProxyMode.RootTun -> MLang.Home.ProxyMode.Tun
                     ProxyMode.Http -> MLang.Home.ProxyMode.Http
                 },
-                style = MiuixTheme.textStyles.footnote1.copy(
+                style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 ),
@@ -302,7 +302,7 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
     val componentSizes = AppTheme.sizes
     val opacity = AppTheme.opacity
 
-    val primary = MiuixTheme.colorScheme.primary
+    val primary = MaterialTheme.colorScheme.primary
     Surface(
         color = primary.copy(alpha = opacity.subtle),
         shape = RoundedCornerShape(50),
@@ -350,7 +350,7 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
                         HomeProxyControlState.Running -> MLang.Home.Status.Running
                         HomeProxyControlState.Disconnecting -> MLang.Home.Status.Disconnecting
                     },
-                    style = MiuixTheme.textStyles.footnote1.copy(
+                    style = MaterialTheme.typography.labelMedium.copy(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     ),

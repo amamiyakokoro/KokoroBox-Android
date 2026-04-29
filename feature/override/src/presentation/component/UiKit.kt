@@ -31,19 +31,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.Dp
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.chevron
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 
 val OverrideSectionSpacing = UiDp.dp12
 val OverrideSectionTitleSpacing = UiDp.dp8
@@ -142,7 +141,7 @@ fun OverrideFormField(
     maxLines: Int = 1,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        TextField(
+        YumeMd3OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             label = label,
@@ -152,13 +151,13 @@ fun OverrideFormField(
         supportText?.takeIf(String::isNotBlank)?.let { helper ->
             OverrideFieldAssistText(
                 text = helper,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         errorText?.takeIf(String::isNotBlank)?.let { message ->
             OverrideFieldAssistText(
                 text = message,
-                color = MiuixTheme.colorScheme.error,
+                color = MaterialTheme.colorScheme.error,
             )
         }
     }
@@ -170,9 +169,9 @@ fun OverrideFieldAssistText(
     color: Color,
     modifier: Modifier = Modifier,
 ) {
-    Text(
+    AppText(
         text = text,
-        style = MiuixTheme.textStyles.body2,
+        style = MaterialTheme.typography.bodyMedium,
         color = color,
         modifier = modifier.padding(
             start = AppTheme.spacing.space14,
@@ -210,18 +209,18 @@ fun OverrideSectionCardHeader(
         label = "override_section_indicator_rotation",
     )
 
-    BasicComponent(
+    PreferenceListItem(
         title = title,
-        summary = summary.orEmpty(),
+        summary = summary,
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = sizes.sectionHeaderMinHeight),
         endActions = {
             if (showIndicator) {
-                Icon(
+                AppIcon(
                     imageVector = Yume.chevron,
                     contentDescription = null,
-                    tint = MiuixTheme.colorScheme.onSurfaceVariantActions,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.rotate(indicatorRotation.value),
                 )
             }
@@ -295,7 +294,7 @@ fun OverrideCardActionIconButton(
     tone: OverrideActionTone = OverrideActionTone.Neutral,
     enabled: Boolean = true,
 ) {
-    val colorScheme = MiuixTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val sizes = AppTheme.sizes
     val (backgroundColor, iconTint) = when (tone) {
         OverrideActionTone.Neutral -> {
@@ -314,21 +313,15 @@ fun OverrideCardActionIconButton(
         }
     }
 
-    IconButton(
+    AppTonalIconButton(
         modifier = modifier,
-        backgroundColor = backgroundColor,
-        minHeight = sizes.compactActionButtonSize,
-        minWidth = sizes.compactActionButtonSize,
-        enabled = enabled,
+        imageVector = imageVector,
+        contentDescription = contentDescription,
         onClick = onClick,
-    ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = contentDescription,
-            tint = iconTint,
-            modifier = Modifier.size(UiDp.dp18),
-        )
-    }
+        enabled = enabled,
+        containerColor = backgroundColor,
+        contentColor = iconTint,
+    )
 }
 
 @Composable
@@ -337,8 +330,13 @@ fun OverrideStatusBadge(
     contentDescription: String,
     tint: Color,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MiuixTheme.colorScheme.secondaryContainer.copy(alpha = 0.78f),
+    backgroundColor: Color = Color.Unspecified,
 ) {
+    val resolvedBackgroundColor = if (backgroundColor == Color.Unspecified) {
+        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.78f)
+    } else {
+        backgroundColor
+    }
     val spacing = AppTheme.spacing
     val sizes = AppTheme.sizes
 
@@ -346,12 +344,12 @@ fun OverrideStatusBadge(
         modifier = modifier
             .size(sizes.statusCapsuleHeight + spacing.space4)
             .background(
-                color = backgroundColor,
+                color = resolvedBackgroundColor,
                 shape = CircleShape,
             ),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(
+        AppIcon(
             imageVector = imageVector,
             contentDescription = contentDescription,
             tint = tint,

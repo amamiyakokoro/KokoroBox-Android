@@ -22,10 +22,9 @@
 package com.github.yumelira.yumebox.presentation.screen.node
 
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -33,6 +32,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,7 +45,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,13 +58,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.ColorUtils
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
 import com.github.yumelira.yumebox.presentation.icon.Yume
@@ -171,32 +172,32 @@ internal fun rememberProxySelectionPalette(
     selected: Boolean,
     defaultContainerColor: Color? = null,
 ): ProxySelectionPalette {
-    val colorScheme = MiuixTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val surface = colorScheme.surface
-    val isDarkSurface = ColorUtils.calculateLuminance(surface.toArgb()) < 0.5
-    val fallbackContainer = defaultContainerColor ?: if (isDarkSurface) {
-        colorScheme.tertiaryContainerVariant.copy(alpha = 0.96f).compositeOver(surface)
-    } else {
-        colorScheme.primary.copy(alpha = 0.10f).compositeOver(surface)
-    }
+    val isDarkTheme = isSystemInDarkTheme()
+    val fallbackContainer = defaultContainerColor
+        ?: colorScheme.surfaceVariant.copy(alpha = 0.42f).compositeOver(surface)
+    val selectedContainer = colorScheme.primaryContainer
+        .copy(alpha = if (isDarkTheme) 0.62f else 0.78f)
+        .compositeOver(surface)
 
     return if (selected) {
         ProxySelectionPalette(
-            containerColor = colorScheme.primary.copy(alpha = 0.16f),
-            borderColor = colorScheme.primary.copy(alpha = 0.18f),
+            containerColor = selectedContainer,
+            borderColor = Color.Transparent,
             contentColor = colorScheme.primary,
-            supportingColor = colorScheme.primary.copy(alpha = 0.82f),
-            chipBackgroundColor = colorScheme.primary.copy(alpha = 0.12f),
+            supportingColor = colorScheme.onSurfaceVariant,
+            chipBackgroundColor = colorScheme.primary.copy(alpha = 0.10f),
             chipContentColor = colorScheme.primary,
-            trailingBadgeBackgroundColor = colorScheme.primary.copy(alpha = 0.12f),
+            trailingBadgeBackgroundColor = colorScheme.primary.copy(alpha = 0.10f),
             trailingBadgeContentColor = colorScheme.primary,
-            iconBackgroundColor = colorScheme.primary.copy(alpha = 0.12f),
+            iconBackgroundColor = colorScheme.primary.copy(alpha = 0.10f),
             iconContentColor = colorScheme.primary,
         )
     } else {
         ProxySelectionPalette(
             containerColor = fallbackContainer,
-            borderColor = if (isDarkSurface) colorScheme.onSurface.copy(alpha = 0.05f) else Color.Transparent,
+            borderColor = Color.Transparent,
             contentColor = colorScheme.onSurface,
             supportingColor = colorScheme.onSurface.copy(alpha = 0.72f),
             chipBackgroundColor = colorScheme.primary.copy(alpha = 0.10f),
@@ -234,6 +235,7 @@ internal fun RotatingCircleGauge(
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun NodeSelectableCard(
     isSelected: Boolean,
@@ -247,27 +249,33 @@ internal fun NodeSelectableCard(
     val interactionSource = remember { MutableInteractionSource() }
     val shape = RoundedCornerShape(radii.radius18)
     val palette = rememberProxySelectionPalette(selected = isSelected)
+    val motionScheme = MaterialTheme.motionScheme
+    val selectionScale = remember { Animatable(1f) }
     val transition = updateTransition(targetState = palette, label = "node_card_selection")
     val backgroundColor by transition.animateColor(
-        transitionSpec = { tween(durationMillis = 180, easing = FastOutSlowInEasing) },
+        transitionSpec = { motionScheme.fastEffectsSpec() },
         label = "node_card_background_color",
     ) { it.containerColor }
     val borderColor by transition.animateColor(
-        transitionSpec = { tween(durationMillis = 180, easing = FastOutSlowInEasing) },
+        transitionSpec = { motionScheme.fastEffectsSpec() },
         label = "node_card_border_color",
     ) { it.borderColor }
 
-    val animatedScale by animateFloatAsState(
-        targetValue = if (isSelected) 1f else 0.985f,
-        animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing),
-        label = "node_card_scale",
-    )
+    LaunchedEffect(isSelected) {
+        if (isSelected) {
+            selectionScale.snapTo(1f)
+            selectionScale.animateTo(1.045f, animationSpec = motionScheme.fastSpatialSpec())
+            selectionScale.animateTo(1f, animationSpec = motionScheme.defaultSpatialSpec())
+        } else {
+            selectionScale.animateTo(1f, animationSpec = motionScheme.fastSpatialSpec())
+        }
+    }
 
     Box(
         modifier = modifier
             .graphicsLayer {
-                scaleX = animatedScale
-                scaleY = animatedScale
+                scaleX = selectionScale.value
+                scaleY = selectionScale.value
             }
             .fillMaxWidth()
             .clip(shape)
@@ -316,8 +324,8 @@ internal fun NodeCard(
     NodeSelectableCard(
         isSelected = isSelected,
         onClick = onCardClick,
-        modifier = modifier.heightIn(min = 148.dp),
-        paddingVertical = sizes.nodeCardPaddingVertical,
+        modifier = modifier.heightIn(min = 144.dp),
+        paddingVertical = spacing.space12,
     ) {
         val presentation = remember(proxy.name, proxy.title) {
             resolveProxyDisplayPresentation(name = proxy.name, title = proxy.title)
@@ -453,7 +461,7 @@ internal fun NodeLargeIcon(
         contentAlignment = Alignment.Center,
     ) {
         if (countryCode != null) {
-            CountryFlagCircle(countryCode = countryCode, size = sizes.nodeLargeIconFlagSize)
+            CountryFlagCircle(countryCode = countryCode, size = sizes.nodeLargeIconFlagSize - 2.dp)
         } else {
             Text(
                 text = typeName.take(2),

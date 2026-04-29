@@ -23,6 +23,7 @@
 package com.github.yumelira.yumebox.screen.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
@@ -30,7 +31,18 @@ import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.store.Preference
+import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class AppSettingsViewModel(
     private val settings: AppSettingsStore,
@@ -45,6 +57,7 @@ class AppSettingsViewModel(
     val appLanguage: Preference<AppLanguage> = settings.appLanguage
     val colorTheme: Preference<AppColorTheme> = settings.colorTheme
     val themeSeedColorArgb: Preference<Long> = settings.themeAccentColorArgb
+    val acgWallpaperSeedColorArgb: Preference<Long> = settings.acgWallpaperSeedColorArgb
     val invertOnPrimaryColors: Preference<Boolean> = settings.invertOnPrimaryColors
     val automaticRestart: Preference<Boolean> = settings.automaticRestart
     val autoUpdateCurrentProfileOnStart: Preference<Boolean> = settings.autoUpdateCurrentProfileOnStart
@@ -61,6 +74,10 @@ class AppSettingsViewModel(
     val acgWallpaperBiasY: Preference<Float> = settings.acgWallpaperBiasY
     val acgHomeQuote: Preference<String> = settings.acgHomeQuote
     val acgHomeQuoteAuthor: Preference<String> = settings.acgHomeQuoteAuthor
+    val acgDailyQuoteEnabled: Preference<Boolean> = settings.acgDailyQuoteEnabled
+    val acgDailyQuote: Preference<String> = settings.acgDailyQuote
+    val acgDailyQuoteAuthor: Preference<String> = settings.acgDailyQuoteAuthor
+    val acgDailyQuoteDate: Preference<String> = settings.acgDailyQuoteDate
     val acgSidebarExpanded: Preference<Boolean> = settings.acgSidebarExpanded
     val pageScale: Preference<Float> = settings.pageScale
     val singleNodeTest: Preference<Boolean> = settings.singleNodeTest
@@ -87,6 +104,7 @@ class AppSettingsViewModel(
     fun onTopBarBlurEnabledChange(enabled: Boolean) = topBarBlurEnabled.set(enabled)
     fun onAcgMainUiEnabledChange(enabled: Boolean) = acgMainUiEnabled.set(enabled)
     fun onAcgWallpaperUriChange(uri: String) = acgWallpaperUri.set(uri)
+    fun onAcgWallpaperSeedColorChange(argb: Long) = acgWallpaperSeedColorArgb.set(argb)
     fun onAcgWallpaperCropChange(zoom: Float, biasX: Float, biasY: Float) {
         acgWallpaperZoom.set(zoom.coerceIn(1f, 5f))
         acgWallpaperBiasX.set(biasX.coerceIn(-1f, 1f))
@@ -94,9 +112,23 @@ class AppSettingsViewModel(
     }
     fun onAcgHomeQuoteChange(quote: String) = acgHomeQuote.set(quote)
     fun onAcgHomeQuoteAuthorChange(author: String) = acgHomeQuoteAuthor.set(author)
+    fun onAcgDailyQuoteEnabledChange(enabled: Boolean) = acgDailyQuoteEnabled.set(enabled)
+    fun refreshDailyAcgQuoteIfNeeded(force: Boolean = false) {
+        val today = todayKey()
+        if (!force && acgDailyQuoteDate.value == today && acgDailyQuote.value.isNotBlank()) {
+            return
+        }
+        viewModelScope.launch {
+            val quote = fetchHitokotoQuote() ?: return@launch
+            acgDailyQuote.set(quote.text)
+            acgDailyQuoteAuthor.set(quote.author)
+            acgDailyQuoteDate.set(today)
+        }
+    }
     fun onAcgSidebarExpandedChange(expanded: Boolean) = acgSidebarExpanded.set(expanded)
     fun clearAcgWallpaperUri() {
         acgWallpaperUri.set("")
+        acgWallpaperSeedColorArgb.set(DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB)
         onAcgWallpaperCropChange(zoom = 1f, biasX = 0f, biasY = 0f)
     }
     fun onPageScaleChange(scale: Float) = pageScale.set(scale)
@@ -115,3 +147,37 @@ class AppSettingsViewModel(
     fun setInitialSetupCompleted(completed: Boolean) = initialSetupCompleted.set(completed)
     fun setPrivacyPolicyAccepted(accepted: Boolean) = privacyPolicyAccepted.set(accepted)
 }
+
+private data class DailyAcgQuote(
+    val text: String,
+    val author: String,
+)
+
+private val dailyQuoteClient = OkHttpClient.Builder()
+    .connectTimeout(8, TimeUnit.SECONDS)
+    .readTimeout(8, TimeUnit.SECONDS)
+    .build()
+
+private fun todayKey(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+
+private suspend fun fetchHitokotoQuote(): DailyAcgQuote? = withContext(Dispatchers.IO) {
+    runCatching {
+        val request = Request.Builder()
+            .url("https://v1.hitokoto.cn/?c=a&c=b&c=c&encode=json")
+            .header("User-Agent", "YumeBox-MaterialDesign")
+            .build()
+        dailyQuoteClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return@withContext null
+            val json = JSONObject(response.body.string())
+            val text = json.optString("hitokoto").trim()
+            if (text.isBlank()) return@withContext null
+            val fromWho = json.optString("from_who").trim().takeIf { it.isNotBlank() && it != "null" }
+            val from = json.optString("from").trim().takeIf { it.isNotBlank() && it != "null" }
+            DailyAcgQuote(
+                text = text,
+                author = fromWho ?: from.orEmpty(),
+            )
+        }
+    }.getOrNull()
+}
+

@@ -21,10 +21,19 @@
 package com.github.yumelira.yumebox.presentation.component
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.preference.SwitchPreference
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3SwitchPreferenceItem
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.chevron
 
 @Composable
 fun PreferenceSwitchItem(
@@ -34,11 +43,11 @@ fun PreferenceSwitchItem(
     summary: String? = null,
     enabled: Boolean = true,
 ) {
-    SwitchPreference(
+    YumeMd3SwitchPreferenceItem(
         title = title,
-        summary = summary,
         checked = checked,
         onCheckedChange = onCheckedChange,
+        summary = summary,
         enabled = enabled,
     )
 }
@@ -48,19 +57,39 @@ fun PreferenceArrowItem(
     title: String,
     onClick: () -> Unit,
     summary: String? = null,
+    enabled: Boolean = true,
     holdDownState: Boolean = false,
     startAction: @Composable (() -> Unit)? = null,
     endActions: @Composable (RowScope.() -> Unit)? = null,
     bottomAction: @Composable (() -> Unit)? = null,
 ) {
-    ArrowPreference(
+    val resolvedContainerColor = if (holdDownState) {
+        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.42f)
+    } else {
+        Color.Transparent
+    }
+
+    YumeMd3PreferenceItem(
         title = title,
         summary = summary,
-        holdDownState = holdDownState,
-        startAction = startAction ?: {},
-        endActions = endActions ?: {},
-        bottomAction = bottomAction ?: {},
+        enabled = enabled,
         onClick = onClick,
+        leadingContent = startAction,
+        trailingContent = {
+            endActions?.invoke(this)
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Yume.chevron,
+                contentDescription = null,
+                tint = if (enabled) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                },
+            )
+        },
+        bottomContent = bottomAction,
+        containerColor = resolvedContainerColor,
     )
 }
 
@@ -69,13 +98,15 @@ fun PreferenceValueItem(
     title: String,
     onClick: () -> Unit,
     summary: String? = null,
+    enabled: Boolean = true,
     endActions: @Composable (RowScope.() -> Unit)? = null,
 ) {
-    BasicComponent(
+    YumeMd3PreferenceItem(
         title = title,
         summary = summary,
-        endActions = endActions ?: {},
+        enabled = enabled,
         onClick = onClick,
+        trailingContent = endActions,
     )
 }
 
@@ -95,5 +126,32 @@ fun <T> PreferenceEnumItem(
         items = items,
         values = values,
         onValueChange = onValueChange,
+    )
+}
+
+@Composable
+fun PreferenceListItem(
+    title: String,
+    summary: String? = null,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    role: Role? = null,
+    startAction: @Composable (() -> Unit)? = null,
+    endActions: @Composable (RowScope.() -> Unit)? = null,
+    bottomAction: @Composable (() -> Unit)? = null,
+    containerColor: Color = Color.Transparent,
+) {
+    YumeMd3PreferenceItem(
+        title = title,
+        summary = summary,
+        modifier = modifier,
+        enabled = enabled,
+        onClick = onClick,
+        role = role,
+        leadingContent = startAction,
+        trailingContent = endActions,
+        bottomContent = bottomAction,
+        containerColor = containerColor,
     )
 }

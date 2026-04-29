@@ -35,6 +35,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,8 +67,6 @@ import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 @Destination<RootGraph>
@@ -116,10 +116,10 @@ fun MainScreen(
             }
         }
     }
-    val bottomBarBackground = if (MiuixTheme.colorScheme.background.luminance() < 0.5f) {
-        MiuixTheme.colorScheme.surface
+    val bottomBarBackground = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
+        MaterialTheme.colorScheme.surface
     } else {
-        MiuixTheme.colorScheme.background
+        MaterialTheme.colorScheme.background
     }
     val opacity = AppTheme.opacity
     val bottomBarHazeStyle = remember(bottomBarBackground) {
@@ -171,7 +171,9 @@ fun MainScreen(
         LocalBottomBarHazeStyle provides if (mainPagerHazeEnabled) bottomBarHazeStyle else null,
         LocalBottomBarUseLegacyStyle provides bottomBarUseLegacyStyle,
     ) {
-        Scaffold { innerPadding ->
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) { innerPadding ->
             Box(Modifier.fillMaxSize()) {
                 val layoutDirection = LocalLayoutDirection.current
                 val visibleBottomBarReservedHeight = rememberBottomBarReservedHeight(

@@ -49,9 +49,9 @@ get() {
             strokeLineCap = StrokeCap.Round,
             strokeLineJoin = StrokeJoin.Round
         ) {
-            moveToRelative(9f, 18f)
-            lineToRelative(6f, -6f)
-            lineToRelative(-6f, -6f)
+            moveTo(8f, 19f)
+            lineTo(16f, 12f)
+            lineTo(8f, 5f)
         }
     }.build()
 

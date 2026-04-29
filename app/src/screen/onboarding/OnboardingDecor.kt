@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of YumeBox.
  *
  * YumeBox is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 
 package com.github.yumelira.yumebox.screen.onboarding
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -33,6 +33,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,11 +45,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.common.AppConstants
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import kotlinx.coroutines.delay
 
 internal val PagePadding = AppConstants.UI.DEFAULT_HORIZONTAL_PADDING
@@ -71,8 +70,8 @@ internal fun DreamBackdrop(
 ) {
     val opacity = AppTheme.opacity
 
-    val surface = MiuixTheme.colorScheme.surface
-    val primary = MiuixTheme.colorScheme.primary
+    val surface = MaterialTheme.colorScheme.surface
+    val primary = MaterialTheme.colorScheme.primary
     val baseTint = remember(surface, boosted) {
         lerp(surface, primary, if (boosted) 0.035f else 0.02f)
     }
@@ -104,8 +103,8 @@ internal fun DreamBackdrop(
 internal fun DetailBackdrop(modifier: Modifier = Modifier) {
     val opacity = AppTheme.opacity
 
-    val surface = MiuixTheme.colorScheme.surface
-    val primary = MiuixTheme.colorScheme.primary
+    val surface = MaterialTheme.colorScheme.surface
+    val primary = MaterialTheme.colorScheme.primary
     val accent = remember(surface) {
         lerp(surface, primary, 0.045f)
     }

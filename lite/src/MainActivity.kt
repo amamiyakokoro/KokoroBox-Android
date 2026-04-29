@@ -26,7 +26,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,9 +50,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.android.ext.android.inject
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 class MainActivity : FragmentActivity() {
     companion object {
@@ -116,10 +115,11 @@ class MainActivity : FragmentActivity() {
                     invertOnPrimaryColors = invertOnPrimaryColors,
                 ) {
                     Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MiuixTheme.colorScheme.surface,
+                        color = MaterialTheme.colorScheme.surface,
                     ) {
-                        Scaffold {
+                        Scaffold(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ) { _ ->
                             DestinationsNavHost(
                                 navGraph = NavGraphs.root,
                                 navController = navController,
@@ -151,3 +151,4 @@ class MainActivity : FragmentActivity() {
         intentController.handleIntent(safeIntent)
     }
 }
+

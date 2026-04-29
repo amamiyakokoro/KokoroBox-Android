@@ -26,14 +26,13 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
-import top.yukonga.miuix.kmp.basic.FloatingActionButton
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Stable
 class OverrideFabController internal constructor() {
@@ -111,10 +110,10 @@ fun OverrideAnimatedFab(
             modifier = Modifier.padding(end = UiDp.dp20, bottom = UiDp.dp85),
             onClick = onClick,
         ) {
-            Icon(
+            AppIcon(
                 imageVector = imageVector,
                 contentDescription = contentDescription,
-                tint = MiuixTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }

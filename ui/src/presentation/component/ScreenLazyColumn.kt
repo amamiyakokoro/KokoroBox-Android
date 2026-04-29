@@ -42,13 +42,10 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.theme.LocalSpacing
 import dev.chrisbanes.haze.hazeSource
-import top.yukonga.miuix.kmp.basic.ScrollBehavior
-import top.yukonga.miuix.kmp.utils.overScrollVertical
-import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
 @Composable
 fun ScreenLazyColumn(
-    scrollBehavior: ScrollBehavior,
+    @Suppress("UNUSED_PARAMETER") scrollBehavior: Any? = null,
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues? = null,
@@ -123,13 +120,10 @@ fun ScreenLazyColumn(
         state = lazyListState,
         modifier = modifier
             .fillMaxSize()
-            .scrollEndHaptic()
-            .overScrollVertical()
             .let { mod ->
                 if (topBarHazeState != null) mod.hazeSource(state = topBarHazeState) else mod
             }
             .nestedScroll(fabScrollObserver)
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .let { mod ->
                 if (enableGlobalScroll && bottomBarScrollBehavior != null) {
                     mod.nestedScroll(bottomBarScrollBehavior.nestedScrollConnection)

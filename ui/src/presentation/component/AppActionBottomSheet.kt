@@ -21,40 +21,32 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Check
-import com.github.yumelira.yumebox.presentation.icon.yume.Close
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3ActionBottomSheet
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetAction
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetCloseAction
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetConfirmAction
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetDefaults
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetIconAction
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.layout.BottomSheetDefaults
-import top.yukonga.miuix.kmp.overlay.OverlayBottomSheet
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 object AppBottomSheetDefaults {
-    val insideMargin = DpSize(UiDp.dp24, UiDp.dp16)
+    val insideMargin: DpSize = YumeMd3BottomSheetDefaults.insideMargin
 
     @Composable
-    fun backgroundColor(): Color = MiuixTheme.colorScheme.surface
+    fun backgroundColor(): Color = YumeMd3BottomSheetDefaults.backgroundColor()
 
     @Composable
-    fun dragHandleColor(): Color = MiuixTheme.colorScheme.onSurfaceVariantActions
+    fun dragHandleColor(): Color = YumeMd3BottomSheetDefaults.dragHandleColor()
 
     @Composable
-    fun actionIconTint(enabled: Boolean): Color = if (enabled) {
-        MiuixTheme.colorScheme.primary
-    } else {
-        MiuixTheme.colorScheme.onSurface.copy(alpha = AppTheme.opacity.disabled)
-    }
+    fun actionIconTint(enabled: Boolean): Color = YumeMd3BottomSheetDefaults.actionIconTint(enabled)
 }
 
 data class AppBottomSheetAction(
@@ -69,21 +61,15 @@ data class AppBottomSheetAction(
 fun AppBottomSheetIconAction(
     action: AppBottomSheetAction,
 ) {
-    IconButton(
-        enabled = action.enabled,
-        onClick = action.onClick,
-    ) {
-        Icon(
-            modifier = Modifier.alpha(if (action.enabled) 1f else AppTheme.opacity.medium),
-            imageVector = action.icon,
+    YumeMd3BottomSheetIconAction(
+        action = YumeMd3BottomSheetAction(
+            icon = action.icon,
             contentDescription = action.contentDescription,
-            tint = if (action.tint == Color.Unspecified) {
-                AppBottomSheetDefaults.actionIconTint(action.enabled)
-            } else {
-                action.tint
-            },
-        )
-    }
+            enabled = action.enabled,
+            tint = action.tint,
+            onClick = action.onClick,
+        ),
+    )
 }
 
 @Composable
@@ -92,13 +78,10 @@ fun AppBottomSheetCloseAction(
     enabled: Boolean = true,
     contentDescription: String = MLang.Component.Button.Cancel,
 ) {
-    AppBottomSheetIconAction(
-        action = AppBottomSheetAction(
-            icon = Yume.Close,
-            contentDescription = contentDescription,
-            enabled = enabled,
-            onClick = onClick,
-        ),
+    YumeMd3BottomSheetCloseAction(
+        onClick = onClick,
+        enabled = enabled,
+        contentDescription = contentDescription,
     )
 }
 
@@ -108,13 +91,10 @@ fun AppBottomSheetConfirmAction(
     enabled: Boolean = true,
     contentDescription: String = MLang.Component.Button.Confirm,
 ) {
-    AppBottomSheetIconAction(
-        action = AppBottomSheetAction(
-            icon = Yume.Check,
-            contentDescription = contentDescription,
-            enabled = enabled,
-            onClick = onClick,
-        ),
+    YumeMd3BottomSheetConfirmAction(
+        onClick = onClick,
+        enabled = enabled,
+        contentDescription = contentDescription,
     )
 }
 
@@ -129,7 +109,7 @@ fun AppActionBottomSheet(
     backgroundColor: Color = Color.Unspecified,
     enableWindowDim: Boolean = true,
     cornerRadius: androidx.compose.ui.unit.Dp = UiDp.dp28,
-    sheetMaxWidth: androidx.compose.ui.unit.Dp = BottomSheetDefaults.maxWidth,
+    sheetMaxWidth: androidx.compose.ui.unit.Dp = UiDp.dp560,
     onDismissFinished: (() -> Unit)? = null,
     outsideMargin: DpSize = DpSize(UiDp.dp16, UiDp.dp0),
     insideMargin: DpSize = AppBottomSheetDefaults.insideMargin,
@@ -140,24 +120,13 @@ fun AppActionBottomSheet(
     renderInRootScaffold: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val resolvedBackgroundColor = if (backgroundColor == Color.Unspecified) {
-        AppBottomSheetDefaults.backgroundColor()
-    } else {
-        backgroundColor
-    }
-    val resolvedDragHandleColor = if (dragHandleColor == Color.Unspecified) {
-        AppBottomSheetDefaults.dragHandleColor()
-    } else {
-        dragHandleColor
-    }
-
-    OverlayBottomSheet(
+    YumeMd3ActionBottomSheet(
         show = show,
         modifier = modifier,
         title = title,
         startAction = startAction,
         endAction = endAction,
-        backgroundColor = resolvedBackgroundColor,
+        backgroundColor = backgroundColor,
         enableWindowDim = enableWindowDim,
         cornerRadius = cornerRadius,
         sheetMaxWidth = sheetMaxWidth,
@@ -166,7 +135,7 @@ fun AppActionBottomSheet(
         outsideMargin = outsideMargin,
         insideMargin = insideMargin,
         defaultWindowInsetsPadding = defaultWindowInsetsPadding,
-        dragHandleColor = resolvedDragHandleColor,
+        dragHandleColor = dragHandleColor,
         allowDismiss = allowDismiss,
         enableNestedScroll = enableNestedScroll,
         renderInRootScaffold = renderInRootScaffold,

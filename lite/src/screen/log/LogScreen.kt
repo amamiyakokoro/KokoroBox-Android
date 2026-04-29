@@ -37,6 +37,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -74,20 +80,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.FloatingActionButton
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Destination<RootGraph>
 @Composable
 fun LogScreen(navigator: DestinationsNavigator) {
     val viewModel = koinViewModel<LogViewModel>()
     val context = LocalContext.current
-    val scrollBehavior = MiuixScrollBehavior()
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     val isRecording by viewModel.isRecording.collectAsState()
@@ -128,10 +126,10 @@ fun LogScreen(navigator: DestinationsNavigator) {
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
                 title = "日志录制",
-                scrollBehavior = scrollBehavior,
                 actions = {
                     if (logEntries.isNotEmpty()) {
                         IconButton(
@@ -181,7 +179,6 @@ fun LogScreen(navigator: DestinationsNavigator) {
                     Icon(
                         imageVector = if (isRecording) Yume.PowerOff else Yume.Play,
                         contentDescription = if (isRecording) "停止录制" else "开始录制",
-                        tint = MiuixTheme.colorScheme.onPrimary,
                     )
                 }
             }
@@ -205,7 +202,6 @@ fun LogScreen(navigator: DestinationsNavigator) {
 
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
         ) {
@@ -223,7 +219,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
 private fun LogEntryRow(entry: LogStore.LogEntry) {
     val levelColor = when (entry.level) {
         LogMessage.Level.Debug -> Color(0xFF9E9E9E)
-        LogMessage.Level.Info -> MiuixTheme.colorScheme.primary
+        LogMessage.Level.Info -> MaterialTheme.colorScheme.primary
         LogMessage.Level.Warning -> Color(0xFFFF9800)
         LogMessage.Level.Error -> Color(0xFFF44336)
         LogMessage.Level.Silent,
@@ -243,15 +239,15 @@ private fun LogEntryRow(entry: LogStore.LogEntry) {
             ) {
                 Text(
                     text = entry.time,
-                    style = MiuixTheme.textStyles.body2.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                     ),
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = entry.level.name.uppercase().take(1),
-                    style = MiuixTheme.textStyles.body2.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                     ),
@@ -261,11 +257,11 @@ private fun LogEntryRow(entry: LogStore.LogEntry) {
             Spacer(modifier = Modifier.size(6.dp))
             Text(
                 text = entry.message,
-                style = MiuixTheme.textStyles.body2.copy(
+                style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 12.sp,
                     fontFamily = FontFamily.Monospace,
                 ),
-                color = MiuixTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

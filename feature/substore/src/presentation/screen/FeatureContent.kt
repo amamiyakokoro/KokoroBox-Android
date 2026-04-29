@@ -22,6 +22,8 @@
 
 package com.github.yumelira.yumebox.presentation.screen
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,23 +31,17 @@ import androidx.compose.runtime.getValue
 import com.github.yumelira.yumebox.common.util.DeviceUtil
 import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.viewmodel.FeatureViewModel
 import com.github.yumelira.yumebox.substore.model.AutoCloseMode
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
 
 @Composable
 fun FeatureContent(
     onOpenExternalUrl: (String) -> Unit,
     onOpenInAppUrl: (String) -> Unit,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val viewModel = koinViewModel<FeatureViewModel>()
     val isServiceRunning by viewModel.serviceRunningState.collectAsState()
     val allowLanAccess by viewModel.allowLanAccess.state.collectAsState()
@@ -73,13 +69,13 @@ fun FeatureContent(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.Feature.Title, scrollBehavior = scrollBehavior)
+            TopBar(title = MLang.Feature.Title)
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
@@ -110,18 +106,18 @@ fun FeatureContent(
                             }
                         },
                     )
-                    SwitchPreference(
+                    PreferenceSwitchItem(
                         title = MLang.Feature.ServiceStatus.AllowLan,
                         summary = MLang.Feature.ServiceStatus.AllowLanSummary,
                         checked = allowLanAccess,
                         onCheckedChange = { viewModel.setAllowLanAccess(it) },
                     )
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = "Sub-Store",
                         summary = subStoreUrl,
                         enabled = !DeviceUtil.is32BitDevice() && isServiceRunning,
                         onClick = {
-                            if (!isServiceRunning) return@ArrowPreference
+                            if (!isServiceRunning) return@PreferenceArrowItem
                             when (panelOpenMode) {
                                 LinkOpenMode.IN_APP -> onOpenInAppUrl(subStoreUrl)
                                 LinkOpenMode.EXTERNAL_BROWSER -> onOpenExternalUrl(subStoreUrl)
@@ -148,19 +144,19 @@ fun FeatureContent(
                 Title(MLang.Feature.Panel.Section)
                 Card {
                     val safeSelectedPanelType = selectedPanelType.coerceIn(0, panelDisplayNames.lastIndex)
-                    WindowDropdownPreference(
+                    YumeMd3DropdownPreference(
                         title = MLang.Feature.Panel.SelectPanel,
-                        summary = panelDisplayNames.getOrElse(safeSelectedPanelType) { panelDisplayNames.first() },
+                        summary = null,
                         items = panelDisplayNames,
                         selectedIndex = safeSelectedPanelType,
                         onSelectedIndexChange = { viewModel.setSelectedPanelType(it) },
                     )
 
-                    BasicComponent(
+                    PreferenceListItem(
                         title = "URL",
                         summary = panelUrl.ifEmpty { currentPanelName },
                         onClick = {
-                            if (panelUrl.isBlank()) return@BasicComponent
+                            if (panelUrl.isBlank()) return@PreferenceListItem
                             when (panelOpenMode) {
                                 LinkOpenMode.IN_APP -> onOpenInAppUrl(panelUrl)
                                 LinkOpenMode.EXTERNAL_BROWSER -> onOpenExternalUrl(panelUrl)
@@ -168,9 +164,9 @@ fun FeatureContent(
                         },
                     )
 
-                    WindowDropdownPreference(
+                    YumeMd3DropdownPreference(
                         title = MLang.ProfilesPage.LinkSettings.OpenMode,
-                        summary = panelOpenModeItems.getOrElse(panelOpenModeIndex) { panelOpenModeItems.first() },
+                        summary = null,
                         items = panelOpenModeItems,
                         selectedIndex = panelOpenModeIndex,
                         onSelectedIndexChange = { index ->
@@ -190,7 +186,7 @@ fun FeatureContent(
                 Title(MLang.Feature.SubStore.SectionHint)
                 Card {
 
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = if (isExtensionInstalled) {
                             MLang.Feature.SubStore.ExtensionInstalled
                         } else {
@@ -209,7 +205,7 @@ fun FeatureContent(
                             }
                         },
                     )
-                    ArrowPreference(
+                    PreferenceArrowItem(
                         title = MLang.Feature.SubStore.DownloadResources,
                         summary = MLang.Feature.SubStore.DownloadResourcesSummary,
                         onClick = { viewModel.downloadSubStoreAll() },

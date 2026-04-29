@@ -28,7 +28,6 @@ import com.github.yumelira.yumebox.core.model.ConfigurationOverride
 import com.github.yumelira.yumebox.presentation.util.*
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
-import top.yukonga.miuix.kmp.preference.ArrowPreference
 
 typealias OpenRuleListEditor = (
     title: String,
@@ -426,7 +425,7 @@ private fun StructuredInputContent(
 
     Column {
         OverrideSelectorCard {
-            ArrowPreference(
+            PreferenceArrowItem(
                 title = MLang.Override.Form.StructuredEdit.format(title),
                 summary = summary,
                 onClick = onStructuredClick,
@@ -438,7 +437,7 @@ private fun StructuredInputContent(
             expanded = advancedExpanded,
             onExpandedChange = { advancedExpanded = it },
         ) {
-            ArrowPreference(
+            PreferenceArrowItem(
                 title = MLang.Override.Form.OpenAdvancedEdit,
                 summary = MLang.Override.Form.OpenAdvancedEditSummary,
                 onClick = onAdvancedClick,
@@ -453,7 +452,7 @@ private fun StructuredEditorEntry(
     summary: String,
     onClick: () -> Unit,
 ) {
-    ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = summary,
         onClick = onClick,

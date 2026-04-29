@@ -31,9 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.TextField
 
 typealias OpenStringListEditor = (
     title: String,
@@ -82,7 +81,7 @@ internal fun OverrideIntInputContent(
     val showDialog = remember { mutableStateOf(false) }
     var textValue by remember { mutableStateOf(value?.toString().orEmpty()) }
 
-    top.yukonga.miuix.kmp.preference.ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = value?.toString() ?: MLang.Component.Selector.NotModify,
         onClick = {
@@ -102,7 +101,7 @@ internal fun OverrideIntInputContent(
                 .padding(vertical = UiDp.dp8),
             verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
         ) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = textValue,
                 onValueChange = { updatedValue ->
                     textValue = updatedValue.filter { it.isDigit() || it == '-' }

@@ -25,12 +25,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3FilledButton
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
 import com.github.yumelira.yumebox.presentation.icon.yume.Delete
@@ -40,23 +45,13 @@ import com.github.yumelira.yumebox.presentation.util.OverrideListModeValues
 import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.Scaffold
+
 
 @Composable
 fun OverrideStringListEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = OverrideStructuredEditorStore.stringListEditorTitle.ifBlank { MLang.Override.Editor.List }
     val placeholder = OverrideStructuredEditorStore.stringListEditorPlaceholder
@@ -114,30 +109,26 @@ fun OverrideStringListEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
                 actions = {
-                    IconButton(
+                    OverrideTopBarAction(
+                        icon = Yume.Undo,
+                        contentDescription = MLang.Override.Editor.ClearCurrentMode,
                         onClick = { showResetDialog = true },
-                    ) {
-                        Icon(
-                            imageVector = Yume.Undo,
-                            contentDescription = MLang.Override.Editor.ClearCurrentMode,
-                        )
-                    }
+                    )
                 },
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
             onScrollDirectionChanged = addFabController::onScrollDirectionChanged,
         ) {
             item {
                 Card {
-                    WindowDropdownPreference(
+                    YumeMd3DropdownPreference(
                         title = MLang.Override.Editor.Mode.Title,
                         items = availableModes.map(OverrideListEditorMode::label),
                         selectedIndex = selectedModeIndex,
@@ -250,15 +241,15 @@ private fun StringListEntryCard(
                 .padding(horizontal = UiDp.dp16, vertical = UiDp.dp14),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
+            AppText(
                 text = "$index.",
-                style = MiuixTheme.textStyles.body1,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.width(UiDp.dp40),
             )
-            Text(
+            AppText(
                 text = value,
-                style = MiuixTheme.textStyles.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = UiDp.dp8),
@@ -296,7 +287,7 @@ private fun StringListEntryDialog(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
         ) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = draftValue,
                 onValueChange = { draftValue = it },
                 label = placeholder,
@@ -305,22 +296,16 @@ private fun StringListEntryDialog(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
-                Button(
+                YumeMd3TextButton(
+                    text = MLang.Override.Dialog.Button.Cancel,
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f),
-                ) {
-                    Text(MLang.Override.Dialog.Button.Cancel)
-                }
-                Button(
+                )
+                YumeMd3FilledButton(
+                    text = MLang.Override.Editor.Confirm,
                     onClick = { onConfirm(draftValue) },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColorsPrimary(),
-                ) {
-                    Text(
-                        MLang.Override.Editor.Confirm,
-                    color = MiuixTheme.colorScheme.onPrimary,
-                    )
-                }
+                )
             }
         }
     }

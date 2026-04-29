@@ -28,21 +28,33 @@ import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.state.ToggleableState
 import androidx.core.graphics.drawable.toBitmap
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
 import com.github.yumelira.yumebox.presentation.icon.yume.`Settings-2`
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
@@ -53,16 +65,11 @@ import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 @Destination<RootGraph>
-fun AccessControlScreen(navigator: DestinationsNavigator) {
+fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNavigator) {
     val layoutDirection = LocalLayoutDirection.current
-    val scrollBehavior = MiuixScrollBehavior()
     val spacing = spacing
     val componentSizes = AppTheme.sizes
     val mainLikePadding = rememberStandalonePageMainPadding()
@@ -80,9 +87,7 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
             )
         )
     }
-    val dynamicTopPadding by remember {
-        derivedStateOf { spacing.space12 * (1f - scrollBehavior.state.collapsedFraction) }
-    }
+    val dynamicTopPadding = spacing.space12
     val listStartPadding = spacing.screenHorizontal
     val listEndPadding = spacing.screenHorizontal
     val currentSearchStatus = remember(searchStatus, filteredApps) {
@@ -128,7 +133,6 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
                 currentSearchStatus.TopAppBarAnim {
                     TopBar(
                         title = MLang.AccessControl.Title,
-                        scrollBehavior = scrollBehavior,
                         actions = {
                             IconButton(
                                 onClick = { showSettingsSheet = true }
@@ -151,6 +155,15 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
                 start = combinedInnerPadding.calculateStartPadding(layoutDirection),
                 end = combinedInnerPadding.calculateEndPadding(layoutDirection),
                 ),
+            collapseBar = { collapsedSearchStatus, topPadding, innerPadding ->
+                FloatingAccessControlSearchBar(
+                    label = collapsedSearchStatus.label,
+                    searchBarTopPadding = topPadding,
+                    startPadding = listStartPadding,
+                    endPadding = listEndPadding,
+                    innerPadding = innerPadding,
+                )
+            },
             ) { boxHeight ->
                 if (uiState.isLoading) {
                     Column(
@@ -165,11 +178,10 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Text(MLang.AccessControl.AppList.Loading, color = MiuixTheme.colorScheme.onSurface)
+                        Text(MLang.AccessControl.AppList.Loading, color = MaterialTheme.colorScheme.onSurface)
                     }
                 } else {
                     ScreenLazyColumn(
-                        scrollBehavior = scrollBehavior,
                         innerPadding = combinedInnerPadding,
                         contentPadding = PaddingValues(
                             top = boxHeight + spacing.space6,
@@ -273,6 +285,52 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
 }
 
 @Composable
+private fun FloatingAccessControlSearchBar(
+    label: String,
+    searchBarTopPadding: androidx.compose.ui.unit.Dp,
+    startPadding: androidx.compose.ui.unit.Dp,
+    endPadding: androidx.compose.ui.unit.Dp,
+    innerPadding: PaddingValues,
+) {
+    val layoutDirection = LocalLayoutDirection.current
+    val spacing = spacing
+    val componentSizes = AppTheme.sizes
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = startPadding, end = endPadding)
+            .padding(
+                start = innerPadding.calculateStartPadding(layoutDirection),
+                end = innerPadding.calculateEndPadding(layoutDirection),
+            )
+            .padding(top = searchBarTopPadding, bottom = spacing.space6)
+            .shadow(
+                elevation = spacing.space8,
+                shape = CircleShape,
+                clip = false,
+            )
+            .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
+            .heightIn(min = componentSizes.searchFieldMinHeight),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = Yume.`Scan-eye`,
+            contentDescription = MLang.Component.Editor.Action.Search,
+            modifier = Modifier
+                .size(componentSizes.searchIconTouchTarget)
+                .padding(start = spacing.space16, end = spacing.space8),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
 private fun AccessControlSettingsSheet(
     show: Boolean,
     uiState: AccessControlViewModel.UiState,
@@ -302,34 +360,31 @@ private fun AccessControlSettingsSheet(
         enableNestedScroll = true,
     ) {
         Column {
-            top.yukonga.miuix.kmp.basic.Card {
-                SwitchPreference(
+            Card {
+                PreferenceSwitchItem(
                     title = MLang.AccessControl.Settings.ShowSystemApps,
                     checked = uiState.showSystemApps,
                     onCheckedChange = onShowSystemAppsChange,
                 )
-                SwitchPreference(
+                PreferenceSwitchItem(
                     title = MLang.AccessControl.Settings.SelectedFirst,
                     checked = uiState.selectedFirst,
                     onCheckedChange = onSelectedFirstChange,
                 )
-                WindowDropdownPreference(
+                PreferenceEnumItem(
                     title = MLang.AccessControl.Settings.SortMode,
-                    summary = MLang.AccessControl.Settings.SortModeCurrent.format(uiState.sortMode.displayName),
+                    currentValue = uiState.sortMode,
                     items = sortModeEntries.map { it.displayName },
-                    selectedIndex = sortModeEntries.indexOf(uiState.sortMode).coerceAtLeast(0),
-                    onSelectedIndexChange = { index ->
-                        sortModeEntries.getOrNull(index)?.let(onSortModeChange)
-                    },
+                    values = sortModeEntries,
+                    onValueChange = onSortModeChange,
                 )
-                WindowDropdownPreference(
+                DropdownActionPreference(
                     title = MLang.AccessControl.Settings.BatchOperation,
                     items = listOf(
                         MLang.AccessControl.Settings.SelectAll,
                         MLang.AccessControl.Settings.DeselectAll,
                         MLang.AccessControl.Settings.Invert,
                     ),
-                    selectedIndex = 0,
                     onSelectedIndexChange = { index ->
                         when (index) {
                             0 -> onSelectAll()
@@ -338,13 +393,12 @@ private fun AccessControlSettingsSheet(
                         }
                     },
                 )
-                WindowDropdownPreference(
+                DropdownActionPreference(
                     title = MLang.AccessControl.Settings.RegionQuickSelect,
                     items = listOf(
                         MLang.AccessControl.Settings.ChinaApps,
                         MLang.AccessControl.Settings.OverseasApps,
                     ),
-                    selectedIndex = 0,
                     onSelectedIndexChange = { index ->
                         val (label, selectedCount) = when (index) {
                             0 -> MLang.AccessControl.Settings.ChinaApps to onSelectChinaApps()
@@ -356,13 +410,12 @@ private fun AccessControlSettingsSheet(
                         )
                     },
                 )
-                WindowDropdownPreference(
+                DropdownActionPreference(
                     title = MLang.AccessControl.Settings.ImportExport,
                     items = listOf(
                         MLang.AccessControl.Settings.Import,
                         MLang.AccessControl.Settings.Export,
                     ),
-                    selectedIndex = 0,
                     onSelectedIndexChange = { index ->
                         when (index) {
                             0 -> {
@@ -406,12 +459,36 @@ private fun AccessControlSettingsSheet(
             Button(
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColorsPrimary(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
-                Text(MLang.AccessControl.Button.Confirm, color = MiuixTheme.colorScheme.onPrimary)
+                Text(MLang.AccessControl.Button.Confirm, color = MaterialTheme.colorScheme.onPrimary)
             }
         }
     }
+}
+
+@Composable
+private fun DropdownActionPreference(
+    title: String,
+    items: List<String>,
+    onSelectedIndexChange: (Int) -> Unit,
+) {
+    val placeholder = "选择"
+    val displayItems = remember(items) { listOf(placeholder) + items }
+
+    YumeMd3DropdownPreference(
+        title = title,
+        items = displayItems,
+        selectedIndex = 0,
+        onSelectedIndexChange = { index ->
+            if (index > 0) {
+                onSelectedIndexChange(index - 1)
+            }
+        },
+    )
 }
 
 @Composable
@@ -428,7 +505,7 @@ private fun AppCard(
         modifier = Modifier.padding(vertical = spacing.space4),
         applyHorizontalPadding = false,
     ) {
-        BasicComponent(
+        PreferenceListItem(
             title = app.label,
             summary = app.packageName,
             startAction = {
@@ -442,8 +519,8 @@ private fun AppCard(
             },
             endActions = {
                 Checkbox(
-                    state = ToggleableState(selected),
-                    onClick = { onSelectionChange(!selected) }
+                    checked = selected,
+                    onCheckedChange = { checked -> onSelectionChange(checked) }
                 )
             },
             onClick = onClick
@@ -490,7 +567,7 @@ private fun SearchEmptyState(
     ) {
         Text(
             text = text,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

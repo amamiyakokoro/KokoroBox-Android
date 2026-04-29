@@ -32,9 +32,7 @@ import com.github.yumelira.yumebox.presentation.icon.yume.Save
 import com.github.yumelira.yumebox.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.preference.ArrowPreference
+import androidx.compose.material3.Scaffold
 
 @Composable
 fun OverrideSubRuleDraftEditorScreen(
@@ -48,7 +46,6 @@ fun OverrideSubRuleDraftEditorScreen(
         callback: (OverrideListModeValues<List<String>>) -> Unit,
     ) -> Unit,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = OverrideStructuredEditorStore.subRuleDraftEditorTitle.ifBlank { MLang.Override.Draft.SubRuleGroup }
     val storeDraft = OverrideStructuredEditorStore.subRuleDraftEditorValue
@@ -115,13 +112,12 @@ fun OverrideSubRuleDraftEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             modifier = Modifier.fillMaxSize(),
             lazyListState = listState,
@@ -145,7 +141,7 @@ fun OverrideSubRuleDraftEditorScreen(
                         )
                     }
                     OverrideCardSection(MLang.Override.Draft.RuleList) {
-                        ArrowPreference(
+                        PreferenceArrowItem(
                             title = MLang.Override.Draft.RuleList,
                             summary = if (rules.isEmpty()) {
                                 MLang.Override.Draft.NoRules

@@ -31,6 +31,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,10 +41,6 @@ import com.github.yumelira.yumebox.common.util.ToastDialogBridge
 import com.github.yumelira.yumebox.common.util.ToastDialogEvent
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.layout.DialogDefaults
-import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.window.WindowDialog
 
 @Composable
 fun ToastDialogHost() {
@@ -63,14 +61,11 @@ fun ToastDialogHost() {
     }
 
     eventSnapshot?.let { snapshot ->
-        WindowDialog(
+        AppDialog(
             show = showDialog.value,
             modifier = Modifier,
             title = snapshot.title,
-            titleColor = DialogDefaults.titleColor(),
             summary = snapshot.message,
-            summaryColor = DialogDefaults.summaryColor(),
-            backgroundColor = DialogDefaults.backgroundColor(),
             enableWindowDim = true,
             onDismissRequest = { showDialog.value = false },
             onDismissFinished = {
@@ -78,15 +73,15 @@ fun ToastDialogHost() {
                 eventSnapshot = null
                 showDialog.value = false
             },
-            outsideMargin = DialogDefaults.outsideMargin,
-            insideMargin = DialogDefaults.insideMargin,
+            outsideMargin = AppDialogDefaults.outsideMargin,
+            insideMargin = AppDialogDefaults.insideMargin,
             defaultWindowInsetsPadding = true,
             content = {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            color = MiuixTheme.colorScheme.primary.copy(alpha = opacity.subtleStrong),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtleStrong),
                             shape = RoundedCornerShape(radii.radius16),
                         )
                         .clickable {
@@ -103,8 +98,8 @@ fun ToastDialogHost() {
                 ) {
                     Text(
                         text = MLang.Component.Button.Copy,
-                        color = MiuixTheme.colorScheme.primary,
-                        style = MiuixTheme.textStyles.body1,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             })

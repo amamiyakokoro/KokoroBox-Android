@@ -25,6 +25,8 @@ package com.github.yumelira.yumebox.presentation.component
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Switch as Md3Switch
+import androidx.compose.material3.SwitchDefaults as Md3SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -117,10 +119,22 @@ fun ProfileCard(
                 )
             }
 
-            Switch(
+            Md3Switch(
                 checked = profile.enabled,
                 enabled = !isDownloading,
-                onCheckedChange = { onToggleEnabled(profile) })
+                onCheckedChange = { onToggleEnabled(profile) },
+                colors = Md3SwitchDefaults.colors(
+                    checkedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    uncheckedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.outline,
+                    uncheckedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerHighest,
+                    uncheckedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.outline,
+                    disabledCheckedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                    disabledCheckedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    disabledUncheckedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                    disabledUncheckedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                ),
+            )
         }
 
         val infoText = remember(profile) {

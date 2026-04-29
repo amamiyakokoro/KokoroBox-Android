@@ -33,9 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun HomeIdleContent(
@@ -47,8 +47,8 @@ fun HomeIdleContent(
     val componentSizes = AppTheme.sizes
     val opacity = AppTheme.opacity
 
-    val accentColor = MiuixTheme.colorScheme.primary
-    val authorColor = MiuixTheme.colorScheme.onSurfaceVariantSummary
+    val accentColor = MaterialTheme.colorScheme.primary
+    val authorColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Column(
         modifier = modifier
@@ -86,13 +86,13 @@ fun HomeIdleContent(
                     )
                     Text(
                         text = oneWord,
-                        style = MiuixTheme.textStyles.headline1.copy(
+                        style = MaterialTheme.typography.headlineLarge.copy(
                             fontSize = 28.sp,
                             lineHeight = 50.sp,
                             letterSpacing = 0.8.sp,
                             fontWeight = FontWeight.Medium,
                         ),
-                        color = MiuixTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f)
                     )
@@ -114,7 +114,7 @@ fun HomeIdleContent(
             Spacer(modifier = Modifier.width(spacing.space12))
             Text(
                 text = author,
-                style = MiuixTheme.textStyles.title3.copy(
+                style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 15.sp,
                     letterSpacing = 1.6.sp,
                     fontWeight = FontWeight.Medium,

@@ -20,26 +20,21 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DialogColumn
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DialogMessage
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun AppDialogColumn(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
+    YumeMd3DialogColumn(
+        modifier = modifier,
         content = content,
     )
 }
@@ -49,11 +44,9 @@ internal fun AppDialogMessage(
     message: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = message,
+    YumeMd3DialogMessage(
+        message = message,
         modifier = modifier,
-        style = MiuixTheme.textStyles.body1,
-        color = MiuixTheme.colorScheme.onSurface,
     )
 }
 

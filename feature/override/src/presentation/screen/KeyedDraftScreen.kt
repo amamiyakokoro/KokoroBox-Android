@@ -34,8 +34,7 @@ import com.github.yumelira.yumebox.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.*
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
+import androidx.compose.material3.Scaffold
 
 private val ProviderKnownKeys = setOf(
     "type",
@@ -84,7 +83,6 @@ private val ProviderOverrideKnownKeys = setOf(
 fun OverrideKeyedObjectDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = remember {
         OverrideStructuredEditorStore.keyedObjectDraftEditorTitle.ifBlank { MLang.Override.Draft.Object }
@@ -223,13 +221,12 @@ fun OverrideKeyedObjectDraftEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
             onScrollDirectionChanged = saveFabController::onScrollDirectionChanged,

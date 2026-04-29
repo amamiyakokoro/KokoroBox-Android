@@ -26,6 +26,14 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,18 +48,15 @@ import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.Connectio
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.`Arrow-down-up`
+import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.overlay.OverlayListPopup
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Search
-import top.yukonga.miuix.kmp.icon.extended.Sort
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private val SortModes = listOf(
     ConnectionSort.Time,
@@ -77,7 +82,6 @@ fun ConnectionScreen(
     val filteredConnections by viewModel.filteredConnections.collectAsState()
     val spacing = AppTheme.spacing
 
-    val scrollBehavior = MiuixScrollBehavior()
     var showSearchBar by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf(state.searchQuery) }
     var showSortPopup by remember { mutableStateOf(false) }
@@ -138,45 +142,47 @@ fun ConnectionScreen(
         topBar = {
             TopBar(
                 title = MLang.Connection.Title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     Box {
                         IconButton(
                             modifier = Modifier.padding(end = spacing.space12),
                             onClick = { showSortPopup = true }) {
                             Icon(
-                                imageVector = MiuixIcons.Sort,
+                                imageVector = Yume.`Arrow-down-up`,
                                 contentDescription = MLang.Connection.SortBy.trimEnd(':', '：'),
-                                tint = MiuixTheme.colorScheme.onSurface,
+                                tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
-                        OverlayListPopup(
-                            show = showSortPopup,
-                            alignment = PopupPositionProvider.Align.BottomEnd,
+                        DropdownMenu(
+                            expanded = showSortPopup,
                             onDismissRequest = { showSortPopup = false },
                         ) {
-                            ListPopupColumn {
-                                SortModes.forEachIndexed { index, mode ->
-                                    DropdownImpl(
-                                        text = mode.getDisplayName(),
-                                        optionSize = SortModes.size,
-                                        isSelected = selectedSortIndex == index,
-                                        onSelectedIndexChange = {
-                                            if (mode != state.sortBy) viewModel.setSortBy(mode)
-                                            showSortPopup = false
-                                        },
-                                        index = index,
-                                    )
-                                }
+                            SortModes.forEachIndexed { index, mode ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = mode.getDisplayName(),
+                                            color = if (selectedSortIndex == index) {
+                                                MaterialTheme.colorScheme.primary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurface
+                                            },
+                                        )
+                                    },
+                                    onClick = {
+                                        if (mode != state.sortBy) viewModel.setSortBy(mode)
+                                        showSortPopup = false
+                                    },
+                                )
                             }
                         }
                     }
                     IconButton(
                         onClick = { showSearchBar = !showSearchBar }) {
                         Icon(
-                            imageVector = MiuixIcons.Search,
+                            imageVector = Yume.`Scan-eye`,
                             contentDescription = MLang.Connection.Search,
-                            tint = MiuixTheme.colorScheme.onSurface,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 },
@@ -185,7 +191,6 @@ fun ConnectionScreen(
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = innerPadding,
             contentPadding = PaddingValues(
                 start = spacing.screenHorizontal,
@@ -222,11 +227,11 @@ fun ConnectionScreen(
                             .padding(vertical = spacing.space8),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        TextField(
+                        OutlinedTextField(
                             value = searchText,
                             onValueChange = { searchText = it },
                             modifier = Modifier.weight(1f),
-                            label = MLang.Connection.SearchHint,
+                            label = { Text(MLang.Connection.SearchHint) },
                             singleLine = true,
                         )
                     }
@@ -243,8 +248,8 @@ fun ConnectionScreen(
                     ) {
                         Text(
                             text = emptyStateText,
-                            style = MiuixTheme.textStyles.body2,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }

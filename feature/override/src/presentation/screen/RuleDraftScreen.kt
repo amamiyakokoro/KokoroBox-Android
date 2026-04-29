@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Save
 import com.github.yumelira.yumebox.presentation.util.OverrideRuleDraft
@@ -36,18 +37,12 @@ import com.github.yumelira.yumebox.presentation.util.rememberCurrentReferenceCat
 import com.github.yumelira.yumebox.presentation.util.supportsRuleExtra
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.Scaffold
 
 @Composable
 fun OverrideRuleDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = OverrideStructuredEditorStore.ruleDraftEditorTitle.ifBlank { MLang.Override.Editor.RuleEdit }
     val initialValue = remember { OverrideStructuredEditorStore.ruleDraftEditorValue }
@@ -170,13 +165,12 @@ fun OverrideRuleDraftEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
             onScrollDirectionChanged = saveFabController::onScrollDirectionChanged,
@@ -188,7 +182,7 @@ fun OverrideRuleDraftEditorScreen(
                 ) {
                     OverrideSection(MLang.Override.Editor.RuleBody) {
                         OverrideSelectorCard {
-                            WindowDropdownPreference(
+                            YumeMd3DropdownPreference(
                                 title = MLang.Override.Editor.RuleType,
                                 items = OverrideRuleTypePresets,
                                 selectedIndex = selectedPresetIndex,
@@ -202,7 +196,7 @@ fun OverrideRuleDraftEditorScreen(
                         }
                         if (isRuleSetType) {
                             OverrideSelectorCard {
-                                ArrowPreference(
+                                PreferenceArrowItem(
                                     title = MLang.Override.Form.RuleProviders,
                                     onClick = {
                                         showRuleProviderSelector = true
@@ -231,7 +225,7 @@ fun OverrideRuleDraftEditorScreen(
                             }
                         }
                         OverrideSelectorCard {
-                            ArrowPreference(
+                            PreferenceArrowItem(
                                 title = if (ruleType.equals("MATCH", ignoreCase = true)) MLang.Override.Editor.MatchResult else targetLabel,
                                 onClick = {
                                     showTargetSelector = true
@@ -243,7 +237,7 @@ fun OverrideRuleDraftEditorScreen(
                         targetErrorText?.let { message ->
                             OverrideFieldAssistText(
                                 text = message,
-                                color = MiuixTheme.colorScheme.error,
+                                color = appErrorColor(),
                             )
                         }
                     }
@@ -322,7 +316,7 @@ private fun RuleExtraSwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
-    SwitchPreference(
+    PreferenceSwitchItem(
         title = title,
         checked = checked,
         onCheckedChange = onCheckedChange,

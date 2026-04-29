@@ -36,20 +36,44 @@ val signingFileProps = if (signingPropsFile.exists()) {
     null
 }
 
-val appAbiList =
-    gropify.abi.app.list.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+val injectedAbi = (
+    rootProject.extra.properties["forcedBuildAbi"] as? String
+        ?: providers.gradleProperty("android.injected.build.abi").orNull
+)?.trim()?.takeIf { it.isNotEmpty() }
+
+val appAbiList = injectedAbi
+    ?.split(',')
+    ?.map { it.trim() }
+    ?.filter { it.isNotEmpty() }
+    ?.takeIf { it.isNotEmpty() }
+    ?: gropify.abi.app.list.split(',')
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+
+val isSingleAbiPackage = injectedAbi != null
+val shouldBuildAbiSplits = !isSingleAbiPackage &&
+    gradle.startParameter.taskNames.none { it.contains("bundle", ignoreCase = true) }
 
 val geoFilesAssetsDir = rootProject.layout.buildDirectory.dir("generated/assets/geo")
+val projectApplicationId = providers.gradleProperty("project.applicationId")
+    .orElse(gropify.project.namespace.base)
+    .get()
 
 android {
     namespace = "${gropify.project.namespace.base}.lite"
 
     defaultConfig {
-        applicationId = "${gropify.project.namespace.base}.lite"
+        applicationId = "$projectApplicationId.lite"
         targetSdk = gropify.android.targetSdk
         versionCode = gropify.project.version.code
         versionName = gropify.project.version.name
-        manifestPlaceholders["appName"] = "${gropify.project.name}(MD3) Lite"
+        manifestPlaceholders["appName"] = "${gropify.project.name} MD3 Lite"
+
+        if (isSingleAbiPackage) {
+            ndk {
+                abiFilters += appAbiList
+            }
+        }
     }
 
     compileOptions {
@@ -61,8 +85,8 @@ android {
 
     sourceSets {
         getByName("main") {
-            kotlin.srcDirs("src")
-            res.srcDirs("res", "../app/res")
+            kotlin.setSrcDirs(listOf("src"))
+            res.setSrcDirs(listOf("res", "../app/res"))
             assets.directories.apply {
                 clear()
                 addAll(
@@ -73,9 +97,9 @@ android {
                     )
                 )
             }
-            aidl.srcDirs("aidl")
-            resources.srcDirs("resources", "../app/resources")
-            jniLibs.srcDirs("../jniLibs")
+            aidl.setSrcDirs(listOf("aidl"))
+            resources.setSrcDirs(listOf("resources", "../app/resources"))
+            jniLibs.setSrcDirs(listOf("../jniLibs"))
             if (project.file("AndroidManifest.xml").isFile) {
                 manifest.srcFile("AndroidManifest.xml")
             }
@@ -99,24 +123,29 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
-            isShrinkResources = false
             isDebuggable = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             vcsInfo.include = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
     splits {
         abi {
-            isEnable = gradle.startParameter.taskNames.none { it.contains("bundle", ignoreCase = true) }
+            isEnable = shouldBuildAbiSplits
             reset()
             include(*appAbiList.toTypedArray())
-            isUniversalApk = true
+            isUniversalApk = false
         }
     }
 
@@ -163,18 +192,21 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+}
 
-    androidComponents {
-        onVariants { variant ->
-            variant.outputs.forEach { output ->
-                val abiName = output.filters.find {
-                    it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
-                }?.identifier ?: "universal"
-                val buildTypeName = variant.buildType ?: "release"
-                (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
-                    "${gropify.project.name}-lite-${abiName}-${buildTypeName}.apk"
-                )
-            }
+//noinspection WrongGradleMethod
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            val splitAbiName = output.filters.find {
+                it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+            }?.identifier
+            val abiName = injectedAbi ?: splitAbiName ?: "universal"
+            val buildTypeName = variant.buildType ?: "release"
+            output.versionName.set(gropify.project.version.name)
+            (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
+                "${gropify.project.name}-lite-${abiName}-${buildTypeName}.apk"
+            )
         }
     }
 }
@@ -198,19 +230,15 @@ dependencies {
     implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.activity:activity-compose:${gropify.dep.version.activityCompose}")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    implementation("top.yukonga.miuix.kmp:miuix-ui:${gropify.dep.version.miuix}")
-    implementation("top.yukonga.miuix.kmp:miuix-preference:${gropify.dep.version.miuix}")
-    implementation("top.yukonga.miuix.kmp:miuix-icons:${gropify.dep.version.miuix}")
-    implementation("top.yukonga.miuix.kmp:miuix-blur-android:${gropify.dep.version.miuix}")
     implementation("dev.chrisbanes.haze:haze:${gropify.dep.version.haze}")
 
     val mmkv64 = gropify.dep.version.mmkv64
     val mmkv32 = gropify.dep.version.mmkv32
-    val injectedAbi = findProperty("android.injected.build.abi") as? String
     val mmkvVersion = if (injectedAbi in listOf("arm64-v8a", "x86_64")) mmkv64 else mmkv32
     //noinspection NewerVersionAvailable
     implementation("com.tencent:mmkv:$mmkvVersion")

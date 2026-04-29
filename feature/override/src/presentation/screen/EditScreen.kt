@@ -20,7 +20,9 @@
 
 package com.github.yumelira.yumebox.presentation.screen
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,9 +55,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
+import androidx.compose.material3.Scaffold
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun OverrideEditScreen(
     navigator: DestinationsNavigator,
@@ -75,7 +77,6 @@ fun OverrideEditScreen(
     var stringMapEditorState by remember { mutableStateOf<StringMapEditorDialogState?>(null) }
     var jsonEditorState by remember { mutableStateOf<JsonEditorDialogState?>(null) }
 
-    val scrollBehavior = MiuixScrollBehavior()
     val editorListState = rememberLazyListState()
     var expandedSectionNames by rememberSaveable { mutableStateOf(emptySet<String>()) }
     val referenceCatalog = editSession?.let { session ->
@@ -121,13 +122,12 @@ fun OverrideEditScreen(
         topBar = {
             TopBar(
                 title = if (isNewConfig) MLang.Override.Edit.TitleNew else MLang.Override.Edit.TitleEdit,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { paddingValues ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(paddingValues, mainLikePadding),
             lazyListState = editorListState,
         ) {

@@ -55,11 +55,11 @@ import com.github.yumelira.yumebox.presentation.theme.Opacity
 import com.github.yumelira.yumebox.presentation.theme.Radii
 import com.github.yumelira.yumebox.presentation.theme.Spacing
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.miuix.YumeMiuixIcon as Icon
+import com.github.yumelira.yumebox.miuix.YumeMiuixText as Text
+import com.github.yumelira.yumebox.miuix.YumeMiuixTheme as MiuixTheme
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlin.math.abs
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private val acgSpacing = Spacing()
 private val acgRadii = Radii()
@@ -113,7 +113,7 @@ internal object AcgUi {
         val trafficRowGap = acgSpacing.space28
         val trafficBottomInset = acgSpacing.space12
         val runtimeInfoTopGap = acgSpacing.space16
-        val delayWidth = UiDp.dp44
+        val delayWidth = UiDp.dp72
         val belowHeroTopGap = acgSpacing.space8
         val belowHeroContentGap = acgSpacing.space12
         val infoPlaceholderAlpha = acgOpacity.surfaceSoft

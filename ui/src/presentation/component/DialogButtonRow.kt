@@ -18,22 +18,14 @@
  *
  */
 
-
 package com.github.yumelira.yumebox.presentation.component
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DialogButtonRow
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DialogFilledButtonRow
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun DialogButtonRow(
@@ -44,27 +36,14 @@ fun DialogButtonRow(
     confirmEnabled: Boolean = true,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-    ) {
-        TextButton(
-            text = cancelText,
-            onClick = onCancel,
-            modifier = Modifier.weight(1f),
-        )
-        Button(
-            onClick = onConfirm,
-            modifier = Modifier.weight(1f),
-            enabled = confirmEnabled,
-            colors = ButtonDefaults.buttonColorsPrimary(),
-        ) {
-            Text(
-                text = confirmText,
-                color = MiuixTheme.colorScheme.onPrimary,
-            )
-        }
-    }
+    YumeMd3DialogButtonRow(
+        onCancel = onCancel,
+        onConfirm = onConfirm,
+        modifier = modifier,
+        cancelText = cancelText,
+        confirmText = confirmText,
+        confirmEnabled = confirmEnabled,
+    )
 }
 
 @Composable
@@ -77,27 +56,13 @@ fun DialogFilledButtonRow(
     primaryEnabled: Boolean = true,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-    ) {
-        Button(
-            onClick = onSecondary,
-            enabled = secondaryEnabled,
-            modifier = Modifier.weight(1f),
-        ) {
-            Text(secondaryText)
-        }
-        Button(
-            onClick = onPrimary,
-            enabled = primaryEnabled,
-            modifier = Modifier.weight(1f),
-            colors = ButtonDefaults.buttonColorsPrimary(),
-        ) {
-            Text(
-                text = primaryText,
-                color = MiuixTheme.colorScheme.onPrimary,
-            )
-        }
-    }
+    YumeMd3DialogFilledButtonRow(
+        onSecondary = onSecondary,
+        onPrimary = onPrimary,
+        modifier = modifier,
+        secondaryText = secondaryText,
+        primaryText = primaryText,
+        secondaryEnabled = secondaryEnabled,
+        primaryEnabled = primaryEnabled,
+    )
 }

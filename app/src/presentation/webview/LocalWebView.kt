@@ -42,7 +42,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.WebViewActivity
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Text
+import androidx.compose.material3.Text
 
 private object NoOpWebViewClient : WebViewClient()
 private object NoOpWebChromeClient : WebChromeClient()

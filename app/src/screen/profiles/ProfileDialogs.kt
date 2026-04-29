@@ -25,9 +25,14 @@ package com.github.yumelira.yumebox.screen.profiles
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.OverrideInternalConstants
 import com.github.yumelira.yumebox.data.model.OverrideConfig
@@ -36,15 +41,16 @@ import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.AppDialog
+import com.github.yumelira.yumebox.presentation.component.AppDialogDefaults
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
+import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
+import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
+import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.layout.DialogDefaults
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private const val PROFILE_SETTINGS_MIN_HEIGHT_FRACTION = 0.5f
 private const val PROFILE_SETTINGS_MAX_HEIGHT_FRACTION = 0.7f
@@ -83,15 +89,15 @@ internal fun DeleteConfirmDialog(
         show = show,
         modifier = Modifier,
         title = MLang.ProfilesPage.DeleteDialog.Title,
-        titleColor = DialogDefaults.titleColor(),
+        titleColor = AppDialogDefaults.titleColor(),
         summary = MLang.ProfilesPage.DeleteDialog.Message.format(profileName),
-        summaryColor = DialogDefaults.summaryColor(),
-        backgroundColor = DialogDefaults.backgroundColor(),
+        summaryColor = AppDialogDefaults.summaryColor(),
+        backgroundColor = AppDialogDefaults.backgroundColor(),
         enableWindowDim = true,
         onDismissRequest = onDismiss,
         onDismissFinished = onDismissFinished,
-        outsideMargin = DialogDefaults.outsideMargin,
-        insideMargin = DialogDefaults.insideMargin,
+        outsideMargin = AppDialogDefaults.outsideMargin,
+        insideMargin = AppDialogDefaults.insideMargin,
         defaultWindowInsetsPadding = true,
         content = {
             DialogButtonRow(
@@ -118,15 +124,15 @@ internal fun ShareOptionsDialog(
         show = show,
         modifier = Modifier,
         title = MLang.ProfilesPage.ShareDialog.Title,
-        titleColor = DialogDefaults.titleColor(),
+        titleColor = AppDialogDefaults.titleColor(),
         summary = null,
-        summaryColor = DialogDefaults.summaryColor(),
-        backgroundColor = DialogDefaults.backgroundColor(),
+        summaryColor = AppDialogDefaults.summaryColor(),
+        backgroundColor = AppDialogDefaults.backgroundColor(),
         enableWindowDim = true,
         onDismissRequest = onDismiss,
         onDismissFinished = onDismissFinished,
-        outsideMargin = DialogDefaults.outsideMargin,
-        insideMargin = DialogDefaults.insideMargin,
+        outsideMargin = AppDialogDefaults.outsideMargin,
+        insideMargin = AppDialogDefaults.insideMargin,
         defaultWindowInsetsPadding = true,
         content = {
             Column(
@@ -136,25 +142,19 @@ internal fun ShareOptionsDialog(
                     Button(
                         onClick = { onShareLink(profile) },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColorsPrimary()
                     ) {
-                        Text(
-                            MLang.ProfilesPage.ShareDialog.ShareLink,
-                            color = MiuixTheme.colorScheme.onPrimary
-                        )
+                        Text(MLang.ProfilesPage.ShareDialog.ShareLink)
                     }
                 }
-                Button(
+                OutlinedButton(
                     onClick = { onShareFile(profile) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors()
                 ) {
                     Text(MLang.ProfilesPage.ShareDialog.ShareFile)
                 }
-                Button(
+                OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors()
                 ) {
                     Text(MLang.ProfilesPage.Button.Cancel)
                 }
@@ -265,15 +265,16 @@ internal fun ProfileSettingsDialog(
                     .padding(bottom = spacing.space16),
                 verticalArrangement = Arrangement.spacedBy(spacing.space16),
             ) {
-                TextField(
+                YumeMd3OutlinedTextField(
                     value = editName,
                     onValueChange = { editName = it },
                     label = MLang.ProfilesPage.Input.ProfileName,
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
                 if (profile.type == Profile.Type.Url) {
-                    TextField(
+                    YumeMd3OutlinedTextField(
                         value = editSource,
                         onValueChange = { editSource = it },
                         label = MLang.ProfilesPage.SettingsDialog.ChangeLink,
@@ -284,7 +285,7 @@ internal fun ProfileSettingsDialog(
 
                 Card {
                     Column {
-                        SwitchPreference(
+                        PreferenceSwitchItem(
                             title = MLang.ProfilesPage.SettingsDialog.SystemPreset,
                             summary = MLang.ProfilesPage.SettingsDialog.SystemPresetSummary,
                             checked = systemPresetSelected,
@@ -296,9 +297,9 @@ internal fun ProfileSettingsDialog(
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = spacing.space16),
                             thickness = componentSizes.thinDividerThickness,
-                            color = MiuixTheme.colorScheme.outline.copy(alpha = opacity.outline),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline),
                         )
-                        SwitchPreference(
+                        PreferenceSwitchItem(
                             title = MLang.ProfilesPage.SettingsDialog.CustomRouting,
                             summary = MLang.ProfilesPage.SettingsDialog.CustomRoutingSummary,
                             checked = customRoutingSelected,
@@ -319,13 +320,13 @@ internal fun ProfileSettingsDialog(
                         ) {
                             itemsIndexed(userConfigs, key = { _, config -> config.id }) { index, config ->
                                 val isSelected = config.id in pendingSelectedUserOverrideIds
-                                BasicComponent(
+                                PreferenceListItem(
                                     title = config.name,
                                     summary = config.description?.takeIf { it.isNotBlank() } ?: MLang.ProfilesPage.SettingsDialog.NoDescription,
                                     endActions = {
                                         Checkbox(
-                                            state = ToggleableState(isSelected),
-                                            onClick = {
+                                            checked = isSelected,
+                                            onCheckedChange = {
                                                 toggleUserOverrideSelection(config.id, isSelected)
                                             },
                                         )
@@ -338,7 +339,7 @@ internal fun ProfileSettingsDialog(
                                     HorizontalDivider(
                                         modifier = Modifier.padding(horizontal = spacing.space16),
                                         thickness = componentSizes.thinDividerThickness,
-                                        color = MiuixTheme.colorScheme.outline.copy(alpha = opacity.outline),
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline),
                                     )
                                 }
                             }

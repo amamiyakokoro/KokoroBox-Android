@@ -28,6 +28,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.BufferOverflow
@@ -41,8 +42,16 @@ import java.io.Closeable
 data class IpInfo(
     val ip: String,
     @SerialName("country_code")
-    val countryCode: String? = null
-)
+    val countryCode: String? = null,
+    val country: String? = null,
+) {
+    fun normalized(): IpInfo = copy(
+        ip = ip.trim(),
+        countryCode = countryCode?.trim()?.takeIf { it.isNotEmpty() }
+            ?: country?.trim()?.takeIf { it.length == 2 },
+        country = country?.trim(),
+    )
+}
 
 sealed class IpMonitoringState {
     data class Success(val localIp: String?, val externalIp: IpInfo?, val isProxyActive: Boolean = false) :
@@ -82,11 +91,24 @@ class NetworkInfoService : Closeable {
     }
 
     suspend fun getExternalIp(): IpInfo? {
+        for (endpoint in EXTERNAL_IP_ENDPOINTS) {
+            val info = fetchExternalIp(endpoint)
+            if (info != null) {
+                return info
+            }
+        }
+        return null
+    }
+
+    private suspend fun fetchExternalIp(endpoint: String): IpInfo? {
         try {
-            val response = httpClient.get("https://api.ip.sb/geoip")
+            val response = httpClient.get(endpoint) {
+                accept(ContentType.Application.Json)
+                header(HttpHeaders.UserAgent, "YumeBox/${System.getProperty("http.agent").orEmpty()}")
+            }
             val body = response.bodyAsText()
-            val info = json.decodeFromString<IpInfo>(body)
-            return info
+            val info = json.decodeFromString<IpInfo>(body).normalized()
+            return info.takeIf { it.ip.isNotBlank() }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             return null
@@ -139,3 +161,9 @@ class NetworkInfoService : Closeable {
         }
     }
 }
+
+private val EXTERNAL_IP_ENDPOINTS = listOf(
+    "https://api.ip.sb/geoip",
+    "https://ipapi.co/json/",
+    "https://api64.ipify.org?format=json",
+)

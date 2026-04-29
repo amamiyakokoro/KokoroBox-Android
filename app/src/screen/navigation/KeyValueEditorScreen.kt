@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.state.ToggleableState
 import com.github.yumelira.yumebox.presentation.component.AppConfirmDialog
 import com.github.yumelira.yumebox.presentation.component.AppFormDialog
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
@@ -48,22 +49,17 @@ import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
+import com.github.yumelira.yumebox.presentation.icon.yume.Delete
+import com.github.yumelira.yumebox.presentation.icon.yume.Undo
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.chrisbanes.haze.hazeSource
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Switch
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.AddCircle
-import top.yukonga.miuix.kmp.icon.extended.Delete
-import top.yukonga.miuix.kmp.icon.extended.Reset
 import java.util.UUID
 
 object EditorDataHolder {
@@ -151,7 +147,6 @@ private sealed interface KeyValueDialogState {
 fun StringListEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val topBarHazeState = LocalTopBarHazeState.current
     val items = remember { mutableStateListOf<TextDraftItem>() }
     val title = EditorDataHolder.listEditorTitle
@@ -178,10 +173,9 @@ fun StringListEditorScreen(
     val listState = rememberLazyListState()
     EditorScaffold(
         title = title,
-        scrollBehavior = scrollBehavior,
         actions = listOf(
             EditorAction(
-                icon = MiuixIcons.Reset,
+                icon = Yume.Undo,
                 contentDescription = "Reset",
                 onClick = { dialogState = StringListDialogState.Reset },
             ),
@@ -212,7 +206,6 @@ fun StringListEditorScreen(
         } else {
             ScreenLazyColumn(
                 lazyListState = listState,
-                scrollBehavior = scrollBehavior,
                 innerPadding = combinedInnerPadding,
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -229,7 +222,7 @@ fun StringListEditorScreen(
                         title = item.value,
                         onClick = { dialogState = StringListDialogState.Edit(item.id) },
                         onDelete = { items.removeAll { it.id == item.id } },
-                        deleteIcon = MiuixIcons.Delete,
+                        deleteIcon = Yume.Delete,
                         deleteContentDescription = "Delete",
                     )
                 }
@@ -306,7 +299,6 @@ fun StringListEditorScreen(
 fun KeyValueEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val topBarHazeState = LocalTopBarHazeState.current
     val items = remember { mutableStateListOf<KeyValueDraftItem>() }
     val title = EditorDataHolder.mapEditorTitle
@@ -339,15 +331,14 @@ fun KeyValueEditorScreen(
     val listState = rememberLazyListState()
     EditorScaffold(
         title = title,
-        scrollBehavior = scrollBehavior,
         actions = listOf(
             EditorAction(
-                icon = MiuixIcons.Reset,
+                icon = Yume.Undo,
                 contentDescription = "Reset",
                 onClick = { dialogState = KeyValueDialogState.Reset },
             ),
             EditorAction(
-                icon = MiuixIcons.AddCircle,
+                icon = Yume.`Badge-plus`,
                 contentDescription = "Add",
                 onClick = { dialogState = KeyValueDialogState.Add },
             ),
@@ -367,7 +358,6 @@ fun KeyValueEditorScreen(
         } else {
             ScreenLazyColumn(
                 lazyListState = listState,
-                scrollBehavior = scrollBehavior,
                 innerPadding = combinedInnerPadding,
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -385,7 +375,7 @@ fun KeyValueEditorScreen(
                         summary = item.value,
                         onClick = { dialogState = KeyValueDialogState.Edit(item.id) },
                         onDelete = { items.removeAll { it.id == item.id } },
-                        deleteIcon = MiuixIcons.Delete,
+                        deleteIcon = Yume.Delete,
                         deleteContentDescription = "Delete",
                     )
                 }
@@ -561,7 +551,7 @@ private fun KeyValueFormDialog(
         },
         error = error,
     ) {
-        TextField(
+        YumeMd3OutlinedTextField(
             value = key,
             onValueChange = {
                 key = it
@@ -570,7 +560,7 @@ private fun KeyValueFormDialog(
             label = keyPlaceholder,
             modifier = Modifier.fillMaxWidth(),
         )
-        TextField(
+        YumeMd3OutlinedTextField(
             value = value,
             onValueChange = { value = it },
             label = valuePlaceholder,
@@ -636,7 +626,7 @@ private fun RuleEditorDialog(
         },
         error = error,
     ) {
-        WindowDropdownPreference(
+        YumeMd3DropdownPreference(
             title = MLang.Component.Editor.Rule.Type,
             items = RULE_TYPE_PRESETS,
             selectedIndex = selectedRuleTypeIndex,
@@ -645,7 +635,7 @@ private fun RuleEditorDialog(
                 error = null
             },
         )
-        WindowDropdownPreference(
+        YumeMd3DropdownPreference(
             title = MLang.Component.Editor.Rule.Target,
             items = targetItems,
             selectedIndex = selectedTargetIndex,
@@ -654,7 +644,7 @@ private fun RuleEditorDialog(
                 error = null
             },
         )
-        TextField(
+        YumeMd3OutlinedTextField(
             value = payload,
             onValueChange = {
                 payload = it
@@ -670,8 +660,8 @@ private fun RuleEditorDialog(
                 onClick = { useSrc = !useSrc },
                 endActions = {
                     Checkbox(
-                        state = if (useSrc) ToggleableState.On else ToggleableState.Off,
-                        onClick = { useSrc = !useSrc },
+                        checked = useSrc,
+                        onCheckedChange = { checked -> useSrc = checked },
                     )
                 },
             )

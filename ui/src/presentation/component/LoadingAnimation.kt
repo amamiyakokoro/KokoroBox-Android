@@ -25,6 +25,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,18 +36,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun PulseRippleLoadingAnimation(
     modifier: Modifier = Modifier,
-    color: Color = MiuixTheme.colorScheme.primary
+    color: Color = MaterialTheme.colorScheme.primary
 ) {
     val opacity = AppTheme.opacity
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -163,11 +162,11 @@ fun StartupLoadingOverlay(
             ) { text ->
                 Text(
                     text = text,
-                    style = MiuixTheme.textStyles.body1.copy(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 16.sp,
                         letterSpacing = 2.sp
                     ),
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

@@ -30,6 +30,10 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -72,12 +76,6 @@ import com.ramcosta.composedestinations.generated.destinations.AcgWallpaperCropS
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Slider
-import top.yukonga.miuix.kmp.basic.SliderDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import androidx.core.net.toUri
 
 @Composable
@@ -85,17 +83,16 @@ import androidx.core.net.toUri
 fun AppSettingsScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val viewModel = koinViewModel<AppSettingsViewModel>()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.AppSettings.Title, scrollBehavior = scrollBehavior)
+            TopBar(title = MLang.AppSettings.Title)
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item { AppBehaviorSettingsSection(viewModel) }
@@ -168,10 +165,12 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             items = listOf(
                 MLang.AppSettings.Interface.ColorThemeModeMonet,
                 MLang.AppSettings.Interface.ColorThemeModeCustom,
+                "根据 ACG 壁纸莫奈取色",
             ),
             values = listOf(
                 AppColorTheme.MonetDynamic,
                 AppColorTheme.Custom,
+                AppColorTheme.AcgWallpaper,
             ),
             onValueChange = viewModel::onColorThemeChange,
         )
@@ -179,6 +178,12 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             ThemeColorPickerItem(
                 themeSeedColorArgb = themeSeedColorArgb,
                 onThemeSeedColorChange = viewModel::onThemeSeedColorChange,
+            )
+        } else if (colorTheme == AppColorTheme.AcgWallpaper) {
+            PreferenceValueItem(
+                title = MLang.AppSettings.Interface.ColorThemePickerTitle,
+                summary = "将使用当前 ACG 首页壁纸提取的主色生成主题；更换并应用壁纸后会自动更新取色。",
+                onClick = { },
             )
         } else {
             PreferenceValueItem(
@@ -354,6 +359,7 @@ private fun AppExperimentalSettingsSection(
     val acgMainUiEnabled by viewModel.acgMainUiEnabled.state.collectAsState()
     val acgHomeQuote by viewModel.acgHomeQuote.state.collectAsState()
     val acgHomeQuoteAuthor by viewModel.acgHomeQuoteAuthor.state.collectAsState()
+    val acgDailyQuoteEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
     val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsState()
     val acgQuoteSummary = remember(acgHomeQuote) {
         acgHomeQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault }
@@ -375,18 +381,31 @@ private fun AppExperimentalSettingsSection(
             checked = acgSidebarExpanded,
             onCheckedChange = viewModel::onAcgSidebarExpandedChange,
         )
+        PreferenceSwitchItem(
+            title = "每日刷新 ACG 一言",
+            summary = "启用后每天从 hitokoto.cn 获取一条动画一言；自定义 ACG 一言将暂时不可编辑。",
+            checked = acgDailyQuoteEnabled,
+            onCheckedChange = { enabled ->
+                viewModel.onAcgDailyQuoteEnabledChange(enabled)
+                if (enabled) {
+                    viewModel.refreshDailyAcgQuoteIfNeeded()
+                }
+            },
+        )
         AcgQuotePreferenceItem(
             title = MLang.AppSettings.Experimental.AcgQuoteTitle,
-            summary = acgQuoteSummary,
+            summary = if (acgDailyQuoteEnabled) "已启用每日刷新，暂不可编辑" else acgQuoteSummary,
             dialogTitle = MLang.AppSettings.Experimental.EditAcgQuoteTitle,
             currentValue = acgHomeQuote,
+            enabled = !acgDailyQuoteEnabled,
             onConfirm = viewModel::onAcgHomeQuoteChange,
         )
         AcgQuotePreferenceItem(
             title = MLang.AppSettings.Experimental.AcgQuoteAuthorTitle,
-            summary = acgQuoteAuthorSummary,
+            summary = if (acgDailyQuoteEnabled) "已启用每日刷新，暂不可编辑" else acgQuoteAuthorSummary,
             dialogTitle = MLang.AppSettings.Experimental.EditAcgQuoteAuthorTitle,
             currentValue = acgHomeQuoteAuthor,
+            enabled = !acgDailyQuoteEnabled,
             onConfirm = viewModel::onAcgHomeQuoteAuthorChange,
         )
         AcgWallpaperPreferenceItem(
@@ -485,6 +504,7 @@ private fun AcgQuotePreferenceItem(
     summary: String,
     dialogTitle: String,
     currentValue: String,
+    enabled: Boolean = true,
     onConfirm: (String) -> Unit,
 ) {
     val showEditDialogState = remember { mutableStateOf(false) }
@@ -493,6 +513,7 @@ private fun AcgQuotePreferenceItem(
     PreferenceValueItem(
         title = title,
         summary = summary,
+        enabled = enabled,
         onClick = {
             textFieldState.value = TextFieldValue(currentValue)
             showEditDialogState.value = true
@@ -635,7 +656,7 @@ private fun PageScalePreferenceItem(
         endActions = {
             Text(
                 text = pageScalePercentText,
-                color = MiuixTheme.colorScheme.onSurfaceVariantActions,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         onClick = { showPageScaleDialogState.value = true },
@@ -646,8 +667,6 @@ private fun PageScalePreferenceItem(
                 onValueChange = { pageScaleLocal = it },
                 onValueChangeFinished = { onApply(pageScaleLocal) },
                 valueRange = 0.8f..1.2f,
-                magnetThreshold = 0.01f,
-                hapticEffect = SliderDefaults.SliderHapticEffect.Step,
             )
         },
     )
@@ -727,7 +746,7 @@ private fun PageScaleDialog(
             Text(
                 text = "%",
                 modifier = Modifier.padding(horizontal = UiDp.dp16),
-                color = MiuixTheme.colorScheme.onSurfaceVariantActions,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
     )

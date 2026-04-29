@@ -23,6 +23,8 @@ package com.github.yumelira.yumebox.screen.home
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -44,8 +46,6 @@ import com.ramcosta.composedestinations.generated.destinations.TrafficStatistics
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
 
 @Composable
 fun HomePager(
@@ -114,16 +114,15 @@ fun HomePager(
         }
     }
 
-    val scrollBehavior = MiuixScrollBehavior()
 
     val isRunning = controlState == HomeProxyControlState.Running
     val isProxyEnabled = profilesLoaded && profiles.isNotEmpty() && controlState.canInteract
 
     Scaffold(
-        topBar = { TopBar(title = MLang.Home.Title, scrollBehavior = scrollBehavior) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = { TopBar(title = MLang.Home.Title) },
     ) { innerPadding ->
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainInnerPadding),
         ) {
             item {
@@ -174,7 +173,7 @@ fun HomePager(
                             serverPing = selectedServerPing.takeIf { isRunning }
                         )
                         IpInfoDisplay(
-                            state = if (isRunning) ipMonitoringState else com.github.yumelira.yumebox.data.gateway.IpMonitoringState.Loading
+                            state = ipMonitoringState
                         )
                     }
 

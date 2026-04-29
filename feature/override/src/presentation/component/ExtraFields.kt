@@ -21,14 +21,14 @@
 
 package com.github.yumelira.yumebox.presentation.component
 import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
 import com.github.yumelira.yumebox.presentation.icon.yume.Delete
 import com.github.yumelira.yumebox.presentation.util.*
@@ -37,11 +37,6 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.intOrNull
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun OverrideExtraFieldsCard(
@@ -56,7 +51,7 @@ fun OverrideExtraFieldsCard(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            BasicComponent(
+            PreferenceListItem(
                 title = title,
                 summary = if (fields.isEmpty()) {
                     MLang.Override.Draft.ClickToAddExtraField
@@ -76,7 +71,7 @@ fun OverrideExtraFieldsCard(
 
             if (fields.isNotEmpty()) {
                 fields.entries.forEach { entry ->
-                    BasicComponent(
+                    PreferenceListItem(
                         title = entry.key,
                         summary = "${resolveValueTypeLabel(entry.value)} · ${summarizeExtraFieldValue(entry.value)}",
                         onClick = { onEditClick(entry.key, entry.value) },
@@ -140,7 +135,7 @@ fun OverrideExtraFieldDialog(
         cancelText = MLang.Override.Dialog.Button.Cancel,
         confirmText = MLang.Override.Editor.Confirm,
     ) {
-        WindowDropdownPreference(
+        YumeMd3DropdownPreference(
             title = MLang.Override.Draft.ValueType,
             items = valueTypeItems,
             selectedIndex = selectedTypeIndex,
@@ -149,7 +144,7 @@ fun OverrideExtraFieldDialog(
                 errorText = null
             },
         )
-        TextField(
+        YumeMd3OutlinedTextField(
             value = keyText,
             onValueChange = {
                 keyText = it
@@ -159,7 +154,7 @@ fun OverrideExtraFieldDialog(
             modifier = Modifier.fillMaxWidth(),
         )
         if (selectedType != OverrideExtraFieldValueType.Null) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = valueText,
                 onValueChange = {
                     valueText = it

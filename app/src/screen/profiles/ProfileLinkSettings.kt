@@ -20,27 +20,43 @@
 
 
 package com.github.yumelira.yumebox.screen.profiles
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.data.store.ProfileLink
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppFormDialog
-import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
 import com.github.yumelira.yumebox.presentation.component.SectionCard
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.Delete
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Delete
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun LinkSettingsDialog(
@@ -124,12 +140,13 @@ internal fun LinkSettingsDialog(
                                     verticalAlignment = Alignment.CenterVertically) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = link.name, style = MiuixTheme.textStyles.body1
+                                            text = link.name,
+                                            style = MaterialTheme.typography.bodyLarge,
                                         )
                                         Text(
                                             text = link.url,
-                                            style = MiuixTheme.textStyles.body2,
-                                            color = MiuixTheme.colorScheme.onSurface.copy(alpha = opacity.secondaryText),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = opacity.secondaryText),
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
@@ -138,9 +155,9 @@ internal fun LinkSettingsDialog(
                                     IconButton(
                                         onClick = { onDeleteLink(link.id) }) {
                                         Icon(
-                                            imageVector = MiuixIcons.Delete,
+                                            imageVector = Yume.Delete,
                                             contentDescription = "Delete",
-                                            tint = MiuixTheme.colorScheme.error
+                                            tint = MaterialTheme.colorScheme.error
                                         )
                                     }
                                 }
@@ -149,7 +166,7 @@ internal fun LinkSettingsDialog(
                                     HorizontalDivider(
                                         modifier = Modifier.padding(horizontal = spacing.space16),
                                         thickness = componentSizes.thinDividerThickness,
-                                        color = MiuixTheme.colorScheme.outline.copy(alpha = opacity.outline)
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline)
                                     )
                                 }
                             }
@@ -161,7 +178,7 @@ internal fun LinkSettingsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(spacing.space12)
                 ) {
-                    TextButton(
+                    YumeMd3TextButton(
                         text = MLang.ProfilesPage.LinkSettings.Close,
                         onClick = { show.value = false },
                         modifier = Modifier.weight(1f)
@@ -169,12 +186,12 @@ internal fun LinkSettingsDialog(
                     Button(
                         onClick = onAddLink,
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColorsPrimary()
-                    ) {
-                        Text(
-                            MLang.ProfilesPage.LinkSettings.AddLink,
-                            color = MiuixTheme.colorScheme.onPrimary
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
                         )
+                    ) {
+                        Text(MLang.ProfilesPage.LinkSettings.AddLink)
                     }
                 }
             }
@@ -230,7 +247,7 @@ internal fun AddLinkDialog(
         cancelText = MLang.ProfilesPage.Button.Cancel,
         confirmText = MLang.ProfilesPage.Button.Confirm,
     ) {
-        TextField(
+        YumeMd3OutlinedTextField(
             value = currentName,
             onValueChange = {
                 currentName = it
@@ -239,7 +256,7 @@ internal fun AddLinkDialog(
             label = MLang.ProfilesPage.LinkSettings.Name,
             modifier = Modifier.fillMaxWidth(),
         )
-        TextField(
+        YumeMd3OutlinedTextField(
             value = currentUrl,
             onValueChange = {
                 currentUrl = it

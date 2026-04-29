@@ -30,6 +30,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,17 +55,13 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.takeOrElse
 import androidx.compose.ui.zIndex
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.Close
+import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.Sizes
 import com.github.yumelira.yumebox.presentation.theme.Spacing
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.InputField
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.basic.Search
-import top.yukonga.miuix.kmp.icon.basic.SearchCleanup
-import top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme
 
 @Composable
 fun SearchStatus.TopAppBarAnim(
@@ -78,7 +77,7 @@ fun SearchStatus.TopAppBarAnim(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .graphicsLayer { this.alpha = alpha },
     ) {
         content()
@@ -117,7 +116,7 @@ fun SearchStatus.SearchBox(
                     onSearchStatusChange(searchStatus.copy(current = SearchStatus.Status.EXPANDING))
                 }
             }
-            .background(colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface),
     ) {
         SearchBoxCollapsedBar(
             searchStatus = searchStatus,
@@ -126,6 +125,9 @@ fun SearchStatus.SearchBox(
             endPadding = resolvedEndPadding,
             contentPadding = contentPadding,
             collapseBar = collapseBar,
+            onClick = {
+                onSearchStatusChange(searchStatus.copy(current = SearchStatus.Status.EXPANDING))
+            },
             onMeasured = { coordinates ->
                 coordinates.positionInWindow().y.apply {
                     offsetY.intValue = (this * 0.9f).toInt()
@@ -157,10 +159,16 @@ private fun SearchBoxCollapsedBar(
     endPadding: Dp,
     contentPadding: PaddingValues,
     collapseBar: (@Composable (SearchStatus, Dp, PaddingValues) -> Unit)?,
+    onClick: () -> Unit,
     onMeasured: (androidx.compose.ui.layout.LayoutCoordinates) -> Unit,
 ) {
     Box(
-        modifier = Modifier.onGloballyPositioned(onMeasured),
+        modifier = Modifier
+            .zIndex(2f)
+            .pointerInput(searchStatus.current) {
+                detectTapGestures { onClick() }
+            }
+            .onGloballyPositioned(onMeasured),
     ) {
         val collapsedBar = collapseBar ?: { collapsedSearchStatus: SearchStatus, topPadding: Dp, innerPadding: PaddingValues ->
             SearchBarCollapsed(
@@ -184,6 +192,7 @@ private fun SearchBoxContentLayer(
 ) {
     AnimatedVisibility(
         visible = shouldCollapsed,
+        modifier = Modifier.zIndex(1f),
         enter = fadeIn(tween(300, easing = LinearOutSlowInEasing)) +
             slideInVertically(tween(300, easing = LinearOutSlowInEasing)) { -offsetY },
         exit = fadeOut(tween(300, easing = LinearOutSlowInEasing)) +
@@ -244,7 +253,7 @@ fun SearchStatus.SearchPager(
         modifier = Modifier
             .fillMaxSize()
             .zIndex(5f)
-            .background(colorScheme.surface.copy(alpha = surfaceAlpha))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = surfaceAlpha))
             .then(
                 if (!isCollapsed) {
                     Modifier.pointerInput(searchStatus.current) {}
@@ -287,7 +296,7 @@ private fun SearchPagerTopRow(
             .padding(top = topPadding)
             .then(
                 if (!isCollapsed) {
-                    Modifier.background(colorScheme.surface)
+                    Modifier.background(MaterialTheme.colorScheme.surface)
                 } else {
                     Modifier
                 },
@@ -330,7 +339,7 @@ private fun SearchPagerCancelButton(
         Text(
             text = MLang.Component.Button.Cancel,
             fontWeight = FontWeight.Bold,
-            color = colorScheme.primary,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .padding(
                     start = spacing.space4,
@@ -415,16 +424,16 @@ private fun SearchBar(
         textStyle = TextStyle(
             fontWeight = FontWeight.Medium,
             fontSize = 17.sp,
-            color = colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
         ),
-        cursorBrush = SolidColor(colorScheme.primary),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         modifier = modifier
             .fillMaxWidth()
             .padding(start = startPadding, end = endPadding)
             .padding(top = searchBarTopPadding, bottom = componentSizes.searchBarBottomPadding)
             .heightIn(min = componentSizes.searchFieldMinHeight)
-            .background(colorScheme.secondaryContainer, CircleShape)
+            .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
             .focusRequester(focusRequester),
         decorationBox = { innerTextField ->
             Row(
@@ -455,12 +464,12 @@ private fun SearchBarLeadingIcon(
     spacing: Spacing,
 ) {
     Icon(
-        imageVector = MiuixIcons.Basic.Search,
+        imageVector = Yume.`Scan-eye`,
         contentDescription = MLang.Component.Editor.Action.Search,
         modifier = Modifier
             .size(componentSizes.searchIconTouchTarget)
             .padding(start = spacing.space16, end = spacing.space8),
-        tint = colorScheme.onSurfaceVariantSummary,
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
@@ -477,9 +486,9 @@ private fun SearchBarClearButton(
         exit = fadeOut() + scaleOut(),
     ) {
         Icon(
-            imageVector = MiuixIcons.Basic.SearchCleanup,
+            imageVector = Yume.Close,
             contentDescription = MLang.Component.Button.Clear,
-            tint = colorScheme.onSurface,
+            tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .size(componentSizes.searchIconTouchTarget)
                 .padding(start = spacing.space8, end = spacing.space16)
@@ -505,32 +514,50 @@ private fun SearchBarCollapsed(
     val componentSizes = AppTheme.sizes
 
     val layoutDirection = LocalLayoutDirection.current
-    InputField(
-        query = "",
-        onQueryChange = {},
-        label = label,
-        leadingIcon = {
-            Icon(
-                imageVector = MiuixIcons.Basic.Search,
-                contentDescription = MLang.Component.Editor.Action.Search,
-                modifier = Modifier
-                    .size(componentSizes.searchIconTouchTarget)
-                    .padding(start = spacing.space16, end = spacing.space8),
-                tint = colorScheme.onSurfaceVariantSummary,
-            )
-        },
+    BasicTextField(
+        value = "",
+        onValueChange = {},
+        enabled = false,
+        singleLine = true,
+        textStyle = TextStyle(
+            fontWeight = FontWeight.Medium,
+            fontSize = 17.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+        ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         modifier = Modifier
-            .background(colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .padding(start = startPadding, end = endPadding)
             .padding(
                 start = innerPadding.calculateStartPadding(layoutDirection),
                 end = innerPadding.calculateEndPadding(layoutDirection),
             )
-            .padding(top = searchBarTopPadding, bottom = componentSizes.searchBarBottomPadding),
-        onSearch = {},
-        enabled = false,
-        expanded = false,
-        onExpandedChange = {},
+            .padding(top = searchBarTopPadding, bottom = componentSizes.searchBarBottomPadding)
+            .heightIn(min = componentSizes.searchFieldMinHeight)
+            .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape),
+        decorationBox = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Yume.`Scan-eye`,
+                    contentDescription = MLang.Component.Editor.Action.Search,
+                    modifier = Modifier
+                        .size(componentSizes.searchIconTouchTarget)
+                        .padding(start = spacing.space16, end = spacing.space8),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = label,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 17.sp,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
     )
 }

@@ -18,43 +18,56 @@
  *
  */
 
-
 package com.github.yumelira.yumebox.screen.about
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.foundation.layout.*
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.R
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.core.bridge.Bridge
 import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.OpenSourceLicensesScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Destination<RootGraph>
 fun AboutScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
-    val scrollBehavior = MiuixScrollBehavior()
     val coreVersion by produceState(initialValue = MLang.About.App.VersionLoading) {
         value = try {
             Bridge.nativeCoreVersion()
@@ -65,14 +78,29 @@ fun AboutScreen(navigator: DestinationsNavigator) {
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.About.Title, scrollBehavior = scrollBehavior)
+            TopAppBar(
+                title = {
+                    Text(
+                        text = MLang.About.Title,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
-        ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
-            innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
                 Column(
@@ -92,23 +120,28 @@ fun AboutScreen(navigator: DestinationsNavigator) {
 
                     Spacer(modifier = Modifier.height(UiDp.dp24))
 
-                    Text(text = "YumeBox(MD3)", style = MiuixTheme.textStyles.title1)
+                    Text(
+                        text = "YumeBox MD3",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
 
                     Spacer(modifier = Modifier.height(UiDp.dp8))
 
                     Text(
-                        text = "0.5.1 (Material You Build) ($coreVersion)",
-                        style = MiuixTheme.textStyles.body1,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        text = "0.5.2 (Material You Build) ($coreVersion)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
                     Spacer(modifier = Modifier.height(UiDp.dp32))
                 }
 
                 Card {
-                    BasicComponent(
-                        title = "YumeBox(Material Design)",
-                        summary = "A Material Design fork of YumeBox, an open-source Android client based on Mihomo",
+                    YumeMd3PreferenceItem(
+                        title = "YumeBox MD3",
+                        summary = "A Material Design 3 / Material You fork of YumeBox, an open-source Android client based on Mihomo",
+                        showDivider = false,
                     )
                 }
 
@@ -152,14 +185,16 @@ fun AboutScreen(navigator: DestinationsNavigator) {
 
                 Title(MLang.About.Section.License)
                 Card {
-                    ArrowPreference(
+                    YumeMd3PreferenceItem(
                         title = MLang.About.License.Libraries,
                         summary = MLang.About.License.LibrariesSummary,
                         onClick = { navigator.navigate(OpenSourceLicensesScreenDestination) },
+                        trailingContent = { ChevronText() },
                     )
-                    BasicComponent(
+                    YumeMd3PreferenceItem(
                         title = MLang.About.License.AgplName,
                         summary = MLang.About.License.AgplDescription,
+                        showDivider = false,
                     )
                 }
             }
@@ -173,7 +208,8 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 ) {
                     Text(
                         text = MLang.About.Copyright,
-                        style = MiuixTheme.textStyles.footnote1,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Spacer(modifier = Modifier.height(UiDp.dp32))
@@ -189,17 +225,23 @@ private fun AboutLinkItem(
     onOpenUrl: (String) -> Unit,
     showArrow: Boolean,
 ) {
-    if (showArrow) {
-        ArrowPreference(
-            title = title,
-            summary = url,
-            onClick = { onOpenUrl(url) },
-        )
-    } else {
-        BasicComponent(
-            title = title,
-            summary = url,
-            onClick = { onOpenUrl(url) },
-        )
-    }
+    YumeMd3PreferenceItem(
+        title = title,
+        summary = url,
+        onClick = { onOpenUrl(url) },
+        trailingContent = if (showArrow) {
+            { ChevronText() }
+        } else {
+            null
+        },
+    )
+}
+
+@Composable
+private fun ChevronText() {
+    Icon(
+        imageVector = Yume.chevron,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }

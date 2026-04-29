@@ -35,4 +35,19 @@ enum class AppLanguage {
 enum class AppColorTheme {
     MonetDynamic,
     Custom,
+    AcgWallpaper,
+}
+
+enum class MonetStyle {
+    TonalSpot,
+    Vibrant,
+    Expressive,
+    Neutral,
+    Monochrome,
+}
+
+enum class MonetContrast {
+    Standard,
+    Medium,
+    High,
 }

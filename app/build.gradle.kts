@@ -77,16 +77,19 @@ val startupGateExpectedSignerSha256 = providers.gradleProperty("startupGate.expe
     ?: ""
 
 val geoFilesAssetsDir = rootProject.layout.buildDirectory.dir("generated/assets/geo")
+val projectApplicationId = providers.gradleProperty("project.applicationId")
+    .orElse(gropify.project.namespace.base)
+    .get()
 
 android {
     namespace = gropify.project.namespace.base
 
     defaultConfig {
-        applicationId = gropify.project.namespace.base
+        applicationId = projectApplicationId
         targetSdk = gropify.android.targetSdk
         versionCode = gropify.project.version.code
         versionName = gropify.project.version.name
-        manifestPlaceholders["appName"] = "${gropify.project.name}(MD3)"
+        manifestPlaceholders["appName"] = "${gropify.project.name} MD3"
         manifestPlaceholders["startupGateEnabled"] = startupGateEnabled
         manifestPlaceholders["startupGateEnforceSigner"] = startupGateEnforceSigner
         manifestPlaceholders["startupGateExpectedSignerSha256"] = startupGateExpectedSignerSha256
@@ -208,21 +211,21 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+}
 
-    //noinspection WrongGradleMethod
-    androidComponents {
-        onVariants { variant ->
-            variant.outputs.forEach { output ->
-                val splitAbiName = output.filters.find {
-                    it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
-                }?.identifier
-                val abiName = injectedAbi ?: splitAbiName ?: "universal"
-                val buildTypeName = variant.buildType ?: "release"
-                output.versionName.set(gropify.project.version.name)
-                (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
-                    "${gropify.project.name}-${abiName}-${buildTypeName}.apk"
-                )
-            }
+//noinspection WrongGradleMethod
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            val splitAbiName = output.filters.find {
+                it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+            }?.identifier
+            val abiName = injectedAbi ?: splitAbiName ?: "universal"
+            val buildTypeName = variant.buildType ?: "release"
+            output.versionName.set(gropify.project.version.name)
+            (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
+                "${gropify.project.name}-${abiName}-${buildTypeName}.apk"
+            )
         }
     }
 }
@@ -250,6 +253,7 @@ dependencies {
     implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.activity:activity-compose:${gropify.dep.version.activityCompose}")
     debugImplementation("androidx.compose.ui:ui-tooling")

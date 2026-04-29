@@ -21,19 +21,22 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.foundation.layout.*
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3FilledButton
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun TextEditBottomSheet(
@@ -51,22 +54,26 @@ fun TextEditBottomSheet(
         onDismissRequest = onDismiss,
     ) {
         Column {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = textFieldValue.value,
                 onValueChange = { textFieldValue.value = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.height(UiDp.dp16))
             Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
-                Button(
-                    onClick = onSecondaryClick, modifier = Modifier.weight(1f)
-                ) { Text(secondaryButtonText) }
-                Button(
+                YumeMd3FilledButton(
+                    text = secondaryButtonText,
+                    onClick = onSecondaryClick,
+                    modifier = Modifier.weight(1f),
+                )
+                YumeMd3FilledButton(
+                    text = MLang.Component.Button.Confirm,
                     onClick = {
                         onConfirm(textFieldValue.value.text)
                         show.value = false
-                    }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColorsPrimary()
-                ) { Text(MLang.Component.Button.Confirm, color = MiuixTheme.colorScheme.onPrimary) }
+                    },
+                    modifier = Modifier.weight(1f),
+                )
             }
             Spacer(modifier = Modifier.height(UiDp.dp16))
         }
@@ -94,12 +101,14 @@ fun WarningBottomSheet(
                 }
             }
             Spacer(modifier = Modifier.height(UiDp.dp16))
-            Button(
+            YumeMd3FilledButton(
+                text = MLang.Component.Button.Confirm,
                 onClick = {
                     onConfirm()
                     show.value = false
-                }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColorsPrimary()
-            ) { Text(MLang.Component.Button.Confirm, color = MiuixTheme.colorScheme.onPrimary) }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
             Spacer(modifier = Modifier.height(UiDp.dp16))
         }
     }

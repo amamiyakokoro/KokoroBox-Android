@@ -30,6 +30,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,10 +54,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -62,7 +61,6 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
     val spacing = AppTheme.spacing
 
-    val scrollBehavior = MiuixScrollBehavior()
     var showLicenseSheet by remember { mutableStateOf(false) }
     var selectedLibrary by remember { mutableStateOf<Library?>(null) }
 
@@ -77,14 +75,12 @@ fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
         topBar = {
             TopBar(
                 title = MLang.OpenSourceLicenses.Title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
             val mainLikePadding = rememberStandalonePageMainPadding()
             ScreenLazyColumn(
-                scrollBehavior = scrollBehavior,
                 innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             ) {
                 if (libraryItems.isNotEmpty()) {
@@ -144,8 +140,8 @@ private fun LibraryItem(
             ) {
                 Text(
                     text = library.name,
-                    style = MiuixTheme.textStyles.body1,
-                    color = MiuixTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
@@ -153,8 +149,8 @@ private fun LibraryItem(
                 library.artifactVersion?.let { version ->
                     Text(
                         text = version,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = spacing.space12),
                     )
                 }
@@ -163,8 +159,8 @@ private fun LibraryItem(
             library.developers.firstOrNull()?.name?.let { author ->
                 Text(
                     text = author,
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -191,13 +187,13 @@ private fun LicenseChip(licenseName: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(radii.radius12))
-            .background(MiuixTheme.colorScheme.primary.copy(alpha = opacity.subtle))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtle))
             .padding(horizontal = spacing.space10, vertical = spacing.space4),
     ) {
         Text(
             text = licenseName,
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -226,8 +222,8 @@ private fun LicenseBottomSheet(
                     Text(
                         modifier = Modifier.verticalScroll(scrollState),
                         text = licenseContent,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 } else {
                     Card(
@@ -236,8 +232,8 @@ private fun LicenseBottomSheet(
                     ) {
                         Text(
                             text = MLang.OpenSourceLicenses.LicenseSheet.NoContent,
-                            style = MiuixTheme.textStyles.body2,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }

@@ -39,6 +39,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +63,6 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -68,7 +75,10 @@ import androidx.compose.ui.zIndex
 import androidx.core.graphics.drawable.toBitmap
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.Close
+import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
 import com.github.yumelira.yumebox.presentation.icon.yume.`Settings-2`
 import com.github.yumelira.yumebox.presentation.theme.LocalSpacing
 import com.ramcosta.composedestinations.annotation.Destination
@@ -77,13 +87,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.basic.Search
-import top.yukonga.miuix.kmp.icon.basic.SearchCleanup
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private object AccessControlPageSpacing {
     val contentHorizontal = 12.dp
@@ -126,7 +129,6 @@ private data class SearchStatus(
 @Composable
 fun AccessControlScreen(navigator: DestinationsNavigator) {
     val layoutDirection = LocalLayoutDirection.current
-    val scrollBehavior = MiuixScrollBehavior()
     val spacing = LocalSpacing.current
     val mainLikePadding = rememberStandalonePageMainPadding()
     val combinedBottomPadding = mainLikePadding.calculateBottomPadding() + spacing.space12
@@ -143,9 +145,7 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
             ),
         )
     }
-    val dynamicTopPadding by remember {
-        derivedStateOf { 12.dp * (1f - scrollBehavior.state.collapsedFraction) }
-    }
+    val dynamicTopPadding = 12.dp
     val listStartPadding = AccessControlPageSpacing.contentHorizontal
     val listEndPadding = AccessControlPageSpacing.contentHorizontal
     val currentSearchStatus = remember(searchStatus, filteredApps) {
@@ -187,11 +187,11 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            containerColor = MaterialTheme.colorScheme.surface,
             topBar = {
                 currentSearchStatus.TopAppBarAnim {
                     TopBar(
                         title = "访问控制",
-                        scrollBehavior = scrollBehavior,
                         actions = {
                             IconButton(onClick = { showSettingsSheet = true }) {
                                 Icon(
@@ -232,7 +232,6 @@ fun AccessControlScreen(navigator: DestinationsNavigator) {
                     }
                 } else {
                     ScreenLazyColumn(
-                        scrollBehavior = scrollBehavior,
                         innerPadding = combinedInnerPadding,
                         contentPadding = PaddingValues(
                             top = combinedInnerPadding.calculateTopPadding() + boxHeight + 6.dp,
@@ -365,18 +364,18 @@ private fun AccessControlSettingsSheet(
         enableNestedScroll = true,
     ) {
         Column {
-            top.yukonga.miuix.kmp.basic.Card {
-                SwitchPreference(
+            Card {
+                PreferenceSwitchItem(
                     title = "显示系统应用",
                     checked = uiState.showSystemApps,
                     onCheckedChange = onShowSystemAppsChange,
                 )
-                SwitchPreference(
+                PreferenceSwitchItem(
                     title = "已选应用排前",
                     checked = uiState.selectedFirst,
                     onCheckedChange = onSelectedFirstChange,
                 )
-                WindowDropdownPreference(
+                YumeMd3DropdownPreference(
                     title = "排序方式",
                     summary = "当前: ${uiState.sortMode.displayName}",
                     items = sortModeEntries.map { it.displayName },
@@ -385,7 +384,7 @@ private fun AccessControlSettingsSheet(
                         sortModeEntries.getOrNull(index)?.let(onSortModeChange)
                     },
                 )
-                WindowDropdownPreference(
+                YumeMd3DropdownPreference(
                     title = "批量操作",
                     items = listOf("全选", "取消选择", "反选"),
                     selectedIndex = 0,
@@ -397,7 +396,7 @@ private fun AccessControlSettingsSheet(
                         }
                     },
                 )
-                WindowDropdownPreference(
+                YumeMd3DropdownPreference(
                     title = "区域快速选择",
                     items = listOf("中国应用", "海外应用"),
                     selectedIndex = 0,
@@ -412,7 +411,7 @@ private fun AccessControlSettingsSheet(
                         }
                     },
                 )
-                WindowDropdownPreference(
+                YumeMd3DropdownPreference(
                     title = "导入 / 导出",
                     items = listOf("从剪贴板导入", "导出到剪贴板"),
                     selectedIndex = 0,
@@ -457,12 +456,12 @@ private fun AccessControlSettingsSheet(
             Button(
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColorsPrimary(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
-                Text(
-                    "完成",
-                    color = MiuixTheme.colorScheme.onPrimary,
-                )
+                Text("完成")
             }
         }
     }
@@ -479,7 +478,7 @@ private fun AppCard(
         modifier = Modifier.padding(vertical = 4.dp),
         applyHorizontalPadding = false,
     ) {
-        BasicComponent(
+        PreferenceListItem(
             title = app.label,
             summary = app.packageName,
             startAction = {
@@ -493,8 +492,8 @@ private fun AppCard(
             },
             endActions = {
                 Checkbox(
-                    state = ToggleableState(selected),
-                    onClick = { onSelectionChange(!selected) },
+                    checked = selected,
+                    onCheckedChange = { onSelectionChange(it) },
                 )
             },
             onClick = onClick,
@@ -541,7 +540,7 @@ private fun SearchEmptyState(
     ) {
         Text(
             text = text,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -560,7 +559,7 @@ private fun SearchStatus.TopAppBarAnim(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MiuixTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface),
     ) {
         Box(modifier = Modifier.graphicsLayer { this.alpha = alpha }) {
             content()
@@ -602,7 +601,7 @@ private fun SearchStatus.SearchBox(
                     onSearchStatusChange(searchStatus.copy(current = SearchStatus.Status.EXPANDING))
                 }
             }
-            .background(MiuixTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface),
     ) {
         SearchBarCollapsed(
             label = searchStatus.label,
@@ -667,7 +666,7 @@ private fun SearchStatus.SearchPager(
         modifier = Modifier
             .fillMaxSize()
             .zIndex(5f)
-            .background(MiuixTheme.colorScheme.surface.copy(alpha = surfaceAlpha))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = surfaceAlpha))
             .then(
                 if (!searchStatus.isCollapsed()) {
                     Modifier.pointerInput(searchStatus.current) {}
@@ -682,7 +681,7 @@ private fun SearchStatus.SearchPager(
                 .padding(top = topPadding)
                 .then(
                     if (!searchStatus.isCollapsed()) {
-                        Modifier.background(MiuixTheme.colorScheme.surface)
+                        Modifier.background(MaterialTheme.colorScheme.surface)
                     } else {
                         Modifier
                     },
@@ -694,7 +693,7 @@ private fun SearchStatus.SearchPager(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .background(MiuixTheme.colorScheme.surface),
+                        .background(MaterialTheme.colorScheme.surface),
                 ) {
                     SearchBar(
                         searchStatus = searchStatus,
@@ -714,7 +713,7 @@ private fun SearchStatus.SearchPager(
                 Text(
                     text = "取消",
                     fontWeight = FontWeight.Bold,
-                    color = MiuixTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .padding(start = 4.dp, end = 16.dp, top = searchBarTopPadding, bottom = 6.dp)
                         .clickable(
@@ -783,16 +782,16 @@ private fun SearchBar(
         textStyle = TextStyle(
             fontWeight = FontWeight.Medium,
             fontSize = 17.sp,
-            color = MiuixTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
         ),
-        cursorBrush = SolidColor(MiuixTheme.colorScheme.primary),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = startPadding, end = endPadding)
             .padding(top = searchBarTopPadding, bottom = 6.dp)
             .heightIn(min = 45.dp)
-            .background(MiuixTheme.colorScheme.secondaryContainer, CircleShape)
+            .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
             .focusRequester(focusRequester),
         decorationBox = { innerTextField ->
             Row(
@@ -800,18 +799,18 @@ private fun SearchBar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = MiuixIcons.Basic.Search,
+                    imageVector = Yume.`Scan-eye`,
                     contentDescription = "搜索",
                     modifier = Modifier
                         .size(44.dp)
                         .padding(start = 16.dp, end = 8.dp),
-                    tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Box(modifier = Modifier.weight(1f)) {
                     if (textFieldValue.text.isEmpty()) {
                         Text(
                             text = searchStatus.label,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     innerTextField()
@@ -822,9 +821,9 @@ private fun SearchBar(
                     exit = fadeOut() + scaleOut(),
                 ) {
                     Icon(
-                        imageVector = MiuixIcons.Basic.SearchCleanup,
+                        imageVector = Yume.Close,
                         contentDescription = "清空",
-                        tint = MiuixTheme.colorScheme.onSurface,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(44.dp)
                             .padding(start = 8.dp, end = 16.dp)
@@ -862,20 +861,20 @@ private fun SearchBarCollapsed(
             )
             .padding(top = searchBarTopPadding, bottom = 6.dp)
             .height(45.dp)
-            .background(MiuixTheme.colorScheme.secondaryContainer, CircleShape),
+            .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = MiuixIcons.Basic.Search,
+            imageVector = Yume.`Scan-eye`,
             contentDescription = "搜索",
             modifier = Modifier
                 .size(44.dp)
                 .padding(start = 16.dp, end = 8.dp),
-            tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = label,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

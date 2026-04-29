@@ -26,6 +26,9 @@ import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,7 +56,6 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import top.yukonga.miuix.kmp.basic.*
 
 @SuppressLint("UseKtx")
 @Composable
@@ -106,14 +108,12 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
         }
     }
 
-    val scrollBehavior = MiuixScrollBehavior()
     val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
             TopBar(
                 title = MLang.ProfilesPage.Title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     IconButton(
                         modifier = Modifier.padding(end = UiDp.dp12),
@@ -164,7 +164,6 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
 
             ScreenLazyColumn(
                 lazyListState = lazyListState,
-                scrollBehavior = scrollBehavior,
                 innerPadding = combinePaddingValues(innerPadding, mainInnerPadding),
                 topPadding = UiDp.dp20,
             ) {

@@ -38,6 +38,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,14 +62,14 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
+import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.`Package-check`
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.preference.WindowSpinnerPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.io.File
 import java.util.*
 import kotlin.math.max
@@ -496,15 +501,15 @@ private fun DownloadProgressContent(
                 Icon(
                     imageVector = Yume.`Package-check`,
                     contentDescription = "Complete",
-                    tint = MiuixTheme.colorScheme.onPrimary,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(UiDp.dp16))
-                        .background(MiuixTheme.colorScheme.primary)
+                        .background(MaterialTheme.colorScheme.primary)
                         .padding(UiDp.dp10),
                 )
             } else {
-                InfiniteProgressIndicator(
+                CircularProgressIndicator(
                     modifier = Modifier.size(UiDp.dp32),
                 )
             }
@@ -513,8 +518,8 @@ private fun DownloadProgressContent(
         downloadProgress?.message?.let { message ->
             Text(
                 text = message,
-                style = MiuixTheme.textStyles.body1,
-                color = MiuixTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 2,
@@ -589,26 +594,21 @@ private fun ProfileTypeSelectorCard(
     profileLocked: Boolean,
     onTypeSelected: (Int) -> Unit,
 ) {
-    top.yukonga.miuix.kmp.basic.Card {
+    Card {
         Box(
-            modifier = Modifier
-                .alpha(if (profileLocked) 0.5f else 1f)
-                .clickable(
-                    enabled = profileLocked,
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = {},
-                ),
+            modifier = Modifier.alpha(if (profileLocked) 0.5f else 1f),
         ) {
-            WindowSpinnerPreference(
+            YumeMd3DropdownPreference(
                 title = MLang.ProfilesPage.Type.Title,
                 items = listOf(
-                    SpinnerEntry(title = MLang.ProfilesPage.Type.Subscription),
-                    SpinnerEntry(title = MLang.ProfilesPage.Type.LocalFile),
-                    SpinnerEntry(title = MLang.ProfilesPage.Type.QrScan),
+                    MLang.ProfilesPage.Type.Subscription,
+                    MLang.ProfilesPage.Type.LocalFile,
+                    MLang.ProfilesPage.Type.QrScan,
                 ),
                 selectedIndex = selectedTypeIndex,
                 onSelectedIndexChange = onTypeSelected,
+                enabled = !profileLocked,
+                showDivider = false,
             )
         }
     }
@@ -630,7 +630,7 @@ private fun QrScannerContent(
                 .fillMaxWidth()
                 .height(UiDp.dp200)
                 .clip(RoundedCornerShape(UiDp.dp12))
-                .background(MiuixTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -639,17 +639,18 @@ private fun QrScannerContent(
                     StableQrScanner(onScanned = onQrScanned)
                 }
             } else if (!hasCameraPermission) {
-                Text(MLang.ProfilesPage.QrScanner.NeedPermission)
+                Text(text = MLang.ProfilesPage.QrScanner.NeedPermission)
             } else {
                 CircularProgressIndicator(modifier = Modifier.size(UiDp.dp32))
             }
         }
 
         TextButton(
-            text = MLang.ProfilesPage.QrScanner.SelectFromAlbum,
             onClick = onSelectQrImage,
             modifier = Modifier.fillMaxWidth(),
-        )
+        ) {
+            Text(text = MLang.ProfilesPage.QrScanner.SelectFromAlbum)
+        }
     }
 }
 
@@ -669,7 +670,7 @@ private fun ManualProfileContent(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
     ) {
-        TextField(
+        YumeMd3OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
             label = MLang.ProfilesPage.Input.ProfileName,
@@ -677,7 +678,7 @@ private fun ManualProfileContent(
         )
 
         if (typeIndex == 0) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = url,
                 onValueChange = onUrlChange,
                 label = MLang.ProfilesPage.Input.SubscriptionUrl,
@@ -687,7 +688,7 @@ private fun ManualProfileContent(
                 modifier = Modifier.fillMaxWidth(),
             )
         } else {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = fileName,
                 onValueChange = {},
                 label = MLang.ProfilesPage.Input.SelectFile,
@@ -706,8 +707,8 @@ private fun ManualProfileContent(
         if (error.isNotEmpty()) {
             Text(
                 text = error,
-                color = MiuixTheme.colorScheme.error,
-                style = MiuixTheme.textStyles.body2,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }

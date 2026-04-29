@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Save
 import com.github.yumelira.yumebox.presentation.util.OverrideExtraFieldDraft
@@ -35,15 +36,12 @@ import com.github.yumelira.yumebox.presentation.util.OverrideProxyTypePresets
 import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.preference.WindowDropdownPreference
+import androidx.compose.material3.Scaffold
 
 @Composable
 fun OverrideProxyDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val scrollBehavior = MiuixScrollBehavior()
     val listState = rememberLazyListState()
     val title = remember {
         OverrideStructuredEditorStore.proxyDraftEditorTitle.ifBlank { MLang.Override.Editor.ProxyNode }
@@ -118,13 +116,12 @@ fun OverrideProxyDraftEditorScreen(
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
+
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
             onScrollDirectionChanged = saveFabController::onScrollDirectionChanged,
@@ -136,7 +133,7 @@ fun OverrideProxyDraftEditorScreen(
                 ) {
                     OverrideSection(MLang.Override.Editor.BasicConnection) {
                         OverrideSelectorCard {
-                            WindowDropdownPreference(
+                            YumeMd3DropdownPreference(
                                 title = MLang.Override.Editor.RuleType,
                                 items = OverrideProxyTypePresets,
                                 selectedIndex = selectedPresetIndex,

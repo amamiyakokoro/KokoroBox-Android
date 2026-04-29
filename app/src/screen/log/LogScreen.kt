@@ -24,13 +24,36 @@ package com.github.yumelira.yumebox.screen.log
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.runtime.*
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -58,18 +81,14 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 @Destination<RootGraph>
 fun LogScreen(navigator: DestinationsNavigator) {
     val viewModel = koinViewModel<LogViewModel>()
-    val scrollBehavior = MiuixScrollBehavior()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val spacing = AppTheme.spacing
@@ -114,10 +133,10 @@ fun LogScreen(navigator: DestinationsNavigator) {
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
                 title = MLang.Log.Title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     if (logEntries.isNotEmpty()) {
                         IconButton(
@@ -176,7 +195,6 @@ fun LogScreen(navigator: DestinationsNavigator) {
                     Icon(
                         imageVector = if (isRecording) Yume.PowerOff else Yume.Play,
                         contentDescription = if (isRecording) "Stop recording" else "Start recording",
-                        tint = MiuixTheme.colorScheme.onPrimary,
                     )
                 }
             }
@@ -200,7 +218,6 @@ fun LogScreen(navigator: DestinationsNavigator) {
 
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
             lazyListState = listState,
         ) {
@@ -222,7 +239,7 @@ private fun LogEntryRow(entry: LogStore.LogEntry) {
 
     val levelColor = when (entry.level) {
         LogMessage.Level.Debug -> semanticColors.logLevel.debug
-        LogMessage.Level.Info -> MiuixTheme.colorScheme.primary
+        LogMessage.Level.Info -> MaterialTheme.colorScheme.primary
         LogMessage.Level.Warning -> semanticColors.logLevel.warning
         LogMessage.Level.Error -> semanticColors.logLevel.error
         LogMessage.Level.Silent -> semanticColors.logLevel.neutral
@@ -241,15 +258,15 @@ private fun LogEntryRow(entry: LogStore.LogEntry) {
             ) {
                 Text(
                     text = entry.time,
-                    style = MiuixTheme.textStyles.body2.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                     ),
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = entry.level.name.uppercase().take(1),
-                    style = MiuixTheme.textStyles.body2.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                     ),
@@ -259,11 +276,11 @@ private fun LogEntryRow(entry: LogStore.LogEntry) {
             Spacer(modifier = Modifier.size(spacing.space6))
             Text(
                 text = entry.message,
-                style = MiuixTheme.textStyles.body2.copy(
+                style = MaterialTheme.typography.bodyMedium.copy(
                     fontSize = 12.sp,
                     fontFamily = FontFamily.Monospace,
                 ),
-                color = MiuixTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

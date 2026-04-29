@@ -28,6 +28,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,8 +41,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.common.util.formatBytes
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 data class BarChartItem(
     val label: String,
@@ -55,8 +55,8 @@ fun TrafficBarChart(
     maxDisplayValue: Long? = null,
     onItemClick: ((Int) -> Unit)? = null,
     selectedIndex: Int = -1,
-    barColor: Color = MiuixTheme.colorScheme.primary.copy(alpha = AppTheme.opacity.medium),
-    highlightColor: Color = MiuixTheme.colorScheme.primary,
+    barColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = AppTheme.opacity.medium),
+    highlightColor: Color = MaterialTheme.colorScheme.primary,
     chartHeight: Dp = AppTheme.sizes.trafficBarChartHeight,
     barWidth: Dp = AppTheme.sizes.trafficBarWidth
 ) {
@@ -94,8 +94,8 @@ fun TrafficBarChart(
         ) {
             Text(
                 text = formatBytes(animatedMaxValue.toLong()),
-                style = MiuixTheme.textStyles.footnote1.copy(fontSize = 10.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
             )
         }
@@ -170,11 +170,11 @@ fun TrafficBarChart(
                         .weight(1f)
                         .wrapContentWidth(Alignment.CenterHorizontally),
                     text = item.label,
-                    style = MiuixTheme.textStyles.footnote1.copy(fontSize = 9.sp),
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
                     color = if (isSelected) {
-                        MiuixTheme.colorScheme.primary
+                        MaterialTheme.colorScheme.primary
                     } else {
-                        MiuixTheme.colorScheme.onSurfaceVariantSummary
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     },
                     maxLines = 1
                 )

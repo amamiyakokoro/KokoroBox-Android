@@ -22,13 +22,14 @@
 
 package com.github.yumelira.yumebox.presentation.screen.node
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.data.model.ProxySortMode
-import top.yukonga.miuix.kmp.basic.DropdownImpl
-import top.yukonga.miuix.kmp.basic.ListPopupColumn
-import top.yukonga.miuix.kmp.basic.ListPopupDefaults
-import top.yukonga.miuix.kmp.basic.PopupPositionProvider
-import top.yukonga.miuix.kmp.window.WindowListPopup
 
 internal val NodeSortModes = listOf(
     ProxySortMode.DEFAULT,
@@ -41,29 +42,33 @@ internal fun NodeSortPopup(
     show: Boolean,
     onDismiss: () -> Unit,
     sortMode: ProxySortMode,
-    alignment: PopupPositionProvider.Align = PopupPositionProvider.Align.Start,
     onSortSelected: (ProxySortMode) -> Unit,
 ) {
     val selectedSortIndex = NodeSortModes.indexOf(sortMode).coerceAtLeast(0)
-    WindowListPopup(
-        show = show,
-        popupPositionProvider = ListPopupDefaults.DropdownPositionProvider,
-        alignment = alignment,
+    DropdownMenu(
+        expanded = show,
         onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        shape = RoundedCornerShape(24.dp),
+        tonalElevation = 6.dp,
     ) {
-        ListPopupColumn {
-            NodeSortModes.forEachIndexed { index, mode ->
-                DropdownImpl(
-                    text = mode.displayName,
-                    optionSize = NodeSortModes.size,
-                    isSelected = selectedSortIndex == index,
-                    onSelectedIndexChange = {
-                        if (mode != sortMode) onSortSelected(mode)
-                        onDismiss()
-                    },
-                    index = index,
-                )
-            }
+        NodeSortModes.forEachIndexed { index, mode ->
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = mode.displayName,
+                        color = if (selectedSortIndex == index) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                    )
+                },
+                onClick = {
+                    if (mode != sortMode) onSortSelected(mode)
+                    onDismiss()
+                },
+            )
         }
     }
 }

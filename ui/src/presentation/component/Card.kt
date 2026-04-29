@@ -18,41 +18,35 @@
  *
  */
 
-
 package com.github.yumelira.yumebox.presentation.component
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CardColors as MaterialCardColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3Card
 import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.presentation.theme.horizontalPadding
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CardColors
-import top.yukonga.miuix.kmp.basic.CardDefaults
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
-    cornerRadius: Int = 24,
+    cornerRadius: Int = 16,
     insideMargin: PaddingValues = PaddingValues(UiDp.dp0),
     applyHorizontalPadding: Boolean = true,
-    colors: CardColors = CardDefaults.defaultColors(
-        color = MiuixTheme.colorScheme.surfaceVariant,
+    colors: MaterialCardColors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = MaterialTheme.colorScheme.onSurface,
     ),
     content: @Composable () -> Unit,
 ) {
-    Card(
-        modifier = if (applyHorizontalPadding) {
-            modifier.horizontalPadding()
-        } else {
-            modifier
-        },
-        cornerRadius = cornerRadius.dp,
+    YumeMd3Card(
+        modifier = modifier,
+        cornerRadius = cornerRadius,
         insideMargin = insideMargin,
+        applyHorizontalPadding = applyHorizontalPadding,
         colors = colors,
-    ) {
-        content()
-    }
+        content = content,
+    )
 }

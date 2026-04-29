@@ -24,6 +24,8 @@ package com.github.yumelira.yumebox.data.store
 
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
+import com.github.yumelira.yumebox.data.model.MonetContrast
+import com.github.yumelira.yumebox.data.model.MonetStyle
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.tencent.mmkv.MMKV
 
@@ -35,7 +37,11 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val themeMode by enumFlow(ThemeMode.Auto)
     val appLanguage by enumFlow(AppLanguage.System)
     val colorTheme by enumFlow(AppColorTheme.MonetDynamic)
-    val themeAccentColorArgb by longFlow(0xFF138A74L)
+    val monetStyle by enumFlow(MonetStyle.TonalSpot)
+    val monetContrast by enumFlow(MonetContrast.Standard)
+    val monetColorIntensity by floatFlow(0.45f)
+    val themeAccentColorArgb by longFlow(0xFFDA98ABL)
+    val acgWallpaperSeedColorArgb by longFlow(0xFFDA98ABL)
     val invertOnPrimaryColors by boolFlow(false)
     val automaticRestart by boolFlow(false)
     val autoUpdateCurrentProfileOnStart by boolFlow(true)
@@ -52,6 +58,10 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val acgWallpaperBiasY by floatFlow(0.0f)
     val acgHomeQuote by strFlow("时间一分一秒流逝而去 终结一步一步迎面而来")
     val acgHomeQuoteAuthor by strFlow("恋文")
+    val acgDailyQuoteEnabled by boolFlow(false)
+    val acgDailyQuote by strFlow("")
+    val acgDailyQuoteAuthor by strFlow("")
+    val acgDailyQuoteDate by strFlow("")
     val acgSidebarExpanded by boolFlow(true)
     val pageScale by floatFlow(1.0f)
     val singleNodeTest by boolFlow(true)

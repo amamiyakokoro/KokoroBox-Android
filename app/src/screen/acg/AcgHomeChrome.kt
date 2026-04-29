@@ -64,11 +64,16 @@ import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.presentation.util.extractFlaggedName
 import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
+import com.github.yumelira.yumebox.screen.home.displayableExternalIp
+import com.github.yumelira.yumebox.miuix.YumeMiuixBlendColorEntry as BlendColorEntry
+import com.github.yumelira.yumebox.miuix.YumeMiuixBlurBlendMode as BlurBlendMode
+import com.github.yumelira.yumebox.miuix.YumeMiuixBlurDefaults as BlurDefaults
+import com.github.yumelira.yumebox.miuix.YumeMiuixIcon as Icon
+import com.github.yumelira.yumebox.miuix.YumeMiuixLayerBackdrop as LayerBackdrop
+import com.github.yumelira.yumebox.miuix.YumeMiuixText as Text
+import com.github.yumelira.yumebox.miuix.YumeMiuixTheme as MiuixTheme
+import com.github.yumelira.yumebox.miuix.yumeMiuixTextureBlur as textureBlur
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.blur.*
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun AcgSidebarDecoration(
@@ -114,7 +119,7 @@ internal fun AcgSidebarDecoration(
             shape = RectangleShape,
             blurRadius = blurRadiusPx,
             noiseCoefficient = 0f,
-            colors = blurColors,
+            blurColors = blurColors,
             enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
         )
     } else {
@@ -177,17 +182,19 @@ internal fun AcgQuoteText(
             softWrap = true,
             overflow = TextOverflow.Clip,
         )
-        Text(
-            text = "— ${quote.author}",
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(top = AcgUi.Quote.authorTopGap),
-            color = color.copy(alpha = AcgUi.Quote.authorAlpha),
-            style = MiuixTheme.textStyles.footnote1,
-            fontWeight = FontWeight.Medium,
-            fontSize = AcgUi.Quote.authorSize,
-            softWrap = false,
-        )
+        if (quote.author.isNotBlank()) {
+            Text(
+                text = "— ${quote.author}",
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = AcgUi.Quote.authorTopGap),
+                color = color.copy(alpha = AcgUi.Quote.authorAlpha),
+                style = MiuixTheme.textStyles.footnote1,
+                fontWeight = FontWeight.Medium,
+                fontSize = AcgUi.Quote.authorSize,
+                softWrap = false,
+            )
+        }
     }
 }
 
@@ -204,13 +211,11 @@ internal fun AcgLaunchButton(
     val isRunning = controlState == HomeProxyControlState.Running
     val background = when {
         !enabled -> colorScheme.primaryContainer.copy(alpha = 0.48f)
-        isRunning -> colorScheme.primary
-        else -> colorScheme.primaryContainer
+        else -> colorScheme.primary
     }
     val contentColor = when {
         !enabled -> colorScheme.onPrimaryContainer.copy(alpha = 0.56f)
-        isRunning -> colorScheme.onPrimary
-        else -> colorScheme.onPrimaryContainer
+        else -> colorScheme.onPrimary
     }
     val containerAlpha = if (enabled) 1f else 0.88f
     val pressScale by animateFloatAsState(
@@ -398,7 +403,7 @@ internal fun AcgHomeInfoPanel(
 ) {
     val flaggedNode = remember(serverName) { serverName?.let(::extractFlaggedName) }
     val resolvedNodeName = flaggedNode?.displayName ?: serverName.orEmpty().ifBlank { "" }
-    val externalIp = (ipMonitoringState as? IpMonitoringState.Success)?.externalIp
+    val externalIp = ipMonitoringState.displayableExternalIp()
     var isIpVisible by rememberSaveable(externalIp?.ip) { mutableStateOf(false) }
     val resolvedExitIp = externalIp?.ip?.let { ipAddress -> buildAcgDisplayIpValue(ipAddress, isIpVisible) }
     val resolvedExitCountryCode = externalIp?.countryCode?.let(LocaleUtil::normalizeRegionCode)
@@ -432,6 +437,23 @@ internal fun AcgHomeInfoPanel(
                         CountryFlagCircle(countryCode = countryCode, size = AppTheme.spacing.space16)
                     }
                 },
+                supportingLeading = {
+                    resolvedExitCountryCode?.let { countryCode ->
+                        AcgSupportingCountryBadge(countryCode = countryCode)
+                    }
+                },
+            )
+        } else if (resolvedExitIp != null) {
+            AcgInfoBlock(
+                value = MLang.Home.IpInfo.ExitIp,
+                supportingValue = resolvedExitIp,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = AcgUi.Info.trailingPadding),
+                supportingValueFontFamily = FontFamily.Monospace,
+                supportingValueColor = MiuixTheme.colorScheme.onBackground.copy(alpha = 0.74f),
+                supportingValueClickable = true,
+                onSupportingValueClick = { isIpVisible = !isIpVisible },
                 supportingLeading = {
                     resolvedExitCountryCode?.let { countryCode ->
                         AcgSupportingCountryBadge(countryCode = countryCode)

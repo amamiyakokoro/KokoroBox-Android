@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of YumeBox.
  *
  * YumeBox is free software: you can redistribute it and/or modify
@@ -22,11 +22,20 @@ package com.github.yumelira.yumebox.screen.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,31 +57,37 @@ import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmA
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
+import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.theme.colorFromArgb
 import com.github.yumelira.yumebox.presentation.theme.colorToArgbLong
-import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AccessControlScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.BasicComponent
-import top.yukonga.miuix.kmp.basic.ColorPicker
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.TextField
 
 private const val TUN_STACK_TITLE = "协议栈"
 private val TUN_STACK_ITEMS = listOf("System", "GVisor", "Mixed")
+
+private val LITE_THEME_SEED_PRESETS = listOf(
+    Color(0xFF6750A4),
+    Color(0xFF006E1C),
+    Color(0xFF006A6A),
+    Color(0xFF006D75),
+    Color(0xFF0061A4),
+    Color(0xFF7D5260),
+    Color(0xFFBA1A1A),
+    Color(0xFF8F4C00),
+)
 
 @Destination<RootGraph>
 @Composable
@@ -94,7 +109,6 @@ fun VpnSettingsScreen(navigator: DestinationsNavigator) {
     val accessUiState by accessViewModel.uiState.collectAsState()
     val accessControlMode by accessViewModel.accessControlMode.state.collectAsState()
 
-    val scrollBehavior = MiuixScrollBehavior()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
@@ -111,13 +125,13 @@ fun VpnSettingsScreen(navigator: DestinationsNavigator) {
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.AppSettings.Title, scrollBehavior = scrollBehavior)
+            TopBar(title = MLang.AppSettings.Title)
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
-            scrollBehavior = scrollBehavior,
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
@@ -246,7 +260,7 @@ private fun LiteThemeColorPickerItem(
         mutableStateOf(liteThemeSeedHexFieldValue(themeSeedColorArgb))
     }
 
-    BasicComponent(
+    PreferenceListItem(
         title = MLang.AppSettings.Interface.ColorThemePickerTitle,
         summary = MLang.AppSettings.Interface.ColorThemeCustomSummary.format(
             liteFormatThemeSeedHex(themeSeedColorArgb),
@@ -257,7 +271,6 @@ private fun LiteThemeColorPickerItem(
             editingThemeSeedHex.value = liteThemeSeedHexFieldValue(themeSeedColorArgb)
             showThemeColorPicker.value = true
         },
-
     )
 
     AppActionBottomSheet(
@@ -282,15 +295,30 @@ private fun LiteThemeColorPickerItem(
                 .navigationBarsPadding()
                 .imePadding(),
         ) {
-            ColorPicker(
-                color = editingThemeSeedColor.value,
-                onColorChanged = {
-                    editingThemeSeedColor.value = it
-                    editingThemeSeedHex.value = liteThemeSeedHexFieldValue(colorToArgbLong(it))
-                },
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-            )
-            TextField(
+                horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
+            ) {
+                LITE_THEME_SEED_PRESETS.forEach { preset ->
+                    LiteThemeColorSwatch(
+                        color = preset,
+                        selected = colorToArgbLong(editingThemeSeedColor.value) == colorToArgbLong(preset),
+                        onClick = {
+                            editingThemeSeedColor.value = preset
+                            editingThemeSeedHex.value = liteThemeSeedHexFieldValue(colorToArgbLong(preset))
+                        },
+                    )
+                }
+                LiteThemeColorSwatch(
+                    color = editingThemeSeedColor.value,
+                    selected = LITE_THEME_SEED_PRESETS.none {
+                        colorToArgbLong(it) == colorToArgbLong(editingThemeSeedColor.value)
+                    },
+                    onClick = { },
+                )
+            }
+            YumeMd3OutlinedTextField(
                 value = editingThemeSeedHex.value,
                 onValueChange = { value ->
                     editingThemeSeedHex.value = normalizeLiteThemeHexInput(value)
@@ -299,12 +327,36 @@ private fun LiteThemeColorPickerItem(
                     }
                 },
                 label = MLang.AppSettings.Interface.ColorThemeCodeLabel,
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = UiDp.dp8),
             )
         }
     }
+}
+
+@Composable
+private fun LiteThemeColorSwatch(
+    color: Color,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val borderColor = if (selected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.outlineVariant
+    }
+    val borderWidth = if (selected) UiDp.dp4 else UiDp.dp1
+
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier
+            .size(UiDp.dp44)
+            .border(borderWidth, borderColor, CircleShape)
+            .padding(UiDp.dp4)
+            .background(color, CircleShape)
+            .clickable(onClick = onClick),
+    )
 }
 
 private fun liteFormatThemeSeedHex(argb: Long): String {
@@ -345,4 +397,3 @@ private fun liteParseThemeHexColorOrNull(input: String): Color? {
     val rgb = body.toLongOrNull(16) ?: return null
     return colorFromArgb(0xFF000000L or rgb)
 }
-

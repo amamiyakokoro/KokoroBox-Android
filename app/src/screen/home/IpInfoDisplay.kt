@@ -20,7 +20,7 @@
 
 
 package com.github.yumelira.yumebox.screen.home
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +31,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,14 +45,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.common.util.LocaleUtil
+import com.github.yumelira.yumebox.data.gateway.IpInfo
 import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private val INFO_VALUE_CORNER_RADIUS = RoundedCornerShape(UiDp.dp10)
 private val INFO_VALUE_MAX_WIDTH = UiDp.dp220
@@ -61,7 +62,7 @@ fun IpInfoDisplay(
     state: IpMonitoringState,
     modifier: Modifier = Modifier
 ) {
-    val externalIp = (state as? IpMonitoringState.Success)?.externalIp
+    val externalIp = state.displayableExternalIp()
     var isIpVisible by rememberSaveable(externalIp?.ip) { mutableStateOf(false) }
 
     when {
@@ -72,7 +73,7 @@ fun IpInfoDisplay(
                     ipAddress = externalIp.ip,
                     isIpVisible = isIpVisible
                 ),
-                valueColor = MiuixTheme.colorScheme.onSurface,
+                valueColor = MaterialTheme.colorScheme.onSurface,
                 countryCode = externalIp.countryCode,
                 isRevealable = true,
                 onToggleVisibility = { isIpVisible = !isIpVisible },
@@ -84,7 +85,7 @@ fun IpInfoDisplay(
             IpInfoRow(
                 label = MLang.Home.IpInfo.ExitIp,
                 value = "--",
-                valueColor = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 countryCode = null,
                 isRevealable = false,
                 onToggleVisibility = {},
@@ -117,13 +118,13 @@ private fun IpInfoRow(
         ) {
             Text(
                 text = label,
-                style = MiuixTheme.textStyles.footnote1.copy(fontSize = 12.sp),
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(UiDp.dp4))
             Text(
                 text = value,
-                style = MiuixTheme.textStyles.body1.copy(lineHeight = 20.sp),
+                style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
                 fontFamily = FontFamily.Monospace,
                 color = valueColor,
                 maxLines = 1,
@@ -159,9 +160,9 @@ private fun CountryBadge(countryCode: String?) {
             )
             Text(
                 text = displayCountryCode,
-                style = MiuixTheme.textStyles.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = MiuixTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.widthIn(max = UiDp.dp40)
@@ -219,6 +220,12 @@ private fun formatIpv6Address(
     } else {
         visiblePrefix.joinToString(":")
     }
+}
+
+internal fun IpMonitoringState.displayableExternalIp(): IpInfo? {
+    return (this as? IpMonitoringState.Success)
+        ?.externalIp
+        ?.takeIf { it.ip.isNotBlank() }
 }
 
 internal fun maskIpAddress(ipAddress: String): String {

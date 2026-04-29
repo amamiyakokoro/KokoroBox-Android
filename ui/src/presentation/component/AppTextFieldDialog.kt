@@ -20,17 +20,16 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.TextField
 
 @Composable
 fun AppTextFieldDialog(
@@ -60,7 +59,7 @@ fun AppTextFieldDialog(
         renderInRootScaffold = renderInRootScaffold,
     ) {
         AppDialogColumn {
-            TextField(
+            YumeMd3OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = if (supportingContent == null) UiDp.dp0 else UiDp.dp8),

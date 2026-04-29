@@ -23,18 +23,18 @@ package com.github.yumelira.yumebox.screen.importconfig
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.component.AppDialog
+import com.github.yumelira.yumebox.presentation.component.AppDialogDefaults
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.layout.DialogDefaults
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.io.File
 
 @Composable
@@ -49,15 +49,15 @@ internal fun DeleteConfirmDialog(
         show = show,
         modifier = Modifier,
         title = MLang.ProfilesPage.DeleteDialog.Title,
-        titleColor = DialogDefaults.titleColor(),
+        titleColor = AppDialogDefaults.titleColor(),
         summary = MLang.ProfilesPage.DeleteDialog.Message.format(profileName),
-        summaryColor = DialogDefaults.summaryColor(),
-        backgroundColor = DialogDefaults.backgroundColor(),
+        summaryColor = AppDialogDefaults.summaryColor(),
+        backgroundColor = AppDialogDefaults.backgroundColor(),
         enableWindowDim = true,
         onDismissRequest = onDismiss,
         onDismissFinished = onDismissFinished,
-        outsideMargin = DialogDefaults.outsideMargin,
-        insideMargin = DialogDefaults.insideMargin,
+        outsideMargin = AppDialogDefaults.outsideMargin,
+        insideMargin = AppDialogDefaults.insideMargin,
         defaultWindowInsetsPadding = true,
     ) {
         DialogButtonRow(
@@ -82,13 +82,13 @@ internal fun ShareOptionsDialog(
         show = show,
         modifier = Modifier,
         title = MLang.ProfilesPage.ShareDialog.Title,
-        titleColor = DialogDefaults.titleColor(),
-        backgroundColor = DialogDefaults.backgroundColor(),
+        titleColor = AppDialogDefaults.titleColor(),
+        backgroundColor = AppDialogDefaults.backgroundColor(),
         enableWindowDim = true,
         onDismissRequest = onDismiss,
         onDismissFinished = onDismissFinished,
-        outsideMargin = DialogDefaults.outsideMargin,
-        insideMargin = DialogDefaults.insideMargin,
+        outsideMargin = AppDialogDefaults.outsideMargin,
+        insideMargin = AppDialogDefaults.insideMargin,
         defaultWindowInsetsPadding = true,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -96,24 +96,24 @@ internal fun ShareOptionsDialog(
                 Button(
                     onClick = { onShareLink(profile) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColorsPrimary(),
                 ) {
-                    Text(MLang.ProfilesPage.ShareDialog.ShareLink, color = MiuixTheme.colorScheme.onPrimary)
+                    Text(MLang.ProfilesPage.ShareDialog.ShareLink)
                 }
             }
-            Button(
+            OutlinedButton(
                 onClick = { onShareFile(profile) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(),
             ) {
                 Text(MLang.ProfilesPage.ShareDialog.ShareFile)
             }
-            Button(
+            OutlinedButton(
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(),
             ) {
-                Text(MLang.ProfilesPage.Button.Cancel)
+                Text(
+                    text = MLang.ProfilesPage.Button.Cancel,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
         }
     }

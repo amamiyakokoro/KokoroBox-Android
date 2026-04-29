@@ -20,20 +20,20 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.github.yumelira.yumebox.common.util.BiometricHelper
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Stable
 data class StartupBiometricGateState(
@@ -139,14 +139,14 @@ fun StartupBiometricContent(
         ) {
             Text(
                 text = MLang.AppSettings.Privacy.BiometricPromptTitle,
-                color = MiuixTheme.colorScheme.onSurface,
-                style = MiuixTheme.textStyles.title3,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
             )
             Text(
                 text = biometricErrorMessage ?: MLang.AppSettings.Privacy.BiometricPromptMessage,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                style = MiuixTheme.textStyles.body2,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
             if (!isAuthenticating && biometricErrorMessage != null) {
@@ -154,7 +154,7 @@ fun StartupBiometricContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                 ) {
-                    Button(
+                    OutlinedButton(
                         modifier = Modifier.weight(1f),
                         onClick = onRetry,
                     ) {
@@ -163,11 +163,10 @@ fun StartupBiometricContent(
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = onExit,
-                        colors = ButtonDefaults.buttonColorsPrimary(),
                     ) {
                         Text(
                             text = MLang.AppSettings.Privacy.BiometricExitButton,
-                            color = MiuixTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }

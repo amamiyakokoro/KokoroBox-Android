@@ -26,7 +26,7 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import com.github.yumelira.yumebox.presentation.theme.YumeTheme
 
 @Composable
 fun WebViewScreen(
@@ -40,7 +40,7 @@ fun WebViewScreen(
         onBack?.invoke() ?: activity?.finish()
     }
 
-    MiuixTheme {
+    YumeTheme {
         LocalWebView(initialUrl = initialUrl)
     }
 }

@@ -4,21 +4,21 @@
 
 <img src="logo.webp" width="96" alt="YumeBox logo">
 
-# YumeBox-MaterialDesign
+# YumeBox MD3
 
 [![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?logo=android)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest)
 [![GitHub License](https://img.shields.io/github/license/Yizuka17/YumeBox-MaterialDesign?logo=gnu)](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/Yizuka17/YumeBox-MaterialDesign/total?logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
 
-A Material Design fork based on [YumeBox](https://github.com/YumeRiMoe/YumeBox), an open-source Android client powered by [mihomo](https://github.com/MetaCubeX/mihomo).
+YumeBox MD3 is a Material Design 3 / Material You fork based on [YumeBox](https://github.com/YumeRiMoe/YumeBox), an open-source Android client powered by [mihomo](https://github.com/MetaCubeX/mihomo).
 
 </div>
 
 ## Use
 
-YumeBox-MaterialDesign currently only supports **Android 8.0 (API 26) and above systems**.
+YumeBox MD3 currently only supports **Android 8.0 (API 26) and above systems**.
 
-Please go to the Release page to download the installation package for the corresponding architecture: [Release](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
+Please go to the Release page to download the arm64-v8a release APK: [Release](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
 
 For more information, please visit the website: [YumeBox](https://yumebox.oom-wg.dev/)
 
@@ -26,18 +26,45 @@ Override configuration syntax reference: [override document](https://yumebox.oom
 
 ## Improvements over the original project
 
-YumeBox-MaterialDesign keeps the core capabilities of the original project while continuously improving the UI experience, configuration workflow, runtime modes, and stability:
+YumeBox MD3 keeps the core capabilities of the original project while continuously improving the UI experience, configuration workflow, runtime modes, and stability:
 
-- **Material Design / Material You experience**: redesigned and optimized multiple pages with dynamic colors, better dark-theme adaptation, navigation bar and Topbar blur effects, smoother page transitions, and animated list sorting.
+- **Material Design 3 / Material You experience**: redesigned and optimized multiple pages; the main UI is now mostly migrated to MD3, with dynamic colors, better dark-theme adaptation, navigation bar and Topbar blur effects, smoother page transitions, and animated list sorting; theme settings now include Monet style, color intensity/vibrancy, and contrast controls, defaulting to a readability-first Tonal Spot experience.
 - **More powerful override and configuration workflow**: introduced a new override system with multi-configuration switching, stacked applying, visual editing, preset routing templates, runtime configuration preview, and suffix modifiers such as `start`, `end`, `merge`, and `force`; it also adds Rust-based override parsing plus syntax checking and partial completion in the configuration editor.
 - **Enhanced proxy runtime and node management**: supports Root Tun (no VPN required, but Root permission is needed), single-node and proxy-group delay tests, node sorting animations, node tags and icon/flag display, persistent node selection, faster proxy startup, and improved bridge implementations.
 - **Better subscription, import, and external-control experience**: supports editing subscription URLs, link preview, configuration sorting, opening external links in the app for quick import, and improves the external controller, Web panel, and notification quick node-switching workflow.
 - **Statistics, privacy, and lightweight build**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; supports YumeBox Lite, adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
 - **Stability and performance optimization**: improves startup blocking, runtime state freezes, dialog stutters, notification content, package size, background UI release, and many interaction details for a smoother and more fault-tolerant daily experience.
 
+## Design and reference notes
+
+v0.5.2 continues to narrow the legacy UI boundary: normal screens now prefer Jetpack Compose Material 3 components and in-project MD3 components, while Miuix remains only as a small compatibility layer for legacy surfaces that have not been rewritten yet.
+
+This theme refactor follows the Monet / dynamic-color setting recommendations summarized in `chat-export-2026-04-28_22-27-47.md`: use wallpaper or system colors as inspiration, keep readability as the baseline, map colors through Material roles, and give users enough but not excessive control. No proxy core/runtime kernel code was changed; the changes are limited to UI, settings, and theme derivation:
+
+- Color styles: Tonal Spot, Vibrant, Expressive, Neutral, and Monochrome.
+- Color intensity / vibrancy: default 45%, with 35%–55% recommended for daily UI; dark theme is intentionally more restrained.
+- Contrast: Standard, Medium, and High, prioritizing readable text, buttons, and containers.
+- Semantic colors: error, warning, latency, traffic, and other functional colors remain static instead of being freely dynamic.
+- ACG home: the existing wallpaper, sidebar, launch button, and quote layout are preserved; it only follows the global theme tokens in a restrained way.
+
+References include Android / Material documentation and related open-source implementations:
+
+- [Material You design - Android Open Source Project](https://source.android.com/docs/core/display/material)
+- [Dynamic color - Android Open Source Project](https://source.android.com/docs/core/display/dynamic-color)
+- [Enable users to personalize their color experience in your app - Android Developers](https://developer.android.com/develop/ui/views/theming/dynamic-colors)
+- [Material 3 color system: how the system works](https://m3.material.io/styles/color/system/how-the-system-works)
+- [Material 3 color roles](https://m3.material.io/styles/color/roles)
+- [material-foundation/material-color-utilities](https://github.com/material-foundation/material-color-utilities)
+- [Jetpack Compose Material 3](https://developer.android.com/jetpack/androidx/releases/compose-material3)
+- [Haze](https://github.com/chrisbanes/haze)
+- [Compose Reorderable](https://github.com/Calvin-LL/Reorderable)
+- [AboutLibraries](https://github.com/mikepenz/AboutLibraries)
+
 ## Roadmap
 
-Future updates will continue to improve personalization and content-driven experiences. Planned ideas include an option to extract theme colors from the ACG image selected by the user, allowing the home page, cards, navigation bar, and other UI elements to change dynamically with the artwork; daily web-based updates for ACG images and hitokoto-style quotes, with more flexible image sources, caching strategies, and manual refresh controls; and continuous improvements to the theme system, configuration editor, runtime status display, and lightweight builds, so YumeBox-MaterialDesign can keep evolving toward being more usable, polished, and fun.
+The focus is now shifting from "migrating to MD3" to polishing a stable MD3 experience. Future updates will continue to clean up the remaining legacy UI boundaries, reduce direct dependency on compatibility layers, and make regular screens more consistent with Material Design 3 / Material You in components, motion, spacing, color, and accessibility.
+
+Personalization and ACG-driven experiences will also keep evolving: theme extraction from selected wallpapers will be refined, with more flexible image sources, caching strategies, manual refresh, and daily content updates. The goal is to let the home page, cards, navigation bars, and other UI elements adapt naturally to user content while preserving readability. Configuration editing, runtime status display, traffic statistics, lightweight builds, and overall stability will continue to be improved so YumeBox MD3 can keep evolving toward being more usable, polished, and fun.
 
 ## Feedback and Suggestions
 
@@ -50,7 +77,7 @@ For more discussion and feedback, please join the original project's group: [@OO
 
 ## Participate and contribute
 
-If you want to make YumeBox-MaterialDesign better, please refer to [CONTRIBUTING](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/CONTRIBUTING.md). If you want to translate YumeBox into more languages, or improve the existing translation, please fork this project and create or update the corresponding translation file in the `locale/lang` directory.
+If you want to make YumeBox MD3 better, please refer to [CONTRIBUTING](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/CONTRIBUTING.md). If you want to translate YumeBox into more languages, or improve the existing translation, please fork this project and create or update the corresponding translation file in the `locale/lang` directory.
 
 ## Special
 

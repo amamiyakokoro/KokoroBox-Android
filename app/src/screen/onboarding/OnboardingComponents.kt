@@ -27,6 +27,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,10 +45,6 @@ import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun StartupTypewriterWord(
@@ -95,12 +95,12 @@ internal fun StartupTypewriterWord(
     ) {
         Text(
             text = displayText,
-            style = MiuixTheme.textStyles.title1.copy(
+            style = MaterialTheme.typography.displayLarge.copy(
                 fontSize = 54.sp,
                 fontWeight = FontWeight.Normal,
                 letterSpacing = 0.2.sp,
             ),
-            color = MiuixTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
 
@@ -111,7 +111,7 @@ internal fun StartupTypewriterWord(
                     .width(UiDp.dp1_2)
                     .height(UiDp.dp46)
                     .background(
-                        color = MiuixTheme.colorScheme.onSurface.copy(alpha = opacity.high),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = opacity.high),
                         shape = RoundedCornerShape(50),
                     ),
             )
@@ -157,12 +157,12 @@ internal fun HeroStartButton(
             modifier = Modifier
                 .matchParentSize()
                 .clip(CircleShape)
-                .background(MiuixTheme.colorScheme.primary),
+                .background(MaterialTheme.colorScheme.primary),
         )
         Icon(
             imageVector = ShellIcons.NavigateForward,
             contentDescription = "Start",
-            tint = MiuixTheme.colorScheme.onPrimary,
+            tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.size(componentSizes.settingsIconGlyphSize),
         )
     }
@@ -177,7 +177,7 @@ internal fun DetailPreviewBadge(icon: ImageVector) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MiuixTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(DetailPreviewIconSize),
         )
     }
@@ -194,7 +194,7 @@ internal fun DetailGroup(
         modifier = modifier
             .fillMaxWidth()
             .clip(SectionShape)
-            .background(MiuixTheme.colorScheme.surfaceVariant.copy(alpha = opacity.surfaceVariant)),
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = opacity.surfaceVariant)),
         content = content,
     )
 }
@@ -208,7 +208,7 @@ internal fun DetailDivider() {
     HorizontalDivider(
         modifier = Modifier.padding(horizontal = spacing.space18),
         thickness = componentSizes.thinDividerThickness,
-        color = MiuixTheme.colorScheme.outline.copy(alpha = opacity.surfaceSoft),
+        color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.surfaceSoft),
     )
 }
 
@@ -237,13 +237,13 @@ internal fun PermissionRow(
             modifier = Modifier
                 .size(componentSizes.iconBadgeMedium)
                 .clip(RoundedCornerShape(radii.radius18))
-                .background(MiuixTheme.colorScheme.primary.copy(alpha = opacity.subtle)),
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtle)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MiuixTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(spacing.space20),
             )
         }
@@ -254,27 +254,27 @@ internal fun PermissionRow(
         ) {
             Text(
                 text = title,
-                style = MiuixTheme.textStyles.body1.copy(fontWeight = FontWeight.Medium),
-                color = MiuixTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = summary,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         if (granted) {
             Text(
                 text = MLang.Onboarding.Permission.Common.Granted,
-                style = MiuixTheme.textStyles.footnote1.copy(fontWeight = FontWeight.SemiBold),
-                color = MiuixTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.primary,
             )
         } else {
             Icon(
                 imageVector = ShellIcons.NavigateForward,
                 contentDescription = null,
-                tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(spacing.space18),
             )
         }
@@ -302,7 +302,7 @@ internal fun ProjectLinkRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MiuixTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(componentSizes.settingsIconGlyphSize),
         )
 
@@ -312,20 +312,20 @@ internal fun ProjectLinkRow(
         ) {
             Text(
                 text = title,
-                style = MiuixTheme.textStyles.body1.copy(fontWeight = FontWeight.Medium),
-                color = MiuixTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = summary,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         Icon(
             imageVector = ShellIcons.NavigateForward,
             contentDescription = null,
-            tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(spacing.space18),
         )
     }
@@ -345,7 +345,7 @@ internal fun PrimaryFooterAction(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(radii.radius24))
-            .background(MiuixTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.primary)
             .graphicsLayer(alpha = if (enabled) 1f else opacity.disabledStrong)
             .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = spacing.space20, vertical = spacing.space16),
@@ -353,8 +353,8 @@ internal fun PrimaryFooterAction(
     ) {
         Text(
             text = text,
-            style = MiuixTheme.textStyles.body1.copy(fontWeight = FontWeight.Bold),
-            color = MiuixTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onPrimary,
         )
     }
 }
@@ -372,15 +372,15 @@ internal fun SecondaryFooterAction(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(radii.radius24))
-            .background(MiuixTheme.colorScheme.surfaceVariant.copy(alpha = opacity.surfaceVariantStrong))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = opacity.surfaceVariantStrong))
             .clickable(onClick = onClick)
             .padding(horizontal = spacing.space20, vertical = spacing.space16),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
-            style = MiuixTheme.textStyles.body1.copy(fontWeight = FontWeight.Medium),
-            color = MiuixTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -402,8 +402,8 @@ internal fun SecondaryLinkAction(
     ) {
         Text(
             text = text,
-            style = MiuixTheme.textStyles.footnote1.copy(fontWeight = FontWeight.Medium),
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

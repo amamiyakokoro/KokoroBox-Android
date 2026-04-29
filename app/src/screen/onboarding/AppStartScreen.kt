@@ -22,6 +22,8 @@
 
 package com.github.yumelira.yumebox.screen.onboarding
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ramcosta.composedestinations.annotation.Destination
@@ -29,8 +31,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AppStartScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 @Destination<RootGraph>(start = true)
@@ -42,5 +42,5 @@ fun AppStartScreen(navigator: DestinationsNavigator) {
         }
     }
 
-    Surface(color = MiuixTheme.colorScheme.surface) {}
+    Surface(color = MaterialTheme.colorScheme.surface) {}
 }
