@@ -30,7 +30,8 @@ YumeBox MD3 keeps the core capabilities of the original project while continuous
 
 - **Material Design 3 / Material You experience**: redesigned and optimized multiple pages; the main UI is now mostly migrated to MD3, with dynamic colors, better dark-theme adaptation, navigation bar and Topbar blur effects, smoother page transitions, and animated list sorting; theme settings now include Monet style, color intensity/vibrancy, and contrast controls, defaulting to a readability-first Tonal Spot experience.
 - **More powerful override and configuration workflow**: introduced a new override system with multi-configuration switching, stacked applying, visual editing, preset routing templates, runtime configuration preview, and suffix modifiers such as `start`, `end`, `merge`, and `force`; it also adds Rust-based override parsing plus syntax checking and partial completion in the configuration editor.
-- **Enhanced proxy runtime and node management**: supports Root Tun (no VPN required, but Root permission is needed), single-node and proxy-group delay tests, node sorting animations, node tags and icon/flag display, persistent node selection, faster proxy startup, and improved bridge implementations.
+- **Enhanced proxy runtime and node management**: supports Root Tun (no VPN required, but Root permission is needed), single-node and proxy-group delay tests, current-node delay testing from the home screens, node sorting animations, node tags and icon/flag display, persistent node selection, faster proxy startup, and improved bridge implementations.
+- **ACG home and quote experience**: the ACG home supports wallpaper, sidebar controls, launch button, runtime information, and quote display; quotes can use the API and/or a user-defined JSON list, with manual refresh, daily refresh, refresh loading feedback, and mixed API/custom selection.
 - **Better subscription, import, and external-control experience**: supports editing subscription URLs, link preview, configuration sorting, opening external links in the app for quick import, and improves the external controller, Web panel, and notification quick node-switching workflow.
 - **Statistics, privacy, and lightweight build**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; supports YumeBox Lite, adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
 - **Stability and performance optimization**: improves startup blocking, runtime state freezes, dialog stutters, notification content, package size, background UI release, and many interaction details for a smoother and more fault-tolerant daily experience.
@@ -41,7 +42,7 @@ v0.5.2 continues to narrow the legacy UI boundary: normal screens now prefer Jet
 
 This theme refactor follows the Monet / dynamic-color setting recommendations summarized in `chat-export-2026-04-28_22-27-47.md`: use wallpaper or system colors as inspiration, keep readability as the baseline, map colors through Material roles, and give users enough but not excessive control. No proxy core/runtime kernel code was changed; the changes are limited to UI, settings, and theme derivation:
 
-- ACG home: the existing wallpaper, sidebar, launch button, and quote layout are preserved; it only follows the global theme tokens in a restrained way.
+- ACG home: preserves the wallpaper, sidebar, launch button, and runtime-information layout while adding quote refresh, current-node delay testing, and refresh-state feedback; it continues to follow the global theme tokens in a restrained way.
 
 References include Android / Material documentation and related open-source implementations:
 
@@ -60,7 +61,7 @@ References include Android / Material documentation and related open-source impl
 
 The focus is now shifting from "migrating to MD3" to polishing a stable MD3 experience. Future updates will continue to clean up the remaining legacy UI boundaries, reduce direct dependency on compatibility layers, and make regular screens more consistent with Material Design 3 / Material You in components, motion, spacing, color, and accessibility.
 
-Personalization and ACG-driven experiences will also keep evolving: theme extraction from selected wallpapers will be refined, with more flexible image sources, caching strategies, manual refresh, and daily content updates. The goal is to let the home page, cards, navigation bars, and other UI elements adapt naturally to user content while preserving readability. Configuration editing, runtime status display, traffic statistics, lightweight builds, and overall stability will continue to be improved so YumeBox MD3 can keep evolving toward being more usable, polished, and fun.
+Personalization and ACG-driven experiences will also keep evolving: theme extraction from selected wallpapers will be refined, with more flexible image sources and caching strategies. The goal is to let the home page, cards, navigation bars, and other UI elements adapt naturally to user content while preserving readability. Configuration editing, runtime status display, traffic statistics, lightweight builds, and overall stability will continue to be improved so YumeBox MD3 can keep evolving toward being more usable, polished, and fun.
 
 ## Feedback and Suggestions
 

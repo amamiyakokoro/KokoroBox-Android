@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -199,6 +200,52 @@ internal fun AcgQuoteText(
 }
 
 @Composable
+internal fun AcgInlineIconButton(
+    icon: ImageVector,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    val spacing = AppTheme.spacing
+    val colorScheme = MiuixTheme.colorScheme
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val background = colorScheme.primary.copy(alpha = if (enabled) 0.12f else 0.06f)
+    val tint = colorScheme.primary.copy(alpha = if (enabled) 0.92f else 0.38f)
+    val pressScale by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = 0.48f, stiffness = 560f),
+        label = "acg_inline_icon_button_press_scale",
+    )
+
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = pressScale
+                scaleY = pressScale
+            }
+            .size(42.dp)
+            .clip(AcgUi.Shape.sidebarIconButton)
+            .background(background)
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = tint,
+            modifier = Modifier.size(spacing.space20),
+        )
+    }
+}
+
+@Composable
 internal fun AcgLaunchButton(
     controlState: HomeProxyControlState,
     enabled: Boolean,
@@ -208,7 +255,6 @@ internal fun AcgLaunchButton(
     val colorScheme = MiuixTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val isRunning = controlState == HomeProxyControlState.Running
     val background = when {
         !enabled -> colorScheme.primaryContainer.copy(alpha = 0.48f)
         else -> colorScheme.primary

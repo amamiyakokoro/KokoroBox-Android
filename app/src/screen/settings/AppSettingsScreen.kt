@@ -28,15 +28,14 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -46,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -74,6 +72,7 @@ import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorSto
 import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.AcgQuoteConfigScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AcgWallpaperCropScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -360,19 +359,9 @@ private fun AppExperimentalSettingsSection(
     navigator: DestinationsNavigator,
 ) {
     val acgMainUiEnabled by viewModel.acgMainUiEnabled.state.collectAsState()
-    val acgHomeQuote by viewModel.acgHomeQuote.state.collectAsState()
-    val acgHomeQuoteAuthor by viewModel.acgHomeQuoteAuthor.state.collectAsState()
-    val acgDailyQuoteEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
-    val acgDailyQuoteApiUrl by viewModel.acgDailyQuoteApiUrl.state.collectAsState()
-    val acgCustomQuoteListJson by viewModel.acgCustomQuoteListJson.state.collectAsState()
-    val acgMergeCustomQuoteList by viewModel.acgMergeCustomQuoteList.state.collectAsState()
+    val acgDailyQuoteApiEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
+    val acgCustomQuoteEnabled by viewModel.acgCustomQuoteEnabled.state.collectAsState()
     val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsState()
-    val acgQuoteSummary = remember(acgHomeQuote) {
-        acgHomeQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault }
-    }
-    val acgQuoteAuthorSummary = remember(acgHomeQuoteAuthor) {
-        acgHomeQuoteAuthor.ifBlank { MLang.AppSettings.Experimental.AcgQuoteAuthorDefault }
-    }
     Title(MLang.AppSettings.Section.Experimental)
     Card {
         PreferenceSwitchItem(
@@ -387,66 +376,19 @@ private fun AppExperimentalSettingsSection(
             checked = acgSidebarExpanded,
             onCheckedChange = viewModel::onAcgSidebarExpandedChange,
         )
-        PreferenceSwitchItem(
-            title = "每日刷新 ACG 一言",
-            summary = "启用后每天从默认或自定义 API 获取 JSON 一言；自定义 ACG 一言将暂时不可编辑。",
-            checked = acgDailyQuoteEnabled,
-            onCheckedChange = { enabled ->
-                viewModel.onAcgDailyQuoteEnabledChange(enabled)
-                if (enabled) {
-                    viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+        PreferenceArrowItem(
+            title = "每日一言",
+            summary = when {
+                acgDailyQuoteApiEnabled && acgCustomQuoteEnabled -> "已启用 API 与用户自定义一言"
+                acgDailyQuoteApiEnabled -> "已启用一言 API"
+                acgCustomQuoteEnabled -> "已启用用户自定义一言"
+                else -> "进入配置一言 API 与用户自定义一言"
+            },
+            onClick = {
+                navigator.navigate(AcgQuoteConfigScreenDestination) {
+                    launchSingleTop = true
                 }
             },
-        )
-        AcgQuotePreferenceItem(
-            title = "每日一言 API（仅支持 JSON）",
-            summary = acgDailyQuoteApiUrl.ifBlank { "仅支持返回JSON的API，详细请看样例" },
-            dialogTitle = "编辑每日一言 API（仅 JSON）",
-            currentValue = acgDailyQuoteApiUrl,
-            onConfirm = {
-                viewModel.onAcgDailyQuoteApiUrlChange(it)
-                if (acgDailyQuoteEnabled) viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-            },
-        )
-        AcgTextEditorPreferenceItem(
-            title = "每日一言 API 样例",
-            summary = "查看 API 与返回格式样例",
-            editorTitle = "每日一言 API 样例",
-            content = DAILY_QUOTE_API_SAMPLE,
-            navigator = navigator,
-        )
-        AcgTextEditorPreferenceItem(
-            title = "自定义一言列表（JSON）",
-            summary = acgCustomQuoteListJson.ifBlank { "点击编辑可带注释的 JSON 文本；样例已写在编辑内容中。" },
-            editorTitle = "编辑自定义一言列表 JSON",
-            content = acgCustomQuoteListJson.ifBlank { CUSTOM_QUOTE_LIST_TEMPLATE },
-            navigator = navigator,
-            onSave = {
-                viewModel.onAcgCustomQuoteListJsonChange(it)
-                if (acgDailyQuoteEnabled) viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-            },
-        )
-        PreferenceSwitchItem(
-            title = "合并自定义列表到每日一言",
-            summary = "启用后每日刷新会随机从 API 与自定义 JSON 列表中取一条；API 不可用时也会回退到自定义列表。",
-            checked = acgMergeCustomQuoteList,
-            onCheckedChange = viewModel::onAcgMergeCustomQuoteListChange,
-        )
-        AcgQuotePreferenceItem(
-            title = MLang.AppSettings.Experimental.AcgQuoteTitle,
-            summary = if (acgDailyQuoteEnabled) "已启用每日刷新，暂不可编辑" else acgQuoteSummary,
-            dialogTitle = MLang.AppSettings.Experimental.EditAcgQuoteTitle,
-            currentValue = acgHomeQuote,
-            enabled = !acgDailyQuoteEnabled,
-            onConfirm = viewModel::onAcgHomeQuoteChange,
-        )
-        AcgQuotePreferenceItem(
-            title = MLang.AppSettings.Experimental.AcgQuoteAuthorTitle,
-            summary = if (acgDailyQuoteEnabled) "已启用每日刷新，暂不可编辑" else acgQuoteAuthorSummary,
-            dialogTitle = MLang.AppSettings.Experimental.EditAcgQuoteAuthorTitle,
-            currentValue = acgHomeQuoteAuthor,
-            enabled = !acgDailyQuoteEnabled,
-            onConfirm = viewModel::onAcgHomeQuoteAuthorChange,
         )
         AcgWallpaperPreferenceItem(
             navigator = navigator,
@@ -457,19 +399,92 @@ private fun AppExperimentalSettingsSection(
     }
 }
 
-private const val DAILY_QUOTE_API_SAMPLE = """API样例：https://v1.hitokoto.cn/?c=a&c=b&c=c
-返回格式样例：{
-"id": 1234,
-"hitokoto": "所谓的成长，就是越来越能接受自己本来的样子。",
-"from": "某作品",
-"from_who": "某角色"
-}"""
+@Composable
+@Destination<RootGraph>
+fun AcgQuoteConfigScreen(
+    navigator: DestinationsNavigator,
+) {
+    val viewModel = koinViewModel<AppSettingsViewModel>()
+    val acgDailyQuoteApiEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
+    val acgCustomQuoteEnabled by viewModel.acgCustomQuoteEnabled.state.collectAsState()
+    val acgDailyQuoteApiUrl by viewModel.acgDailyQuoteApiUrl.state.collectAsState()
+    val acgCustomQuoteListJson by viewModel.acgCustomQuoteListJson.state.collectAsState()
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = {
+            TopBar(title = "一言配置")
+        },
+    ) { innerPadding ->
+        val mainLikePadding = rememberStandalonePageMainPadding()
+        ScreenLazyColumn(
+            innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
+        ) {
+            item {
+                Title("每日一言")
+                Card {
+                    AcgQuotePreferenceItem(
+                        title = "一言 API",
+                        summary = acgDailyQuoteApiUrl,
+                        dialogTitle = "编辑一言 API（仅 JSON）",
+                        currentValue = acgDailyQuoteApiUrl,
+                        endActions = {
+                            Switch(
+                                checked = acgDailyQuoteApiEnabled,
+                                onCheckedChange = { enabled ->
+                                    viewModel.onAcgDailyQuoteEnabledChange(enabled)
+                                    if (enabled || acgCustomQuoteEnabled) {
+                                        viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                                    }
+                                },
+                            )
+                        },
+                        onConfirm = {
+                            viewModel.onAcgDailyQuoteApiUrlChange(it)
+                            if (acgDailyQuoteApiEnabled || acgCustomQuoteEnabled) {
+                                viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                            }
+                        },
+                    )
+                    AcgTextEditorPreferenceItem(
+                        title = "用户自定义一言",
+                        summary = "点击编辑可带注释的 JSON 文本；默认内容已内置在列表中。",
+                        editorTitle = "编辑用户自定义一言 JSON",
+                        content = acgCustomQuoteListJson.ifBlank { CUSTOM_QUOTE_LIST_TEMPLATE },
+                        navigator = navigator,
+                        endActions = {
+                            Switch(
+                                checked = acgCustomQuoteEnabled,
+                                onCheckedChange = { enabled ->
+                                    viewModel.onAcgCustomQuoteEnabledChange(enabled)
+                                    if (enabled || acgDailyQuoteApiEnabled) {
+                                        viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                                    }
+                                },
+                            )
+                        },
+                        onSave = {
+                            viewModel.onAcgCustomQuoteListJsonChange(it)
+                            if (acgDailyQuoteApiEnabled || acgCustomQuoteEnabled) {
+                                viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                            }
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
 
 private const val CUSTOM_QUOTE_LIST_TEMPLATE = """// 自定义一言列表样例，保存前可以保留以 // 开头的注释
 // 支持字符串数组：
 // ["一句话", "另一句话"]
 // 也支持对象数组，字段支持 text/quote/content/hitokoto 与 author/from/from_who/source：
 [
+  {
+    "text": "时间一分一秒流逝而去 终结一步一步迎面而来",
+    "author": "恋文"
+  },
   {
     "text": "所谓的成长，就是越来越能接受自己本来的样子。",
     "author": "某角色"
@@ -569,6 +584,7 @@ private fun AcgQuotePreferenceItem(
     dialogTitle: String,
     currentValue: String,
     enabled: Boolean = true,
+    endActions: @Composable (androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
     onConfirm: (String) -> Unit,
 ) {
     val showEditDialogState = remember { mutableStateOf(false) }
@@ -578,6 +594,7 @@ private fun AcgQuotePreferenceItem(
         title = title,
         summary = summary,
         enabled = enabled,
+        endActions = endActions,
         onClick = {
             textFieldState.value = TextFieldValue(currentValue)
             showEditDialogState.value = true
@@ -599,11 +616,13 @@ private fun AcgTextEditorPreferenceItem(
     editorTitle: String,
     content: String,
     navigator: DestinationsNavigator,
+    endActions: @Composable (androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
     onSave: ((String) -> Unit)? = null,
 ) {
     PreferenceValueItem(
         title = title,
         summary = summary,
+        endActions = endActions,
         onClick = {
             OverrideStructuredEditorStore.setupConfigPreview(
                 title = editorTitle,

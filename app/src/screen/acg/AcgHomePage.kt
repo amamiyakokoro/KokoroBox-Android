@@ -24,7 +24,6 @@ package com.github.yumelira.yumebox.screen.acg
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.*
@@ -52,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -62,13 +62,16 @@ import com.github.panpf.sketch.resize.Scale
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
 import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.presentation.component.LocalHandlePageChange
+import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.Speed
+import com.github.yumelira.yumebox.presentation.icon.yume.`Redo-dot`
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
@@ -103,6 +106,7 @@ fun AcgHomePage(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val controlState by homeViewModel.controlState.collectAsState()
+    val uiState by homeViewModel.uiState.collectAsState()
     val profiles by homeViewModel.profiles.collectAsState()
     val profilesLoaded by homeViewModel.profilesLoaded.collectAsState()
     val recommendedProfile by homeViewModel.recommendedProfile.collectAsState()
@@ -114,23 +118,37 @@ fun AcgHomePage(
     val proxyMode by homeViewModel.proxyMode.collectAsState()
     val runtimeSnapshot by homeViewModel.runtimeSnapshot.collectAsState()
     val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
-    val acgHomeQuote by appSettingsViewModel.acgHomeQuote.state.collectAsState()
-    val acgHomeQuoteAuthor by appSettingsViewModel.acgHomeQuoteAuthor.state.collectAsState()
-    val acgDailyQuoteEnabled by appSettingsViewModel.acgDailyQuoteEnabled.state.collectAsState()
+    val acgDailyQuoteApiEnabled by appSettingsViewModel.acgDailyQuoteEnabled.state.collectAsState()
+    val acgCustomQuoteEnabled by appSettingsViewModel.acgCustomQuoteEnabled.state.collectAsState()
     val acgDailyQuote by appSettingsViewModel.acgDailyQuote.state.collectAsState()
     val acgDailyQuoteAuthor by appSettingsViewModel.acgDailyQuoteAuthor.state.collectAsState()
+    val isRefreshingDailyAcgQuote by appSettingsViewModel.isRefreshingDailyAcgQuote.collectAsState()
     val sidebarExpanded by appSettingsViewModel.acgSidebarExpanded.state.collectAsState()
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
-    LaunchedEffect(acgDailyQuoteEnabled) {
-        if (acgDailyQuoteEnabled) {
+    LaunchedEffect(acgDailyQuoteApiEnabled, acgCustomQuoteEnabled) {
+        if (acgDailyQuoteApiEnabled || acgCustomQuoteEnabled) {
             appSettingsViewModel.refreshDailyAcgQuoteIfNeeded()
         }
     }
 
     LaunchedEffect(Unit) {
         homeViewModel.refreshProxyMode()
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            context.toast(it, Toast.LENGTH_LONG)
+            homeViewModel.consumeError()
+        }
+    }
+
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            context.toast(it, Toast.LENGTH_SHORT)
+            homeViewModel.consumeMessage()
+        }
     }
 
     LaunchedEffect(isActive) {
@@ -204,24 +222,29 @@ fun AcgHomePage(
     } else {
         YumeMiuixTheme.colorScheme.background
     }
-    val heroBlendColor = if (isDarkHomeSurface) Color.Black else contentSurface
+    val heroBlendColor = contentSurface
     val handlePageChange = LocalHandlePageChange.current
-    val sidebarIcons = remember {
+    val sidebarIcons = remember(handlePageChange, homeViewModel) {
         listOf(
+            AcgSidebarIconItem(Yume.Speed) {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                homeViewModel.testCurrentNodeDelay()
+            },
             AcgSidebarIconItem(ShellIcons.OpenProxy) { handlePageChange(1) },
             AcgSidebarIconItem(ShellIcons.OpenProfiles) { handlePageChange(2) },
             AcgSidebarIconItem(ShellIcons.OpenSettings) { handlePageChange(3) },
         )
     }
-    val quote = if (acgDailyQuoteEnabled) {
+    val dailyQuoteEnabled = acgDailyQuoteApiEnabled || acgCustomQuoteEnabled
+    val quote = if (dailyQuoteEnabled) {
         AcgQuote(
             text = acgDailyQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault },
             author = acgDailyQuoteAuthor,
         )
     } else {
         AcgQuote(
-            text = acgHomeQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault },
-            author = acgHomeQuoteAuthor.ifBlank { MLang.AppSettings.Experimental.AcgQuoteAuthorDefault },
+            text = MLang.AppSettings.Experimental.AcgQuoteDefault,
+            author = MLang.AppSettings.Experimental.AcgQuoteAuthorDefault,
         )
     }
     val animatedSidebarToggleProgress by animateFloatAsState(
@@ -438,14 +461,36 @@ fun AcgHomePage(
                 )
             }
 
-            Column(
+            Row(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
                     .padding(
+                        start = UiDp.dp12,
                         end = UiDp.dp12,
                         bottom = mainInnerPadding.calculateBottomPadding() + AcgUi.Button.bottomInset,
                     ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (isRefreshingDailyAcgQuote) {
+                    Box(
+                        modifier = Modifier.size(42.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Md3ELoading()
+                    }
+                } else {
+                    AcgInlineIconButton(
+                        icon = Yume.`Redo-dot`,
+                        contentDescription = "刷新一言",
+                        enabled = dailyQuoteEnabled,
+                        onClick = {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                            appSettingsViewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                        },
+                    )
+                }
                 AcgLaunchButton(
                     controlState = visualControlState,
                     enabled = profilesLoaded && profiles.isNotEmpty() && visualControlState.canInteract,
@@ -459,13 +504,13 @@ fun AcgHomePage(
 @Composable
 private fun AcgWallpaperBackground(
     wallpaperUri: String,
+    modifier: Modifier = Modifier,
     wallpaperZoom: Float = 1f,
     wallpaperBiasX: Float = 0f,
     wallpaperBiasY: Float = 0f,
     qualityMode: AcgWallpaperQualityMode = AcgWallpaperQualityMode.Foreground,
     stableRequestWidth: androidx.compose.ui.unit.Dp? = null,
     stableRequestHeight: androidx.compose.ui.unit.Dp? = null,
-    modifier: Modifier = Modifier,
 ) {
     val clampedZoom = wallpaperZoom.coerceIn(1f, 5f)
     val model: String = wallpaperUri.ifBlank { "file:///android_asset/wallpaper.jpg" }
@@ -479,7 +524,7 @@ private fun AcgWallpaperBackground(
         }
         value = withContext(Dispatchers.IO) {
             runCatching {
-                context.contentResolver.openInputStream(Uri.parse(model))?.use { input ->
+                context.contentResolver.openInputStream(model.toUri())?.use { input ->
                     val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                     BitmapFactory.decodeStream(input, null, options)
                     if (options.outWidth > 0 && options.outHeight > 0) {

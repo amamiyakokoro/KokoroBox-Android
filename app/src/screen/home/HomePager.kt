@@ -23,6 +23,8 @@ package com.github.yumelira.yumebox.screen.home
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -42,6 +44,8 @@ import com.github.yumelira.yumebox.presentation.component.LocalNavigator
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
+import com.github.yumelira.yumebox.presentation.icon.Yume
+import com.github.yumelira.yumebox.presentation.icon.yume.Speed
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
@@ -67,6 +71,7 @@ fun HomePager(
     val selectedServerName by homeViewModel.selectedServerName.collectAsState()
     val selectedServerPing by homeViewModel.selectedServerPing.collectAsState()
     val speedHistory by homeViewModel.speedHistory.collectAsState()
+    val testingCurrentNodeDelay by homeViewModel.testingCurrentNodeDelay.collectAsState()
     val proxyMode by homeViewModel.proxyMode.collectAsState()
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
@@ -110,6 +115,7 @@ fun HomePager(
 
     LaunchedEffect(uiState.message) {
         uiState.message?.let {
+            context.toast(it, Toast.LENGTH_SHORT)
             homeViewModel.consumeMessage()
         }
     }
@@ -120,7 +126,25 @@ fun HomePager(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { TopBar(title = MLang.Home.Title) },
+        topBar = {
+            TopBar(
+                title = MLang.Home.Title,
+                actions = {
+                    IconButton(
+                        enabled = isRunning && !testingCurrentNodeDelay,
+                        onClick = {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                            homeViewModel.testCurrentNodeDelay()
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Yume.Speed,
+                            contentDescription = MLang.Proxy.Action.Test,
+                        )
+                    }
+                },
+            )
+        },
     ) { innerPadding ->
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, mainInnerPadding),

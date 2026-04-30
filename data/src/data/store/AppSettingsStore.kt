@@ -62,8 +62,9 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val acgDailyQuote by strFlow("")
     val acgDailyQuoteAuthor by strFlow("")
     val acgDailyQuoteDate by strFlow("")
-    val acgDailyQuoteApiUrl by strFlow("")
-    val acgCustomQuoteListJson by strFlow("")
+    val acgDailyQuoteApiUrl by strFlow("https://v1.hitokoto.cn/?c=a&c=b&c=c")
+    val acgCustomQuoteEnabled by boolFlow(false)
+    val acgCustomQuoteListJson by strFlow(DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON)
     val acgMergeCustomQuoteList by boolFlow(false)
     val acgSidebarExpanded by boolFlow(true)
     val pageScale by floatFlow(1.0f)
@@ -74,3 +75,11 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val customUserAgent by strFlow("")
 
 }
+
+private const val DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON = """[
+  {
+    "text": "时间一分一秒流逝而去 终结一步一步迎面而来",
+    "author": "恋文"
+  }
+]
+"""
