@@ -56,6 +56,7 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.ThemeMode
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
 import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
@@ -69,10 +70,12 @@ import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.WarningBottomSheet
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
 import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AcgWallpaperCropScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
@@ -360,6 +363,9 @@ private fun AppExperimentalSettingsSection(
     val acgHomeQuote by viewModel.acgHomeQuote.state.collectAsState()
     val acgHomeQuoteAuthor by viewModel.acgHomeQuoteAuthor.state.collectAsState()
     val acgDailyQuoteEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
+    val acgDailyQuoteApiUrl by viewModel.acgDailyQuoteApiUrl.state.collectAsState()
+    val acgCustomQuoteListJson by viewModel.acgCustomQuoteListJson.state.collectAsState()
+    val acgMergeCustomQuoteList by viewModel.acgMergeCustomQuoteList.state.collectAsState()
     val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsState()
     val acgQuoteSummary = remember(acgHomeQuote) {
         acgHomeQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault }
@@ -383,14 +389,48 @@ private fun AppExperimentalSettingsSection(
         )
         PreferenceSwitchItem(
             title = "每日刷新 ACG 一言",
-            summary = "启用后每天从 hitokoto.cn 获取一条动画一言；自定义 ACG 一言将暂时不可编辑。",
+            summary = "启用后每天从默认或自定义 API 获取 JSON 一言；自定义 ACG 一言将暂时不可编辑。",
             checked = acgDailyQuoteEnabled,
             onCheckedChange = { enabled ->
                 viewModel.onAcgDailyQuoteEnabledChange(enabled)
                 if (enabled) {
-                    viewModel.refreshDailyAcgQuoteIfNeeded()
+                    viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
                 }
             },
+        )
+        AcgQuotePreferenceItem(
+            title = "每日一言 API（仅支持 JSON）",
+            summary = acgDailyQuoteApiUrl.ifBlank { "仅支持返回JSON的API，详细请看样例" },
+            dialogTitle = "编辑每日一言 API（仅 JSON）",
+            currentValue = acgDailyQuoteApiUrl,
+            onConfirm = {
+                viewModel.onAcgDailyQuoteApiUrlChange(it)
+                if (acgDailyQuoteEnabled) viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+            },
+        )
+        AcgTextEditorPreferenceItem(
+            title = "每日一言 API 样例",
+            summary = "查看 API 与返回格式样例",
+            editorTitle = "每日一言 API 样例",
+            content = DAILY_QUOTE_API_SAMPLE,
+            navigator = navigator,
+        )
+        AcgTextEditorPreferenceItem(
+            title = "自定义一言列表（JSON）",
+            summary = acgCustomQuoteListJson.ifBlank { "点击编辑可带注释的 JSON 文本；样例已写在编辑内容中。" },
+            editorTitle = "编辑自定义一言列表 JSON",
+            content = acgCustomQuoteListJson.ifBlank { CUSTOM_QUOTE_LIST_TEMPLATE },
+            navigator = navigator,
+            onSave = {
+                viewModel.onAcgCustomQuoteListJsonChange(it)
+                if (acgDailyQuoteEnabled) viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+            },
+        )
+        PreferenceSwitchItem(
+            title = "合并自定义列表到每日一言",
+            summary = "启用后每日刷新会随机从 API 与自定义 JSON 列表中取一条；API 不可用时也会回退到自定义列表。",
+            checked = acgMergeCustomQuoteList,
+            onCheckedChange = viewModel::onAcgMergeCustomQuoteListChange,
         )
         AcgQuotePreferenceItem(
             title = MLang.AppSettings.Experimental.AcgQuoteTitle,
@@ -416,6 +456,30 @@ private fun AppExperimentalSettingsSection(
         )
     }
 }
+
+private const val DAILY_QUOTE_API_SAMPLE = """API样例：https://v1.hitokoto.cn/?c=a&c=b&c=c
+返回格式样例：{
+"id": 1234,
+"hitokoto": "所谓的成长，就是越来越能接受自己本来的样子。",
+"from": "某作品",
+"from_who": "某角色"
+}"""
+
+private const val CUSTOM_QUOTE_LIST_TEMPLATE = """// 自定义一言列表样例，保存前可以保留以 // 开头的注释
+// 支持字符串数组：
+// ["一句话", "另一句话"]
+// 也支持对象数组，字段支持 text/quote/content/hitokoto 与 author/from/from_who/source：
+[
+  {
+    "text": "所谓的成长，就是越来越能接受自己本来的样子。",
+    "author": "某角色"
+  },
+  {
+    "hitokoto": "愿你历尽千帆，归来仍是少年。",
+    "from": "自定义"
+  }
+]
+"""
 
 @Composable
 private fun BiometricProtectedPreferenceSwitch(
@@ -525,6 +589,30 @@ private fun AcgQuotePreferenceItem(
         title = dialogTitle,
         textFieldValue = textFieldState,
         onConfirm = onConfirm,
+    )
+}
+
+@Composable
+private fun AcgTextEditorPreferenceItem(
+    title: String,
+    summary: String,
+    editorTitle: String,
+    content: String,
+    navigator: DestinationsNavigator,
+    onSave: ((String) -> Unit)? = null,
+) {
+    PreferenceValueItem(
+        title = title,
+        summary = summary,
+        onClick = {
+            OverrideStructuredEditorStore.setupConfigPreview(
+                title = editorTitle,
+                content = content,
+                language = LanguageScope.Text,
+                callback = onSave,
+            )
+            navigator.navigate(OverrideConfigPreviewRouteDestination)
+        },
     )
 }
 

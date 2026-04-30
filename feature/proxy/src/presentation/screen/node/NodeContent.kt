@@ -52,7 +52,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
@@ -103,6 +105,7 @@ internal fun NodeTabs(
 ) {
     val hazeState = LocalTopBarHazeState.current
     val hazeStyle = LocalTopBarHazeStyle.current
+    val hapticFeedback = LocalHapticFeedback.current
     val listState = rememberLazyListState()
 
     LaunchedEffect(selectedIndex, groups.size) {
@@ -166,7 +169,10 @@ internal fun NodeTabs(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = { onSelect(index) },
+                        onClick = {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                            onSelect(index)
+                        },
                     ),
                 contentAlignment = Alignment.Center,
             ) {

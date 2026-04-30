@@ -143,7 +143,6 @@ class ProxyViewModel(
             setLoading(false)
 
             if (testingTargets.isNotEmpty()) {
-                PollingTimers.awaitTick(PollingTimerSpecs.ProxyTestingSortHold)
                 _testingGroupNames.update { it - testingTargets }
             }
 

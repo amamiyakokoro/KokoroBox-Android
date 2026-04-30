@@ -36,26 +36,26 @@ data class GeoXItem(
 val geoXItems = listOf(
     GeoXItem(
         GeoFileType.GeoIP,
-        "GeoIP.dat",
-        "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
-        "geoip.dat"
+        "GeoIP.metadb",
+        "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.metadb",
+        "geoip.metadb"
     ),
     GeoXItem(
         GeoFileType.GeoSite,
         "GeoSite.dat",
-        "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat",
+        "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
         "geosite.dat"
     ),
     GeoXItem(
         GeoFileType.Country,
         "Country.mmdb",
-        "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb",
+        "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb",
         "country.mmdb"
     ),
     GeoXItem(
         GeoFileType.ASN,
         "ASN.mmdb",
-        "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb",
+        "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb",
         "ASN.mmdb"
     ),
 )

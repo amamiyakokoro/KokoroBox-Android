@@ -44,7 +44,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,6 +72,7 @@ import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
@@ -360,7 +360,7 @@ internal fun AddProfileSheet(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                            Md3ELoading(modifier = Modifier.size(48.dp))
                             Text(
                                 text = downloadProgress?.message ?: MLang.ProfilesVM.Progress.Preparing,
                                 style = MaterialTheme.typography.bodyLarge,

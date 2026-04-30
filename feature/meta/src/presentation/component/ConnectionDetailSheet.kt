@@ -26,6 +26,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
@@ -44,10 +48,6 @@ import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private const val CONNECTION_LEADING_ICON_BITMAP_SIZE = 96
 
@@ -205,7 +205,7 @@ private fun ProxyChainRow(chains: List<String>) {
                 if (!isLast) {
                     Text(
                         text = "→",
-                        style = MiuixTheme.textStyles.footnote1,
+                        style = MaterialTheme.typography.labelSmall,
                         color = appColors.connection.chainArrow,
                         modifier = Modifier.padding(horizontal = spacing.space2),
                     )
@@ -224,7 +224,10 @@ private fun InterruptConnectionButton(
         onClick = onInterrupt,
         enabled = !isInterrupting,
         modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ),
     ) {
         Text(
             text = if (isInterrupting) {
@@ -232,7 +235,7 @@ private fun InterruptConnectionButton(
             } else {
                 MLang.Connection.Detail.Action.Interrupt
             },
-            color = MiuixTheme.colorScheme.error,
+            color = MaterialTheme.colorScheme.onErrorContainer,
         )
     }
 }
@@ -250,7 +253,7 @@ private fun ChainNode(
     val backgroundColor = if (isActive) {
         appColors.connection.chainActive.copy(alpha = opacity.subtleStrong)
     } else {
-        MiuixTheme.colorScheme.surfaceVariant
+        MaterialTheme.colorScheme.surfaceVariant
     }
     val textColor = if (isActive) {
         appColors.connection.chainActive
@@ -280,7 +283,7 @@ private fun ChainNode(
 
         Text(
             text = name,
-            style = MiuixTheme.textStyles.footnote1.copy(fontSize = 11.sp),
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
             color = textColor,
             maxLines = 1,
         )
@@ -310,10 +313,10 @@ private fun RuleInfoSection(
 private fun SectionTitle(title: String) {
     Text(
         text = title,
-        style = MiuixTheme.textStyles.body2.copy(
+        style = MaterialTheme.typography.bodyMedium.copy(
             fontWeight = FontWeight.Medium,
         ),
-        color = MiuixTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }
 
@@ -321,7 +324,7 @@ private fun SectionTitle(title: String) {
 private fun InfoRow(
     label: String,
     value: String,
-    valueColor: Color = MiuixTheme.colorScheme.onSurface,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     val spacing = AppTheme.spacing
     val sizes = AppTheme.sizes
@@ -331,13 +334,13 @@ private fun InfoRow(
     ) {
         Text(
             text = label,
-            style = MiuixTheme.textStyles.footnote1,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.width(sizes.connectionDetailLabelWidth),
         )
         Text(
             text = value,
-            style = MiuixTheme.textStyles.footnote1,
+            style = MaterialTheme.typography.labelSmall,
             color = valueColor,
             modifier = Modifier.weight(1f),
         )

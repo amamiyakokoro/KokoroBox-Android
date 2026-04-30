@@ -58,7 +58,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -247,6 +249,7 @@ internal fun NodeSelectableCard(
     val radii = AppTheme.radii
     val sizes = AppTheme.sizes
     val interactionSource = remember { MutableInteractionSource() }
+    val hapticFeedback = LocalHapticFeedback.current
     val shape = RoundedCornerShape(radii.radius18)
     val palette = rememberProxySelectionPalette(selected = isSelected)
     val motionScheme = MaterialTheme.motionScheme
@@ -286,7 +289,10 @@ internal fun NodeSelectableCard(
                     it.clickable(
                         interactionSource = interactionSource,
                         indication = null,
-                        onClick = onClick,
+                        onClick = {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                            onClick()
+                        },
                     )
                 } else {
                     it

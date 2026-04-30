@@ -23,13 +23,20 @@ package com.github.yumelira.yumebox.screen.profiles
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -110,7 +117,8 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
 
     val scope = rememberCoroutineScope()
 
-    Scaffold(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
         topBar = {
             TopBar(
                 title = MLang.ProfilesPage.Title,
@@ -222,6 +230,23 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                         )
                     }
                 }
+            }
+        }
+    }
+
+        AnimatedVisibility(
+            visible = isDownloading,
+            enter = fadeIn(animationSpec = tween(durationMillis = 150)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 150)),
+            modifier = Modifier.matchParentSize(),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.18f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Md3ELoading()
             }
         }
     }

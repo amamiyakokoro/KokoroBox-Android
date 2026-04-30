@@ -32,9 +32,13 @@ import okio.buffer
 import okio.sink
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.Base64
 import java.util.Calendar
 import java.util.Locale
@@ -78,8 +82,9 @@ class SubStoreDownloadClient(
         url: String,
         targetFile: File,
         onProgress: ((DownloadProgress) -> Unit)? = null,
+        validator: ((File) -> Boolean)? = null,
     ): Boolean = withContext(Dispatchers.IO) {
-        val (success, _) = downloadWithSubscriptionInfo(url, targetFile, onProgress)
+        val (success, _) = downloadWithSubscriptionInfo(url, targetFile, onProgress, validator)
         success
     }
 
@@ -87,10 +92,12 @@ class SubStoreDownloadClient(
         url: String,
         targetFile: File,
         onProgress: ((DownloadProgress) -> Unit)? = null,
+        validator: ((File) -> Boolean)? = null,
     ): Pair<Boolean, SubscriptionInfo?> = withContext(Dispatchers.IO) {
+        var tempFile: File? = null
         try {
             targetFile.parentFile?.mkdirs()
-            if (targetFile.exists()) targetFile.delete()
+            tempFile = createDownloadTempFile(targetFile)
 
             val request = Request.Builder()
                 .url(url)
@@ -111,7 +118,7 @@ class SubStoreDownloadClient(
                 var lastBytesRead = 0L
                 var totalBytesRead = 0L
 
-                targetFile.sink().buffer().use { output ->
+                tempFile.sink().buffer().use { output ->
                     val buffer = ByteArray(8192)
                     var bytesRead: Int
 
@@ -146,11 +153,20 @@ class SubStoreDownloadClient(
                     output.flush()
                 }
 
+                if (totalBytesRead <= 0L) {
+                    throw IOException("Downloaded file is empty")
+                }
+                if (validator != null && !validator(tempFile)) {
+                    throw IOException("Downloaded file failed validation: ${targetFile.name}")
+                }
+
+                replaceDownloadedFile(tempFile, targetFile)
+                tempFile = null
                 Pair(true, subscriptionInfo)
             }
         } catch (e: Exception) {
             Timber.e(e, "Download failed: %s", url)
-            if (targetFile.exists()) targetFile.delete()
+            tempFile?.delete()
             Pair(false, null)
         }
     }
@@ -197,6 +213,33 @@ class SubStoreDownloadClient(
     private fun resolveUserAgent(): String {
         val customUA = appSettings.customUserAgent.value
         return customUA.ifEmpty { DEFAULT_USER_AGENT }
+    }
+
+    private fun createDownloadTempFile(targetFile: File): File {
+        val parent = targetFile.parentFile ?: application.cacheDir
+        val tempFile = File(
+            parent,
+            ".${targetFile.name}.${System.currentTimeMillis()}.download",
+        )
+        if (tempFile.exists()) tempFile.delete()
+        return tempFile
+    }
+
+    private fun replaceDownloadedFile(tempFile: File, targetFile: File) {
+        try {
+            Files.move(
+                tempFile.toPath(),
+                targetFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.ATOMIC_MOVE,
+            )
+        } catch (_: AtomicMoveNotSupportedException) {
+            Files.move(
+                tempFile.toPath(),
+                targetFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+            )
+        }
     }
 
     private fun parseSubscriptionInfo(headers: Headers): SubscriptionInfo {

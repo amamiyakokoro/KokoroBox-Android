@@ -26,6 +26,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -40,8 +42,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun TabRowWithContour(
@@ -53,8 +53,8 @@ fun TabRowWithContour(
     if (tabs.isEmpty()) return
 
     val shape = RoundedCornerShape(100.dp)
-    val backgroundColor = MiuixTheme.colorScheme.surfaceVariant
-    val selectedColor = MiuixTheme.colorScheme.primary
+    val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
+    val selectedColor = MaterialTheme.colorScheme.primary
     val indicatorInset = 4.dp
     val indicatorGap = 4.dp
     val indicatorAnimationSpec = remember {
@@ -113,9 +113,9 @@ fun TabRowWithContour(
                 val isSelected = clampedSelectedTabIndex == index
                 val textColor by animateColorAsState(
                     targetValue = if (isSelected) {
-                        MiuixTheme.colorScheme.onPrimary
+                        MaterialTheme.colorScheme.onPrimary
                     } else {
-                        MiuixTheme.colorScheme.onSurface
+                        MaterialTheme.colorScheme.onSurface
                     },
                     animationSpec = textAnimationSpec,
                     label = "tab_row_text_color_$index",
@@ -135,7 +135,7 @@ fun TabRowWithContour(
                 ) {
                     Text(
                         text = tab,
-                        style = MiuixTheme.textStyles.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = textColor,
                     )
                 }

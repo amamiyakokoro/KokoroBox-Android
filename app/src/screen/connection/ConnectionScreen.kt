@@ -25,13 +25,16 @@ package com.github.yumelira.yumebox.screen.connection
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.foundation.lazy.items
@@ -39,6 +42,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.feature.meta.presentation.component.ConnectionCard
 import com.github.yumelira.yumebox.feature.meta.presentation.component.ConnectionDetailSheet
 import com.github.yumelira.yumebox.feature.meta.presentation.component.TabRowWithContour
@@ -156,6 +162,10 @@ fun ConnectionScreen(
                         DropdownMenu(
                             expanded = showSortPopup,
                             onDismissRequest = { showSortPopup = false },
+                            modifier = Modifier.widthIn(min = 180.dp),
+                            offset = DpOffset(x = (-144).dp, y = spacing.space4),
+                            shape = RoundedCornerShape(AppTheme.radii.radius24),
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         ) {
                             SortModes.forEachIndexed { index, mode ->
                                 DropdownMenuItem(
@@ -221,20 +231,13 @@ fun ConnectionScreen(
                         shrinkTowards = Alignment.Top,
                     ) + fadeOut(animationSpec = tween(200, easing = FastOutSlowInEasing)),
                 ) {
-                    Row(
+                    ConnectionSearchField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = spacing.space8),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        OutlinedTextField(
-                            value = searchText,
-                            onValueChange = { searchText = it },
-                            modifier = Modifier.weight(1f),
-                            label = { Text(MLang.Connection.SearchHint) },
-                            singleLine = true,
-                        )
-                    }
+                    )
                 }
             }
 
@@ -265,7 +268,7 @@ fun ConnectionScreen(
                             selectedConnection = connection
                             showDetailSheet = true
                         },
-                        modifier = Modifier.padding(vertical = spacing.space6),
+                        modifier = Modifier,
                     )
                 }
             }
@@ -280,4 +283,58 @@ fun ConnectionScreen(
             onDismissFinished = { selectedConnection = null },
         )
     }
+}
+
+@Composable
+private fun ConnectionSearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = AppTheme.spacing
+    val componentSizes = AppTheme.sizes
+
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
+            color = MaterialTheme.colorScheme.onSurface,
+        ),
+        modifier = modifier
+            .shadow(
+                elevation = spacing.space8,
+                shape = CircleShape,
+                clip = false,
+            )
+            .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape)
+            .heightIn(min = componentSizes.searchFieldMinHeight),
+        decorationBox = { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = spacing.space16),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Yume.`Scan-eye`,
+                    contentDescription = MLang.Component.Editor.Action.Search,
+                    modifier = Modifier
+                        .size(componentSizes.searchIconTouchTarget)
+                        .padding(start = spacing.space16, end = spacing.space8),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Box(modifier = Modifier.weight(1f)) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = MLang.Connection.SearchHint,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        },
+    )
 }

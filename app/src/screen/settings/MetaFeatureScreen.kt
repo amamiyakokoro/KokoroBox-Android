@@ -46,6 +46,8 @@ import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import java.io.File
 
+private const val MIN_GEO_FILE_SIZE_BYTES = 64 * 1024L
+
 @Composable
 @Destination<RootGraph>
 fun MetaFeatureScreen(navigator: DestinationsNavigator) {
@@ -189,11 +191,34 @@ private fun downloadGeoXFiles(
             runtimeHome.mkdirs()
             items.forEach { item ->
                 val targetFile = File(runtimeHome, item.fileName)
-                if (downloadClient.download(item.url, targetFile)) {
+                if (downloadClient.download(item.url, targetFile, validator = ::isGeoXDownloadUsable)) {
                     successCount++
                 }
             }
         }
         context.toast(MLang.MetaFeature.Download.DownloadComplete.format(successCount, items.size))
     }
+}
+
+private fun isGeoXDownloadUsable(file: File): Boolean {
+    if (!file.isFile || file.length() < MIN_GEO_FILE_SIZE_BYTES) return false
+    return !looksLikeHttpErrorBody(file)
+}
+
+private fun looksLikeHttpErrorBody(file: File): Boolean {
+    return runCatching {
+        val buffer = ByteArray(512)
+        val read = file.inputStream().buffered().use { input -> input.read(buffer) }
+        if (read <= 0) return@runCatching true
+
+        val head = String(buffer, 0, read, Charsets.UTF_8)
+            .trimStart('\uFEFF', ' ', '\t', '\r', '\n')
+            .lowercase()
+        head.startsWith("<!doctype") ||
+            head.startsWith("<html") ||
+            head.startsWith("not found") ||
+            head.startsWith("404") ||
+            head.contains("<title>404") ||
+            head.contains("rate limit")
+    }.getOrDefault(false)
 }

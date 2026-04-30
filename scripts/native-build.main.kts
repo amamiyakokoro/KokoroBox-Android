@@ -22,6 +22,9 @@
 
 import java.io.File
 import java.net.URL
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.thread
@@ -630,7 +633,7 @@ class ResourceDownloader(private val config: ProjectConfig) {
                 println("[Geo] Downloaded and compressed $name -> ${outputFile.absolutePath}")
             } else {
                 val outputFile = File(outputDir, name)
-                tempFile.copyTo(outputFile, overwrite = true)
+                replaceWithTemp(tempFile, outputFile)
                 println("[Geo] Downloaded $name to ${outputFile.absolutePath}")
             }
         } catch (e: Exception) {
@@ -639,15 +642,39 @@ class ResourceDownloader(private val config: ProjectConfig) {
     }
 
     private fun compressToXz(sourceFile: File, outputFile: File) {
-        if (outputFile.exists()) {
-            outputFile.delete()
+        val tempOutputFile = File(outputFile.parentFile, ".${outputFile.name}.${System.currentTimeMillis()}.tmp")
+        if (tempOutputFile.exists()) {
+            tempOutputFile.delete()
         }
-        sourceFile.inputStream().buffered().use { input ->
-            outputFile.outputStream().buffered().use { fileOutput ->
-                XZOutputStream(fileOutput, LZMA2Options()).use { xzOutput ->
-                    input.copyTo(xzOutput)
+        try {
+            sourceFile.inputStream().buffered().use { input ->
+                tempOutputFile.outputStream().buffered().use { fileOutput ->
+                    XZOutputStream(fileOutput, LZMA2Options()).use { xzOutput ->
+                        input.copyTo(xzOutput)
+                    }
                 }
             }
+            replaceWithTemp(tempOutputFile, outputFile)
+        } finally {
+            tempOutputFile.delete()
+        }
+    }
+
+    private fun replaceWithTemp(tempFile: File, outputFile: File) {
+        outputFile.parentFile?.mkdirs()
+        try {
+            Files.move(
+                tempFile.toPath(),
+                outputFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.ATOMIC_MOVE,
+            )
+        } catch (_: AtomicMoveNotSupportedException) {
+            Files.move(
+                tempFile.toPath(),
+                outputFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+            )
         }
     }
 }

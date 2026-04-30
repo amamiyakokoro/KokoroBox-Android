@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
+import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Check
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
@@ -142,12 +143,7 @@ internal fun NodeGroupCard(
                     }
 
                     isDelayTesting -> {
-                        RotatingCircleGauge(
-                            isRotating = true,
-                            modifier = Modifier.size(spacing.space18),
-                            tint = palette.supportingColor,
-                            contentDescription = null,
-                        )
+                        Md3ELoading(modifier = Modifier.size(spacing.space18))
                     }
                 }
             }

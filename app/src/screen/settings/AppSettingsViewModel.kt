@@ -38,11 +38,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class AppSettingsViewModel(
     private val settings: AppSettingsStore,
@@ -78,6 +80,9 @@ class AppSettingsViewModel(
     val acgDailyQuote: Preference<String> = settings.acgDailyQuote
     val acgDailyQuoteAuthor: Preference<String> = settings.acgDailyQuoteAuthor
     val acgDailyQuoteDate: Preference<String> = settings.acgDailyQuoteDate
+    val acgDailyQuoteApiUrl: Preference<String> = settings.acgDailyQuoteApiUrl
+    val acgCustomQuoteListJson: Preference<String> = settings.acgCustomQuoteListJson
+    val acgMergeCustomQuoteList: Preference<Boolean> = settings.acgMergeCustomQuoteList
     val acgSidebarExpanded: Preference<Boolean> = settings.acgSidebarExpanded
     val pageScale: Preference<Float> = settings.pageScale
     val singleNodeTest: Preference<Boolean> = settings.singleNodeTest
@@ -113,13 +118,22 @@ class AppSettingsViewModel(
     fun onAcgHomeQuoteChange(quote: String) = acgHomeQuote.set(quote)
     fun onAcgHomeQuoteAuthorChange(author: String) = acgHomeQuoteAuthor.set(author)
     fun onAcgDailyQuoteEnabledChange(enabled: Boolean) = acgDailyQuoteEnabled.set(enabled)
+    fun onAcgDailyQuoteApiUrlChange(url: String) = acgDailyQuoteApiUrl.set(url.trim())
+    fun onAcgCustomQuoteListJsonChange(json: String) = acgCustomQuoteListJson.set(json)
+    fun onAcgMergeCustomQuoteListChange(enabled: Boolean) = acgMergeCustomQuoteList.set(enabled)
     fun refreshDailyAcgQuoteIfNeeded(force: Boolean = false) {
         val today = todayKey()
         if (!force && acgDailyQuoteDate.value == today && acgDailyQuote.value.isNotBlank()) {
             return
         }
         viewModelScope.launch {
-            val quote = fetchHitokotoQuote() ?: return@launch
+            val customQuotes = parseCustomQuoteList(acgCustomQuoteListJson.value)
+            val quote = when {
+                acgMergeCustomQuoteList.value && customQuotes.isNotEmpty() && Random.nextBoolean() -> {
+                    customQuotes.random()
+                }
+                else -> fetchDailyQuote(acgDailyQuoteApiUrl.value) ?: customQuotes.randomOrNull()
+            } ?: return@launch
             acgDailyQuote.set(quote.text)
             acgDailyQuoteAuthor.set(quote.author)
             acgDailyQuoteDate.set(today)
@@ -158,26 +172,55 @@ private val dailyQuoteClient = OkHttpClient.Builder()
     .readTimeout(8, TimeUnit.SECONDS)
     .build()
 
+private const val DEFAULT_DAILY_QUOTE_API_URL = "https://v1.hitokoto.cn/?c=a&c=b&c=c&encode=json"
+
 private fun todayKey(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
-private suspend fun fetchHitokotoQuote(): DailyAcgQuote? = withContext(Dispatchers.IO) {
+private suspend fun fetchDailyQuote(apiUrl: String): DailyAcgQuote? = withContext(Dispatchers.IO) {
     runCatching {
+        val url = apiUrl.trim().ifBlank { DEFAULT_DAILY_QUOTE_API_URL }
         val request = Request.Builder()
-            .url("https://v1.hitokoto.cn/?c=a&c=b&c=c&encode=json")
+            .url(url)
+            .header("Accept", "application/json")
             .header("User-Agent", "YumeBox-MaterialDesign")
             .build()
         dailyQuoteClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return@withContext null
-            val json = JSONObject(response.body.string())
-            val text = json.optString("hitokoto").trim()
-            if (text.isBlank()) return@withContext null
-            val fromWho = json.optString("from_who").trim().takeIf { it.isNotBlank() && it != "null" }
-            val from = json.optString("from").trim().takeIf { it.isNotBlank() && it != "null" }
-            DailyAcgQuote(
-                text = text,
-                author = fromWho ?: from.orEmpty(),
-            )
+            val contentType = response.header("Content-Type").orEmpty().lowercase(Locale.ROOT)
+            if (contentType.isNotBlank() && "json" !in contentType) return@withContext null
+            parseDailyQuoteJson(response.body.string())
         }
     }.getOrNull()
+}
+
+private fun parseDailyQuoteJson(rawJson: String): DailyAcgQuote? {
+    val json = JSONObject(rawJson)
+    val text = listOf("hitokoto", "text", "quote", "content", "sentence")
+        .firstNotNullOfOrNull { key -> json.optString(key).trim().takeIf(String::isNotBlank) }
+        ?: return null
+    val author = listOf("from_who", "author", "from", "source")
+        .firstNotNullOfOrNull { key -> json.optString(key).trim().takeIf { it.isNotBlank() && it != "null" } }
+        .orEmpty()
+    return DailyAcgQuote(text = text, author = author)
+}
+
+private fun parseCustomQuoteList(rawJson: String): List<DailyAcgQuote> = runCatching {
+    val json = stripJsonLineComments(rawJson)
+    if (json.isBlank()) return@runCatching emptyList()
+    val array = JSONArray(json)
+    buildList {
+        for (index in 0 until array.length()) {
+            when (val item = array.get(index)) {
+                is String -> item.trim().takeIf(String::isNotBlank)?.let { add(DailyAcgQuote(it, "")) }
+                is JSONObject -> parseDailyQuoteJson(item.toString())?.let(::add)
+            }
+        }
+    }
+}.getOrDefault(emptyList())
+
+private fun stripJsonLineComments(raw: String): String {
+    return raw.lineSequence()
+        .filterNot { it.trimStart().startsWith("//") }
+        .joinToString(separator = "\n")
 }
 

@@ -26,6 +26,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -46,8 +48,6 @@ import com.github.yumelira.yumebox.data.controller.AppIdentityResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private const val CONNECTION_APP_ICON_BITMAP_SIZE = 80
 
@@ -108,7 +108,7 @@ private fun ProtocolFallbackIcon(
     size: Dp = Dp.Unspecified,
 ) {
     val sizes = AppTheme.sizes
-    val neutral = MiuixTheme.colorScheme.onSurface
+    val neutral = MaterialTheme.colorScheme.onSurface
     val resolvedSize = size.takeOrElse { sizes.connectionLeadingIconSize }
     val protocolColor = getProtocolColor(network)
 
@@ -121,7 +121,7 @@ private fun ProtocolFallbackIcon(
     ) {
         Text(
             text = network.take(3).uppercase(),
-            style = MiuixTheme.textStyles.footnote1.copy(fontSize = 12.sp),
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
             color = protocolColor,
         )
     }

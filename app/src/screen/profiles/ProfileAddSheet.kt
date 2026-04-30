@@ -38,7 +38,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,6 +62,7 @@ import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.Card
+import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.icon.Yume
@@ -509,8 +509,8 @@ private fun DownloadProgressContent(
                         .padding(UiDp.dp10),
                 )
             } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(UiDp.dp32),
+                Md3ELoading(
+                    modifier = Modifier.size(UiDp.dp48),
                 )
             }
         }
@@ -641,7 +641,7 @@ private fun QrScannerContent(
             } else if (!hasCameraPermission) {
                 Text(text = MLang.ProfilesPage.QrScanner.NeedPermission)
             } else {
-                CircularProgressIndicator(modifier = Modifier.size(UiDp.dp32))
+                Md3ELoading(modifier = Modifier.size(UiDp.dp48))
             }
         }
 

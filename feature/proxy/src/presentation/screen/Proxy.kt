@@ -54,6 +54,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -430,6 +432,7 @@ private fun ProxyGroupTabs(
 ) {
     var showAllGroups by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val hapticFeedback = LocalHapticFeedback.current
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -447,7 +450,10 @@ private fun ProxyGroupTabs(
                     title = group.name,
                     selected = group.name == selectedGroupName,
                     modifier = Modifier.widthIn(min = 84.dp),
-                    onClick = { onGroupSelected(group.name) },
+                    onClick = {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                        onGroupSelected(group.name)
+                    },
                 )
             }
         }
@@ -456,7 +462,10 @@ private fun ProxyGroupTabs(
                 .size(UiDp.dp36)
                 .clip(RoundedCornerShape(999.dp))
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .clickable(onClick = { showAllGroups = true }),
+                .clickable(onClick = {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                    showAllGroups = true
+                }),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -491,6 +500,7 @@ private fun ProxyGroupTabs(
                     isSelected = group.name == selectedGroupName,
                     showTrailingIndicator = false,
                     onClick = {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
                         onGroupSelected(group.name)
                         coroutineScope.launch {
                             delay(180)
