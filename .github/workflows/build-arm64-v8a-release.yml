@@ -130,7 +130,8 @@ jobs:
           test -n "$SIGNING_KEY_PASSWORD"
 
           ./gradlew assembleReleaseArm64V8a \
-            -Psigning.store.file=release.keystorePING_STORE_PASSWORD" \
+            -Psigning.store.file=release.keystore \
+            -Psigning.store.password="$SIGNING_STORE_PASSWORD" \
             -Psigning.key.alias="$SIGNING_KEY_ALIAS" \
             -Psigning.key.password="$SIGNING_KEY_PASSWORD"
 
