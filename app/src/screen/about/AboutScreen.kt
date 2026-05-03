@@ -129,7 +129,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     Spacer(modifier = Modifier.height(UiDp.dp8))
 
                     Text(
-                        text = "0.5.2 (Material You Build) ($coreVersion)",
+                        text = "v0.5.3 ($coreVersion)",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

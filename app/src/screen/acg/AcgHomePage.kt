@@ -494,23 +494,52 @@ fun AcgHomePage(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (isRefreshingDailyAcgQuote) {
-                    Box(
-                        modifier = Modifier.size(42.dp),
+                Box(
+                    modifier = Modifier.size(42.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AnimatedContent(
+                        targetState = isRefreshingDailyAcgQuote,
                         contentAlignment = Alignment.Center,
-                    ) {
-                        Md3ELoading()
-                    }
-                } else {
-                    AcgInlineIconButton(
-                        icon = Yume.`Redo-dot`,
-                        contentDescription = MLang.Home.Acg.RefreshQuote,
-                        enabled = dailyQuoteEnabled,
-                        onClick = {
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                            appSettingsViewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                        transitionSpec = {
+                            (fadeIn(animationSpec = tween(180, easing = FastOutSlowInEasing)) +
+                                    scaleIn(
+                                        initialScale = 0.86f,
+                                        animationSpec = tween(220, easing = FastOutSlowInEasing),
+                                    )) togetherWith
+                                    (fadeOut(animationSpec = tween(120, easing = FastOutSlowInEasing)) +
+                                            scaleOut(
+                                                targetScale = 0.86f,
+                                                animationSpec = tween(160, easing = FastOutSlowInEasing),
+                                            )) using
+                                    SizeTransform(
+                                        clip = false,
+                                        sizeAnimationSpec = { _, _ ->
+                                            tween(durationMillis = 220, easing = FastOutSlowInEasing)
+                                        },
+                                    )
                         },
-                    )
+                        label = "acg_quote_refresh_button_content",
+                    ) { refreshing ->
+                        if (refreshing) {
+                            Box(
+                                modifier = Modifier.size(42.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Md3ELoading()
+                            }
+                        } else {
+                            AcgInlineIconButton(
+                                icon = Yume.`Redo-dot`,
+                                contentDescription = MLang.Home.Acg.RefreshQuote,
+                                enabled = dailyQuoteEnabled,
+                                onClick = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                                    appSettingsViewModel.refreshDailyAcgQuoteIfNeeded(force = true)
+                                },
+                            )
+                        }
+                    }
                 }
                 AcgLaunchButton(
                     controlState = visualControlState,

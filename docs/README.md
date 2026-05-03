@@ -30,19 +30,31 @@ YumeBox MD3 keeps the core capabilities of the original project while continuous
 
 - **Material Design 3 / Material You experience**: redesigned and optimized multiple pages; the main UI is now mostly migrated to MD3, with dynamic colors, better dark-theme adaptation, navigation bar and Topbar blur effects, smoother page transitions, and animated list sorting; theme settings now include Monet style, color intensity/vibrancy, and contrast controls, defaulting to a readability-first Tonal Spot experience.
 - **More powerful override and configuration workflow**: introduced a new override system with multi-configuration switching, stacked applying, visual editing, preset routing templates, runtime configuration preview, and suffix modifiers such as `start`, `end`, `merge`, and `force`; it also adds Rust-based override parsing plus syntax checking and partial completion in the configuration editor.
-- **Enhanced proxy runtime and node management**: supports Root Tun (no VPN required, but Root permission is needed), single-node and proxy-group delay tests, current-node delay testing from the home screens, node sorting animations, node tags and icon/flag display, persistent node selection, faster proxy startup, and improved bridge implementations.
-- **ACG home and quote experience**: the ACG home supports wallpaper, sidebar controls, launch button, runtime information, and quote display; quotes can use the API and/or a user-defined JSON list, with manual refresh, daily refresh, refresh loading feedback, and mixed API/custom selection.
+- **Enhanced proxy runtime and node management**: supports Root Tun (no VPN required, but Root permission is needed), single-node and proxy-group delay tests, current-node delay testing from the home screens, node sorting animations, node tags and icon/flag display, persistent node selection, per-card loading feedback and cancel/restore for subscription updates, faster proxy startup, and improved bridge implementations.
+- **ACG home and quote experience**: the ACG home supports wallpaper, sidebar controls, launch button, runtime information, and quote display; quotes can use the API and/or a user-defined JSON list, with manual refresh, daily refresh, refresh loading feedback, mixed API/custom selection, and an in-app documentation entry in the quote configuration page.
 - **Better subscription, import, and external-control experience**: supports editing subscription URLs, link preview, configuration sorting, opening external links in the app for quick import, and improves the external controller, Web panel, and notification quick node-switching workflow.
 - **Statistics, privacy, and lightweight build**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; supports YumeBox Lite, adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
 - **Stability and performance optimization**: improves startup blocking, runtime state freezes, dialog stutters, notification content, package size, background UI release, and many interaction details for a smoother and more fault-tolerant daily experience.
 
+## Changelog
+
+### v0.5.3
+
+Summarized from commits after `v0.5.2` (`12c3cda`):
+
+- **Release and signing**: v0.5.3 release APKs are now signed with the author's private signing key (~~definitely not because the author forgot what the signing key was~~); the arm64-v8a release workflow, JDK 24 build environment, signing store path, and certificate SHA-256 configuration were also updated.
+- **ACG home and Daily Quote**: improved quote refresh, current-node delay testing, and refresh animation feedback on the ACG home; added Daily Quote API / custom JSON format guides and an in-app documentation entry in the quote configuration page.
+- **Configuration, editor, and localization**: restored and improved lightweight editor syntax highlighting, expanded JSON diagnostics, editor UI text, settings text, proxy mode UI text, and Traditional Chinese localization.
+- **Connection, proxy, and subscription experience**: continued MD3 polishing for connection and proxy screens, including connection cards, detail sheets, node cards, and proxy-group display; subscription updates now support per-card loading feedback plus cancel/restore behavior, with stable profile ordering.
+- **Version display**: bumped the version to `v0.5.3`; the About page no longer shows the `Material You Build` suffix and now keeps the displayed version clean.
+
 ## Design and reference notes
 
-v0.5.2 continues to narrow the legacy UI boundary: normal screens now prefer Jetpack Compose Material 3 components and in-project MD3 components, while Miuix remains only as a small compatibility layer for legacy surfaces that have not been rewritten yet.
+v0.5.3 continues to narrow the legacy UI boundary: normal screens now prefer Jetpack Compose Material 3 components and in-project MD3 components, while Miuix remains only as a small compatibility layer for legacy surfaces that have not been rewritten yet. This version also removes the extra build label from the About page and keeps the displayed app version as a clean version number.
 
 This theme refactor follows the Monet / dynamic-color setting recommendations summarized in `chat-export-2026-04-28_22-27-47.md`: use wallpaper or system colors as inspiration, keep readability as the baseline, map colors through Material roles, and give users enough but not excessive control. No proxy core/runtime kernel code was changed; the changes are limited to UI, settings, and theme derivation:
 
-- ACG home: preserves the wallpaper, sidebar, launch button, and runtime-information layout while adding quote refresh, current-node delay testing, and refresh-state feedback; it continues to follow the global theme tokens in a restrained way.
+- ACG home: preserves the wallpaper, sidebar, launch button, and runtime-information layout while adding quote refresh, current-node delay testing, refresh-state feedback, and a Daily Quote configuration guide entry; it continues to follow the global theme tokens in a restrained way.
 
 References include Android / Material documentation and related open-source implementations:
 

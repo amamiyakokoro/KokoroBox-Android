@@ -23,16 +23,34 @@
 package com.github.yumelira.yumebox.presentation.component
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Switch as Md3Switch
 import androidx.compose.material3.SwitchDefaults as Md3SwitchDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,6 +74,7 @@ fun ProfileCard(
     profile: Profile,
     workDir: File,
     isDownloading: Boolean = false,
+    isUpdating: Boolean = false,
     onExport: (Profile) -> Unit,
     onUpdate: (Profile) -> Unit,
     onDelete: (Profile) -> Unit,
@@ -68,6 +87,7 @@ fun ProfileCard(
     val opacity = AppTheme.opacity
     val componentSizes = AppTheme.sizes
     val hapticFeedback = LocalHapticFeedback.current
+    val density = LocalDensity.current
 
     val colorScheme = MiuixTheme.colorScheme
 
@@ -124,7 +144,7 @@ fun ProfileCard(
 
             Md3Switch(
                 checked = profile.enabled,
-                enabled = !isDownloading,
+                enabled = true,
                 onCheckedChange = {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
                     onToggleEnabled(profile)
@@ -244,32 +264,85 @@ fun ProfileCard(
             Spacer(Modifier.weight(1f))
 
             if (profile.shouldShowUpdateButton()) {
-                IconButton(
-                    modifier = Modifier.padding(end = spacing.space8),
-                    backgroundColor = updateBg,
-                    minHeight = componentSizes.compactActionButtonSize,
-                    minWidth = componentSizes.compactActionButtonSize,
-                    enabled = !isDownloading,
-                    onClick = { if (!isDownloading) onUpdate(profile) },
+                val updateButtonSize = componentSizes.compactActionButtonSize
+                var expandedUpdateButtonWidthPx by remember { mutableIntStateOf(0) }
+                val expandedUpdateButtonWidth = remember(expandedUpdateButtonWidthPx, density) {
+                    if (expandedUpdateButtonWidthPx > 0) with(density) { expandedUpdateButtonWidthPx.toDp() } else null
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(end = spacing.space8)
+                        .height(updateButtonSize)
+                        .then(expandedUpdateButtonWidth?.let(Modifier::width) ?: Modifier.wrapContentWidth()),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = spacing.space10),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(spacing.space2),
+                    Box(
+                        modifier = Modifier
+                            .height(updateButtonSize)
+                            .clip(CircleShape)
+                            .background(updateBg)
+                            .clickable(
+                                enabled = !isDownloading && !isUpdating,
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                            ) {
+                                if (!isDownloading && !isUpdating) onUpdate(profile)
+                            }
+                            .animateContentSize(
+                                animationSpec = tween(
+                                    durationMillis = 280,
+                                    easing = FastOutSlowInEasing,
+                                ),
+                            ),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            modifier = Modifier.size(spacing.space20),
-                            imageVector = Yume.`Circle-fading-arrow-up`,
-                            tint = updateTint,
-                            contentDescription = "Update",
-                        )
-                        Text(
-                            modifier = Modifier.padding(end = componentSizes.textLineCompactSpacing),
-                            text = MLang.Component.ProfileCard.Update,
-                            color = updateTint,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 15.sp
-                        )
+                        AnimatedContent(
+                            targetState = isUpdating,
+                            contentAlignment = Alignment.Center,
+                            transitionSpec = {
+                                fadeIn(animationSpec = tween(180)) togetherWith
+                                        fadeOut(animationSpec = tween(120)) using
+                                        SizeTransform(
+                                            clip = false,
+                                            sizeAnimationSpec = { _, _ ->
+                                                tween(durationMillis = 280, easing = FastOutSlowInEasing)
+                                            },
+                                        )
+                            },
+                            label = "ProfileUpdateButtonContent",
+                        ) { updating ->
+                            if (updating) {
+                                Md3ELoading(
+                                    modifier = Modifier.size(updateButtonSize),
+                                )
+                            } else {
+                                Row(
+                                    modifier = Modifier
+                                        .height(updateButtonSize)
+                                        .onSizeChanged { size ->
+                                            if (size.width > 0) expandedUpdateButtonWidthPx = size.width
+                                        }
+                                        .padding(horizontal = spacing.space10),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(spacing.space2),
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(spacing.space20),
+                                        imageVector = Yume.`Circle-fading-arrow-up`,
+                                        tint = updateTint,
+                                        contentDescription = "Update",
+                                    )
+                                    Text(
+                                        modifier = Modifier.padding(end = componentSizes.textLineCompactSpacing),
+                                        text = MLang.Component.ProfileCard.Update,
+                                        color = updateTint,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 15.sp,
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

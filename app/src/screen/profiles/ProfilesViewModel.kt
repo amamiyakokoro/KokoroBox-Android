@@ -38,9 +38,11 @@ import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -70,6 +72,13 @@ class ProfilesViewModel(
 
     private val _downloadProgress = MutableStateFlow<DownloadProgress?>(null)
     val downloadProgress: StateFlow<DownloadProgress?> = _downloadProgress.asStateFlow()
+
+    private val _updatingProfileIds = MutableStateFlow<Set<UUID>>(emptySet())
+    val updatingProfileIds: StateFlow<Set<UUID>> = _updatingProfileIds.asStateFlow()
+
+    private val updateJobs = mutableMapOf<UUID, Job>()
+    private val profileConfigBackups = mutableMapOf<UUID, ProfileConfigBackup>()
+    private val canceledProfileUpdateIds = mutableSetOf<UUID>()
 
     init {
         refreshProfiles()
@@ -221,7 +230,13 @@ class ProfilesViewModel(
     }
 
     fun updateProfile(uuid: UUID) {
-        viewModelScope.launch {
+        if (uuid in _updatingProfileIds.value) return
+        val updateJob = viewModelScope.launch {
+            val backup = captureProfileConfigBackup(uuid)
+            var restoreBackupOnExit = false
+            profileConfigBackups[uuid] = backup
+            canceledProfileUpdateIds.remove(uuid)
+            _updatingProfileIds.update { it + uuid }
             try {
                 applyLoading(true)
                 _downloadProgress.value = DownloadProgress(
@@ -234,23 +249,52 @@ class ProfilesViewModel(
                 }
 
                 profilesRepository.updateProfile(uuid, observer)
+                if (!profileConfigExists(uuid)) {
+                    error("Updated configuration file is missing")
+                }
 
-                _downloadProgress.value = DownloadProgress(
-                    percent = 100,
-                    message = MLang.ProfilesVM.Progress.ImportComplete,
-                    isCompleted = true,
-                )
-                showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(uuid.toString()))
-                refreshProfiles()
-                Timber.i("Profile updated: $uuid")
+                if (uuid !in canceledProfileUpdateIds) {
+                    _downloadProgress.value = DownloadProgress(
+                        percent = 100,
+                        message = MLang.ProfilesVM.Progress.ImportComplete,
+                        isCompleted = true,
+                    )
+                    showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(uuid.toString()))
+                    refreshProfiles()
+                    Timber.i("Profile updated: $uuid")
+                }
             } catch (e: Exception) {
-                if (e is CancellationException) throw e
-                Timber.e(e, "Failed to update profile")
-                showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
-                _downloadProgress.value = null
+                restoreBackupOnExit = true
+                if (e is CancellationException) {
+                    Timber.d("Profile update cancelled: $uuid")
+                } else {
+                    Timber.e(e, "Failed to update profile")
+                    showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
+                    _downloadProgress.value = null
+                }
             } finally {
+                if (uuid in canceledProfileUpdateIds || restoreBackupOnExit) {
+                    restoreProfileConfigBackup(uuid)
+                    canceledProfileUpdateIds.remove(uuid)
+                    refreshProfiles()
+                }
+                updateJobs.remove(uuid)
+                profileConfigBackups.remove(uuid)
+                _updatingProfileIds.update { it - uuid }
                 applyLoading(false)
             }
+        }
+        updateJobs[uuid] = updateJob
+    }
+
+    fun cancelProfileUpdateAndRestore(uuid: UUID) {
+        if (uuid !in _updatingProfileIds.value && uuid !in profileConfigBackups) return
+        canceledProfileUpdateIds.add(uuid)
+        updateJobs[uuid]?.cancel()
+        _updatingProfileIds.update { it - uuid }
+        viewModelScope.launch {
+            restoreProfileConfigBackup(uuid)
+            refreshProfiles()
         }
     }
 
@@ -308,6 +352,7 @@ class ProfilesViewModel(
                     ?: error("Profile not found: $uuid")
 
                 if (profile.active) {
+                    cancelProfileUpdateAndRestore(uuid)
                     profilesRepository.clearActiveProfile(profile)
                     showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(profile.name))
                 } else {
@@ -340,6 +385,33 @@ class ProfilesViewModel(
         super.setLoading(loading)
     }
 
+    private suspend fun captureProfileConfigBackup(uuid: UUID): ProfileConfigBackup = withContext(Dispatchers.IO) {
+        val configFile = profileConfigFile(uuid)
+        ProfileConfigBackup(
+            existed = configFile.exists(),
+            bytes = if (configFile.exists()) configFile.readBytes() else null,
+        )
+    }
+
+    private suspend fun restoreProfileConfigBackup(uuid: UUID) = withContext(Dispatchers.IO) {
+        val backup = profileConfigBackups[uuid] ?: return@withContext
+        val configFile = profileConfigFile(uuid)
+        if (backup.existed) {
+            configFile.parentFile?.mkdirs()
+            configFile.writeBytes(backup.bytes ?: ByteArray(0))
+        } else {
+            configFile.delete()
+        }
+    }
+
+    private suspend fun profileConfigExists(uuid: UUID): Boolean = withContext(Dispatchers.IO) {
+        profileConfigFile(uuid).exists()
+    }
+
+    private fun profileConfigFile(uuid: UUID): File {
+        return File(getApplication<Application>().filesDir, "imported/${uuid}/config.yaml")
+    }
+
     private fun showError(message: String) {
         postError(message, ProfilesUiEffect.ShowError(message))
     }
@@ -353,6 +425,11 @@ class ProfilesViewModel(
         data class ShowError(val message: String) : ProfilesUiEffect
     }
 }
+
+private data class ProfileConfigBackup(
+    val existed: Boolean,
+    val bytes: ByteArray?,
+)
 
 data class ProfilesUiState(
     override val isLoading: Boolean = false,

@@ -74,7 +74,7 @@ fun AboutScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNavigator) 
                 Card {
                     YumeMd3PreferenceItem(
                         title = "YumeBox MD3 Lite",
-                        summary = "0.5.2 (Material You Build)",
+                        summary = "v0.5.3",
                         showDivider = false,
                     )
                 }

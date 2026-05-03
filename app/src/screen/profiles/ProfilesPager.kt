@@ -23,20 +23,13 @@ package com.github.yumelira.yumebox.screen.profiles
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +64,7 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
     val profilesViewModel = koinViewModel<ProfilesViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
     val profiles by profilesViewModel.profiles.collectAsState()
+    val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsState()
     val isRunning by homeViewModel.isRunning.collectAsState()
 
     val overrideConfigViewModel = koinViewModel<OverrideConfigViewModel>()
@@ -91,13 +85,13 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
     var profileToShare by remember { mutableStateOf<Profile?>(null) }
     var profileToEdit by remember { mutableStateOf<Profile?>(null) }
     var profileBinding by remember { mutableStateOf<ProfileBinding?>(null) }
-    var isDownloading by remember { mutableStateOf(false) }
 
     var importUrlFromScheme by remember { mutableStateOf<String?>(null) }
     val pendingImportUrl by MainActivity.pendingImportUrl.collectAsState()
     val urlProfiles = remember(profiles) {
         profiles.filter { it.type == Profile.Type.Url }
     }
+    val hasUpdatableProfiles = urlProfiles.any { it.uuid !in updatingProfileIds }
 
     var scannedUrl by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(pendingImportUrl) {
@@ -125,14 +119,11 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                 actions = {
                     IconButton(
                         modifier = Modifier.padding(end = UiDp.dp12),
+                        enabled = hasUpdatableProfiles,
                         onClick = {
-                            if (!isDownloading && urlProfiles.isNotEmpty()) {
-                                isDownloading = true
-                                scope.launch {
-                                    urlProfiles.forEach { p ->
-                                        profilesViewModel.updateProfile(p.uuid)
-                                    }
-                                    isDownloading = false
+                                urlProfiles.forEach { p ->
+                                if (p.uuid !in updatingProfileIds) {
+                                    profilesViewModel.updateProfile(p.uuid)
                                 }
                             }
                         }
@@ -186,45 +177,43 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                         ProfileCard(
                             profile = profile,
                             workDir = App.instance.filesDir.resolve("imported"),
-                            isDownloading = isDownloading,
+                            isDownloading = false,
+                            isUpdating = profile.uuid in updatingProfileIds,
                             modifier = Modifier
                                 .longPressDraggableHandle()
                                 .alpha(if (isDragging) 0.9f else 1f),
                             onExport = { profile ->
-                                if (!isDownloading) {
+                                if (profile.uuid !in updatingProfileIds) {
                                     profileToShare = profile
                                     showShareDialog.value = true
                                 }
                             },
                             onUpdate = { profile ->
-                                if (!isDownloading) {
-                                    isDownloading = true
-                                    scope.launch {
-                                        profilesViewModel.updateProfile(profile.uuid)
-                                        isDownloading = false
-                                    }
+                                if (profile.uuid !in updatingProfileIds) {
+                                    profilesViewModel.updateProfile(profile.uuid)
                                 }
                             },
                             onDelete = { profile ->
-                                if (!isDownloading) {
+                                if (profile.uuid !in updatingProfileIds) {
                                     showDeleteDialog = profile
                                     isDeleteDialogVisible = true
                                 }
                             },
                             onEdit = { profile ->
-                                if (!isDownloading) {
+                                if (profile.uuid !in updatingProfileIds) {
                                     showEditOptionsDialog = profile
                                     isEditOptionsDialogVisible = true
                                 }
                             },
                             onToggleEnabled = { profile ->
-                                if (!isDownloading) {
-                                    scope.launch {
-                                        if (profile.active && isRunning) {
-                                            homeViewModel.stopProxy()
-                                        }
-                                        profilesViewModel.toggleProfileEnabled(profile.uuid)
+                                if (profile.active) {
+                                    profilesViewModel.cancelProfileUpdateAndRestore(profile.uuid)
+                                }
+                                scope.launch {
+                                    if (profile.active && isRunning) {
+                                        homeViewModel.stopProxy()
                                     }
+                                    profilesViewModel.toggleProfileEnabled(profile.uuid)
                                 }
                             },
                         )
@@ -233,22 +222,6 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
             }
         }
     }
-
-        AnimatedVisibility(
-            visible = isDownloading,
-            enter = fadeIn(animationSpec = tween(durationMillis = 150)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 150)),
-            modifier = Modifier.matchParentSize(),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.18f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Md3ELoading()
-            }
-        }
     }
 
     AddProfileSheet(
@@ -262,7 +235,6 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
             profilesViewModel.patchProfile(uuid, name, source, interval)
         },
         onDownloadComplete = {
-            isDownloading = false
             showAddBottomSheet.value = false
             profilesViewModel.clearDownloadProgress()
         },

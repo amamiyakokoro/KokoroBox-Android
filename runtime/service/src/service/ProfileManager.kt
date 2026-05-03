@@ -70,6 +70,7 @@ class ProfileManager(private val context: Context) : IProfileManager,
         )
 
         ImportedDao.insert(imported)
+        appendProfileToOrder(uuid)
 
         return uuid
     }
@@ -104,6 +105,7 @@ class ProfileManager(private val context: Context) : IProfileManager,
         sourceDir.copyRecursively(targetDir)
 
         ImportedDao.insert(newImported)
+        appendProfileToOrder(newUUID)
 
         return newUUID
     }
@@ -139,13 +141,11 @@ class ProfileManager(private val context: Context) : IProfileManager,
             ImportedDao.queryAllUUIDs()
         }
 
-        val orderIndex = ProfileStore.loadProfileOrder()
-            .withIndex()
-            .associate { it.value to it.index }
+        val order = normalizeProfileOrder(uuids)
+        val orderIndex = order.withIndex().associate { it.value to it.index }
 
         return uuids.mapNotNull { resolveProfile(it) }
-            .sortedWith(compareBy<Profile> { orderIndex[it.uuid] ?: Int.MAX_VALUE }
-                .thenByDescending { it.updatedAt })
+            .sortedBy { orderIndex[it.uuid] ?: Int.MAX_VALUE }
     }
 
     override suspend fun queryActive(): Profile? {
@@ -185,6 +185,32 @@ class ProfileManager(private val context: Context) : IProfileManager,
         }
 
         ProfileStore.saveProfileOrder(normalized)
+    }
+
+    private fun normalizeProfileOrder(existing: List<UUID>): List<UUID> {
+        val existingSet = existing.toSet()
+        val storedOrder = ProfileStore.loadProfileOrder()
+        val normalized = buildList {
+            storedOrder.forEach { uuid ->
+                if (uuid in existingSet && uuid !in this) add(uuid)
+            }
+            existing.forEach { uuid ->
+                if (uuid !in this) add(uuid)
+            }
+        }
+
+        if (normalized != storedOrder) {
+            ProfileStore.saveProfileOrder(normalized)
+        }
+
+        return normalized
+    }
+
+    private fun appendProfileToOrder(uuid: UUID) {
+        val order = ProfileStore.loadProfileOrder()
+        if (uuid !in order) {
+            ProfileStore.saveProfileOrder(order + uuid)
+        }
     }
 
     private suspend fun resolveProfile(uuid: UUID): Profile? {

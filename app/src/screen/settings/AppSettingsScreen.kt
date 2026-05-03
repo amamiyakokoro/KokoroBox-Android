@@ -405,6 +405,7 @@ fun AcgQuoteConfigScreen(
     val acgCustomQuoteEnabled by viewModel.acgCustomQuoteEnabled.state.collectAsState()
     val acgDailyQuoteApiUrl by viewModel.acgDailyQuoteApiUrl.state.collectAsState()
     val acgCustomQuoteListJson by viewModel.acgCustomQuoteListJson.state.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -466,11 +467,31 @@ fun AcgQuoteConfigScreen(
                             }
                         },
                     )
+                    PreferenceArrowItem(
+                        title = MLang.AppSettings.Experimental.DailyQuoteDocsTitle,
+                        summary = MLang.AppSettings.Experimental.DailyQuoteDocsSummary,
+                        onClick = {
+                            if (!openDailyQuoteDocs(context)) {
+                                context.toast(MLang.Util.Error.UnknownError)
+                            }
+                        },
+                    )
                 }
             }
         }
     }
 }
+
+private const val DAILY_QUOTE_DOCS_URL =
+    "https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/docs/DailyQuote.md"
+
+private fun openDailyQuoteDocs(context: android.content.Context): Boolean = runCatching {
+    context.startActivity(
+        Intent(Intent.ACTION_VIEW, DAILY_QUOTE_DOCS_URL.toUri()).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        },
+    )
+}.isSuccess
 
 private fun customQuoteListTemplate() = """// ${MLang.AppSettings.Experimental.CustomQuoteTemplateComment}
 // ${MLang.AppSettings.Experimental.CustomQuoteTemplateStringArray}
