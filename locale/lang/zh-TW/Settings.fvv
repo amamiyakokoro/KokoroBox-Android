@@ -1,0 +1,33 @@
+<Settings Page>
+Settings = {
+    Title = "設定"
+
+    Section = {
+        UiSettings = "介面設定"
+        More = "更多"
+    }
+
+    UiSettings = {
+        App = "應用程式"
+        AppSummary = "外觀 · 語言 · 主題"
+        Network = "網路"
+        NetworkSummary = "DNS · 埠 · 入站"
+        Override = "覆寫"
+        OverrideSummary = "規則覆寫"
+        MetaFeatures = "Meta 功能"
+        MetaFeaturesSummary = "Meta 擴充套件"
+    }
+
+    More = {
+        Lab = "實驗室"
+        LabSummary = "Sub-Store · 實驗功能"
+        Logs = "日誌"
+        LogsSummary = "執行日誌"
+        About = "關於"
+        AboutSummary = "版本與許可"
+    }
+
+    Error = {
+        WebviewFailed = "無法開啟 WebView：%s"
+    }
+}

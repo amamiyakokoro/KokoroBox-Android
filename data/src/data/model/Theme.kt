@@ -29,6 +29,7 @@ enum class ThemeMode {
 enum class AppLanguage {
     System,
     Zh,
+    ZhTw,
     En,
 }
 

@@ -143,6 +143,7 @@ fun VpnSettingsScreen(navigator: DestinationsNavigator) {
                         items = listOf(
                             MLang.AppSettings.Interface.LanguageSystem,
                             MLang.AppSettings.Interface.LanguageChinese,
+                            MLang.AppSettings.Interface.LanguageTraditionalChinese,
                             MLang.AppSettings.Interface.LanguageEnglish,
                         ),
                         values = AppLanguage.entries,

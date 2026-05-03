@@ -1,0 +1,40 @@
+<Editor Feature>
+Editor = {
+    Common = {
+        JsonSubtitle = "Edit using JSON format"
+        ConfigPreviewTitle = "Config Preview"
+        EditConfigTitle = "Edit Config"
+        EditOverrideConfigTitle = "Edit Override Config"
+        EditProfileConfigTitle = "Edit Profile Config"
+    }
+
+    Action = {
+        Format = "Format"
+        Save = "Save"
+        Discard = "Discard"
+    }
+
+    Dialog = {
+        DiscardTitle = "Discard Changes"
+        UnsavedChangesTitle = "Unsaved Changes"
+        UnsavedChangesMessage = "There are unsaved changes. Discard them?"
+    }
+
+    Toast = {
+        FormatSuccess = "Formatted successfully"
+        FormatFailedOrUnchanged = "Format failed or no changes needed"
+        SyntaxError = "Syntax error, please check the content"
+        SaveFailed = "Save failed"
+    }
+
+    Diagnostic = {
+        JsonFormatError = "JSON format error"
+        JsonMustStartWithObjectOrArray = "JSON must start with '{' or '['"
+        JsonSyntaxError = "JSON syntax error"
+        Unterminated = "Unterminated string or object"
+        Unknown = "Unknown"
+        Expected = "Expected %s"
+        NoValue = "Missing value"
+        DuplicateKey = "Duplicate key"
+    }
+}

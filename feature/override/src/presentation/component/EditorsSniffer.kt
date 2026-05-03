@@ -69,7 +69,7 @@ fun SnifferEditor(
         }
         OverrideCardSection("HTTP") {
             StringListWithModifiersInput(
-                title = "HTTP 端口",
+                title = MLang.Override.Form.HttpPorts,
                 replaceValue = config.sniffer.sniff.http.ports,
                 startValue = config.sniffer.sniff.http.portsStart,
                 endValue = config.sniffer.sniff.http.portsEnd,
@@ -129,7 +129,7 @@ fun SnifferEditor(
         }
         OverrideCardSection("TLS") {
             StringListWithModifiersInput(
-                title = "TLS 端口",
+                title = MLang.Override.Form.TlsPorts,
                 replaceValue = config.sniffer.sniff.tls.ports,
                 startValue = config.sniffer.sniff.tls.portsStart,
                 endValue = config.sniffer.sniff.tls.portsEnd,
@@ -189,7 +189,7 @@ fun SnifferEditor(
         }
         OverrideCardSection("QUIC") {
             StringListWithModifiersInput(
-                title = "QUIC 端口",
+                title = MLang.Override.Form.QuicPorts,
                 replaceValue = config.sniffer.sniff.quic.ports,
                 startValue = config.sniffer.sniff.quic.portsStart,
                 endValue = config.sniffer.sniff.quic.portsEnd,

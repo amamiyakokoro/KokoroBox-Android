@@ -1,0 +1,72 @@
+<Onboarding>
+Onboarding = {
+    Navigation = {
+        Back = "返回"
+        Next = "下一步"
+        Start = "開始設定"
+        Enter = "進入應用程式"
+    }
+
+    Permission = {
+        Title = "確認執行權限"
+        Subtitle = "權限會影響通知和依應用程式分流等功能"
+
+        Common = {
+            Granted = "已授權"
+        }
+
+        Notification = {
+            Title = "通知權限"
+            SummaryNeed = "用於顯示連線狀態和流量通知"
+            SummaryNotRequired = "目前系統無需額外授權"
+        }
+
+        AppList = {
+            Title = "應用程式清單權限"
+            SummaryNeed = "用於依應用程式分流等功能"
+        }
+    }
+
+    Privacy = {
+        Title = "確認隱私與協議"
+        Subtitle = "閱讀並同意協議後方可繼續"
+        RichTextLead = "在開始使用前需要同意隱私協議，才能繼續使用 YumeBox。"
+        RichTextPrefix = "繼續前請先閱讀並同意 "
+        RichTextConnector = " 與 "
+        RichTextSuffix = "。"
+        TermsLink = "《使用條款》"
+        PolicyLink = "《隱私政策》"
+        Privacy = {
+            Title = "隱私政策"
+        }
+        Accept = {
+            Title = "我已閱讀並同意隱私政策"
+        }
+    }
+
+    Personalize = {
+        Title = "調整介面風格"
+        Subtitle = "主題模式和主色可隨時在設定中修改"
+    }
+
+    Finish = {
+        Title = "準備完成"
+        Subtitle = "基礎設定已就緒即將進入主頁"
+    }
+
+    Project = {
+        Github = {
+            Title = "GitHub 倉庫"
+            Summary = "github.com/YumeLira/YumeBox"
+        }
+        Community = {
+            Title = "社群頻道"
+            Summary = "加入頻道或群組繼續反饋"
+        }
+    }
+
+    Sheet = {
+        PrivacyPolicyTitle = "隱私政策"
+        LoadFailed = "無法載入協議內容"
+    }
+}

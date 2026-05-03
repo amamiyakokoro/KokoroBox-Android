@@ -22,6 +22,7 @@
 
 package com.github.yumelira.yumebox.feature.editor.presentation.diagnostic
 
+import dev.oom_wg.purejoy.mlang.MLang
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticDetail
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticRegion
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticsContainer
@@ -55,8 +56,8 @@ object JsonDiagnosticsProvider {
                             DiagnosticRegion.SEVERITY_ERROR,
                             0,
                             DiagnosticDetail(
-                                briefMessage = "JSON 格式错误",
-                                detailedMessage = "JSON 必须以 '{' 或 '[' 开头"
+                                briefMessage = MLang.Editor.Diagnostic.JsonFormatError,
+                                detailedMessage = MLang.Editor.Diagnostic.JsonMustStartWithObjectOrArray
                             )
                         )
                     )
@@ -92,7 +93,7 @@ object JsonDiagnosticsProvider {
             DiagnosticRegion.SEVERITY_ERROR,
             0,
             DiagnosticDetail(
-                briefMessage = "JSON 语法错误",
+                briefMessage = MLang.Editor.Diagnostic.JsonSyntaxError,
                 detailedMessage = formatErrorMessage(message)
             )
         )
@@ -100,15 +101,15 @@ object JsonDiagnosticsProvider {
 
     private fun formatErrorMessage(message: String): String {
         return when {
-            message.contains("Unterminated") -> "未终止的字符串或对象"
+            message.contains("Unterminated") -> MLang.Editor.Diagnostic.Unterminated
             message.contains("Expected") -> {
 
                 val expectedPattern = "Expected (\\S+)".toRegex()
-                val expected = expectedPattern.find(message)?.groupValues?.get(1) ?: "未知"
-                "期望 $expected"
+                val expected = expectedPattern.find(message)?.groupValues?.get(1) ?: MLang.Editor.Diagnostic.Unknown
+                MLang.Editor.Diagnostic.Expected.format(expected)
             }
-            message.contains("No value") -> "缺少值"
-            message.contains("Duplicate") -> "重复的键"
+            message.contains("No value") -> MLang.Editor.Diagnostic.NoValue
+            message.contains("Duplicate") -> MLang.Editor.Diagnostic.DuplicateKey
             else -> message
         }
     }

@@ -1,0 +1,48 @@
+<Traffic Statistics Page>
+TrafficStatistics = {
+    Title = "流量統計"
+    EntrySummary = "檢視流量使用情況"
+
+    TimeRange = {
+        Today = "今日"
+        Week = "本週"
+    }
+
+    Summary = {
+        TodayTraffic = "今日流量"
+        WeekTraffic = "本週流量"
+    }
+
+    Compare = {
+        MoreThanYesterday = "較昨日 +%s"
+        LessThanYesterday = "較昨日 %s"
+        SameAsYesterday = "與昨日持平"
+        WeekStats = "近 7 天統計"
+    }
+
+    Chart = {
+        Hourly = "4 小時"
+        Daily = "按天"
+    }
+
+    Donut = {
+        Other = "其他"
+    }
+
+    Action = {
+        Clear = "清空統計"
+        ClearSuccess = "統計資料已清空"
+    }
+
+    Section = {
+        Traffic = "流量"
+        TopApps = "高流量應用程式"
+        EmptyApps = "暫無應用程式流量統計"
+    }
+
+    Metric = {
+        Download = "下行"
+        Upload = "上行"
+        UsageLine = "下行 %s  上行 %s"
+    }
+}

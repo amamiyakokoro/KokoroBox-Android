@@ -1,0 +1,59 @@
+<Connection Page>
+Connection = {
+    Title = "連線"
+    Summary = "檢視目前活動連線"
+
+    Tab = {
+        Active = "活動中"
+        Closed = "已關閉"
+    }
+
+    Search = "搜尋"
+    SearchHint = "搜尋主機、程序..."
+
+    SortBy = "排序:"
+    Sort = {
+        Time = "時間"
+        Upload = "上傳"
+        Download = "下載"
+        Host = "主機"
+    }
+
+    ChainCount = "x%d"
+
+    RelativeTime = {
+        JustNow = "剛剛"
+        MinutesAgo = "%d 分鐘前"
+        HoursAgo = "%d 小時前"
+        DaysAgo = "%d 天前"
+        Date = "%02d-%02d"
+    }
+
+    Detail = {
+        Action = {
+            Interrupting = "正在打斷連線..."
+            Interrupt = "打斷連線"
+        }
+
+        Section = {
+            Info = "連線資訊"
+            Rule = "規則"
+        }
+
+        Label = {
+            Protocol = "協議"
+            Process = "程序"
+            SourceAddress = "源地址"
+            DestinationAddress = "目標地址"
+            Duration = "連線時長"
+            Upload = "上傳"
+            Download = "下載"
+            Type = "型別"
+            Content = "內容"
+        }
+    }
+
+    Loading = "載入中..."
+    Empty = "暫無活動連線"
+    NoResults = "沒有匹配的連線"
+}

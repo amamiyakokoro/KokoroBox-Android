@@ -43,6 +43,7 @@ import com.github.yumelira.yumebox.presentation.icon.yume.ListCollapse
 import com.github.yumelira.yumebox.presentation.icon.yume.Save
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -52,7 +53,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 @Composable
 fun ConfigPreviewScreen(
     navigator: DestinationsNavigator,
-    title: String = "配置预览",
+    title: String = MLang.Editor.Common.ConfigPreviewTitle,
     initialContent: String = "",
     language: LanguageScope = LanguageScope.Yaml,
     onSave: ((String) -> Unit)? = null,
@@ -78,7 +79,7 @@ fun ConfigPreviewScreen(
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = { navigator.navigateUp() }) {
-                        Icon(Yume.ArrowLeft, contentDescription = "Back")
+                        Icon(Yume.ArrowLeft, contentDescription = MLang.Component.Navigation.Back)
                     }
                 },
                 actions = {
@@ -91,7 +92,7 @@ fun ConfigPreviewScreen(
                             }
                         }
                     ) {
-                        Icon(Yume.ListCollapse, contentDescription = "Format")
+                        Icon(Yume.ListCollapse, contentDescription = MLang.Editor.Action.Format)
                     }
                     IconButton(
                         onClick = {
@@ -101,12 +102,12 @@ fun ConfigPreviewScreen(
                             }.onSuccess {
                                 navigator.navigateUp()
                             }.onFailure {
-                                context.toast(it.message ?: "保存失败")
+                                context.toast(it.message ?: MLang.Editor.Toast.SaveFailed)
                             }
                         },
                         enabled = canSave
                     ) {
-                        Icon(Yume.Save, contentDescription = "Save")
+                        Icon(Yume.Save, contentDescription = MLang.Editor.Action.Save)
                     }
                 }
             )
@@ -127,6 +128,7 @@ fun ConfigPreviewScreen(
                 },
                 modifier = Modifier.fillMaxSize(),
                 readOnly = onSave == null,
+                language = language,
             )
         }
     }

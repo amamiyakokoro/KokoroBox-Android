@@ -1,0 +1,542 @@
+<Override Page>
+Override = {
+    Title = "覆寫設定"
+
+    Action = {
+        Create = "建立覆寫設定"
+        New = "新增覆寫設定"
+        Import = "匯入 JSON"
+        ImportFile = "匯入設定檔"
+    }
+
+    Empty = {
+        Title = "暫無覆寫設定"
+        Hint = "點選下方按鈕建立新的覆寫設定，或匯入 JSON"
+    }
+
+    Status = {
+        InUse = "使用中"
+        NotInUse = "未使用"
+    }
+
+    Card = {
+        Copy = "複製設定"
+        Export = "匯出設定"
+        Edit = "編輯設定"
+        Delete = "刪除設定"
+        EditButton = "編輯"
+        DeleteButton = "刪除"
+        NoDescription = "未填寫描述"
+    }
+
+    Import = {
+        ReadError = "無法讀取匯入檔案"
+        Success = "已從 %s 匯入 %d 個設定"
+        SuccessDefault = "已匯入 %d 個設定"
+        Failed = "匯入失敗: %s"
+        FileError = "讀取檔案失敗: %s"
+    }
+
+    Export = {
+        Failed = "匯出失敗：%s"
+        Success = "已匯出設定：%s"
+    }
+
+    Dialog = {
+        Create = {
+            Title = "新增設定"
+            Name = "設定名稱"
+            Description = "設定描述"
+            ImportHint = "選擇 JSON 檔案匯入覆寫設定"
+        }
+        Delete = {
+            Title = "刪除設定"
+            InUseMessage = "設定 %s 正在被訂閱使用，刪除後將解除繫結關係。確定要刪除嗎？此操作不可恢復。"
+            Message = "確定要刪除設定 %s 嗎？此操作不可恢復。"
+        }
+        EditOptions = {
+            Title = "編輯設定"
+            CodeEditor = "程式碼編輯器"
+            VisualEditor = "視覺化編輯"
+        }
+        Button = {
+            Cancel = "取消"
+            Delete = "刪除"
+        }
+    }
+
+    Edit = {
+        TitleNew = "新增覆寫設定"
+        TitleEdit = "編輯設定"
+        EmptyName = {
+            Title = "名稱為空"
+            Summary = "目前名稱為空，無法實時儲存。確定放棄這次未儲存的修改嗎？"
+        }
+        Button = {
+            Cancel = "取消"
+            Discard = "放棄"
+        }
+        PresetApplied = "已更新預設分流模板"
+    }
+
+    Section = {
+        General = {
+            Title = "全域設定"
+            Summary = "執行模式、控制器、持久化與 GEO"
+        }
+        Dns = {
+            Title = "DNS"
+            Summary = "基礎開關、Fake-IP、上游與策略"
+        }
+        Sniffer = {
+            Title = "網域嗅探"
+            Summary = "策略開關、協議埠、跳過規則"
+        }
+        Inbound = {
+            Title = "入站"
+            Summary = "埠、鑑權、區域網路存取"
+        }
+        Tun = {
+            Title = "Tun"
+            Summary = "入站 Tun、路由與應用程式範圍"
+        }
+        Rules = {
+            Title = "路由規則"
+            Summary = "規則鏈與匹配順序"
+        }
+        Proxies = {
+            Title = "出站代理"
+            Summary = "代理節點與協議物件"
+        }
+        ProxyProviders = {
+            Title = "代理集合"
+            Summary = "Proxy Providers 合併與覆蓋"
+        }
+        ProxyGroups = {
+            Title = "代理組"
+            Summary = "Proxy Groups 前置、覆蓋、後置"
+        }
+        RuleProviders = {
+            Title = "規則集合"
+            Summary = "Rule Providers 合併與覆蓋"
+        }
+        SubRules = {
+            Title = "子規則"
+            Summary = "Sub Rules 分組與合併"
+        }
+    }
+
+    Modifier = {
+        Replace = "覆蓋"
+        Start = "前置追加"
+        End = "後置追加"
+        Merge = "合併"
+        Force = "強制覆蓋"
+        NotModified = "未修改"
+        ItemsCount = "%d 項"
+        NoChanges = "暫無改動"
+    }
+
+    Structured = {
+        Proxies = {
+            Title = "代理節點"
+            ItemLabel = "代理節點"
+            EmptyHint = "暫無代理節點"
+        }
+        ProxyGroups = {
+            Title = "策略組"
+            ItemLabel = "策略組"
+            EmptyHint = "暫無策略組"
+        }
+        RuleProviders = {
+            Title = "規則提供者"
+            ItemLabel = "Provider"
+        }
+        ProxyProviders = {
+            Title = "代理提供者"
+            ItemLabel = "Provider"
+        }
+        SubRules = {
+            Title = "子規則"
+            ItemLabel = "子規則組"
+        }
+    }
+
+    Editor = {
+        Mode = {
+            Title = "修飾符模式"
+        }
+        ClearDialog = {
+            Title = "清空%s"
+            Summary = "清空後將移除目前模式裡的所有%s。"
+        }
+        New = "新增"
+        NewRule = "新增規則"
+        EditRule = "編輯規則"
+        NewSubRuleGroup = "新增子規則組"
+        UnnamedSubRuleGroup = "未命名子規則組"
+        EditSubRuleGroup = "編輯子規則組"
+        ClearSubRules = "清空子規則"
+        Unnamed = "未命名%s"
+        UnnamedRule = "未命名規則"
+        Edit = "編輯"
+        DragToSort = "拖拽排序"
+        CancelDelete = "取消刪除"
+        DeleteSelected = "刪除已選條目"
+        DeleteSelectedRules = "刪除已選規則"
+        ClearMode = "清空目前模式"
+        EnterDeleteMode = "進入刪除模式"
+        EmptyString = "空字串"
+        ArrayItems = "陣列 %d 項"
+        ObjectFields = "物件 %d 個欄位"
+        Clear = "清空"
+        Rules = "規則"
+        AddCustom = "新增自訂"
+        ContentEmpty = "內容不能為空"
+        Confirm = "確定"
+        OneItemPerLine = "每行一個條目"
+        AddItem = "新增一項"
+        DeleteLastItem = "刪除最後一項"
+        Copy = "複製"
+        Delete = "刪除"
+        MoveUp = "上移"
+        MoveDown = "下移"
+        AddObject = "新增物件"
+        SubRuleName = "子規則名稱"
+        NoRules = "暫無規則"
+        RulesConfiguredInline = "已設定 %d 條規則"
+        AddSubRuleGroup = "新增子規則組"
+        EditSubRule = "編輯子規則"
+        RulePlaceholder = "DOMAIN-SUFFIX,example.com,DIRECT"
+        KeyName = "鍵名"
+        List = "清單"
+        AddItem = "新增條目"
+        EditItem = "編輯條目"
+        ClearCurrentMode = "清空目前模式"
+        NewProxyNode = "新增代理節點"
+        NewProxyGroup = "新增策略組"
+        EditProxyNode = "編輯代理節點"
+        EditProxyGroup = "編輯策略組"
+        UnnamedProxyNode = "未命名代理節點"
+        UnnamedProxyGroup = "未命名策略組"
+        EnterDeleteMode = "進入刪除模式"
+        ProxyNode = "代理節點"
+        ProxyGroup = "策略組"
+        RuleEdit = "規則編輯"
+        SubRuleTarget = "子規則目標"
+        ProxyGroupTarget = "策略組目標"
+        RuleTypeEmpty = "規則型別不能為空"
+        PayloadEmpty = "匹配內容不能為空"
+        TargetEmpty = "目標不能為空"
+        MatchResult = "匹配結果"
+        SelectMatchResult = "選擇匹配結果"
+        CustomMatchResult = "自訂匹配結果"
+        SelectSubRuleTarget = "選擇子規則目標"
+        SelectProxyGroupTarget = "選擇策略組目標"
+        CustomSubRuleTarget = "自訂子規則目標"
+        CustomProxyGroupTarget = "自訂策略組目標"
+        SelectRuleProvider = "選擇規則提供者"
+        RuleBody = "規則主體"
+        RuleType = "型別"
+        Payload = "匹配內容"
+        AdditionalParams = "附加參數"
+        BasicConnection = "基礎連線"
+        NetworkAndRoute = "網路與路由"
+        PortEmptyHint = "留空表示不覆寫埠"
+        TypeEmpty = "型別不能為空"
+        MemberSource = "成員來源"
+        HealthCheckAndFilter = "健康檢查與過濾"
+        SelectProxyGroupMember = "選擇策略組成員"
+        CustomMember = "自訂成員"
+        SaveProxyNode = "儲存代理節點"
+        SaveProxyGroup = "儲存策略組"
+        SaveRule = "儲存規則"
+        RuleProviderInputHint = "輸入框是自訂內容；留空時使用下面選中的規則提供者"
+        LogicalRuleHint = "邏輯規則可直接填寫完整 payload"
+        OtherExtraParams = "其他附加參數，多個值用逗號分隔"
+        ExtraParamsHint = "例如 src,no-resolve 之外的額外參數\n邏輯規則請直接填寫完整 payload，例如 ((DOMAIN,google.com),(NETWORK,udp))。"
+        JsonBlockSubtitle = "使用 JSON 格式編輯該設定塊"
+        ObjectListHint = "結構化編輯物件清單，欄位值支援字串、數字、布林和 JSON 片段。"
+        ProviderMapHint = "結構化編輯 Provider 字典，同名鍵會覆蓋舊值。"
+        SubRuleGroupHint = "每個子規則組包含一個名稱和一組規則。"
+        ObjectFieldHint = "鍵值內容支援簡單值和 JSON 結構。"
+        ObjectJsonPlaceholder = "{ \"name\": \"proxy\", \"type\": \"ss\" }"
+        ObjectFallbackTitle = "物件 %d"
+        ObjectFieldCount = "%d 個欄位"
+        NewProvider = "新增 Provider"
+        UnnamedProvider = "未命名 Provider"
+    }
+
+    Draft = {
+        Object = "物件"
+        SubRuleGroup = "子規則組"
+        Name = "名稱"
+        NameRequired = "名稱不能為空"
+        Save = "儲存"
+        BasicInfo = "基礎資訊"
+        BasicIdentity = "基礎身份"
+        CoreSource = "核心來源"
+        NetworkAuth = "網路與認證"
+        RuleList = "規則清單"
+        NoRules = "未設定規則"
+        RulesConfigured = "已設定 %d 條規則"
+        EditSubRules = "編輯子規則"
+        ExtraFields = "額外欄位"
+        AddExtraField = "新增額外欄位"
+        EditExtraField = "編輯額外欄位"
+        AddHealthCheckField = "新增 health-check 額外欄位"
+        EditHealthCheckField = "編輯 health-check 額外欄位"
+        AddOverrideField = "新增 override 額外欄位"
+        EditOverrideField = "編輯 override 額外欄位"
+        HealthCheckSwitch = "Health Check 開關"
+        HealthCheckFields = "Health Check 額外欄位"
+        OverrideSwitch = "Override 開關"
+        OverrideFields = "Override 額外欄位"
+        BooleanOptions = "布林選項"
+        HeaderHint = "每行一個 header，格式：Key: value1 | value2"
+        ConfigName = "設定名稱"
+        ConfigDescription = "設定說明"
+        PresetTemplate = "預設分流模板"
+        PresetApplySummary = "套用後會覆蓋目前覆寫裡的規則提供者、策略組和規則"
+        OfficialMrs = "官方 MRS 常用分流"
+        OfficialMrsSummary = "頂部模板編輯器，支援地區自動組和每個分流項單獨開關；套用時會重建目前覆寫裡的規則三塊。"
+        ConfigSections = "設定區塊"
+        Apply = "套用"
+        RegionalAutoGroup = "地區自動組"
+        BasicRouting = "基礎分流"
+        ServiceRouting = "服務分流"
+        ClickToAddExtraField = "點選新增額外欄位"
+        ExtraFieldsConfigured = "已設定 %d 個額外欄位"
+        DeleteExtraField = "刪除額外欄位"
+        ValueType = "值型別"
+        StringValue = "字串值"
+        IntValue = "整數值"
+        DoubleValue = "浮點數值"
+        JsonFragment = "單一 JSON 片段"
+        KeyNameEmpty = "鍵名不能為空"
+        ValueTypeMismatch = "目前值與所選型別不匹配"
+    }
+
+    Form = {
+        RuleChain = "規則鏈"
+        RuleChainNotSet = "未設定規則鏈"
+        SubRules = "子規則"
+        SubRulesHint = "結構化規則組"
+        SubRulesAdvanced = "複雜子規則結構統一收在高階 JSON 中"
+        RuleProviders = "規則提供者"
+        RuleProvidersHint = "結構化 Provider"
+        RuleProvidersAdvanced = "需要複雜 Provider 欄位時再進入高階 JSON"
+        ProxyNodes = "代理節點"
+        ProxyNodesHint = "結構化代理條目"
+        ProxyProviders = "代理提供者"
+        ProxyProvidersHint = "結構化 Provider"
+        ProxyProvidersAdvanced = "需要協議細節、校驗或額外欄位時再進入高階 JSON"
+        ProxyGroups = "策略組"
+        ProxyGroupsHint = "結構化策略組"
+        StructuredEdit = "%s · 結構化編輯"
+        AdvancedJson = "%s · 高階 JSON"
+        OpenAdvancedEdit = "開啟高階編輯"
+        OpenAdvancedEditSummary = "直接編輯原始物件，用於補充結構化表單未覆蓋的欄位"
+        ItemsConfigured = "已設定 %d 項"
+
+        ProxyPorts = "代理埠"
+        RunAndLog = "執行與日誌"
+        ProcessMode = "程序匹配模式"
+        NotModify = "不修改"
+        UnifiedDelay = "統一延遲"
+        TcpConcurrent = "TCP 併發"
+        GeodataMode = "Geodata 模式"
+        RunAndLogExtra = "執行與日誌補充"
+        Seconds = "秒"
+        ConnectionNetwork = "連線與網路"
+        OutboundInterface = "出站介面"
+        RoutingMark = "路由標記"
+        GeositeMatcher = "Geosite 匹配器"
+        GlobalClientFingerprint = "全域客戶端指紋"
+        LanAccess = "區域網路存取"
+        AllowedIPs = "允許 IP 段"
+        DisallowedIPs = "禁止 IP 段"
+        LanAddress = "區域網地址"
+        BindAddress = "繫結地址"
+        UserAuth = "使用者驗證"
+        SkipAuthIPs = "跳過鑑權網段"
+        ExternalControl = "外部控制"
+        ExternalController = "外部控制器"
+        ExternalControllerHttps = "HTTPS 控制器"
+        ExternalDoH = "外部 DoH 服務"
+        ApiSecret = "API 存取金鑰"
+        ControllerCors = "控制器 CORS"
+        AllowPrivateNetwork = "允許私有網路"
+        ConfigPersistence = "設定持久化"
+        SaveGroupSelection = "儲存策略組選擇"
+        SaveFakeIpMapping = "儲存 Fake-IP 對映"
+        GeoResources = "GEO 資源開關"
+        AutoUpdateGeo = "自動更新 GEO"
+        GeoUpdateInterval = "GEO 更新間隔"
+        Hours = "小時"
+        GeoipUrl = "GeoIP 地址"
+        GeositeUrl = "GeoSite 地址"
+        MmdbUrl = "MMDB 地址"
+
+        TunBasicSwitch = "基礎開關"
+        Stack = "協定堆疊"
+        AutoRoute = "自動路由"
+        AutoRedirect = "自動重新導向"
+        AutoDetectInterface = "自動識別網路卡"
+        StrictRoute = "嚴格路由"
+        EndpointIndependentNat = "獨立於端點 NAT"
+        NetworkPerfSwitch = "網路效能開關"
+        EnableGso = "啟用 GSO"
+        DisableIcmpForward = "停用 ICMP 轉送"
+        NetworkPerfParams = "網路效能參數"
+
+        DnsBasicSwitch = "基礎開關"
+        DnsBasicParams = "DNS 基礎參數"
+        DirectFollowPolicy = "Direct 遵循 Policy"
+        Ipv6Timeout = "IPv6 超時"
+        FakeIpMode = "Fake-IP 模式"
+        FakeIpParams = "Fake-IP 參數"
+        FakeIpIpv6Range = "Fake-IP IPv6 網段"
+        ProxyServerNameserverPolicy = "Proxy Server Nameserver Policy"
+        FallbackSwitch = "Fallback 開關"
+        FallbackParams = "Fallback 參數"
+        FallbackFilter = "Fallback 過濾"
+        DnsFakeIpRange = "FakeIP 地址段"
+        DnsUpstream = "上游伺服器"
+        DnsPolicyMode = "策略模式"
+
+        SnifferSwitch = "開關"
+        HttpPorts = "HTTP 埠"
+        TlsPorts = "TLS 埠"
+        QuicPorts = "QUIC 埠"
+        SnifferPorts = "埠"
+        SnifferOverride = "覆寫目標"
+        SnifferSkipDomain = "跳過網域"
+        SnifferForceDomain = "強制網域"
+        SnifferParsePureIp = "解析純 IP"
+
+        TunRouteAndApps = "路由與應用程式"
+        DnsHijack = "DNS 劫持"
+        RouteAddress = "路由網段"
+        RouteExcludeAddress = "排除路由網段"
+        IncludePackage = "包含應用程式"
+        ExcludePackage = "排除應用程式"
+        CacheLimit = "快取上限"
+        DnsUpstreamServers = "上游伺服器"
+        NameserverPolicySection = "策略對映"
+        FilterList = "過濾清單"
+        BasicPolicy = "基礎策略"
+        SkipAndForce = "跳過與強制"
+        SkipSrcAddress = "跳過來源地址"
+        SkipDstAddress = "跳過目標地址"
+    }
+
+    Rule = {
+        EmptyWarning = "規則 #%d 為空"
+        InvalidFormatWarning = "規則 #%d 格式可能不正確: %s"
+        MissingTargetWarning = "規則 #%d 缺少策略組目標: %s"
+    }
+
+    Save = {
+        PresetNotModifiable = "系統預設不可修改"
+        ApplyFailed = "覆寫已儲存，但重新套用到目前設定失敗"
+        Failed = "儲存覆寫設定失敗"
+        ImportEmpty = "匯入內容不能為空"
+        ImportDefaultName = "匯入的覆寫設定"
+    }
+
+    Dns = {
+        Policy = "DNS 策略"
+        PolicyNotModify = "不修改"
+        PolicyForceEnable = "強制啟用"
+        PolicyUseBuiltin = "使用內建"
+        PreferH3 = "優先 HTTP/3"
+        Listen = "監聽地址"
+        ListenHint = "例如：0.0.0.0:53"
+        Ipv6 = "DNS IPv6"
+        UseHosts = "使用 hosts"
+        AppendSystem = "追加系統 DNS"
+        EnhancedMode = "增強模式"
+        EnhancedNotModify = "不修改"
+        EnhancedDisable = "停用"
+        EnhancedFakeip = "FakeIP"
+        EnhancedMapping = "Mapping"
+        Servers = "DNS 伺服器"
+        ServersHint = "例如：8.8.8.8, tls://dns.google"
+        Fallback = "備用 DNS"
+        FallbackHint = "例如：1.1.1.1"
+        Default = "預設 DNS"
+        DefaultHint = "用於解析 DNS 伺服器網域"
+        FakeipFilter = "FakeIP 過濾"
+        FakeipFilterHint = "例如：+.lan, localhost"
+        FakeipFilterMode = "FakeIP 過濾模式"
+        FakeipBlacklist = "黑名單"
+        FakeipWhitelist = "白名單"
+        FallbackGeoip = "GeoIP 回退"
+        FallbackGeoipCode = "GeoIP 程式碼"
+        FallbackGeoipCodeHint = "例如：CN"
+        FallbackDomain = "網域回退"
+        FallbackDomainHint = "例如：+.google.com"
+        FallbackIpcidr = "IP CIDR 回退"
+        FallbackIpcidrHint = "例如：240.0.0.0/4"
+        NameserverPolicy = "DNS 策略"
+        NameserverPolicyKey = "網域匹配規則"
+        NameserverPolicyValue = "DNS 伺服器"
+    }
+
+    General = {
+        HttpPort = "HTTP 埠"
+        SocksPort = "SOCKS 埠"
+        MixedPort = "Mixed 埠"
+        RedirectPort = "Redirect 埠"
+        TproxyPort = "TProxy 埠"
+        AllowLan = "允許區域網"
+        Ipv6 = "IPv6"
+        ProxyMode = "代理模式"
+        LogLevel = "日誌等級"
+    }
+
+    Label = {
+        CacheAlgorithm = "快取演算法"
+        Enable = "啟用"
+        FakeIpRange = "FakeIP 地址段"
+        ForceDnsMapping = "強制 DNS 對映"
+        ForceDomain = "強制嗅探網域"
+        HttpOverride = "HTTP 覆寫"
+        KeepAliveIdle = "Keep Alive 空閒閾值"
+        KeepAliveInterval = "Keep Alive 間隔"
+        OverrideDestination = "覆寫目標地址"
+        ParsePureIp = "解析純 IP"
+        QuicOverride = "QUIC 覆寫"
+        RespectRules = "遵循路由規則"
+        RulesReplace = "覆蓋規則"
+        SkipDomain = "跳過嗅探網域"
+        TlsOverride = "TLS 覆寫"
+        UseSystemHosts = "使用系統 Hosts"
+    }
+
+    ProxyGroup = {
+        Field = {
+            Url = "URL"
+            Interval = "間隔"
+            Timeout = "超時"
+            MaxFailedTimes = "最大失敗次數"
+            Proxies = "成員"
+            Use = "使用 Provider"
+            UseHint = "每行一個 Provider 名稱"
+            InterfaceName = "介面名稱"
+            RoutingMark = "路由標記"
+            Filter = "過濾器"
+            ExcludeFilter = "排除過濾器"
+            ExcludeType = "排除型別"
+            ExpectedStatus = "期望狀態"
+            Icon = "圖示"
+            Lazy = "懶載入"
+            DisableUdp = "停用 UDP"
+            IncludeAll = "包含全部"
+            IncludeAllProxies = "包含全部代理"
+            IncludeAllProviders = "包含全部 Provider"
+            Hidden = "隱藏"
+        }
+    }
+}

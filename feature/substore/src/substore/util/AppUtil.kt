@@ -24,6 +24,7 @@ package com.github.yumelira.yumebox.substore.util
 
 import com.github.yumelira.yumebox.core.Global
 import com.github.yumelira.yumebox.substore.SubStorePaths
+import dev.oom_wg.purejoy.mlang.MLang
 import java.io.File
 
 object AppUtil {
@@ -73,7 +74,7 @@ object AppUtil {
 
             val unzipSuccess = ArchiveUtil.unzipZip(zipPath, stagingDir)
             if (!unzipSuccess) {
-                throw IllegalStateException("Sub-Store 前端资源解压失败")
+                throw IllegalStateException(MLang.Feature.SubStore.FrontendExtractFailed)
             }
 
             val extractedRoot = File(stagingDir, "dist").takeIf { it.exists() } ?: stagingDir

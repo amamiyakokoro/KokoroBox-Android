@@ -45,6 +45,7 @@ import com.github.yumelira.yumebox.presentation.icon.yume.Atom
 import com.github.yumelira.yumebox.presentation.icon.yume.Save
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -55,7 +56,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 @Composable
 fun FullscreenEditorScreen(
     navigator: DestinationsNavigator,
-    title: String = "编辑配置",
+    title: String = MLang.Editor.Common.EditConfigTitle,
     initialContent: String = "",
     language: LanguageScope = LanguageScope.Yaml,
     onSave: (String) -> Unit = {},
@@ -90,22 +91,22 @@ fun FullscreenEditorScreen(
                             val formatted = CodeFormatter.format(content, language)
                             if (formatted != null && formatted != content) {
                                 content = formatted
-                                context.toast("格式化成功")
+                                context.toast(MLang.Editor.Toast.FormatSuccess)
                             } else {
-                                context.toast("格式化失败或无需格式化")
+                                context.toast(MLang.Editor.Toast.FormatFailedOrUnchanged)
                             }
                         },
                     ) {
                         Icon(
                             imageVector = Yume.Atom,
-                            contentDescription = "Format"
+                            contentDescription = MLang.Editor.Action.Format
                         )
                     }
 
                     IconButton(
                         onClick = {
                             if (!CodeFormatter.validate(content, language)) {
-                                context.toast("语法错误，请检查内容")
+                                context.toast(MLang.Editor.Toast.SyntaxError)
                                 return@IconButton
                             }
                             runCatching {
@@ -113,13 +114,13 @@ fun FullscreenEditorScreen(
                             }.onSuccess {
                                 navigator.navigateUp()
                             }.onFailure {
-                                context.toast(it.message ?: "保存失败")
+                                context.toast(it.message ?: MLang.Editor.Toast.SaveFailed)
                             }
                         },
                     ) {
                         Icon(
                             imageVector = Yume.Save,
-                            contentDescription = "Save"
+                            contentDescription = MLang.Editor.Action.Save
                         )
                     }
                 }
@@ -136,14 +137,15 @@ fun FullscreenEditorScreen(
                 value = content,
                 onValueChange = { content = it },
                 modifier = Modifier.fillMaxSize(),
+                language = language,
             )
         }
     }
 
     AppDialog(
         show = showDiscardDialog.value,
-        title = "未保存的修改",
-        summary = "当前有未保存的修改，确定要放弃吗？",
+        title = MLang.Editor.Dialog.UnsavedChangesTitle,
+        summary = MLang.Editor.Dialog.UnsavedChangesMessage,
         onDismissRequest = { showDiscardDialog.value = false }
     ) {
         DialogButtonRow(
@@ -152,8 +154,8 @@ fun FullscreenEditorScreen(
                 showDiscardDialog.value = false
                 navigator.navigateUp()
             },
-            cancelText = "取消",
-            confirmText = "放弃"
+            cancelText = MLang.Component.Button.Cancel,
+            confirmText = MLang.Editor.Action.Discard
         )
     }
 }

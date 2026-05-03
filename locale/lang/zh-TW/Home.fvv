@@ -1,0 +1,58 @@
+<Home Page>
+Home = {
+    Title = "YumeBox"
+
+    Message = {
+        ConfigSwitched = "設定檔已切換"
+        ConfigSwitchFailed = "設定檔切換失敗：%s"
+        Preparing = "正在準備..."
+        StartFailed = "啟動失敗：%s"
+        StopFailed = "停止失敗：%s"
+    }
+
+    Control = {
+        HintAddProfile = "請先新增設定檔"
+        HintEnableProfile = "請先在「設定檔」頁面啟用一個設定檔"
+    }
+
+    NodeInfo = {
+        Node = "節點"
+        Delay = "延遲"
+        Unknown = "未知"
+        DelayValue = "%dms"
+    }
+
+    Traffic = {
+        UpShort = "UP"
+        DownShort = "DOWN"
+        NoProfile = "無設定檔"
+    }
+
+    IpInfo = {
+        ExitIp = "出口 IP"
+    }
+
+    Acg = {
+        RefreshQuote = "重新整理一言"
+    }
+
+    Status = {
+        Connecting = "連線中"
+        Disconnecting = "斷開中"
+        Running = "執行中"
+        TapToStart = "輕觸啟動"
+    }
+
+    Control = {
+        HintAddProfile = "請先新增設定檔"
+        HintEnableProfile = "請先在「設定檔」頁面啟用一個設定檔"
+        Start = "啟動"
+        Stop = "停止"
+    }
+
+    ProxyMode = {
+        Vpn = "VPN"
+        Tun = "TUN"
+        Http = "HTTP"
+    }
+}

@@ -1,0 +1,32 @@
+<About Page>
+About = {
+    Title = "關於"
+
+    App = {
+        Description = "一個普通的盒子，儘可能普通"
+        VersionLoading = "Loading..."
+        VersionFailed = "Failed to load"
+    }
+
+    Section = {
+        ProjectLinks = "專案連結"
+        More = "更多"
+        License = "許可證"
+    }
+
+    Link = {
+        TelegramGroup = "Telegram 群組"
+        TelegramChannel = "Telegram 頻道"
+    }
+
+    License = {
+        CheckUpdate = "檢查更新"
+        CheckUpdateSummary = "手動檢查 GitHub Release 更新"
+        Libraries = "引用庫"
+        LibrariesSummary = "View all third-party libraries used in this app"
+        AgplName = "GNU Affero General Public License v3.0"
+        AgplDescription = "This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License."
+    }
+
+    Copyright = "© 2025 – 至今 YumeLira"
+}

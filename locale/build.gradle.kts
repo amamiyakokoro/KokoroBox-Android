@@ -111,9 +111,14 @@ val generateFYTxt by tasks.registering {
             "        return when {",
         )
 
-        languageMaps.keys.forEach { language ->
+        languageMaps.keys.sortedByDescending { it.length }.forEach { language ->
             val lower = language.lowercase()
-            lines += "            tag == ${lower.kotlinString()} || tag.startsWith(${"$lower-".kotlinString()}) -> ${language.kotlinString()}"
+            val condition = if (lower == "zh-tw") {
+                "tag == ${lower.kotlinString()} || tag.startsWith(${"$lower-".kotlinString()}) || tag == ${"zh-hant".kotlinString()} || tag.startsWith(${"zh-hant-".kotlinString()})"
+            } else {
+                "tag == ${lower.kotlinString()} || tag.startsWith(${"$lower-".kotlinString()})"
+            }
+            lines += "            $condition -> ${language.kotlinString()}"
         }
         lines += listOf(
             "            else -> \"zh\"",

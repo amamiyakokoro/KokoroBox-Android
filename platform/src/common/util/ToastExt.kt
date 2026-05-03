@@ -39,15 +39,13 @@ data class ToastDialogEvent(
 )
 
 object ToastDialogBridge {
-    private const val DEFAULT_TITLE = "提示"
-
     private val nextId = AtomicLong(1L)
     private val queue = ArrayDeque<ToastDialogEvent>()
     private val lock = Any()
     private val _event = MutableStateFlow<ToastDialogEvent?>(null)
     val event: StateFlow<ToastDialogEvent?> = _event.asStateFlow()
 
-    fun show(message: String, title: String = DEFAULT_TITLE) {
+    fun show(message: String, title: String = "") {
         if (message.isBlank()) return
 
         val event = ToastDialogEvent(
@@ -76,7 +74,7 @@ object ToastDialogBridge {
     }
 }
 
-fun showToastDialog(message: String, title: String = "提示") {
+fun showToastDialog(message: String, title: String = "") {
     ToastDialogBridge.show(message = message, title = title)
 }
 

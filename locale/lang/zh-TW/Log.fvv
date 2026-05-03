@@ -1,0 +1,20 @@
+<Log Page>
+Log = {
+    Title = "日誌"
+
+    Action = {
+        StopRecording = "停止記錄"
+        StartRecording = "開始記錄"
+        Save = "儲存"
+    }
+
+    Empty = {
+        NoLogs = "暫無日誌記錄"
+        StartRecordingHint = "點選右下角按鈕開始記錄日誌"
+    }
+
+    Detail = {
+        WaitingLog = "等待日誌..."
+        WillShowWhenGenerated = "日誌將在產生時顯示"
+    }
+}

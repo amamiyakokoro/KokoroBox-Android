@@ -112,7 +112,7 @@ fun DnsEditor(
                 },
             )
             NullableBooleanSelector(
-                title = "Direct 遵循 Policy",
+                title = MLang.Override.Form.DirectFollowPolicy,
                 value = config.dns.directFollowPolicy,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(directFollowPolicy = it)))
@@ -120,7 +120,7 @@ fun DnsEditor(
             )
         }
 
-        OverrideFormSection("DNS 基础参数") {
+        OverrideFormSection(MLang.Override.Form.DnsBasicParams) {
             OverrideTextInputContent(
                 title = MLang.Override.Dns.Listen,
                 value = config.dns.listen,
@@ -136,7 +136,7 @@ fun DnsEditor(
                 },
             )
             OverrideIntInputContent(
-                title = "IPv6 超时",
+                title = MLang.Override.Form.Ipv6Timeout,
                 value = config.dns.ipv6Timeout,
                 placeholder = "100",
                 onValueChange = {
@@ -153,7 +153,7 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection("Fake-IP 模式") {
+        OverrideCardSection(MLang.Override.Form.FakeIpMode) {
             NullableEnumSelector(
                 title = MLang.Override.Dns.FakeipFilterMode,
                 value = config.dns.fakeIPFilterMode,
@@ -175,7 +175,7 @@ fun DnsEditor(
             )
         }
 
-        OverrideFormSection("Fake-IP 参数") {
+        OverrideFormSection(MLang.Override.Form.FakeIpParams) {
             OverrideTextInputContent(
                 title = MLang.Override.Label.FakeIpRange,
                 value = config.dns.fakeIpRange,
@@ -185,7 +185,7 @@ fun DnsEditor(
                 },
             )
             OverrideTextInputContent(
-                title = "Fake-IP IPv6 网段",
+                title = MLang.Override.Form.FakeIpIpv6Range,
                 value = config.dns.fakeIpRange6,
                 placeholder = "fdfe:dcba:9876::1/64",
                 onValueChange = {
@@ -312,11 +312,11 @@ fun DnsEditor(
                 },
             )
             StringMapWithModifiersInput(
-                title = "Proxy Server Nameserver Policy",
+                title = MLang.Override.Form.ProxyServerNameserverPolicy,
                 replaceValue = config.dns.proxyServerNameserverPolicy,
                 mergeValue = config.dns.proxyServerNameserverPolicyMerge,
-                keyPlaceholder = "域名 / RuleSet",
-                valuePlaceholder = "DNS 服务器",
+                keyPlaceholder = MLang.Override.Dns.NameserverPolicyKey,
+                valuePlaceholder = MLang.Override.Dns.NameserverPolicyValue,
                 onReplaceChange = {
                     onConfigChange(
                         config.copy(dns = config.dns.copy(proxyServerNameserverPolicy = it)),
@@ -365,7 +365,7 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection("Fallback 开关") {
+        OverrideCardSection(MLang.Override.Form.FallbackSwitch) {
             NullableBooleanSelector(
                 title = MLang.Override.Dns.FallbackGeoip,
                 value = config.dns.fallbackFilter.geoIp,
@@ -381,7 +381,7 @@ fun DnsEditor(
             )
         }
 
-        OverrideFormSection("Fallback 参数") {
+        OverrideFormSection(MLang.Override.Form.FallbackParams) {
             OverrideTextInputContent(
                 title = MLang.Override.Dns.FallbackGeoipCode,
                 value = config.dns.fallbackFilter.geoIpCode,
@@ -398,7 +398,7 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection("Fallback 过滤") {
+        OverrideCardSection(MLang.Override.Form.FallbackFilter) {
             StringListWithModifiersInput(
                 title = MLang.Override.Dns.FallbackDomain,
                 replaceValue = config.dns.fallbackFilter.domain,

@@ -44,6 +44,7 @@ import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -103,8 +104,8 @@ fun ConfigEditorScreen(
         topBar = {
             TopBar(
                 title = when (configType) {
-                    ConfigType.Override -> "编辑覆写配置"
-                    ConfigType.Profile -> "编辑订阅配置"
+                    ConfigType.Override -> MLang.Editor.Common.EditOverrideConfigTitle
+                    ConfigType.Profile -> MLang.Editor.Common.EditProfileConfigTitle
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -121,14 +122,15 @@ fun ConfigEditorScreen(
                     value = content,
                     onValueChange = { content = it },
                     modifier = Modifier.fillMaxSize(),
+                    language = language,
                 )
             }
         }
 
         AppDialog(
             show = showDiscardDialog.value,
-            title = "放弃修改",
-            summary = "当前有未保存的修改，确定要放弃吗？",
+            title = MLang.Editor.Dialog.DiscardTitle,
+            summary = MLang.Editor.Dialog.UnsavedChangesMessage,
             onDismissRequest = { showDiscardDialog.value = false }
         ) {
             DialogButtonRow(
@@ -138,8 +140,8 @@ fun ConfigEditorScreen(
                     viewModel.discardDraft()
                     navigator.navigateUp()
                 },
-                cancelText = "取消",
-                confirmText = "放弃"
+                cancelText = MLang.Component.Button.Cancel,
+                confirmText = MLang.Editor.Action.Discard
             )
         }
     }

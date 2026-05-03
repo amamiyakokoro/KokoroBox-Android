@@ -63,6 +63,7 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val acgDailyQuoteAuthor by strFlow("")
     val acgDailyQuoteDate by strFlow("")
     val acgDailyQuoteApiUrl by strFlow("https://v1.hitokoto.cn/?c=a&c=b&c=c")
+    val acgDailyQuoteApiHistoryJson by strFlow("[]")
     val acgCustomQuoteEnabled by boolFlow(false)
     val acgCustomQuoteListJson by strFlow(DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON)
     val acgMergeCustomQuoteList by boolFlow(false)
@@ -76,10 +77,22 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
 
 }
 
-private const val DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON = """[
+const val DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON = """[
   {
     "text": "时间一分一秒流逝而去 终结一步一步迎面而来",
     "author": "恋文"
+  },
+  {
+    "text": "在安静的线路上，等一朵云完成漫游",
+    "author": "YumeBox"
+  },
+  {
+    "text": "人类的赞歌是勇气的赞歌。",
+    "author": "威尔·A·齐贝林"
+  },
+  {
+    "text": "不相信自己的人，连努力的价值都没有。",
+    "author": "迈特凯"
   }
 ]
 """

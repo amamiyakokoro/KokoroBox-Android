@@ -34,10 +34,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
-private class NativeConfigEditText(context: android.content.Context) : AppCompatEditText(context) {
+internal class NativeConfigEditText(context: android.content.Context) : AppCompatEditText(context) {
     var suppressChanges: Boolean = false
+    var highlightRunnable: Runnable? = null
 }
 
 @Composable
@@ -46,11 +48,20 @@ fun NativeTextEditor(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     readOnly: Boolean = false,
+    language: LanguageScope = LanguageScope.Text,
+    syntaxHighlightingEnabled: Boolean = true,
 ) {
     val density = LocalDensity.current
     val textColor = MiuixTheme.colorScheme.onBackground.toArgb()
     val cursorColor = MiuixTheme.colorScheme.primary.toArgb()
     val backgroundColor = MiuixTheme.colorScheme.background.toArgb()
+    val syntaxColors = SyntaxHighlightColors(
+        key = MiuixTheme.colorScheme.primary.toArgb(),
+        string = MiuixTheme.colorScheme.onSurfaceVariantSummary.toArgb(),
+        number = MiuixTheme.colorScheme.primary.toArgb(),
+        keyword = MiuixTheme.colorScheme.primary.toArgb(),
+        comment = MiuixTheme.colorScheme.outline.toArgb(),
+    )
     val paddingPx = remember(density) { with(density) { 16.dp.roundToPx() } }
 
     AndroidView(
@@ -89,8 +100,21 @@ fun NativeTextEditor(
                         }
                     }
 
-                    override fun afterTextChanged(s: Editable?) = Unit
+                    override fun afterTextChanged(s: Editable?) {
+                        LightweightSyntaxHighlighter.schedule(
+                            editText = this@apply,
+                            language = language,
+                            colors = syntaxColors,
+                            enabled = syntaxHighlightingEnabled,
+                        )
+                    }
                 })
+                LightweightSyntaxHighlighter.apply(
+                    editable = text,
+                    language = language,
+                    colors = syntaxColors,
+                    enabled = syntaxHighlightingEnabled,
+                )
             }
         },
         update = { editText ->
@@ -111,6 +135,13 @@ fun NativeTextEditor(
                 val resolvedEnd = selectionEnd.coerceAtMost(value.length).coerceAtLeast(resolvedStart)
                 editText.setSelection(resolvedStart, resolvedEnd)
                 editText.suppressChanges = false
+            } else {
+                LightweightSyntaxHighlighter.apply(
+                    editable = editText.text,
+                    language = language,
+                    colors = syntaxColors,
+                    enabled = syntaxHighlightingEnabled,
+                )
             }
         },
     )

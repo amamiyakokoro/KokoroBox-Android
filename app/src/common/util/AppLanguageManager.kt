@@ -47,6 +47,7 @@ object AppLanguageManager {
             when (language) {
                 AppLanguage.System -> LocaleListCompat.getEmptyLocaleList()
                 AppLanguage.Zh -> LocaleListCompat.forLanguageTags("zh-Hans")
+                AppLanguage.ZhTw -> LocaleListCompat.forLanguageTags("zh-Hant-TW")
                 AppLanguage.En -> LocaleListCompat.forLanguageTags("en")
             },
         )
@@ -72,6 +73,7 @@ object AppLanguageManager {
         return when (language) {
             AppLanguage.System -> systemLocale()
             AppLanguage.Zh -> Locale.SIMPLIFIED_CHINESE
+            AppLanguage.ZhTw -> Locale.TRADITIONAL_CHINESE
             AppLanguage.En -> Locale.ENGLISH
         }
     }

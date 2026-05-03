@@ -1,0 +1,22 @@
+<Service>
+Service = {
+    Notification = {
+        Running = "執行中"
+        TrafficFormat = "總計：%s"
+        UnknownProfile = "未知設定"
+    }
+
+    Tile = {
+        ClickToOpen = "點選開啟應用程式"
+        ClickToStartProxy = "啟動代理"
+        ClickToStopProxy = "停止代理"
+        Connecting = "正在連線..."
+        Disconnecting = "正在斷開..."
+    }
+
+    AutoRestart = {
+        ChannelName = "自動重啟服務"
+        ChannelDescription = "用於自動重啟代理服務"
+        Checking = "正在檢查自動啟動..."
+    }
+}

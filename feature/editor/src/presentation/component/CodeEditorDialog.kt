@@ -30,6 +30,7 @@ import com.github.yumelira.yumebox.feature.editor.presentation.language.Language
 import com.github.yumelira.yumebox.presentation.component.AppDialog
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
@@ -84,8 +85,8 @@ fun CodeEditorDialog(
                         onValueChange(editorState.content.takeIf { it.isNotBlank() })
                         onDismiss()
                     },
-                    cancelText = "取消",
-                    confirmText = "确定",
+                    cancelText = MLang.Component.Button.Cancel,
+                    confirmText = MLang.Component.Button.Confirm,
                 )
             }
         }
@@ -116,7 +117,7 @@ fun YamlEditorDialog(
 fun JsonEditorDialog(
     show: Boolean,
     title: String,
-    subtitle: String? = "使用 JSON 格式编辑",
+    subtitle: String? = MLang.Editor.Common.JsonSubtitle,
     value: String?,
     onValueChange: (String?) -> Unit,
     onDismiss: () -> Unit = {},

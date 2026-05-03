@@ -41,6 +41,8 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon as MdIcon
@@ -59,6 +61,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.model.ProxySortMode
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
@@ -104,6 +107,8 @@ fun ProxyPager(
     val testingGroupNames by proxyViewModel.testingGroupNames.collectAsState()
     val testingProxyNames by proxyViewModel.testingProxyNames.collectAsState()
     val sortMode by proxyViewModel.sortMode.collectAsState()
+    val tunnelMode by proxyViewModel.tunnelMode.collectAsState()
+    var displayTunnelMode by remember { mutableStateOf(tunnelMode) }
     val singleNodeTest by proxyViewModel.singleNodeTest.collectAsState()
     val groupScrollBehavior = MiuixScrollBehavior(snapAnimationSpec = null)
     val topBarHazeState = LocalTopBarHazeState.current
@@ -143,7 +148,12 @@ fun ProxyPager(
     val effectiveTestingProxyNames = remember(testingProxyNames, pendingTestProxyName) {
         pendingTestProxyName?.let { testingProxyNames + it } ?: testingProxyNames
     }
-    val gridState = remember(effectiveSelectedGroupName) { LazyGridState() }
+    val gridState = remember(displayTunnelMode, effectiveSelectedGroupName) { LazyGridState() }
+    val modes = remember { listOf(TunnelState.Mode.Rule, TunnelState.Mode.Global, TunnelState.Mode.Direct) }
+
+    LaunchedEffect(tunnelMode) {
+        displayTunnelMode = tunnelMode
+    }
 
     LaunchedEffect(proxyGroups, selectedGroupName) {
         when {
@@ -207,43 +217,42 @@ fun ProxyPager(
                 .background(MaterialTheme.colorScheme.surface)
                 .let { modifier -> if (topBarHazeState != null) modifier.hazeSource(state = topBarHazeState) else modifier }
         ) {
-            if (proxyGroups.isEmpty()) {
-                CenteredText(
-                    firstLine = MLang.Proxy.Empty.NoNodes,
-                    secondLine = MLang.Proxy.Empty.Hint,
-                )
-            } else {
-                ProxySurfboardContent(
-                    proxyGroups = proxyGroups,
-                    selectedGroup = selectedGroup,
-                    selectedGroupName = effectiveSelectedGroupName,
-                    testingGroupNames = effectiveTestingGroupNames,
-                    testingProxyNames = effectiveTestingProxyNames,
-                    gridState = gridState,
-                    innerPadding = innerPadding,
-                    mainInnerPadding = mainInnerPadding,
-                    onGroupSelected = { selectedGroupName = it },
-                    onSelectProxy = { groupName, proxyName, onSuccess ->
-                        proxyViewModel.selectProxy(groupName, proxyName, onSuccess = onSuccess)
-                    },
-                    onProxyStartRequested = onProxyStartRequested,
-                    isProxyRunning = isProxyRunning,
-                    onTestDelay = onTestDelayAction,
-                    onTestProxyDelay = { proxyName ->
-                        if (!isProxyRunning) {
-                            pendingTestGroupName = effectiveSelectedGroupName
-                            pendingTestProxyName = proxyName
-                            onProxyStartRequested?.invoke()
-                        } else {
-                            effectiveSelectedGroupName?.let { groupName ->
-                                proxyViewModel.testProxyDelay(groupName, proxyName)
-                            }
+            ProxySurfboardContent(
+                proxyGroups = proxyGroups,
+                selectedGroup = selectedGroup,
+                selectedGroupName = effectiveSelectedGroupName,
+                testingGroupNames = effectiveTestingGroupNames,
+                testingProxyNames = effectiveTestingProxyNames,
+                gridState = gridState,
+                modes = modes,
+                tunnelMode = displayTunnelMode,
+                onTunnelModeSelected = { mode ->
+                    displayTunnelMode = mode
+                    proxyViewModel.setTunnelMode(mode)
+                },
+                innerPadding = innerPadding,
+                mainInnerPadding = mainInnerPadding,
+                onGroupSelected = { selectedGroupName = it },
+                onSelectProxy = { groupName, proxyName, onSuccess ->
+                    proxyViewModel.selectProxy(groupName, proxyName, onSuccess = onSuccess)
+                },
+                onProxyStartRequested = onProxyStartRequested,
+                isProxyRunning = isProxyRunning,
+                onTestDelay = onTestDelayAction,
+                onTestProxyDelay = { proxyName ->
+                    if (!isProxyRunning) {
+                        pendingTestGroupName = effectiveSelectedGroupName
+                        pendingTestProxyName = proxyName
+                        onProxyStartRequested?.invoke()
+                    } else {
+                        effectiveSelectedGroupName?.let { groupName ->
+                            proxyViewModel.testProxyDelay(groupName, proxyName)
                         }
-                        Unit
-                    },
-                    singleNodeTestEnabled = singleNodeTest,
-                )
             }
+                    Unit
+                },
+                singleNodeTestEnabled = singleNodeTest,
+            )
         }
     }
 }
@@ -317,6 +326,9 @@ private fun ProxySurfboardContent(
     testingGroupNames: Set<String>,
     testingProxyNames: Set<String>,
     gridState: LazyGridState,
+    modes: List<TunnelState.Mode>,
+    tunnelMode: TunnelState.Mode,
+    onTunnelModeSelected: (TunnelState.Mode) -> Unit,
     innerPadding: PaddingValues,
     mainInnerPadding: PaddingValues,
     onGroupSelected: (String) -> Unit,
@@ -330,85 +342,169 @@ private fun ProxySurfboardContent(
     val spacing = LocalSpacing.current
     val selectedName = selectedGroupName ?: selectedGroup?.name
     val isTesting = selectedName?.let(testingGroupNames::contains) == true
+    val currentPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
+    val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { modes.size })
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        state = gridState,
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = UiDp.dp12,
-            end = UiDp.dp12,
-            top = innerPadding.calculateTopPadding() + UiDp.dp8,
-            bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
-        ),
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-        verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            ProxyGroupTabSection(
-                groups = proxyGroups,
-                selectedGroupName = selectedName,
-                onGroupSelected = onGroupSelected,
-            )
+    LaunchedEffect(tunnelMode) {
+        val targetPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
+        if (pagerState.currentPage != targetPage) {
+            pagerState.scrollToPage(targetPage)
         }
+    }
 
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            AnimatedVisibility(
-                visible = isTesting,
-                enter = expandVertically(
-                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
-                    expandFrom = Alignment.Top,
-                ) + fadeIn(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.RefreshIndicatorFadeDuration)),
-                exit = shrinkVertically(
-                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
-                    shrinkTowards = Alignment.Top,
-                ) + fadeOut(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.RefreshIndicatorFadeDuration)),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = innerPadding.calculateTopPadding() + UiDp.dp8),
+    ) {
+        ProxyModeSelector(
+            currentMode = tunnelMode,
+            onModeSelected = onTunnelModeSelected,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = UiDp.dp12),
+        )
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            userScrollEnabled = false,
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                state = gridState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = UiDp.dp12,
+                    end = UiDp.dp12,
+                    top = UiDp.dp12,
+                    bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
+                ),
+                horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = UiDp.dp2, bottom = UiDp.dp4),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Md3ELoading()
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    ProxyGroupTabSection(
+                        groups = proxyGroups,
+                        selectedGroupName = selectedName,
+                        onGroupSelected = onGroupSelected,
+                    )
+                }
+
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                    AnimatedVisibility(
+                        visible = isTesting,
+                        enter = expandVertically(
+                            animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                            expandFrom = Alignment.Top,
+                        ) + fadeIn(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.RefreshIndicatorFadeDuration)),
+                        exit = shrinkVertically(
+                            animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                            shrinkTowards = Alignment.Top,
+                        ) + fadeOut(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.RefreshIndicatorFadeDuration)),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = UiDp.dp2, bottom = UiDp.dp4),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Md3ELoading()
+                        }
+                    }
+                }
+
+                if (selectedGroup == null) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        CenteredText(
+                            firstLine = MLang.Proxy.Empty.NoNodes,
+                            secondLine = MLang.Proxy.Empty.Hint,
+                        )
+                    }
+                } else {
+                    items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
+                        NodeCard(
+                            proxy = proxy,
+                            isSelected = proxy.name == selectedGroup.now,
+                            onClick = { proxyName ->
+                                if (selectedGroup.type == com.github.yumelira.yumebox.core.model.Proxy.Type.Selector) {
+                                    onSelectProxy(selectedGroup.name, proxyName, null)
+                                } else {
+                                    onTestDelay()
+                                }
+                            },
+                            isDelayTesting = isTesting,
+                            isThisProxyTesting = proxy.name in testingProxyNames,
+                            onSingleNodeTestClick = onTestProxyDelay,
+                            showCountryFlag = true,
+                            singleNodeTestEnabled = singleNodeTestEnabled,
+                        )
+                    }
                 }
             }
         }
+    }
+}
 
-        if (selectedGroup == null) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                CenteredText(
-                    firstLine = MLang.Proxy.Empty.NoNodes,
-                    secondLine = MLang.Proxy.Empty.Hint,
-                )
-            }
-        } else {
-            items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
-                NodeCard(
-                    proxy = proxy,
-                    isSelected = proxy.name == selectedGroup.now,
-                    onClick = { proxyName ->
-                        if (selectedGroup.type == com.github.yumelira.yumebox.core.model.Proxy.Type.Selector) {
-                            if (isProxyRunning) {
-                                onSelectProxy(selectedGroup.name, proxyName, null)
-                            } else {
-                                onSelectProxy(selectedGroup.name, proxyName, null)
-                            }
-                        } else if (isProxyRunning) {
-                            onTestDelay()
-                        } else {
-                            onTestDelay()
-                        }
+@Composable
+private fun ProxyModeSelector(
+    currentMode: TunnelState.Mode,
+    onModeSelected: (TunnelState.Mode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val modes = listOf(TunnelState.Mode.Rule, TunnelState.Mode.Global, TunnelState.Mode.Direct)
+    val hapticFeedback = LocalHapticFeedback.current
+    val shape = RoundedCornerShape(999.dp)
+
+    Row(
+        modifier = modifier
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.62f))
+            .padding(UiDp.dp4),
+        horizontalArrangement = Arrangement.spacedBy(UiDp.dp4),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        modes.forEach { mode ->
+            val selected = mode == currentMode
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(UiDp.dp40)
+                    .clip(shape)
+                    .background(
+                        if (selected) MaterialTheme.colorScheme.primaryContainer
+                        else Color.Transparent,
+                    )
+                    .clickable(enabled = !selected) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                        onModeSelected(mode)
                     },
-                    isDelayTesting = isTesting,
-                    isThisProxyTesting = proxy.name in testingProxyNames,
-                    onSingleNodeTestClick = onTestProxyDelay,
-                    showCountryFlag = true,
-                    singleNodeTestEnabled = singleNodeTestEnabled,
+                contentAlignment = Alignment.Center,
+            ) {
+                MdText(
+                    text = mode.displayName(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                    color = if (selected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
     }
+}
+
+private fun TunnelState.Mode.displayName(): String = when (this) {
+    TunnelState.Mode.Direct -> MLang.Proxy.Mode.Direct
+    TunnelState.Mode.Global -> MLang.Proxy.Mode.Global
+    TunnelState.Mode.Rule -> MLang.Proxy.Mode.Rule
+    TunnelState.Mode.Script -> "Script"
 }
 
 @Composable
@@ -500,7 +596,6 @@ private fun ProxyGroupTabs(
                     isSelected = group.name == selectedGroupName,
                     showTrailingIndicator = false,
                     onClick = {
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
                         onGroupSelected(group.name)
                         coroutineScope.launch {
                             delay(180)

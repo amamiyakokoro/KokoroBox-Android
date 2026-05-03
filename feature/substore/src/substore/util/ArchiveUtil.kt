@@ -22,6 +22,7 @@
 
 package com.github.yumelira.yumebox.substore.util
 
+import dev.oom_wg.purejoy.mlang.MLang
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import java.io.File
@@ -144,9 +145,17 @@ object ArchiveUtil {
 
     private fun prepareDestination(destination: File) {
         if (!destination.exists()) {
-            if (!destination.mkdirs()) throw IllegalStateException("无法创建目录: ${destination.absolutePath}")
+            if (!destination.mkdirs()) {
+                throw IllegalStateException(
+                    MLang.Feature.SubStore.CreateDirectoryFailed.format(destination.absolutePath)
+                )
+            }
         }
-        if (!destination.isDirectory) throw IllegalStateException("目标不是目录: ${destination.absolutePath}")
+        if (!destination.isDirectory) {
+            throw IllegalStateException(
+                MLang.Feature.SubStore.TargetNotDirectory.format(destination.absolutePath)
+            )
+        }
     }
 
     private fun resolveEntryTarget(destination: File, entryName: String): File {
@@ -156,7 +165,7 @@ object ArchiveUtil {
 
         val relativePath = getRelativePath(canonicalDestination, canonicalTarget)
         if (relativePath == null || relativePath.startsWith("..")) {
-            throw SecurityException("检测到路径遍历: $entryName")
+            throw SecurityException(MLang.Feature.SubStore.PathTraversalDetected.format(entryName))
         }
         return targetFile
     }
@@ -174,9 +183,15 @@ object ArchiveUtil {
 
     private fun ensureDirectory(directory: File) {
         if (directory.exists()) {
-            if (!directory.isDirectory) throw IllegalStateException("路径已存在但不是目录: ${directory.absolutePath}")
+            if (!directory.isDirectory) {
+                throw IllegalStateException(
+                    MLang.Feature.SubStore.PathExistsButNotDirectory.format(directory.absolutePath)
+                )
+            }
         } else if (!directory.mkdirs()) {
-            throw IllegalStateException("无法创建目录: ${directory.absolutePath}")
+            throw IllegalStateException(
+                MLang.Feature.SubStore.CreateDirectoryFailed.format(directory.absolutePath)
+            )
         }
     }
 

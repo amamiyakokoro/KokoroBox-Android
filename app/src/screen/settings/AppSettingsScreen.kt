@@ -23,7 +23,7 @@ package com.github.yumelira.yumebox.screen.settings
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.content.Intent
 import android.net.Uri
-import android.os.PowerManager
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -32,10 +32,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -43,11 +41,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.yumelira.yumebox.common.util.AppIconHelper
 import com.github.yumelira.yumebox.common.util.BiometricHelper
 import com.github.yumelira.yumebox.common.util.toast
@@ -57,6 +54,7 @@ import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
+import com.github.yumelira.yumebox.presentation.component.HapticSwitch
 import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
@@ -79,6 +77,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
+import kotlin.math.abs
 
 @Composable
 @Destination<RootGraph>
@@ -167,7 +166,7 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             items = listOf(
                 MLang.AppSettings.Interface.ColorThemeModeMonet,
                 MLang.AppSettings.Interface.ColorThemeModeCustom,
-                "根据 ACG 壁纸莫奈取色",
+                MLang.AppSettings.Interface.ColorThemeModeAcgWallpaper,
             ),
             values = listOf(
                 AppColorTheme.MonetDynamic,
@@ -184,7 +183,7 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
         } else if (colorTheme == AppColorTheme.AcgWallpaper) {
             PreferenceValueItem(
                 title = MLang.AppSettings.Interface.ColorThemePickerTitle,
-                summary = "将使用当前 ACG 首页壁纸提取的主色生成主题；更换并应用壁纸后会自动更新取色。",
+                summary = MLang.AppSettings.Interface.ColorThemeAcgWallpaperSummary,
                 onClick = { },
             )
         } else {
@@ -210,6 +209,7 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             items = listOf(
                 MLang.AppSettings.Interface.LanguageSystem,
                 MLang.AppSettings.Interface.LanguageChinese,
+                MLang.AppSettings.Interface.LanguageTraditionalChinese,
                 MLang.AppSettings.Interface.LanguageEnglish,
             ),
             values = AppLanguage.entries,
@@ -280,32 +280,9 @@ private fun AppPrivacySettingsSection(viewModel: AppSettingsViewModel) {
 @Composable
 private fun AppServiceSettingsSection(viewModel: AppSettingsViewModel) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val showTrafficNotification by viewModel.showTrafficNotification.state.collectAsState()
     val singleNodeTest by viewModel.singleNodeTest.state.collectAsState()
     val exitUiWhenBackground by viewModel.exitUiWhenBackground.state.collectAsState()
-    var batteryOptimizationIgnored by remember {
-        mutableStateOf(isBatteryOptimizationIgnored(context))
-    }
-    val batteryOptimizationSummary = remember(batteryOptimizationIgnored) {
-        if (batteryOptimizationIgnored) {
-            MLang.AppSettings.ServiceSection.BatteryOptimizationSummaryEnabled
-        } else {
-            MLang.AppSettings.ServiceSection.BatteryOptimizationSummaryDisabled
-        }
-    }
-
-    DisposableEffect(lifecycleOwner, context) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                batteryOptimizationIgnored = isBatteryOptimizationIgnored(context)
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
 
     Title(MLang.AppSettings.Section.Service)
     Card {
@@ -327,12 +304,10 @@ private fun AppServiceSettingsSection(viewModel: AppSettingsViewModel) {
             checked = exitUiWhenBackground,
             onCheckedChange = viewModel::onExitUiWhenBackgroundChange,
         )
-        PreferenceSwitchItem(
+        PreferenceArrowItem(
             title = MLang.AppSettings.ServiceSection.BatteryOptimizationTitle,
-            summary = batteryOptimizationSummary,
-            checked = batteryOptimizationIgnored,
-            onCheckedChange = {
-                if (!openBatteryOptimizationSettings(context, batteryOptimizationIgnored)) {
+            onClick = {
+                if (!openBatteryOptimizationSettings(context)) {
                     context.toast(MLang.Util.Error.UnknownError)
                 }
             },
@@ -362,6 +337,11 @@ private fun AppExperimentalSettingsSection(
     val acgDailyQuoteApiEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
     val acgCustomQuoteEnabled by viewModel.acgCustomQuoteEnabled.state.collectAsState()
     val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsState()
+    val acgWallpaperUri by viewModel.acgWallpaperUri.state.collectAsState()
+    val acgWallpaperZoom by viewModel.acgWallpaperZoom.state.collectAsState()
+    val acgWallpaperBiasX by viewModel.acgWallpaperBiasX.state.collectAsState()
+    val acgWallpaperBiasY by viewModel.acgWallpaperBiasY.state.collectAsState()
+    val context = LocalContext.current
     Title(MLang.AppSettings.Section.Experimental)
     Card {
         PreferenceSwitchItem(
@@ -377,12 +357,12 @@ private fun AppExperimentalSettingsSection(
             onCheckedChange = viewModel::onAcgSidebarExpandedChange,
         )
         PreferenceArrowItem(
-            title = "每日一言",
+            title = MLang.AppSettings.Experimental.DailyQuoteTitle,
             summary = when {
-                acgDailyQuoteApiEnabled && acgCustomQuoteEnabled -> "已启用 API 与用户自定义一言"
-                acgDailyQuoteApiEnabled -> "已启用一言 API"
-                acgCustomQuoteEnabled -> "已启用用户自定义一言"
-                else -> "进入配置一言 API 与用户自定义一言"
+                acgDailyQuoteApiEnabled && acgCustomQuoteEnabled -> MLang.AppSettings.Experimental.DailyQuoteSummaryApiAndCustomEnabled
+                acgDailyQuoteApiEnabled -> MLang.AppSettings.Experimental.DailyQuoteSummaryApiEnabled
+                acgCustomQuoteEnabled -> MLang.AppSettings.Experimental.DailyQuoteSummaryCustomEnabled
+                else -> MLang.AppSettings.Experimental.DailyQuoteSummaryConfig
             },
             onClick = {
                 navigator.navigate(AcgQuoteConfigScreenDestination) {
@@ -392,9 +372,25 @@ private fun AppExperimentalSettingsSection(
         )
         AcgWallpaperPreferenceItem(
             navigator = navigator,
-            wallpaperZoom = viewModel.acgWallpaperZoom.value,
-            wallpaperBiasX = viewModel.acgWallpaperBiasX.value,
-            wallpaperBiasY = viewModel.acgWallpaperBiasY.value,
+            wallpaperZoom = acgWallpaperZoom,
+            wallpaperBiasX = acgWallpaperBiasX,
+            wallpaperBiasY = acgWallpaperBiasY,
+        )
+        PreferenceValueItem(
+            title = MLang.AppSettings.Experimental.ResetWallpaperTitle,
+            summary = MLang.AppSettings.Experimental.ResetWallpaperSummary,
+            onClick = {
+                if (acgWallpaperUri.isNotBlank()) {
+                    runCatching {
+                        context.contentResolver.releasePersistableUriPermission(
+                            acgWallpaperUri.toUri(),
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                        )
+                    }
+                }
+                viewModel.clearAcgWallpaperUri()
+                context.toast(MLang.AppSettings.Experimental.ResetWallpaperSuccess)
+            },
         )
     }
 }
@@ -413,7 +409,7 @@ fun AcgQuoteConfigScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = "一言配置")
+            TopBar(title = MLang.AppSettings.Experimental.DailyQuoteConfigTitle)
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
@@ -421,15 +417,15 @@ fun AcgQuoteConfigScreen(
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
-                Title("每日一言")
+                Title(MLang.AppSettings.Experimental.DailyQuoteTitle)
                 Card {
                     AcgQuotePreferenceItem(
-                        title = "一言 API",
+                        title = MLang.AppSettings.Experimental.DailyQuoteApiTitle,
                         summary = acgDailyQuoteApiUrl,
-                        dialogTitle = "编辑一言 API（仅 JSON）",
+                        dialogTitle = MLang.AppSettings.Experimental.DailyQuoteApiEditTitle,
                         currentValue = acgDailyQuoteApiUrl,
                         endActions = {
-                            Switch(
+                            HapticSwitch(
                                 checked = acgDailyQuoteApiEnabled,
                                 onCheckedChange = { enabled ->
                                     viewModel.onAcgDailyQuoteEnabledChange(enabled)
@@ -447,13 +443,13 @@ fun AcgQuoteConfigScreen(
                         },
                     )
                     AcgTextEditorPreferenceItem(
-                        title = "用户自定义一言",
-                        summary = "点击编辑可带注释的 JSON 文本；默认内容已内置在列表中。",
-                        editorTitle = "编辑用户自定义一言 JSON",
-                        content = acgCustomQuoteListJson.ifBlank { CUSTOM_QUOTE_LIST_TEMPLATE },
+                        title = MLang.AppSettings.Experimental.CustomQuoteTitle,
+                        summary = MLang.AppSettings.Experimental.CustomQuoteSummary,
+                        editorTitle = MLang.AppSettings.Experimental.CustomQuoteEditorTitle,
+                        content = acgCustomQuoteListJson.ifBlank { customQuoteListTemplate() },
                         navigator = navigator,
                         endActions = {
-                            Switch(
+                            HapticSwitch(
                                 checked = acgCustomQuoteEnabled,
                                 onCheckedChange = { enabled ->
                                     viewModel.onAcgCustomQuoteEnabledChange(enabled)
@@ -476,22 +472,22 @@ fun AcgQuoteConfigScreen(
     }
 }
 
-private const val CUSTOM_QUOTE_LIST_TEMPLATE = """// 自定义一言列表样例，保存前可以保留以 // 开头的注释
-// 支持字符串数组：
-// ["一句话", "另一句话"]
-// 也支持对象数组，字段支持 text/quote/content/hitokoto 与 author/from/from_who/source：
+private fun customQuoteListTemplate() = """// ${MLang.AppSettings.Experimental.CustomQuoteTemplateComment}
+// ${MLang.AppSettings.Experimental.CustomQuoteTemplateStringArray}
+// ["${MLang.AppSettings.Experimental.CustomQuoteTemplateSentenceOne}", "${MLang.AppSettings.Experimental.CustomQuoteTemplateSentenceTwo}"]
+// ${MLang.AppSettings.Experimental.CustomQuoteTemplateObjectArray}
 [
   {
-    "text": "时间一分一秒流逝而去 终结一步一步迎面而来",
-    "author": "恋文"
+    "text": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleTextOne}",
+    "author": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleAuthorOne}"
   },
   {
-    "text": "所谓的成长，就是越来越能接受自己本来的样子。",
-    "author": "某角色"
+    "text": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleTextTwo}",
+    "author": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleAuthorTwo}"
   },
   {
-    "hitokoto": "愿你历尽千帆，归来仍是少年。",
-    "from": "自定义"
+    "hitokoto": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleTextThree}",
+    "from": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleSource}"
   }
 ]
 """
@@ -709,32 +705,45 @@ private fun requestBiometricConfirmation(
     )
 }
 
-private fun isBatteryOptimizationIgnored(context: android.content.Context): Boolean {
-    val powerManager = context.getSystemService(PowerManager::class.java) ?: return false
-    return powerManager.isIgnoringBatteryOptimizations(context.packageName)
-}
-
 private fun openBatteryOptimizationSettings(
     context: android.content.Context,
-    alreadyIgnored: Boolean,
 ): Boolean {
+    val packageName = context.packageName
+    val packageUri = "package:$packageName".toUri()
+    val appLabel = runCatching {
+        context.applicationInfo.loadLabel(context.packageManager).toString()
+    }.getOrDefault(packageName)
+
     val intents = buildList {
-        if (!alreadyIgnored) {
-            add(
-                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = "package:${context.packageName}".toUri()
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                },
-            )
-        }
         add(
-            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
+            Intent("android.settings.APP_BATTERY_USAGE_SETTINGS").apply {
+                data = packageUri
+                putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
+        add(
+            Intent("android.settings.APP_BATTERY_SETTINGS").apply {
+                data = packageUri
+                putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
+        add(
+            Intent("miui.intent.action.POWER_HIDE_MODE_APP_CONFIG").apply {
+                putExtra("package_name", packageName)
+                putExtra("package_label", appLabel)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             },
         )
         add(
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", context.packageName, null)
+                data = Uri.fromParts("package", packageName, null)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
+        add(
+            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             },
         )
@@ -754,8 +763,33 @@ private fun PageScalePreferenceItem(
     onApply: (Float) -> Unit,
 ) {
     var pageScaleLocal by remember(pageScale) { mutableFloatStateOf(pageScale) }
+    var lastHapticScale by remember(pageScale) { mutableFloatStateOf(pageScale) }
+    var lastHapticTimeMs by remember { mutableStateOf(0L) }
+    var lastChangeScale by remember(pageScale) { mutableFloatStateOf(pageScale) }
+    var lastChangeTimeMs by remember { mutableStateOf(0L) }
+    val hapticFeedback = LocalHapticFeedback.current
     val pageScalePercentText = remember(pageScaleLocal) { "${(pageScaleLocal * 100).toInt()}%" }
     val showPageScaleDialogState = remember { mutableStateOf(false) }
+
+    fun performPageScaleSliderHaptic(targetScale: Float) {
+        val now = SystemClock.uptimeMillis()
+        val elapsedMs = (now - lastChangeTimeMs).coerceAtLeast(1L)
+        val percentPerSecond = abs(targetScale - lastChangeScale) * 100_000f / elapsedMs
+        val minIntervalMs = when {
+            percentPerSecond >= 120f -> 28L
+            percentPerSecond >= 60f -> 42L
+            percentPerSecond >= 25f -> 60L
+            else -> 90L
+        }
+        val crossedPercentStep = abs(targetScale - lastHapticScale) >= 0.01f
+        if (crossedPercentStep && now - lastHapticTimeMs >= minIntervalMs) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            lastHapticScale = targetScale
+            lastHapticTimeMs = now
+        }
+        lastChangeScale = targetScale
+        lastChangeTimeMs = now
+    }
 
     PreferenceArrowItem(
         title = MLang.AppSettings.Interface.PageScaleTitle,
@@ -771,7 +805,10 @@ private fun PageScalePreferenceItem(
         bottomAction = {
             Slider(
                 value = pageScaleLocal,
-                onValueChange = { pageScaleLocal = it },
+                onValueChange = { value ->
+                    pageScaleLocal = value
+                    performPageScaleSliderHaptic(value)
+                },
                 onValueChangeFinished = { onApply(pageScaleLocal) },
                 valueRange = 0.8f..1.2f,
             )

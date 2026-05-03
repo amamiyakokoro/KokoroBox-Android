@@ -22,7 +22,7 @@ Please go to the Release page to download the arm64-v8a release APK: [Release](h
 
 For more information, please visit the website: [YumeBox](https://yumebox.oom-wg.dev/)
 
-Override configuration syntax reference: [override document](https://yumebox.oom-wg.dev/override). If this project is helpful to you, please click Star. This is the motivation for continuous updates.
+Override configuration syntax reference: [override document](https://yumebox.oom-wg.dev/override). Daily Quote API and custom JSON format reference: [Daily Quote format guide](DailyQuote.md). If this project is helpful to you, please click Star. This is the motivation for continuous updates.
 
 ## Improvements over the original project
 
@@ -36,13 +36,24 @@ YumeBox MD3 keeps the core capabilities of the original project while continuous
 - **Statistics, privacy, and lightweight build**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; supports YumeBox Lite, adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
 - **Stability and performance optimization**: improves startup blocking, runtime state freezes, dialog stutters, notification content, package size, background UI release, and many interaction details for a smoother and more fault-tolerant daily experience.
 
+## v0.5.3 highlights
+
+v0.5.3 focuses on making the MD3 experience more complete in daily use, especially around personalization, editing, proxy switching, localization, and documentation:
+
+- **Theme and personalization settings**: adds an ACG-wallpaper color mode, wallpaper reset entry, page-scale haptic feedback, and more reliable access to app battery-optimization settings across Android/MIUI variants.
+- **Daily Quote workflow**: improves ACG Daily Quote settings with API/custom-source toggles, a localized custom JSON template, quote history storage, refresh feedback, and dedicated format documentation.
+- **Configuration editor polish**: adds lightweight JSON/YAML syntax highlighting for the native editor, localizes editor titles/actions/toasts/diagnostics, and improves unsaved-change prompts.
+- **Proxy page interaction**: refines the proxy screen with an in-page Rule/Global/Direct mode switch, better paging/group interactions, and node testing/selection flow adjustments.
+- **Localization expansion**: adds Traditional Chinese language support and broadens translations for settings, editor, override forms, SubStore errors, and common UI components.
+- **Stability and compatibility cleanup**: tightens archive extraction path checks, SubStore error reporting, toast-dialog defaults, and Lite settings consistency.
+
 ## Design and reference notes
 
-v0.5.2 continues to narrow the legacy UI boundary: normal screens now prefer Jetpack Compose Material 3 components and in-project MD3 components, while Miuix remains only as a small compatibility layer for legacy surfaces that have not been rewritten yet.
+The current implementation continues to narrow the legacy UI boundary: normal screens now prefer Jetpack Compose Material 3 components and in-project MD3 components, while Miuix remains only as a small compatibility layer for legacy surfaces that have not been rewritten yet.
 
-This theme refactor follows the Monet / dynamic-color setting recommendations summarized in `chat-export-2026-04-28_22-27-47.md`: use wallpaper or system colors as inspiration, keep readability as the baseline, map colors through Material roles, and give users enough but not excessive control. No proxy core/runtime kernel code was changed; the changes are limited to UI, settings, and theme derivation:
+v0.5.3 also follows the Monet / dynamic-color setting recommendations summarized in `chat-export-2026-04-28_22-27-47.md`: use wallpaper or system colors as inspiration, keep readability as the baseline, map colors through Material roles, and give users enough but not excessive control. No proxy core/runtime kernel code was changed; the changes are limited to UI, settings, documentation, localization, and interaction details:
 
-- ACG home: preserves the wallpaper, sidebar, launch button, and runtime-information layout while adding quote refresh, current-node delay testing, and refresh-state feedback; it continues to follow the global theme tokens in a restrained way.
+- ACG home and settings: preserve the wallpaper, sidebar, launch button, and runtime-information layout while adding quote refresh, current-node delay testing, wallpaper reset, and refresh-state feedback; they continue to follow the global theme tokens in a restrained way.
 
 References include Android / Material documentation and related open-source implementations:
 

@@ -1,0 +1,149 @@
+<App Settings Page>
+AppSettings = {
+    Title = "應用程式設定"
+
+    Section = {
+        Behavior = "行為"
+        Interface = "介面"
+        Privacy = "隱私"
+        Service = "服務"
+        Network = "網路"
+        Experimental = "實驗性內容"
+    }
+
+    Behavior = {
+        AutoStartTitle = "自動啟動"
+        AutoStartSummary = "應用程式啟動和開機時自動啟動代理服務"
+        AutoUpdateOnStartTitle = "啟動時更新設定檔"
+        AutoUpdateOnStartSummary = "啟動時自動更新目前訂閱設定檔"
+    }
+
+    Interface = {
+        ThemeModeTitle = "主題模式"
+        ThemeModeSummary = "選擇應用程式的主題樣式"
+        ThemeModeSystem = "跟隨系統"
+        ThemeModeLight = "淺色"
+        ThemeModeDark = "深色"
+        LanguageTitle = "應用程式語言"
+        LanguageSummary = "選擇應用程式語言"
+        LanguageSystem = "跟隨系統"
+        LanguageChinese = "簡體中文"
+        LanguageTraditionalChinese = "繁體中文"
+        LanguageEnglish = "English"
+
+        ColorThemeTitle = "主題配色"
+        ColorThemeModeTitle = "取色來源"
+        ColorThemeModeSummary = "選擇跟隨系統或手動指定主題色"
+        ColorThemeModeMonet = "跟隨系統"
+        ColorThemeModeCustom = "自訂主題色"
+        ColorThemeModeAcgWallpaper = "根據 ACG 桌布取色"
+        ColorThemePickerTitle = "選擇主題色"
+        ColorThemeCodeLabel = "主題色程式碼（#RRGGBB）"
+        ColorThemeDynamicSummary = "目前跟隨系統配色"
+        ColorThemeAcgWallpaperSummary = "將使用目前 ACG 首頁桌布提取的主色生成主題；更換並套用桌布後會自動更新取色。"
+        ColorThemeCustomSummary = "目前主題色：%s"
+        ThemeColorPolarityInvertTitle = "反轉主題前景色"
+        ThemeColorPolarityInvertSummary = "當主題取色看起來怪異時可嘗試開啟"
+        TopBarBlurTitle = "背景模糊"
+        TopBarBlurSummary = "套用模糊背景"
+        AutoHideNavbarTitle = "滑動隱藏底欄"
+        AutoHideNavbarSummary = "向下滑動時自動隱藏底欄，向上滑動時顯示"
+        LegacyNavbarStyleTitle = "浮動導航欄"
+        LegacyNavbarStyleSummary = "懸浮導航欄樣式"
+
+        PageScaleTitle = "頁面縮放"
+        PageScaleSummary = "調整應用程式介面的整體縮放比例"
+        PageScaleDialogSummary = "80% - 120%"
+    }
+
+    Privacy = {
+        BiometricUnlockTitle = "啟動時生物驗證"
+        BiometricUnlockSummary = "每次開啟應用程式需要生物識別或螢幕鎖定憑據驗證才能進入"
+        ScreenshotProtectionTitle = "禁止截圖"
+        ScreenshotProtectionSummary = "禁止截圖、螢幕錄影及最近任務預覽"
+        BiometricDialogTitleEnable = "開啟啟動驗證"
+        BiometricDialogTitleDisable = "關閉啟動驗證"
+        ScreenshotDialogTitleEnable = "開啟禁止截圖"
+        ScreenshotDialogTitleDisable = "關閉禁止截圖"
+        BiometricPromptTitle = "驗證身份"
+        BiometricPromptMessage = "請完成驗證以繼續進入應用程式"
+        BiometricRetryButton = "重試"
+        BiometricExitButton = "離開"
+        BiometricUnavailableTitle = "無法使用指紋驗證"
+        BiometricUnavailableMessage = "目前無法使用生物識別，請稍後重試或檢查系統螢幕鎖定與生物識別設定"
+        BiometricUnavailableNoneEnrolled = "您尚未錄入生物資訊，請先在系統設定中錄入，或啟用 PIN、圖案、密碼等螢幕鎖定驗證"
+        BiometricUnavailableNoHardware = "目前裝置不支援生物識別，請啟用系統螢幕鎖定驗證或關閉此功能"
+        BiometricUnavailableHwUnavailable = "生物識別硬體目前不可用，請稍後再試"
+        BiometricUnavailableNoDeviceCredential = "目前未設定系統螢幕鎖定驗證，請先啟用 PIN、圖案或密碼"
+
+        HideIconTitle = "隱藏應用程式圖示"
+        HideIconSummary = "隱藏後可透過撥號鍵盤 *#*#0721#*#* 開啟"
+        HideFromRecentsTitle = "隱藏最近任務卡片"
+        HideFromRecentsSummary = "啟用後不在最近使用的應用程式清單中顯示應用程式"
+    }
+
+    Experimental = {
+        AcgHomeTitle = "ACG 實驗首頁"
+        AcgHomeSummary = "啟用新的 ACG 風格首頁佈局"
+        AcgQuoteDefault = "在安靜的線路上，等一朵雲完成漫遊"
+        AcgQuoteAuthorDefault = "YumeBox"
+        AcgSidebarExpandedTitle = "ACG 側欄預設展開"
+        AcgSidebarExpandedSummary = "進入 ACG 首頁時預設展開左側資訊欄"
+        WallpaperTitle = "ACG 桌布"
+        WallpaperSummary = "為 ACG 首頁選擇自訂桌布"
+        ResetWallpaperTitle = "重置 ACG 桌布"
+        ResetWallpaperSummary = "恢復內建預設桌布，並重置裁剪位置與桌布取色"
+        ResetWallpaperSuccess = "已恢復預設桌布"
+        DailyQuoteTitle = "每日一言"
+        DailyQuoteSummaryApiAndCustomEnabled = "已啟用 API 與使用者自訂一言"
+        DailyQuoteSummaryApiEnabled = "已啟用一言 API"
+        DailyQuoteSummaryCustomEnabled = "已啟用使用者自訂一言"
+        DailyQuoteSummaryConfig = "進入設定一言 API 與使用者自訂一言"
+        DailyQuoteConfigTitle = "一言設定"
+        DailyQuoteApiTitle = "一言 API"
+        DailyQuoteApiEditTitle = "編輯一言 API（僅 JSON）"
+        CustomQuoteTitle = "使用者自訂一言"
+        CustomQuoteSummary = "點選編輯可帶註釋的 JSON 文字；預設內容已內建在清單中。"
+        CustomQuoteEditorTitle = "編輯使用者自訂一言 JSON"
+        CustomQuoteTemplateComment = "自訂一言清單樣例，儲存前可以保留以 // 開頭的註釋"
+        CustomQuoteTemplateStringArray = "支援字串陣列："
+        CustomQuoteTemplateSentenceOne = "一句話"
+        CustomQuoteTemplateSentenceTwo = "另一句話"
+        CustomQuoteTemplateObjectArray = "也支援物件陣列，欄位支援 text/quote/content/hitokoto 與 author/from/from_who/source："
+        CustomQuoteTemplateSampleTextOne = "時間一分一秒流逝而去 終結一步一步迎面而來"
+        CustomQuoteTemplateSampleAuthorOne = "戀文"
+        CustomQuoteTemplateSampleTextTwo = "人類的讚歌是勇氣的讚歌。"
+        CustomQuoteTemplateSampleAuthorTwo = "威爾·A·齊貝林"
+        CustomQuoteTemplateSampleTextThree = "不相信自己的人，連努力的價值都沒有。"
+        CustomQuoteTemplateSampleSource = "阿凱"
+    }
+
+    ServiceSection = {
+        TrafficNotificationTitle = "顯示流量通知"
+        TrafficNotificationSummary = "在通知欄中顯示流量使用情況"
+        SingleNodeTestTitle = "單節點測試"
+        SingleNodeTestSummary = "點選節點卡片右側圖示測試單一節點延遲"
+        ExitUiWhenBackgroundTitle = "背景隱藏時釋放介面"
+        ExitUiWhenBackgroundSummary = "應用程式切到背景且介面不可見時主動釋放 UI，僅保留執行中的代理服務"
+        BatteryOptimizationTitle = "電池最佳化無限制"
+    }
+
+    Network = {
+        CustomUserAgentTitle = "自訂 User-Agent"
+        CustomUserAgentSummaryDefault = "未設定，使用預設值"
+    }
+
+    WarningDialog = {
+        Title = "警告"
+        HideIconMsg1 = "請在隱藏之前確認你能夠存取本應用程式的設定介面！"
+        HideIconMsg2 = "對於 HyperOS, 請開啟 自啟動 和 背景彈出介面 權限，以接受撥號介面程式碼！"
+    }
+
+    EditDialog = {
+        UserAgentTitle = "編輯 User-Agent"
+    }
+
+    Button = {
+        Apply = "套用"
+    }
+}
