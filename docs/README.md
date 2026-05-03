@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 **English** | [简体中文](README_ZH_HANS.md)
 
@@ -33,7 +33,7 @@ YumeBox MD3 keeps the core capabilities of the original project while continuous
 - **Enhanced proxy runtime and node management**: supports Root Tun (no VPN required, but Root permission is needed), Rule / Global / Direct mode selection on the proxy page, internal dispatcher-backed configuration separation between Rule and Global modes, single-node and proxy-group delay tests, current-node delay testing from the home screens, node sorting animations, node tags and icon/flag display, persistent node selection, per-card loading feedback and cancel/restore for subscription updates, faster proxy startup, and improved bridge implementations.
 - **ACG home and quote experience**: the ACG home supports wallpaper, sidebar controls, launch button, runtime information, and quote display; quotes can use the API and/or a user-defined JSON list, with manual refresh, daily refresh, refresh loading feedback, mixed API/custom selection, and an in-app documentation entry in the quote configuration page.
 - **Better subscription, import, and external-control experience**: supports editing subscription URLs, link preview, configuration sorting, opening external links in the app for quick import, and improves the external controller, Web panel, and notification quick node-switching workflow.
-- **Statistics, privacy, and lightweight build**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; supports YumeBox Lite, adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
+- **Statistics, privacy, and stability**: adds a connection page and richer traffic statistics, including per-app traffic statistics when process lookup is enabled; adds language switching and privacy settings, and removes the Sentry tracker and EMAS push update service.
 - **Stability and performance optimization**: improves startup blocking, runtime state freezes, dialog stutters, notification content, package size, background UI release, and many interaction details for a smoother and more fault-tolerant daily experience.
 
 ## Changelog
@@ -73,7 +73,7 @@ References include Android / Material documentation and related open-source impl
 
 The focus is now shifting from "migrating to MD3" to polishing a stable MD3 experience. Future updates will continue to clean up the remaining legacy UI boundaries, reduce direct dependency on compatibility layers, and make regular screens more consistent with Material Design 3 / Material You in components, motion, spacing, color, and accessibility.
 
-Personalization and ACG-driven experiences will also keep evolving: theme extraction from selected wallpapers will be refined, with more flexible image sources and caching strategies. The goal is to let the home page, cards, navigation bars, and other UI elements adapt naturally to user content while preserving readability. Configuration editing, runtime status display, traffic statistics, lightweight builds, and overall stability will continue to be improved so YumeBox MD3 can keep evolving toward being more usable, polished, and fun.
+Personalization and ACG-driven experiences will also keep evolving: theme extraction from selected wallpapers will be refined, with more flexible image sources and caching strategies. The goal is to let the home page, cards, navigation bars, and other UI elements adapt naturally to user content while preserving readability. Configuration editing, runtime status display, traffic statistics, and overall stability will continue to be improved so YumeBox MD3 can keep evolving toward being more usable, polished, and fun.
 
 ## Feedback and Suggestions
 

@@ -109,7 +109,6 @@ include(
     ":data",
     ":extension",
     ":app",
-    ":lite",
     ":feature:substore",
     ":feature:proxy",
     ":feature:override",
