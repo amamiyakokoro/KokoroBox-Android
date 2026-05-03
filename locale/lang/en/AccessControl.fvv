@@ -19,6 +19,7 @@ AccessControl = {
         SelectedFirst = "Selected Apps First"
         SortMode = "Sort Mode"
         SortModeCurrent = "Current: %s"
+        SelectAction = "Select"
         BatchOperation = "Batch Operation"
         SelectAll = "Select All"
         DeselectAll = "Deselect All"

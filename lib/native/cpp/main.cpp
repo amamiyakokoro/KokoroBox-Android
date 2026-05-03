@@ -57,6 +57,16 @@ Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeQueryTunnelState(JNIEn
     return new_string(response);
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeSetTunnelMode(JNIEnv *env, jobject thiz,
+                                                              jstring mode) {
+    TRACE_METHOD();
+
+    scoped_string _mode = get_string(mode);
+
+    return (jboolean) setTunnelMode(_mode);
+}
+
 JNIEXPORT jlong JNICALL
 Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeQueryTrafficNow(JNIEnv *env, jobject thiz) {
     TRACE_METHOD();

@@ -61,10 +61,11 @@ fun ToastDialogHost() {
     }
 
     eventSnapshot?.let { snapshot ->
+        val localizedTitle = snapshot.title.ifBlank { MLang.Component.Message.Hint }
         AppDialog(
             show = showDialog.value,
             modifier = Modifier,
-            title = snapshot.title,
+            title = localizedTitle,
             summary = snapshot.message,
             enableWindowDim = true,
             onDismissRequest = { showDialog.value = false },
@@ -87,9 +88,9 @@ fun ToastDialogHost() {
                         .clickable {
                             val clipboardManager =
                                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val textToCopy = snapshot.message.ifBlank { snapshot.title }
+                            val textToCopy = snapshot.message.ifBlank { localizedTitle }
                             clipboardManager.setPrimaryClip(
-                                ClipData.newPlainText(snapshot.title, textToCopy)
+                                ClipData.newPlainText(localizedTitle, textToCopy)
                             )
                             showDialog.value = false
                         }

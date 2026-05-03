@@ -32,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -65,6 +67,7 @@ fun ProfileCard(
     val spacing = AppTheme.spacing
     val opacity = AppTheme.opacity
     val componentSizes = AppTheme.sizes
+    val hapticFeedback = LocalHapticFeedback.current
 
     val colorScheme = MiuixTheme.colorScheme
 
@@ -122,7 +125,10 @@ fun ProfileCard(
             Md3Switch(
                 checked = profile.enabled,
                 enabled = !isDownloading,
-                onCheckedChange = { onToggleEnabled(profile) },
+                onCheckedChange = {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                    onToggleEnabled(profile)
+                },
                 colors = Md3SwitchDefaults.colors(
                     checkedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
                     checkedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,

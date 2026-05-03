@@ -26,6 +26,7 @@ import com.github.yumelira.yumebox.core.model.*
 
 interface IClashManager {
     fun queryTunnelState(): TunnelState
+    fun setTunnelMode(mode: TunnelState.Mode): Boolean
     fun queryTrafficNow(): Long
     fun queryTrafficTotal(): Long
     fun queryConnections(): ConnectionSnapshot

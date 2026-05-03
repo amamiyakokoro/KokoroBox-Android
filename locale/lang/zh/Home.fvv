@@ -32,6 +32,10 @@ Home = {
         ExitIp = "出口 IP"
     }
 
+    Acg = {
+        RefreshQuote = "刷新一言"
+    }
+
     Status = {
         Connecting = "连接中"
         Disconnecting = "断开中"

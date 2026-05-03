@@ -32,6 +32,10 @@ Home = {
         ExitIp = "Exit IP"
     }
 
+    Acg = {
+        RefreshQuote = "Refresh quote"
+    }
+
     Status = {
         Connecting = "Connecting"
         Disconnecting = "Disconnecting"

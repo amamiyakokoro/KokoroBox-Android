@@ -56,17 +56,20 @@ func (s *sortableProxyList) Swap(i, j int) {
 }
 
 func QueryProxyGroupNames(excludeNotSelectable bool) []string {
-	mode := tunnel.Mode()
-
-	if mode == tunnel.Direct {
+	globalProxy := tunnel.Proxies()["GLOBAL"]
+	if globalProxy == nil {
 		return []string{}
 	}
 
-	global := tunnel.Proxies()["GLOBAL"].Adapter().(outboundgroup.ProxyGroup)
+	global, ok := globalProxy.Adapter().(outboundgroup.ProxyGroup)
+	if !ok {
+		return []string{}
+	}
+
 	proxies := global.Providers()[0].Proxies()
 	result := make([]string, 0, len(proxies)+1)
 
-	if mode == tunnel.Global {
+	if !excludeNotSelectable || globalProxy.Type() == C.Selector {
 		result = append(result, "GLOBAL")
 	}
 

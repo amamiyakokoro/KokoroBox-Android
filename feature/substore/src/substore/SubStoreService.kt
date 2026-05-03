@@ -26,6 +26,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.github.yumelira.yumebox.substore.engine.NativeLibraryManager
+import dev.oom_wg.purejoy.mlang.MLang
 import timber.log.Timber
 
 class SubStoreService : Service() {
@@ -45,11 +46,13 @@ class SubStoreService : Service() {
                 NetworkUtil.isPortInUse(request.frontendPort) ||
                 NetworkUtil.isPortInUse(request.backendPort)
             ) {
-                throw Exception("端口 ${request.frontendPort} 或 ${request.backendPort} 已被占用")
+                throw Exception(
+                    MLang.Feature.SubStore.PortInUse.format(request.frontendPort, request.backendPort)
+                )
             }
 
             if (!ensureJavetLibraryLoaded()) {
-                throw Exception("Javet native 库加载失败")
+                throw Exception(MLang.Feature.SubStore.JavetLoadFailed)
             }
 
             val engine = CaseEngine(
@@ -60,7 +63,7 @@ class SubStoreService : Service() {
             caseEngine = engine
 
             if (!engine.isInitialized()) {
-                throw Exception("CaseEngine 初始化失败")
+                throw Exception(MLang.Feature.SubStore.CaseEngineInitFailed)
             }
 
             engine.startServer()

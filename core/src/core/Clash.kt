@@ -73,6 +73,10 @@ object Clash {
         return Json.decodeFromString(TunnelState.serializer(), json)
     }
 
+    fun setTunnelMode(mode: TunnelState.Mode): Boolean {
+        return Bridge.nativeSetTunnelMode(mode.serialName)
+    }
+
     fun queryTrafficNow(): Traffic {
         return Bridge.nativeQueryTrafficNow()
     }
@@ -306,6 +310,14 @@ object Clash {
             )
         }
     }
+
+    private val TunnelState.Mode.serialName: String
+        get() = when (this) {
+            TunnelState.Mode.Direct -> "direct"
+            TunnelState.Mode.Global -> "global"
+            TunnelState.Mode.Rule -> "rule"
+            TunnelState.Mode.Script -> "script"
+        }
 
     fun setCustomUserAgent(userAgent: String) {
         Bridge.nativeSetCustomUserAgent(userAgent)

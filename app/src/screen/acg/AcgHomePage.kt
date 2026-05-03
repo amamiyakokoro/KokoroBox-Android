@@ -111,11 +111,13 @@ fun AcgHomePage(
     val profilesLoaded by homeViewModel.profilesLoaded.collectAsState()
     val recommendedProfile by homeViewModel.recommendedProfile.collectAsState()
     val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsState(initial = false)
+    val currentProfile by homeViewModel.currentProfile.collectAsState()
     val selectedServerName by homeViewModel.selectedServerName.collectAsState()
     val selectedServerPing by homeViewModel.selectedServerPing.collectAsState()
     val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsState()
     val trafficNow by homeViewModel.trafficNow.collectAsState()
     val proxyMode by homeViewModel.proxyMode.collectAsState()
+    val tunnelMode by homeViewModel.tunnelMode.collectAsState()
     val runtimeSnapshot by homeViewModel.runtimeSnapshot.collectAsState()
     val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
     val acgDailyQuoteApiEnabled by appSettingsViewModel.acgDailyQuoteEnabled.state.collectAsState()
@@ -278,6 +280,8 @@ fun AcgHomePage(
         val collapsedVisibleWidth = AcgUi.Sidebar.collapsedVisibleWidth
         val heroHeight = maxHeight * 0.66f
         val heroMaxWidth = maxWidth - (AcgUi.Hero.containerHorizontalInset * 2)
+        val profileModeBadgeMaxWidth = maxWidth -
+            (AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset) * 2
         val heroBottomBlendSolidHeight = 56.dp
         val heroBottomBlendGradientHeight = 90.dp
         val heroBottomBlendTotalHeight = heroBottomBlendSolidHeight + heroBottomBlendGradientHeight
@@ -371,9 +375,6 @@ fun AcgHomePage(
                     .graphicsLayer {
                         shape = AcgUi.Shape.hero
                         clip = true
-                        transformOrigin = TransformOrigin(0.5f, 0f)
-                        scaleX = heroImageScale
-                        scaleY = heroImageScale
                     }
             ) {
                 AcgWallpaperBackground(
@@ -384,6 +385,7 @@ fun AcgHomePage(
                     qualityMode = AcgWallpaperQualityMode.Foreground,
                     stableRequestWidth = heroMaxWidth,
                     stableRequestHeight = heroHeight,
+                    foregroundMotionScale = heroImageScale,
                     modifier = Modifier.matchParentSize(),
                 )
 
@@ -442,6 +444,25 @@ fun AcgHomePage(
                 }
             }
 
+            AnimatedVisibility(
+                visible = isRunning,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(
+                        start = AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset,
+                        end = AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset,
+                        top = statusBarTop + heroHeight - UiDp.dp28 + AcgUi.Info.contentGap,
+                    ),
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 3 }),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 3 }),
+            ) {
+                AcgProfileModeBadge(
+                    profileName = currentProfile?.name,
+                    tunnelMode = tunnelMode,
+                    modifier = Modifier.widthIn(max = profileModeBadgeMaxWidth),
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -483,7 +504,7 @@ fun AcgHomePage(
                 } else {
                     AcgInlineIconButton(
                         icon = Yume.`Redo-dot`,
-                        contentDescription = "刷新一言",
+                        contentDescription = MLang.Home.Acg.RefreshQuote,
                         enabled = dailyQuoteEnabled,
                         onClick = {
                             hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
@@ -511,6 +532,7 @@ private fun AcgWallpaperBackground(
     qualityMode: AcgWallpaperQualityMode = AcgWallpaperQualityMode.Foreground,
     stableRequestWidth: androidx.compose.ui.unit.Dp? = null,
     stableRequestHeight: androidx.compose.ui.unit.Dp? = null,
+    foregroundMotionScale: Float = 1f,
 ) {
     val clampedZoom = wallpaperZoom.coerceIn(1f, 5f)
     val model: String = wallpaperUri.ifBlank { "file:///android_asset/wallpaper.jpg" }
@@ -586,6 +608,8 @@ private fun AcgWallpaperBackground(
             biasX = wallpaperBiasX,
             biasY = wallpaperBiasY,
         )
+        val foregroundScale = foregroundMotionScale.coerceIn(0.96f, 1.04f)
+        val imageOverscanScale = 1.04f
         Image(
             painter = painter,
             contentDescription = null,
@@ -594,8 +618,9 @@ private fun AcgWallpaperBackground(
             modifier = Modifier
                 .matchParentSize()
                 .graphicsLayer {
-                    scaleX = 1.04f
-                    scaleY = 1.04f
+                    scaleX = imageOverscanScale * foregroundScale
+                    scaleY = imageOverscanScale * foregroundScale
+                    transformOrigin = TransformOrigin(0.5f, 0f)
                     translationY = 2f
                 },
         )

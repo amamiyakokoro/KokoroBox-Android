@@ -111,6 +111,16 @@ class RootTunRootService : RootService() {
             )
         }
 
+        override fun setTunnelMode(mode: String): Boolean {
+            val parsed = runCatching {
+                RootTunJson.Default.decodeFromString(
+                    com.github.yumelira.yumebox.core.model.TunnelState.Mode.serializer(),
+                    "\"$mode\"",
+                )
+            }.getOrNull() ?: return false
+            return runtime.setTunnelMode(parsed)
+        }
+
         override fun queryTrafficNow(): Long = runtime.queryTrafficNow()
 
         override fun queryTrafficTotal(): Long = runtime.queryTrafficTotal()

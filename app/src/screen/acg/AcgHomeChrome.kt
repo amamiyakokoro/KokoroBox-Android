@@ -36,6 +36,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text as MdText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.common.util.LocaleUtil
 import com.github.yumelira.yumebox.common.util.formatBytesForDisplay
+import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
@@ -194,6 +200,62 @@ internal fun AcgQuoteText(
                 fontWeight = FontWeight.Medium,
                 fontSize = AcgUi.Quote.authorSize,
                 softWrap = false,
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AcgProfileModeBadge(
+    profileName: String?,
+    tunnelMode: TunnelState.Mode?,
+    modifier: Modifier = Modifier,
+) {
+    if (profileName == null && tunnelMode == null) return
+
+    val spacing = AppTheme.spacing
+    val componentSizes = AppTheme.sizes
+    val opacity = AppTheme.opacity
+
+    Surface(
+        color = MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtle),
+        shape = RoundedCornerShape(50),
+        modifier = modifier
+            .wrapContentWidth(Alignment.Start)
+            .height(componentSizes.statusCapsuleHeight),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = spacing.space12),
+            horizontalArrangement = Arrangement.spacedBy(spacing.space8),
+        ) {
+            MdText(
+                text = profileName ?: MLang.Home.Traffic.NoProfile,
+                modifier = Modifier.weight(weight = 1f, fill = false),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(spacing.space4)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape),
+            )
+
+            MdText(
+                text = tunnelMode.toAcgTunnelDisplayName(),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
             )
         }
     }
@@ -625,6 +687,13 @@ private fun AcgSupportingCountryBadge(countryCode: String) {
             overflow = TextOverflow.Clip,
         )
     }
+}
+
+private fun TunnelState.Mode?.toAcgTunnelDisplayName(): String = when (this) {
+    TunnelState.Mode.Direct -> "Direct"
+    TunnelState.Mode.Global -> "Global"
+    TunnelState.Mode.Rule -> "Rule"
+    else -> "Rule"
 }
 
 private fun buildAcgDisplayIpValue(

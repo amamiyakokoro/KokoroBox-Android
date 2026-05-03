@@ -54,8 +54,12 @@ func QueryProxyGroupsFromCompiledYaml(yamlText string, profileDir string, exclud
 
 	app.ApplySubtitlePattern(rawCfg.ClashForAndroid.UiSubtitlePattern)
 
-	groupNames := make([]string, 0, len(rawCfg.ProxyGroup))
-	seen := make(map[string]struct{}, len(rawCfg.ProxyGroup))
+	groupNames := make([]string, 0, len(rawCfg.ProxyGroup)+1)
+	seen := make(map[string]struct{}, len(rawCfg.ProxyGroup)+1)
+	if cfg.Proxies["GLOBAL"] != nil {
+		seen["GLOBAL"] = struct{}{}
+		groupNames = append(groupNames, "GLOBAL")
+	}
 	for _, mapping := range rawCfg.ProxyGroup {
 		name, _ := mapping["name"].(string)
 		name = strings.TrimSpace(name)

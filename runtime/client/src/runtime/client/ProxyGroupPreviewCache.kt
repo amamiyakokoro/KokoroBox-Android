@@ -20,6 +20,7 @@
 
 package com.github.yumelira.yumebox.runtime.client
 
+import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import com.github.yumelira.yumebox.service.runtime.state.RuntimePhase
@@ -31,6 +32,7 @@ internal class ProxyGroupPreviewCache {
         val profileUpdatedAt: Long,
         val excludeNotSelectable: Boolean,
         val overrideSignature: String,
+        val mode: TunnelState.Mode,
     )
 
     private data class CacheEntry(
@@ -38,18 +40,36 @@ internal class ProxyGroupPreviewCache {
         val groups: List<ProxyGroupInfo>,
     )
 
-    private var entry: CacheEntry? = null
+    private val entries = linkedMapOf<CacheKey, CacheEntry>()
 
     fun store(
         profile: Profile,
         excludeNotSelectable: Boolean,
         overrideSignature: String,
+        mode: TunnelState.Mode,
         groups: List<ProxyGroupInfo>,
     ) {
-        entry = CacheEntry(
-            key = key(profile, excludeNotSelectable, overrideSignature),
+        val cacheKey = key(profile, excludeNotSelectable, overrideSignature, mode)
+        entries[cacheKey] = CacheEntry(
+            key = cacheKey,
             groups = groups,
         )
+    }
+
+    fun cached(
+        profile: Profile?,
+        excludeNotSelectable: Boolean,
+        overrideSignature: String,
+        mode: TunnelState.Mode,
+    ): List<ProxyGroupInfo>? {
+        val targetProfile = profile ?: return null
+        val cacheKey = key(targetProfile, excludeNotSelectable, overrideSignature, mode)
+        return entries[cacheKey]?.groups
+            ?: entries.values.lastOrNull { entry ->
+                entry.key.profileId == targetProfile.uuid &&
+                    entry.key.excludeNotSelectable == excludeNotSelectable &&
+                    entry.key.mode == mode
+            }?.groups
     }
 
     fun fallback(
@@ -57,25 +77,29 @@ internal class ProxyGroupPreviewCache {
         profile: Profile?,
         excludeNotSelectable: Boolean,
         overrideSignature: String,
+        mode: TunnelState.Mode,
     ): List<ProxyGroupInfo>? {
         if (phase == RuntimePhase.Running) return null
-        val cached = entry ?: return null
-        if (profile == null) return cached.groups
-        return cached.takeIf {
-            it.key == key(profile, excludeNotSelectable, overrideSignature)
-        }?.groups
+        return cached(
+            profile = profile,
+            excludeNotSelectable = excludeNotSelectable,
+            overrideSignature = overrideSignature,
+            mode = mode,
+        )
     }
 
     private fun key(
         profile: Profile,
         excludeNotSelectable: Boolean,
         overrideSignature: String,
+        mode: TunnelState.Mode,
     ): CacheKey {
         return CacheKey(
             profileId = profile.uuid,
             profileUpdatedAt = profile.updatedAt,
             excludeNotSelectable = excludeNotSelectable,
             overrideSignature = overrideSignature,
+            mode = mode,
         )
     }
 }

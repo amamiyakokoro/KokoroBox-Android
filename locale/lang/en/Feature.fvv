@@ -44,5 +44,13 @@ Feature = {
         BackendDownloadSuccess = "Sub-Store backend downloaded"
         BackendDownloadFailed = "Sub-Store backend download failed"
         DownloadError = "Download error: %s"
+        PortInUse = "Port %d or %d is already in use"
+        JavetLoadFailed = "Failed to load Javet native library"
+        CaseEngineInitFailed = "Failed to initialize CaseEngine"
+        FrontendExtractFailed = "Failed to extract Sub-Store frontend resources"
+        CreateDirectoryFailed = "Cannot create directory: %s"
+        TargetNotDirectory = "Target is not a directory: %s"
+        PathTraversalDetected = "Path traversal detected: %s"
+        PathExistsButNotDirectory = "Path exists but is not a directory: %s"
     }
 }

@@ -57,6 +57,14 @@ class RuntimeClashManager(
         )
     }
 
+    override fun setTunnelMode(mode: TunnelState.Mode): Boolean {
+        return queryWithRuntime(
+            rootCall = { runBlocking { RootTunController.setTunnelMode(appContext, mode) } },
+            localCall = { local.setTunnelMode(mode) },
+            fallbackOnRootFailure = false,
+        )
+    }
+
     override fun queryTrafficNow(): Long {
         return queryWithRuntime(
             rootCall = { runBlocking { RootTunController.queryTrafficNow(appContext) } },

@@ -13,6 +13,7 @@ import (
 
 const defaultTestURL = "https://www.gstatic.com/generate_204"
 const healthCheckTimeout = 5 * time.Second
+const healthCheckConcurrency = 8
 
 func HealthCheck(name string) {
 	log.Infoln("HealthCheck: request group=%s", name)
@@ -42,10 +43,13 @@ func HealthCheck(name string) {
 	log.Infoln("HealthCheck: group=%s proxies=%d", name, len(allProxies))
 
 	wg := &sync.WaitGroup{}
+	sem := make(chan struct{}, healthCheckConcurrency)
 	for _, proxy := range allProxies {
 		wg.Add(1)
 		go func(px C.Proxy) {
 			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
 			ctx, cancel := context.WithTimeout(context.Background(), healthCheckTimeout)
 			defer cancel()
 			_, _ = px.URLTest(ctx, defaultTestURL, nil)

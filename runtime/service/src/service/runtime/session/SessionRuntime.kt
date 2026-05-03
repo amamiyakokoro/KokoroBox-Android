@@ -151,6 +151,11 @@ class SessionRuntime(
         return if (currentSnapshot.phase == RuntimePhase.Running) Clash.queryTunnelState() else TunnelState(TunnelState.Mode.Rule)
     }
 
+    fun setTunnelMode(mode: TunnelState.Mode): Boolean {
+        if (currentSnapshot.phase != RuntimePhase.Running) return false
+        return Clash.setTunnelMode(mode)
+    }
+
     fun queryTrafficNow(): Long {
         return if (currentSnapshot.phase == RuntimePhase.Running) {
             Clash.queryTrafficNow().also {

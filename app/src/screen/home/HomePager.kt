@@ -73,6 +73,7 @@ fun HomePager(
     val speedHistory by homeViewModel.speedHistory.collectAsState()
     val testingCurrentNodeDelay by homeViewModel.testingCurrentNodeDelay.collectAsState()
     val proxyMode by homeViewModel.proxyMode.collectAsState()
+    val tunnelMode by homeViewModel.tunnelMode.collectAsState()
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -165,7 +166,7 @@ fun HomePager(
                             TrafficData.ZERO
                         },
                         profileName = currentProfile?.name?.takeIf { isRunning },
-                        tunnelMode = null,
+                        tunnelMode = tunnelMode.takeIf { isRunning },
                         controlState = controlState,
                         proxyMode = proxyMode,
                         isEnabled = isProxyEnabled,

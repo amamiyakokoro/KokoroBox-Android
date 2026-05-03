@@ -228,6 +228,11 @@ object RootTunController {
         }
     }
 
+    suspend fun setTunnelMode(context: Context, mode: TunnelState.Mode): Boolean {
+        val rawMode = RootTunJson.Default.encodeToString(TunnelState.Mode.serializer(), mode).trim('"')
+        return remoteCall(context) { service -> service.setTunnelMode(rawMode) }
+    }
+
     suspend fun queryTrafficNow(context: Context): Long {
         return remoteCall(context) { service -> service.queryTrafficNow() }
     }

@@ -19,6 +19,7 @@ AccessControl = {
         SelectedFirst = "已选应用优先"
         SortMode = "排序方式"
         SortModeCurrent = "当前：%s"
+        SelectAction = "选择"
         BatchOperation = "批量操作"
         SelectAll = "全选"
         DeselectAll = "全不选"

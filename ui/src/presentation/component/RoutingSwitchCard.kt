@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.key
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,7 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
@@ -107,6 +108,7 @@ private fun RoutingSwitchRow(
     contentPadding: PaddingValues,
 ) {
     val spacing = AppTheme.spacing
+    val hapticFeedback = LocalHapticFeedback.current
 
     val interactionSource = remember { MutableInteractionSource() }
     Row(
@@ -116,7 +118,10 @@ private fun RoutingSwitchRow(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = { onCheckedChange(!checked) },
+                onClick = {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                    onCheckedChange(!checked)
+                },
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(spacing.space16),
@@ -133,7 +138,7 @@ private fun RoutingSwitchRow(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
-        Switch(
+        HapticSwitch(
             checked = checked,
             onCheckedChange = onCheckedChange,
         )

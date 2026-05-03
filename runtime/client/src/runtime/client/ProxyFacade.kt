@@ -36,6 +36,7 @@ import com.github.yumelira.yumebox.core.util.PollingTimers
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.store.MMKVProvider
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
+import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.remote.ServiceClient
 import com.github.yumelira.yumebox.remote.VpnPermissionRequired
@@ -83,6 +84,9 @@ class ProxyFacade(
     private val networkSettingsStorage by lazy {
         NetworkSettingsStore(MMKVProvider().getMMKV("network_settings"))
     }
+    private val proxyDisplaySettingsStorage by lazy {
+        ProxyDisplaySettingsStore(MMKVProvider().getMMKV("proxy_display"))
+    }
     private val rootTunStateStore by lazy { RootTunStateStore(appContext) }
     private val runtimeControl = ProxyRuntimeControl(appContext) { actionClashRequestStop }
     private val previewCache = ProxyGroupPreviewCache()
@@ -92,6 +96,8 @@ class ProxyFacade(
         RuntimeStateMapper.idleSnapshot(networkSettingsStorage.proxyMode.value),
     )
     val runtimeSnapshot: StateFlow<RuntimeSnapshot> = _runtimeSnapshot.asStateFlow()
+    private val _preferredTunnelMode = MutableStateFlow(proxyDisplaySettingsStorage.proxyMode.value)
+    val preferredTunnelMode: StateFlow<TunnelState.Mode> = _preferredTunnelMode.asStateFlow()
 
     private val actionServiceRecreated: String get() = Intents.actionServiceRecreated(appContext.packageName)
     private val actionClashStarted: String get() = Intents.actionClashStarted(appContext.packageName)
@@ -238,6 +244,7 @@ class ProxyFacade(
             )
 
             if (_runtimeSnapshot.value.phase.running) {
+                applyPreferredTunnelModeSafely()
                 startTrafficPolling()
                 refreshAllSafely()
             } else {
@@ -391,7 +398,7 @@ class ProxyFacade(
         val activeProfile = ServiceClient.profile().queryActive() ?: return false
         SelectionDao.upsertManualSelection(activeProfile.uuid, group, proxyName)
         val updatedGroups = updateCachedProxyGroup(targetGroup.copy(now = proxyName))
-        publishProxyGroups(updatedGroups, cacheForPreview = true)
+        publishProxyGroups(updatedGroups, cacheForPreview = true, mode = proxyDisplaySettingsStorage.proxyMode.value)
         return true
     }
 
@@ -404,8 +411,6 @@ class ProxyFacade(
             ServiceClient.clash().healthCheck(group)
         }
         Timber.d("Health check dispatched: group=%s", group)
-        scheduleRuntimeGroupRefresh(group, PollingTimerSpecs.ProxyHealthcheckRefresh.intervalMillis)
-        scheduleRuntimeProxyGroupsRefresh(PollingTimerSpecs.ProxyHealthcheckRefresh.intervalMillis)
     }
 
     suspend fun healthCheckAll() {
@@ -433,8 +438,6 @@ class ProxyFacade(
             ServiceClient.clash().healthCheckProxy(group, proxyName)
         }
         Timber.d("Health check proxy done: group=%s proxy=%s delay=%s", group, proxyName, delay)
-        refreshProxyGroup(group)
-        scheduleRuntimeProxyGroupsRefresh(PROXY_SELECT_FULL_REFRESH_DELAY_MS)
         return delay
     }
 
@@ -444,6 +447,40 @@ class ProxyFacade(
         }
         connectCurrentBackend()
         return ServiceClient.clash().queryTunnelState()
+    }
+
+    suspend fun switchPreferredTunnelMode(mode: TunnelState.Mode) {
+        proxyDisplaySettingsStorage.proxyMode.set(mode)
+        _preferredTunnelMode.value = mode
+
+        cachedProxyGroupsForMode(mode)?.let { cachedGroups ->
+            publishProxyGroups(cachedGroups, cacheForPreview = false, mode = mode)
+        } ?: run {
+            _proxyGroups.value = emptyList()
+            lastProxyGroupsSummary = null
+            updateResolvedPrimaryNode(emptyList())
+        }
+        if (_runtimeSnapshot.value.running) {
+            setTunnelMode(mode)
+            refreshAll()
+        } else {
+            refreshPreviewStateSafely()
+        }
+    }
+
+    suspend fun setTunnelMode(mode: TunnelState.Mode): Boolean {
+        if (!_runtimeSnapshot.value.running) return false
+        val ok = if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
+            RootTunController.setTunnelMode(appContext, mode)
+        } else {
+            connectCurrentBackend()
+            ServiceClient.clash().setTunnelMode(mode)
+        }
+        if (ok) {
+            closeRuntimeConnectionsSafely()
+            scheduleRuntimeProxyGroupsRefresh(PROXY_SELECT_FULL_REFRESH_DELAY_MS)
+        }
+        return ok
     }
 
     suspend fun queryConnections(): ConnectionSnapshot {
@@ -516,6 +553,7 @@ class ProxyFacade(
     suspend fun refreshProxyGroups() {
         refreshProxyGroupsMutex.withLock {
             val snapshot = _runtimeSnapshot.value
+            val requestedMode = proxyDisplaySettingsStorage.proxyMode.value
             var missingLocalRuntime = false
             val groups = withContext(Dispatchers.IO) {
                 runCatching {
@@ -525,6 +563,13 @@ class ProxyFacade(
 
                     if (snapshot.owner == RuntimeOwner.RootTun && !isRootSessionActive()) {
                         error("RootTun runtime not ready")
+                    }
+
+                    val preferredMode = requestedMode
+                    if (preferredMode == TunnelState.Mode.Global) {
+                        queryRuntimeProxyGroupInfo(snapshot, "GLOBAL")?.let { globalGroup ->
+                            return@runCatching listOf(globalGroup)
+                        }
                     }
 
                     if (snapshot.owner == RuntimeOwner.RootTun) {
@@ -544,12 +589,24 @@ class ProxyFacade(
             }
 
             if (groups != null) {
-                publishProxyGroups(groups, cacheForPreview = true)
+                val normalizedGroups = groupsForMode(requestedMode, groups)
+                val groupsToPublish = normalizedGroups.ifEmpty {
+                    if (!snapshot.running) fallbackPreviewGroups(snapshot, requestedMode).orEmpty() else emptyList()
+                }
+                if (proxyDisplaySettingsStorage.proxyMode.value == requestedMode) {
+                    publishProxyGroups(
+                        groups = groupsToPublish,
+                        cacheForPreview = normalizedGroups.isNotEmpty(),
+                        mode = requestedMode,
+                    )
+                }
             } else if (missingLocalRuntime) {
                 handleMissingLocalRuntime(snapshot, "runtime backend unavailable")
             } else if (!snapshot.running) {
-                fallbackPreviewGroups(snapshot)?.let { cached ->
-                    publishProxyGroups(cached, cacheForPreview = false)
+                fallbackPreviewGroups(snapshot, requestedMode)?.let { cached ->
+                    if (proxyDisplaySettingsStorage.proxyMode.value == requestedMode) {
+                        publishProxyGroups(cached, cacheForPreview = false, mode = requestedMode)
+                    }
                 }
             }
         }
@@ -583,8 +640,11 @@ class ProxyFacade(
                 }
             } ?: return
 
-            val updatedGroups = updateCachedProxyGroup(updatedGroup)
-            publishProxyGroups(updatedGroups, cacheForPreview = true)
+            val requestedMode = proxyDisplaySettingsStorage.proxyMode.value
+            val updatedGroups = groupsForMode(requestedMode, updateCachedProxyGroup(updatedGroup))
+            if (proxyDisplaySettingsStorage.proxyMode.value == requestedMode) {
+                publishProxyGroups(updatedGroups, cacheForPreview = true, mode = requestedMode)
+            }
         }
     }
 
@@ -772,8 +832,11 @@ class ProxyFacade(
             ),
         )
         if (_runtimeSnapshot.value.phase.running) {
-            startTrafficPolling()
-            scope.launch { refreshAllSafely() }
+            scope.launch {
+                applyPreferredTunnelModeSafely()
+                startTrafficPolling()
+                refreshAllSafely()
+            }
         } else {
             stopTrafficPolling()
             scope.launch { refreshPreviewStateSafely() }
@@ -859,8 +922,24 @@ class ProxyFacade(
                 configuredMode = networkSettingsStorage.proxyMode.value,
             ),
         )
+        applyPreferredTunnelModeSafely()
         startTrafficPolling()
         refreshAllSafely()
+    }
+
+    private suspend fun applyPreferredTunnelModeSafely() {
+        val preferredMode = proxyDisplaySettingsStorage.proxyMode.value
+        _preferredTunnelMode.value = preferredMode
+        runCatching {
+            if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
+                RootTunController.setTunnelMode(appContext, preferredMode)
+            } else {
+                connectCurrentBackend()
+                ServiceClient.clash().setTunnelMode(preferredMode)
+            }
+        }.onFailure { error ->
+            Timber.d(error, "Apply preferred tunnel mode skipped")
+        }
     }
 
     private suspend fun handleRuntimeStopped(reason: String?) {
@@ -1010,6 +1089,34 @@ class ProxyFacade(
         )
     }
 
+    private suspend fun queryRuntimeProxyGroupInfo(
+        snapshot: RuntimeSnapshot,
+        name: String,
+        sort: ProxySort = ProxySort.Default,
+    ): ProxyGroupInfo? {
+        return runCatching {
+            if (snapshot.owner == RuntimeOwner.RootTun) {
+                toProxyGroupInfo(RootTunController.queryProxyGroup(appContext, name, sort))
+            } else {
+                connectCurrentBackend()
+                toProxyGroupInfo(ServiceClient.clash().queryProxyGroup(name, sort))
+            }
+        }.getOrNull()
+    }
+
+    private suspend fun closeRuntimeConnectionsSafely() {
+        runCatching {
+            if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
+                RootTunController.closeAllConnections(appContext)
+            } else {
+                connectCurrentBackend()
+                ServiceClient.clash().closeAllConnections()
+            }
+        }.onFailure { error ->
+            Timber.d(error, "Close connections after tunnel mode switch skipped")
+        }
+    }
+
     private suspend fun currentRootTunStatus(): RootTunStatus {
         return runCatching { RootTunController.queryStatus(appContext) }
             .getOrElse { rootTunStateStore.snapshot() }
@@ -1035,6 +1142,7 @@ class ProxyFacade(
                 ),
             )
             if (status.state == com.github.yumelira.yumebox.service.root.RootTunState.Running) {
+                applyPreferredTunnelModeSafely()
                 startTrafficPolling()
                 refreshAllSafely()
             }
@@ -1078,6 +1186,7 @@ class ProxyFacade(
                         ),
                     )
                     if (status.state == com.github.yumelira.yumebox.service.root.RootTunState.Running) {
+                        applyPreferredTunnelModeSafely()
                         startTrafficPolling()
                         refreshAllSafely()
                         return@launch
@@ -1130,7 +1239,7 @@ class ProxyFacade(
         stopTrafficPolling()
         runCatching { queryPreviewProxyGroups() }
             .onSuccess { groups ->
-                publishProxyGroups(groups, cacheForPreview = true)
+                publishProxyGroups(groups, cacheForPreview = true, mode = proxyDisplaySettingsStorage.proxyMode.value)
             }
             .onFailure { error ->
                 Timber.d(error, "Fallback preview refresh skipped after stale runtime reset")
@@ -1180,14 +1289,17 @@ class ProxyFacade(
         }
 
         if (activeProfile == null) {
-            return emptyList()
+            return groupsForMode(proxyDisplaySettingsStorage.proxyMode.value, emptyList())
         }
         connectCurrentBackend()
         val groups = ServiceClient.clash()
             .queryProfileProxyGroups(excludeNotSelectable = false)
             .map(::toProxyGroupInfo)
 
-        return applyStoredSelectionsToPreviewGroups(activeProfile, groups)
+        return groupsForMode(
+            mode = proxyDisplaySettingsStorage.proxyMode.value,
+            groups = applyStoredSelectionsToPreviewGroups(activeProfile, groups),
+        )
     }
 
     private fun applyStoredSelectionsToPreviewGroups(
@@ -1209,36 +1321,106 @@ class ProxyFacade(
         }
     }
 
-    private fun backfillPreviewCache(groups: List<ProxyGroupInfo>) {
+    private fun backfillPreviewCache(groups: List<ProxyGroupInfo>, mode: TunnelState.Mode) {
         val profile = _currentProfile.value ?: return
         previewCache.store(
             profile = profile,
             excludeNotSelectable = false,
             overrideSignature = previewOverrideSignature(profile),
+            mode = mode,
             groups = groups,
         )
     }
 
-    private fun fallbackPreviewGroups(snapshot: RuntimeSnapshot): List<ProxyGroupInfo>? {
+    private fun fallbackPreviewGroups(snapshot: RuntimeSnapshot, mode: TunnelState.Mode): List<ProxyGroupInfo>? {
         val profile = _currentProfile.value
         return previewCache.fallback(
             phase = snapshot.phase,
             profile = profile,
             excludeNotSelectable = false,
             overrideSignature = profile?.let(::previewOverrideSignature).orEmpty(),
+            mode = mode,
         )
     }
 
-    private fun publishProxyGroups(groups: List<ProxyGroupInfo>, cacheForPreview: Boolean) {
+    private fun cachedProxyGroupsForMode(mode: TunnelState.Mode): List<ProxyGroupInfo>? {
+        val profile = _currentProfile.value ?: return null
+        return previewCache.cached(
+            profile = profile,
+            excludeNotSelectable = false,
+            overrideSignature = previewOverrideSignature(profile),
+            mode = mode,
+        )
+    }
+
+    private fun groupsForMode(mode: TunnelState.Mode, groups: List<ProxyGroupInfo>): List<ProxyGroupInfo> {
+        return when (mode) {
+            TunnelState.Mode.Direct -> directProxyGroups()
+            TunnelState.Mode.Global -> globalProxyGroups(groups)
+            else -> groups.filterNot { it.name.equals("GLOBAL", ignoreCase = true) }
+                .ifEmpty { groups }
+        }
+    }
+
+    private fun globalProxyGroups(groups: List<ProxyGroupInfo>): List<ProxyGroupInfo> {
+        if (groups.isEmpty()) return groups
+        return groups.firstOrNull { it.name.equals("GLOBAL", ignoreCase = true) }
+            ?.let { listOf(it.withRememberedGlobalSelection()) }
+            ?: emptyList()
+    }
+
+    private fun ProxyGroupInfo.withRememberedGlobalSelection(): ProxyGroupInfo {
+        val selected = rememberedGlobalSelection()
+            ?.takeIf { remembered -> proxies.any { it.name == remembered } }
+            ?: now.takeIf { current -> proxies.any { it.name == current } }
+            ?: proxies.firstOrNull()?.name
+            ?: now
+        return copy(now = selected)
+    }
+
+    private fun rememberedGlobalSelection(): String? {
+        val profile = _currentProfile.value ?: return null
+        return SelectionDao.querySelections(profile.uuid)
+            .firstOrNull { it.proxy.equals("GLOBAL", ignoreCase = true) }
+            ?.selected
+            ?.trim()
+            ?.takeIf(String::isNotEmpty)
+    }
+
+    private fun directProxyGroups(): List<ProxyGroupInfo> {
+        val directProxy = Proxy(
+            name = "DIRECT",
+            title = "DIRECT",
+            subtitle = "Direct",
+            type = Proxy.Type.Direct,
+            delay = 0,
+        )
+        return listOf(
+            ProxyGroupInfo(
+                name = "DIRECT",
+                type = Proxy.Type.Selector,
+                proxies = listOf(directProxy),
+                now = directProxy.name,
+                icon = null,
+                hidden = false,
+            ),
+        )
+    }
+
+    private fun publishProxyGroups(
+        groups: List<ProxyGroupInfo>,
+        cacheForPreview: Boolean,
+        mode: TunnelState.Mode = proxyDisplaySettingsStorage.proxyMode.value,
+    ) {
         val summary = summarizeProxyGroups(groups)
         if (summary != lastProxyGroupsSummary) {
             _proxyGroups.value = groups
             lastProxyGroupsSummary = summary
         }
         updateGroupsReady(groups.isNotEmpty())
-        updateResolvedPrimaryNode(groups)
+        updateResolvedPrimaryNode(groups, mode)
         if (cacheForPreview) {
-            backfillPreviewCache(groups)
+            backfillPreviewCache(groups, mode)
         }
     }
 
@@ -1288,12 +1470,15 @@ class ProxyFacade(
         }
     }
 
-    private fun updateResolvedPrimaryNode(groups: List<ProxyGroupInfo>) {
+    private fun updateResolvedPrimaryNode(groups: List<ProxyGroupInfo>, mode: TunnelState.Mode = proxyDisplaySettingsStorage.proxyMode.value) {
         if (_runtimeSnapshot.value.phase != RuntimePhase.Running || groups.isEmpty()) {
             _resolvedPrimaryNode.value = null
             return
         }
-        val mainGroup = groups.find { it.name.equals("Proxy", ignoreCase = true) } ?: groups.firstOrNull()
+        val mainGroup = when (mode) {
+            TunnelState.Mode.Global -> groups.firstOrNull()
+            else -> groups.find { it.name.equals("Proxy", ignoreCase = true) } ?: groups.firstOrNull()
+        }
         val targetNode = mainGroup?.now?.trim().orEmpty()
         _resolvedPrimaryNode.value = targetNode.takeIf(String::isNotEmpty)?.let { resolveProxyNode(it, groups) }
     }
@@ -1310,7 +1495,12 @@ class ProxyFacade(
         val group = groups.firstOrNull { it.name == nodeName }
         if (group != null) {
             val groupNow = group.now.trim()
-            return groupNow.takeIf { it.isNotEmpty() }?.let { resolveProxyNode(it, groups, visited) }
+            val selectedProxy = group.proxies.firstOrNull { it.name == groupNow }
+            if (selectedProxy != null && !selectedProxy.type.group) {
+                return selectedProxy
+            }
+            return groupNow.takeIf { it.isNotEmpty() && it != nodeName }?.let { resolveProxyNode(it, groups, visited) }
+                ?: selectedProxy
         }
 
         groups.forEach { proxyGroup ->

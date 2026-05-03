@@ -476,7 +476,7 @@ private fun DropdownActionPreference(
     items: List<String>,
     onSelectedIndexChange: (Int) -> Unit,
 ) {
-    val placeholder = "选择"
+    val placeholder = MLang.AccessControl.Settings.SelectAction
     val displayItems = remember(items) { listOf(placeholder) + items }
 
     YumeMd3DropdownPreference(

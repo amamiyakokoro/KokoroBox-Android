@@ -56,9 +56,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -306,7 +308,9 @@ private fun ModernBottomBarContent(
     val bottomBarVisible = isVisible && (bottomBarScrollBehavior?.isBottomBarVisible ?: true)
 
     val handlePageChange = LocalHandlePageChange.current
+    val hapticFeedback = LocalHapticFeedback.current
     val onItemClick: (Int) -> Unit = { index ->
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
         if (index != mainPagerState.selectedPage) {
             handlePageChange(index)
         }
@@ -535,7 +539,9 @@ private fun LegacyBottomBarContent(
     }
 
     val handlePageChange = LocalHandlePageChange.current
+    val hapticFeedback = LocalHapticFeedback.current
     val onItemClick: (Int) -> Unit = { index ->
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
         if (index != mainPagerState.selectedPage) {
             handlePageChange(index)
         }

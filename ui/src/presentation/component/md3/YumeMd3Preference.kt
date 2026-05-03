@@ -33,15 +33,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.HapticSwitch
 
 private val PreferenceMinHeight = 64.dp
 private val PreferenceHorizontalPadding = 16.dp
@@ -168,15 +170,20 @@ fun YumeMd3SwitchPreferenceItem(
     enabled: Boolean = true,
     showDivider: Boolean = false,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
+
     YumeMd3PreferenceItem(
         title = title,
         modifier = modifier,
         summary = summary,
         enabled = enabled,
-        onClick = { onCheckedChange(!checked) },
+        onClick = {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            onCheckedChange(!checked)
+        },
         role = Role.Switch,
         trailingContent = {
-            Switch(
+            HapticSwitch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 enabled = enabled,

@@ -16,8 +16,6 @@ AppSettings = {
         AutoStartSummary = "Automatically start proxy service on app launch and boot"
         AutoUpdateOnStartTitle = "Update on Start"
         AutoUpdateOnStartSummary = "Auto-update the active subscription profile on start"
-        OneChinaTitle = "One-China Policy"
-        OneChinaSummary = "Automatically display TW region flags and codes as China"
     }
 
     Interface = {
@@ -30,17 +28,19 @@ AppSettings = {
         LanguageSummary = "Choose the app language"
         LanguageSystem = "Follow System"
         LanguageChinese = "简体中文"
+        LanguageTraditionalChinese = "繁體中文"
         LanguageEnglish = "English"
 
         ColorThemeTitle = "Theme Palette"
-        ColorThemeSummary = "Follow system colors by default, or switch to a custom theme seed"
         ColorThemeModeTitle = "Color Source"
         ColorThemeModeSummary = "Choose between following system colors and a manual theme seed"
         ColorThemeModeMonet = "Follow System"
         ColorThemeModeCustom = "Custom Theme Color"
+        ColorThemeModeAcgWallpaper = "From ACG Wallpaper"
         ColorThemePickerTitle = "Pick Theme Color"
         ColorThemeCodeLabel = "Theme Color Code (#RRGGBB)"
         ColorThemeDynamicSummary = "Currently following system colors"
+        ColorThemeAcgWallpaperSummary = "Generate the theme from the main color extracted from the current ACG home wallpaper. The color seed updates automatically after changing and applying a wallpaper."
         ColorThemeCustomSummary = "Current theme color: %s"
         ThemeColorPolarityInvertTitle = "Invert Theme Foreground"
         ThemeColorPolarityInvertSummary = "If themed colors look odd, try enabling this"
@@ -85,22 +85,37 @@ AppSettings = {
     Experimental = {
         AcgHomeTitle = "ACG Experimental Home"
         AcgHomeSummary = "Enable the new ACG-inspired home layout"
-        AcgQuoteTitle = "ACG Quote"
         AcgQuoteDefault = "Wait for a cloud to finish roaming on a quiet route"
-        AcgQuoteAuthorTitle = "ACG Quote Author"
         AcgQuoteAuthorDefault = "YumeBox"
         AcgSidebarExpandedTitle = "Expand ACG Sidebar by Default"
         AcgSidebarExpandedSummary = "Open the left info sidebar by default on the ACG home page"
         WallpaperTitle = "ACG Wallpaper"
         WallpaperSummary = "Choose a custom wallpaper for the ACG home page"
-        WallpaperCropTitle = "Wallpaper Cropper"
-        WallpaperCropSummary = "Use the home viewport height and slide left or right to pick the visible area"
-        WallpaperCropModeFree = "Manual Preview"
-        WallpaperCropModeFixed = "Fixed Ratio Crop"
-        WallpaperCropSwitchMode = "Switch Mode"
         ResetWallpaperTitle = "Reset ACG Wallpaper"
-        EditAcgQuoteTitle = "Edit ACG Quote"
-        EditAcgQuoteAuthorTitle = "Edit ACG Quote Author"
+        ResetWallpaperSummary = "Restore the built-in default wallpaper and reset crop position and wallpaper color seed"
+        ResetWallpaperSuccess = "Default wallpaper restored"
+        DailyQuoteTitle = "Daily Quote"
+        DailyQuoteSummaryApiAndCustomEnabled = "API and custom quotes enabled"
+        DailyQuoteSummaryApiEnabled = "Quote API enabled"
+        DailyQuoteSummaryCustomEnabled = "Custom quotes enabled"
+        DailyQuoteSummaryConfig = "Configure the quote API and custom quotes"
+        DailyQuoteConfigTitle = "Quote Configuration"
+        DailyQuoteApiTitle = "Quote API"
+        DailyQuoteApiEditTitle = "Edit Quote API (JSON only)"
+        CustomQuoteTitle = "Custom Quotes"
+        CustomQuoteSummary = "Tap to edit commented JSON. The default content is already built into the list."
+        CustomQuoteEditorTitle = "Edit Custom Quotes JSON"
+        CustomQuoteTemplateComment = "Custom quote list example. Comments starting with // can be kept before saving"
+        CustomQuoteTemplateStringArray = "String arrays are supported:"
+        CustomQuoteTemplateSentenceOne = "One quote"
+        CustomQuoteTemplateSentenceTwo = "Another quote"
+        CustomQuoteTemplateObjectArray = "Object arrays are also supported. Fields: text/quote/content/hitokoto and author/from/from_who/source:"
+        CustomQuoteTemplateSampleTextOne = "Time slips away second by second, and the end approaches step by step"
+        CustomQuoteTemplateSampleAuthorOne = "Koibumi"
+        CustomQuoteTemplateSampleTextTwo = "Humanity's hymn is the hymn of courage."
+        CustomQuoteTemplateSampleAuthorTwo = "Will A. Zeppeli"
+        CustomQuoteTemplateSampleTextThree = "Those who do not believe in themselves have no value in hard work."
+        CustomQuoteTemplateSampleSource = "Might Guy"
     }
 
     ServiceSection = {
@@ -111,16 +126,9 @@ AppSettings = {
         ExitUiWhenBackgroundTitle = "Release UI In Background"
         ExitUiWhenBackgroundSummary = "Release the activity UI when the app is fully hidden in background while keeping the proxy service running"
         BatteryOptimizationTitle = "Unrestricted Battery"
-        BatteryOptimizationSummaryEnabled = "Background activity is currently unrestricted. Tap to open system power management settings"
-        BatteryOptimizationSummaryDisabled = "Battery optimization is still restricting background activity. Set it to unrestricted to reduce background kills"
     }
 
     Network = {
-        UpdateChannelTitle = "Update Channel"
-        UpdateChannelSummary = "Choose which GitHub Release channel is used for update checks"
-        UpdateChannelStable = "Stable"
-        UpdateChannelPre = "Pre-release"
-        UpdateChannelSmart = "Smart"
         CustomUserAgentTitle = "Custom User-Agent"
         CustomUserAgentSummaryDefault = "Not set, using default"
     }
@@ -136,7 +144,6 @@ AppSettings = {
     }
 
     Button = {
-        Cancel = "Cancel"
         Apply = "Apply"
     }
 }

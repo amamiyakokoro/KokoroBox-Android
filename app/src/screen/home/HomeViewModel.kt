@@ -34,6 +34,7 @@ import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.gateway.NetworkInfoService
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
+import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
@@ -72,6 +73,7 @@ class HomeViewModel(
     private val profilesRepository: ProfilesRepository,
     private val networkInfoService: NetworkInfoService,
     private val networkSettingsStore: NetworkSettingsStore,
+    private val proxyDisplaySettingsStore: ProxyDisplaySettingsStore,
 ) : AndroidContractStateViewModel<HomeViewModel.HomeUiState, HomeViewModel.HomeUiEffect>(
     application,
     HomeUiState(),
@@ -96,6 +98,7 @@ class HomeViewModel(
     val currentProfile = proxyFacade.currentProfile
     val trafficNow = proxyFacade.trafficNow
     val proxyGroups = proxyFacade.proxyGroups
+    val tunnelMode: StateFlow<com.github.yumelira.yumebox.core.model.TunnelState.Mode> = proxyFacade.preferredTunnelMode
 
     private val _proxyMode = MutableStateFlow(ProxyMode.Tun)
     val proxyMode: StateFlow<ProxyMode> = _proxyMode.asStateFlow()
@@ -138,7 +141,9 @@ class HomeViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val ipMonitoringState: StateFlow<IpMonitoringState> = isRunning.flatMapLatest { running ->
+    val ipMonitoringState: StateFlow<IpMonitoringState> = combine(isRunning, tunnelMode) { running, mode ->
+        running to mode
+    }.flatMapLatest { (running, _) ->
         if (running) {
             networkInfoService.startIpMonitoring(
                 isProxyActiveFlow = isRunning,

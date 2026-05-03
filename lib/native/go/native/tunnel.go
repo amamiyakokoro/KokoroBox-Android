@@ -21,6 +21,15 @@ func queryTunnelState() *C.char {
 	return marshalJson(response)
 }
 
+//export setTunnelMode
+func setTunnelMode(mode C.c_string) C.int {
+	if tunnel.SetMode(C.GoString(mode)) {
+		return 1
+	}
+
+	return 0
+}
+
 //export queryNow
 func queryNow(upload, download *C.uint64_t) {
 	up, down := tunnel.Now()

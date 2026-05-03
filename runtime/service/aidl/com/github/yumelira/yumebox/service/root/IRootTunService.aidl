@@ -7,6 +7,7 @@ interface IRootTunService {
     String stopRootTun();
     String queryStatus();
     String queryTunnelStateJson();
+    boolean setTunnelMode(String mode);
     long queryTrafficNow();
     long queryTrafficTotal();
     String queryConnectionsJson();

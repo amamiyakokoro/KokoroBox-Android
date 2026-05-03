@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +42,7 @@ import com.github.yumelira.yumebox.presentation.component.EditorAction
 import com.github.yumelira.yumebox.presentation.component.EditorEmptyState
 import com.github.yumelira.yumebox.presentation.component.EditorListItem
 import com.github.yumelira.yumebox.presentation.component.EditorScaffold
+import com.github.yumelira.yumebox.presentation.component.HapticSwitch
 import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
 import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
@@ -670,7 +670,7 @@ private fun RuleEditorDialog(
                 summary = null,
                 onClick = { useNoResolve = !useNoResolve },
                 endActions = {
-                    Switch(
+                    HapticSwitch(
                         checked = useNoResolve,
                         onCheckedChange = { checked -> useNoResolve = checked },
                     )

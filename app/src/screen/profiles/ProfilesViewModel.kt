@@ -41,7 +41,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -51,7 +50,7 @@ import java.util.*
 class ProfilesViewModel(
     application: Application,
     private val profilesRepository: ProfilesRepository,
-    profileLinksStorage: ProfileLinksStore
+    profileLinksStorage: ProfileLinksStore,
 ) : AndroidContractStateViewModel<ProfilesUiState, ProfilesViewModel.ProfilesUiEffect>(
     application,
     ProfilesUiState(),

@@ -71,6 +71,10 @@ class ClashManager(private val context: Context) : IClashManager,
         return Clash.queryTunnelState()
     }
 
+    override fun setTunnelMode(mode: TunnelState.Mode): Boolean {
+        return Clash.setTunnelMode(mode)
+    }
+
     override fun queryTrafficNow(): Long {
         if (!StatusProvider.serviceRunning) return 0L
         return Clash.queryTrafficNow()

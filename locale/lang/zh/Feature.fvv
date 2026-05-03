@@ -44,5 +44,13 @@ Feature = {
         BackendDownloadSuccess = "Sub-Store 后端下载完成"
         BackendDownloadFailed = "Sub-Store 后端下载失败"
         DownloadError = "下载出错：%s"
+        PortInUse = "端口 %d 或 %d 已被占用"
+        JavetLoadFailed = "Javet native 库加载失败"
+        CaseEngineInitFailed = "CaseEngine 初始化失败"
+        FrontendExtractFailed = "Sub-Store 前端资源解压失败"
+        CreateDirectoryFailed = "无法创建目录: %s"
+        TargetNotDirectory = "目标不是目录: %s"
+        PathTraversalDetected = "检测到路径遍历: %s"
+        PathExistsButNotDirectory = "路径已存在但不是目录: %s"
     }
 }
