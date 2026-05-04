@@ -29,35 +29,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBar as MaterialTopAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar as MaterialCenterAlignedTopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.github.yumelira.yumebox.presentation.theme.UiDp
-import dev.chrisbanes.haze.ExperimentalHazeApi
-import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.hazeEffect
-
-val LocalTopBarHazeState = compositionLocalOf<HazeState?> { null }
-val LocalTopBarHazeStyle = compositionLocalOf<HazeStyle?> { null }
-
-@OptIn(ExperimentalHazeApi::class)
-private fun Modifier.topBarHazeEffect(
-    state: HazeState?,
-    style: HazeStyle?,
-): Modifier {
-    if (state == null || style == null) return this
-
-    return hazeEffect(state) {
-        this.style = style
-        blurRadius = UiDp.dp20
-        inputScale = HazeInputScale.Fixed(0.35f)
-        noiseFactor = 0f
-        forceInvalidateOnPreDraw = false
-    }
-}
 
 @Composable
 private fun defaultTopBarContainerColor(): Color {
@@ -74,13 +49,9 @@ fun TopBar(
     @Suppress("UNUSED_PARAMETER") navigationIconPadding: Dp = UiDp.dp16,
     @Suppress("UNUSED_PARAMETER") actionIconPadding: Dp = UiDp.dp16,
     containerColor: Color = Color.Unspecified,
-    enableHaze: Boolean = false,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    val hazeState = LocalTopBarHazeState.current
-    val hazeStyle = LocalTopBarHazeStyle.current
-    val hazeEnabled = enableHaze && hazeState != null && hazeStyle != null
     val resolvedContainerColor = if (containerColor == Color.Unspecified) {
         defaultTopBarContainerColor()
     } else {
@@ -94,7 +65,7 @@ fun TopBar(
                 style = MaterialTheme.typography.titleLarge,
             )
         },
-        modifier = if (hazeEnabled) modifier.topBarHazeEffect(hazeState, hazeStyle) else modifier,
+        modifier = modifier,
         navigationIcon = navigationIcon,
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
@@ -117,13 +88,9 @@ fun SmallTopBar(
     @Suppress("UNUSED_PARAMETER") navigationIconPadding: Dp = UiDp.dp16,
     @Suppress("UNUSED_PARAMETER") actionIconPadding: Dp = UiDp.dp16,
     containerColor: Color = Color.Unspecified,
-    enableHaze: Boolean = false,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    val hazeState = LocalTopBarHazeState.current
-    val hazeStyle = LocalTopBarHazeStyle.current
-    val hazeEnabled = enableHaze && hazeState != null && hazeStyle != null
     val resolvedContainerColor = if (containerColor == Color.Unspecified) {
         defaultTopBarContainerColor()
     } else {
@@ -137,7 +104,7 @@ fun SmallTopBar(
                 style = MaterialTheme.typography.titleLarge,
             )
         },
-        modifier = if (hazeEnabled) modifier.topBarHazeEffect(hazeState, hazeStyle) else modifier,
+        modifier = modifier,
         navigationIcon = navigationIcon,
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(

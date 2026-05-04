@@ -24,6 +24,7 @@ package com.github.yumelira.yumebox.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.yumelira.yumebox.data.controller.AcgWallpaperStorage
 import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
@@ -32,6 +33,7 @@ import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.data.store.DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON
 import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.store.Preference
+import com.github.yumelira.yumebox.data.controller.UserSettingsBackupController
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +56,8 @@ class AppSettingsViewModel(
     private val settings: AppSettingsStore,
     private val featureStore: FeatureStore,
     private val controller: AppSettingsController,
+    private val userSettingsBackupController: UserSettingsBackupController,
+    private val acgWallpaperStorage: AcgWallpaperStorage,
 ) : ViewModel() {
 
     val initialSetupCompleted: Preference<Boolean> = settings.initialSetupCompleted
@@ -72,7 +76,6 @@ class AppSettingsViewModel(
     val showTrafficNotification: Preference<Boolean> = settings.showTrafficNotification
     val bottomBarAutoHide: Preference<Boolean> = settings.bottomBarAutoHide
     val bottomBarUseLegacyStyle: Preference<Boolean> = settings.bottomBarUseLegacyStyle
-    val topBarBlurEnabled: Preference<Boolean> = settings.topBarBlurEnabled
     val acgMainUiEnabled: Preference<Boolean> = settings.acgMainUiEnabled
     val acgWallpaperUri: Preference<String> = settings.acgWallpaperUri
     val acgWallpaperZoom: Preference<Float> = settings.acgWallpaperZoom
@@ -115,9 +118,13 @@ class AppSettingsViewModel(
     }
     fun onBottomBarAutoHideChange(enabled: Boolean) = bottomBarAutoHide.set(enabled)
     fun onBottomBarUseLegacyStyleChange(enabled: Boolean) = bottomBarUseLegacyStyle.set(enabled)
-    fun onTopBarBlurEnabledChange(enabled: Boolean) = topBarBlurEnabled.set(enabled)
     fun onAcgMainUiEnabledChange(enabled: Boolean) = acgMainUiEnabled.set(enabled)
     fun onAcgWallpaperUriChange(uri: String) = acgWallpaperUri.set(uri)
+    fun applyAcgWallpaper(sourceUri: String): String {
+        val localUri = acgWallpaperStorage.copyFromUri(sourceUri)
+        acgWallpaperUri.set(localUri)
+        return localUri
+    }
     fun onAcgWallpaperSeedColorChange(argb: Long) = acgWallpaperSeedColorArgb.set(argb)
     fun onAcgWallpaperCropChange(zoom: Float, biasX: Float, biasY: Float) {
         acgWallpaperZoom.set(zoom.coerceIn(1f, 5f))
@@ -196,6 +203,7 @@ class AppSettingsViewModel(
     }
     fun onAcgSidebarExpandedChange(expanded: Boolean) = acgSidebarExpanded.set(expanded)
     fun clearAcgWallpaperUri() {
+        acgWallpaperStorage.clear()
         acgWallpaperUri.set("")
         acgWallpaperSeedColorArgb.set(DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB)
         onAcgWallpaperCropChange(zoom = 1f, biasX = 0f, biasY = 0f)
@@ -212,6 +220,16 @@ class AppSettingsViewModel(
     fun onExitUiWhenBackgroundChange(enabled: Boolean) = exitUiWhenBackground.set(enabled)
 
     fun applyCustomUserAgent(userAgent: String) = controller.applyCustomUserAgent(userAgent)
+
+    fun exportUserSettingsBackup(): Result<String> = runCatching {
+        userSettingsBackupController.exportToJson()
+    }
+
+    fun importUserSettingsBackup(rawJson: String): Result<Unit> = runCatching {
+        userSettingsBackupController.importFromJson(rawJson)
+        controller.applyAppLanguage(appLanguage.value)
+        controller.applyCustomUserAgent(customUserAgent.value)
+    }
 
     fun setInitialSetupCompleted(completed: Boolean) = initialSetupCompleted.set(completed)
     fun setPrivacyPolicyAccepted(accepted: Boolean) = privacyPolicyAccepted.set(accepted)

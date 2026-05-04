@@ -23,12 +23,15 @@
 package com.github.yumelira.yumebox.di
 
 import com.github.yumelira.yumebox.data.controller.AccessControlController
+import com.github.yumelira.yumebox.data.controller.AcgWallpaperStorage
 import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.controller.NetworkSettingsController
 import com.github.yumelira.yumebox.data.controller.RuntimeOverrideController
+import com.github.yumelira.yumebox.data.controller.UserSettingsBackupController
 import com.github.yumelira.yumebox.data.controller.ActiveProfileOverrideReloader
 import com.github.yumelira.yumebox.data.controller.AppIdentityResolver
 import com.github.yumelira.yumebox.data.controller.AppTrafficStatisticsCollector
+import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.data.store.LogStore
 import com.github.yumelira.yumebox.data.gateway.LogRecordGateway
 import com.github.yumelira.yumebox.data.gateway.NetworkInfoService
@@ -86,6 +89,9 @@ val appFoundationModule = module {
     single { FeatureStore(get(named("substore"))) }
     single { ProxyDisplaySettingsStore(get(named("proxy_display"))) }
     single { TrafficStatisticsStore(get(named("traffic_statistics"))) }
+    single { AcgWallpaperStorage(androidContext()) }
+    single { UserSettingsBackupController(get(), get(), get(), get(), get(), get()) }
+    single { GeoXDataController(androidContext()) }
 }
 
 val appDataRuntimeModule = module {

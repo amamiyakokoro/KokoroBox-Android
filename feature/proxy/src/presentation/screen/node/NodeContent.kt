@@ -60,14 +60,8 @@ import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.data.model.normalizeProxySheetHeightFraction
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeStyle
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.theme.UiDp
-import dev.chrisbanes.haze.HazeProgressive
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.hazeEffect
 import top.yukonga.miuix.kmp.utils.overScrollHorizontal
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 
@@ -82,20 +76,6 @@ private fun LazyListState.isScrolledFromTop(): Boolean {
     return firstVisibleItemIndex > 0 || firstVisibleItemScrollOffset > 0
 }
 
-private fun Modifier.nodeTabHaze(state: HazeState?, style: HazeStyle?): Modifier {
-    if (state == null || style == null) return this
-    return hazeEffect(state) {
-        this.style = style
-        blurRadius = UiDp.dp30
-        noiseFactor = 0f
-        progressive = HazeProgressive.verticalGradient(
-            startIntensity = 1f,
-            endIntensity = 0f,
-            preferPerformance = true,
-        )
-    }
-}
-
 @Suppress("unused")
 @Composable
 internal fun NodeTabs(
@@ -103,8 +83,6 @@ internal fun NodeTabs(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
 ) {
-    val hazeState = LocalTopBarHazeState.current
-    val hazeStyle = LocalTopBarHazeStyle.current
     val hapticFeedback = LocalHapticFeedback.current
     val listState = rememberLazyListState()
 
@@ -120,7 +98,6 @@ internal fun NodeTabs(
         state = listState,
         modifier = Modifier
             .fillMaxWidth()
-            .nodeTabHaze(hazeState, hazeStyle)
             .background(MaterialTheme.colorScheme.surface)
             .overScrollHorizontal(),
         contentPadding = PaddingValues(start = UiDp.dp14, end = UiDp.dp14, top = UiDp.dp10, bottom = UiDp.dp10),

@@ -55,6 +55,11 @@ func loadCompiledConfig(completable unsafe.Pointer, path C.c_string) {
 	}(C.GoString(path))
 }
 
+//export validateGeoFile
+func validateGeoFile(path C.c_string, typ C.c_string) *C.char {
+	return marshalString(config.ValidateGeoFileJson(C.GoString(path), C.GoString(typ)))
+}
+
 //export inspectCompiledConfig
 func inspectCompiledConfig(yamlText C.c_string) *C.char {
 	cfg, err := config.QueryConfigFromCompiledYaml(C.GoString(yamlText))

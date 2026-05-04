@@ -8,6 +8,7 @@ AppSettings = {
         Privacy = "隱私"
         Service = "服務"
         Network = "網路"
+        Backup = "備份"
         Experimental = "實驗性內容"
     }
 
@@ -44,8 +45,6 @@ AppSettings = {
         ColorThemeCustomSummary = "目前主題色：%s"
         ThemeColorPolarityInvertTitle = "反轉主題前景色"
         ThemeColorPolarityInvertSummary = "當主題取色看起來怪異時可嘗試開啟"
-        TopBarBlurTitle = "背景模糊"
-        TopBarBlurSummary = "套用模糊背景"
         AutoHideNavbarTitle = "滑動隱藏底欄"
         AutoHideNavbarSummary = "向下滑動時自動隱藏底欄，向上滑動時顯示"
         LegacyNavbarStyleTitle = "浮動導航欄"
@@ -133,6 +132,19 @@ AppSettings = {
     Network = {
         CustomUserAgentTitle = "自訂 User-Agent"
         CustomUserAgentSummaryDefault = "未設定，使用預設值"
+    }
+
+    Backup = {
+        ExportTitle = "匯出設定備份"
+        ExportSummary = "將應用程式偏好、網路選項、面板連結和顯示設定儲存為 JSON 檔案"
+        ImportTitle = "匯入設定備份"
+        ImportSummary = "從 YumeBox 備份 JSON 檔案還原設定"
+        ExportSuccess = "已匯出設定備份"
+        ExportFailed = "匯出設定備份失敗"
+        ExportFailedDetail = "匯出設定備份失敗：%s"
+        ImportSuccess = "已匯入設定備份"
+        ImportReadFailed = "讀取備份檔案失敗"
+        ImportFailedDetail = "匯入設定備份失敗：%s"
     }
 
     WarningDialog = {

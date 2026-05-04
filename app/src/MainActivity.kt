@@ -54,8 +54,6 @@ import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
 import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.model.AppColorTheme
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeStyle
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
 import com.github.yumelira.yumebox.presentation.component.rememberStartupBiometricGateState
@@ -69,9 +67,6 @@ import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.tencent.mmkv.MMKV
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.HazeTint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -155,7 +150,6 @@ class MainActivity : FragmentActivity() {
             }
             val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsState().value
             val excludeFromRecents = appSettingsViewModel.excludeFromRecents.state.collectAsState().value
-            val topBarBlurEnabled = appSettingsViewModel.topBarBlurEnabled.state.collectAsState().value
             val pageScale = appSettingsViewModel.pageScale.state.collectAsState().value
             val screenshotProtectionEnabled = appSettingsViewModel.screenshotProtectionEnabled.state.collectAsState().value
             val biometricUnlockEnabled by appSettingsViewModel.biometricUnlockEnabled.state.collectAsState()
@@ -198,30 +192,17 @@ class MainActivity : FragmentActivity() {
                                 )
                             }
                         } else {
-                            val topBarHazeState = remember { HazeState() }
-                            val topBarBackground = MaterialTheme.colorScheme.surface
-                            val topBarHazeStyle = remember(topBarBackground) {
-                                HazeStyle(
-                                    backgroundColor = topBarBackground,
-                                    tint = HazeTint(topBarBackground.copy(0.8f)),
-                                )
-                            }
                             val navController = rememberNavController()
 
-                            CompositionLocalProvider(
-                                LocalTopBarHazeState provides if (topBarBlurEnabled) topBarHazeState else null,
-                                LocalTopBarHazeStyle provides if (topBarBlurEnabled) topBarHazeStyle else null,
+                            Surface(
+                                modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
                             ) {
-                                Surface(
-                                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
-                                ) {
-                                    DestinationsNavHost(
-                                        navGraph = NavGraphs.root,
-                                        navController = navController,
-                                        defaultTransitions = NavigationTransitions.defaultStyle,
-                                    )
-                                    ToastDialogHost()
-                                }
+                                DestinationsNavHost(
+                                    navGraph = NavGraphs.root,
+                                    navController = navController,
+                                    defaultTransitions = NavigationTransitions.defaultStyle,
+                                )
+                                ToastDialogHost()
                             }
                         }
                     }
@@ -285,6 +266,7 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    @Suppress("SpellCheckingInspection")
     private fun handleIntent(intent: Intent?) {
         intent?.let { safeIntent ->
             if (safeIntent.getBooleanExtra(EXTRA_EXIT_UI_WHEN_BACKGROUND, false)) {

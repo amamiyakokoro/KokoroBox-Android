@@ -34,6 +34,7 @@ import java.io.File
 object Bridge {
     external fun nativeCompilePreview(requestJson: String): String
     external fun nativeCompileToFile(requestJson: String): String
+    external fun nativeValidateGeoFile(path: String, type: String): String
     external fun nativeReset()
     external fun nativeForceGc()
     external fun nativeSuspend(suspend: Boolean)

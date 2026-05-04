@@ -56,6 +56,17 @@ object Clash {
         return Json.decodeFromString(CompileResult.serializer(), payload)
     }
 
+    fun validateGeoFile(path: File, type: GeoFileType): GeoValidationResult {
+        return runCatching {
+            Json.decodeFromString(
+                GeoValidationResult.serializer(),
+                Bridge.nativeValidateGeoFile(path.absolutePath, type.name),
+            )
+        }.getOrElse { error ->
+            GeoValidationResult(valid = false, message = error.message)
+        }
+    }
+
     fun reset() {
         Bridge.nativeReset()
     }

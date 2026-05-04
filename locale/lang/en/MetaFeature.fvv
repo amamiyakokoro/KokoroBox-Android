@@ -29,5 +29,17 @@ MetaFeature = {
         DialogTitle = "Update GeoX Online"
         SelectFiles = "Please select files to update"
         DownloadComplete = "Download complete: %d/%d"
+        ProgressTitle = "Updating GeoX"
+        ProgressSummary = "Keep this page open while files are downloaded and validated"
+        StatusPending = "Pending"
+        StatusDownloading = "Downloading %d%%"
+        StatusValidating = "Validating"
+        StatusSuccess = "Done"
+        StatusFailed = "Failed"
+        ProgressDetail = "%s / %s · %s"
+        ProgressDetailUnknownTotal = "%s · %s"
+        ProgressWaiting = "Waiting to start"
+        ProgressSuccess = "File updated and validated"
+        ProgressFailed = "Download or validation failed; usable fallback file was kept"
     }
 }

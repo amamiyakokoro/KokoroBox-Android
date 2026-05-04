@@ -40,14 +40,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.screen.ProxyPager
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.viewmodel.FeatureViewModel
 import com.github.yumelira.yumebox.presentation.webview.WebViewUtils.getPanelUrl
 import com.github.yumelira.yumebox.screen.acg.AcgHomePage
@@ -61,10 +59,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ProvidersScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 
@@ -78,7 +72,6 @@ fun MainScreen(
     val initialMainPage = initialPage.coerceIn(0, 3)
     val pagerState = rememberPagerState(initialPage = initialMainPage, pageCount = { 4 })
     val mainPagerState = rememberMainPagerState(pagerState)
-    val hazeState = remember { HazeState() }
 
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val featureViewModel = koinViewModel<FeatureViewModel>()
@@ -86,7 +79,6 @@ fun MainScreen(
     val isProxyRunning by homeViewModel.isRunning.collectAsState()
     val bottomBarAutoHideEnabled by appSettingsViewModel.bottomBarAutoHide.state.collectAsState()
     val bottomBarUseLegacyStyle by appSettingsViewModel.bottomBarUseLegacyStyle.state.collectAsState()
-    val topBarBlurEnabled by appSettingsViewModel.topBarBlurEnabled.state.collectAsState()
     val acgMainUiEnabled by appSettingsViewModel.acgMainUiEnabled.state.collectAsState()
     val acgWallpaperUri by appSettingsViewModel.acgWallpaperUri.state.collectAsState()
     val acgWallpaperZoom by appSettingsViewModel.acgWallpaperZoom.state.collectAsState()
@@ -116,19 +108,6 @@ fun MainScreen(
             }
         }
     }
-    val bottomBarBackground = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
-        MaterialTheme.colorScheme.surface
-    } else {
-        MaterialTheme.colorScheme.background
-    }
-    val opacity = AppTheme.opacity
-    val bottomBarHazeStyle = remember(bottomBarBackground) {
-        HazeStyle(
-            backgroundColor = bottomBarBackground.copy(alpha = opacity.subtle),
-            tint = HazeTint(bottomBarBackground.copy(alpha = opacity.softOverlay)),
-        )
-    }
-
     LaunchedEffect(mainPagerState.pagerState.currentPage) {
         mainPagerState.syncPage()
     }
@@ -159,16 +138,12 @@ fun MainScreen(
         handlePageChange(0)
     }
 
-    val mainPagerHazeEnabled = topBarBlurEnabled && (!acgMainUiEnabled || settledMainPage != 0)
-
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalPagerState provides mainPagerState.pagerState,
         LocalMainPagerState provides mainPagerState,
         LocalHandlePageChange provides handlePageChange,
         LocalBottomBarScrollBehavior provides bottomBarScrollBehavior,
-        LocalBottomBarHazeState provides if (mainPagerHazeEnabled) hazeState else null,
-        LocalBottomBarHazeStyle provides if (mainPagerHazeEnabled) bottomBarHazeStyle else null,
         LocalBottomBarUseLegacyStyle provides bottomBarUseLegacyStyle,
     ) {
         Scaffold(
@@ -191,15 +166,7 @@ fun MainScreen(
                     end = WindowInsets.systemBars.asPaddingValues().calculateEndPadding(layoutDirection),
                 )
                 HorizontalPager(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .let { modifier ->
-                            if (mainPagerHazeEnabled) {
-                                modifier.hazeSource(state = hazeState)
-                            } else {
-                                modifier
-                            }
-                        },
+                    modifier = Modifier.fillMaxSize(),
                     state = mainPagerState.pagerState,
                     beyondViewportPageCount = if (acgMainUiEnabled) 2 else 1,
                     flingBehavior = pagerFlingBehavior,

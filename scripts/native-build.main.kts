@@ -600,6 +600,7 @@ class ResourceDownloader(private val config: ProjectConfig) {
         val assets = listOf(
             AssetInfo("geoip.metadb", config.getString("asset.geoip.url", "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb")),
             AssetInfo("geosite.dat", config.getString("asset.geosite.url", "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat")),
+            AssetInfo("country.mmdb", config.getString("asset.country.url", "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb")),
             AssetInfo("ASN.mmdb", config.getString("asset.asn.url", "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb"))
         )
 
@@ -689,7 +690,7 @@ fun printUsage() {
           --go       Build Go native libraries
           --rust     Build Rust config compiler
           --cpp      Generate CMake/git info
-          --geo      Download and compress GeoIP/GeoSite assets into app/assets with XZ
+          --geo      Download and compress GeoIP/GeoSite/Country/ASN assets into app/assets with XZ
           --clean    Clean build outputs
           --all      Build everything (default)
           --help     Show this help
@@ -700,7 +701,7 @@ fun cleanBuildOutputs() {
     println("[Clean] Removing build outputs...")
     File("build/native").deleteRecursively()
     File("build/generated").deleteRecursively()
-    listOf("geoip.metadb.xz", "geosite.dat.xz", "ASN.mmdb.xz").forEach { name ->
+    listOf("geoip.metadb.xz", "geosite.dat.xz", "country.mmdb.xz", "ASN.mmdb.xz").forEach { name ->
         File("app/assets/$name").delete()
     }
 

@@ -22,17 +22,41 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.model.GeoFileType
 import com.github.yumelira.yumebox.core.model.GeoXItem
 import com.github.yumelira.yumebox.core.model.geoXItems
 import com.github.yumelira.yumebox.core.util.runtimeHomeDir
+import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.substore.util.DownloadProgress
 import com.github.yumelira.yumebox.substore.util.SubStoreDownloadClient
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -40,13 +64,32 @@ import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenD
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import java.io.File
+import kotlin.math.PI
+import kotlin.math.sin
 
-private const val MIN_GEO_FILE_SIZE_BYTES = 64 * 1024L
+private data class GeoXDownloadProgressState(
+    val itemTitle: String,
+    val progress: Int = 0,
+    val currentSize: Long = 0L,
+    val totalSize: Long = -1L,
+    val speed: String = "",
+    val status: GeoXDownloadStatus = GeoXDownloadStatus.Pending,
+)
+
+private enum class GeoXDownloadStatus {
+    Pending,
+    Downloading,
+    Validating,
+    Success,
+    Failed,
+}
 
 @Composable
 @Destination<RootGraph>
@@ -54,6 +97,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val downloadClient: SubStoreDownloadClient = koinInject()
+    val geoXDataController: GeoXDataController = koinInject()
 
     val showGeoXDownloadSheet = remember { mutableStateOf(false) }
 
@@ -122,6 +166,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             context = context,
             scope = scope,
             downloadClient = downloadClient,
+            geoXDataController = geoXDataController,
         )
     }
 }
@@ -132,29 +177,75 @@ private fun GeoXDownloadSheet(
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
     downloadClient: SubStoreDownloadClient,
+    geoXDataController: GeoXDataController,
 ) {
     val selectedItems = remember { mutableStateMapOf<GeoFileType, Boolean>() }
+    val progressItems = remember { mutableStateMapOf<GeoFileType, GeoXDownloadProgressState>() }
+    var isDownloading by remember { mutableStateOf(false) }
+    var downloadJob by remember { mutableStateOf<Job?>(null) }
+    var downloadSession by remember { mutableIntStateOf(0) }
+
+    fun resetDownloadState() {
+        downloadSession++
+        downloadJob?.cancel()
+        downloadJob = null
+        isDownloading = false
+        selectedItems.clear()
+        progressItems.clear()
+    }
+
+    fun cancelDownloadAndClose() {
+        resetDownloadState()
+        show.value = false
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { resetDownloadState() }
+    }
 
     AppActionBottomSheet(
         show = show.value,
         title = MLang.MetaFeature.Download.DialogTitle,
-        onDismissRequest = { show.value = false },
+        onDismissRequest = { cancelDownloadAndClose() },
         startAction = {
             AppBottomSheetCloseAction(
-                onClick = { show.value = false },
+                onClick = { cancelDownloadAndClose() },
             )
         },
         endAction = {
             AppBottomSheetConfirmAction(
-                enabled = selectedItems.values.any { it },
+                enabled = selectedItems.values.any { it } && !isDownloading,
                 onClick = {
                     val itemsToDownload = geoXItems.filter { selectedItems[it.type] == true }
                     if (itemsToDownload.isEmpty()) {
                         context.toast(MLang.MetaFeature.Download.SelectFiles)
                         return@AppBottomSheetConfirmAction
                     }
-                    show.value = false
-                    downloadGeoXFiles(context, scope, downloadClient, itemsToDownload)
+                    isDownloading = true
+                    val currentSession = ++downloadSession
+                    progressItems.clear()
+                    itemsToDownload.forEach { item ->
+                        progressItems[item.type] = GeoXDownloadProgressState(itemTitle = item.title)
+                    }
+                    downloadJob = downloadGeoXFiles(
+                        context = context,
+                        scope = scope,
+                        downloadClient = downloadClient,
+                        geoXDataController = geoXDataController,
+                        items = itemsToDownload,
+                        onProgress = { type, progress ->
+                            if (currentSession == downloadSession) {
+                                progressItems[type] = progress
+                            }
+                        },
+                        onComplete = { successCount, totalCount ->
+                            if (currentSession == downloadSession) {
+                                isDownloading = false
+                                downloadJob = null
+                                context.toast(MLang.MetaFeature.Download.DownloadComplete.format(successCount, totalCount))
+                            }
+                        },
+                    )
                 },
             )
         },
@@ -166,12 +257,21 @@ private fun GeoXDownloadSheet(
                         endActions = {
                             Checkbox(
                                 checked = selectedItems[item.type] ?: false,
+                                enabled = !isDownloading,
                                 onCheckedChange = { checked -> selectedItems[item.type] = checked }
                             )
                         },
-                        onClick = {
-                            selectedItems[item.type] = !(selectedItems[item.type] ?: false)
+                        onClick = if (isDownloading) {
+                            null
+                        } else {
+                            { selectedItems[item.type] = !(selectedItems[item.type] ?: false) }
                         }
+                    )
+                }
+                if (isDownloading || progressItems.isNotEmpty()) {
+                    GeoXDownloadProgressContent(
+                        items = progressItems.values.toList(),
+                        isUpdating = isDownloading,
                     )
                 }
             }
@@ -182,43 +282,298 @@ private fun downloadGeoXFiles(
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
     downloadClient: SubStoreDownloadClient,
+    geoXDataController: GeoXDataController,
     items: List<GeoXItem>,
-) {
-    scope.launch {
+    onProgress: (GeoFileType, GeoXDownloadProgressState) -> Unit,
+    onComplete: (Int, Int) -> Unit,
+): Job {
+    return scope.launch {
         var successCount = 0
-        withContext(Dispatchers.IO) {
-            val runtimeHome = context.runtimeHomeDir
-            runtimeHome.mkdirs()
-            items.forEach { item ->
-                val targetFile = File(runtimeHome, item.fileName)
-                if (downloadClient.download(item.url, targetFile, validator = ::isGeoXDownloadUsable)) {
-                    successCount++
+        try {
+            withContext(Dispatchers.IO) {
+                val runtimeHome = context.runtimeHomeDir
+                runtimeHome.mkdirs()
+                items.forEach { item ->
+                    val targetFile = File(runtimeHome, item.fileName)
+                    var latestState = GeoXDownloadProgressState(
+                        itemTitle = item.title,
+                        status = GeoXDownloadStatus.Downloading,
+                    )
+                    withContext(Dispatchers.Main.immediate) {
+                        onProgress(item.type, latestState)
+                    }
+                    val downloaded = downloadClient.download(
+                        url = item.url,
+                        targetFile = targetFile,
+                        onProgress = { progress ->
+                            latestState = progress.toGeoXProgressState(item.title, GeoXDownloadStatus.Downloading)
+                            scope.launch(Dispatchers.Main.immediate) {
+                                onProgress(item.type, latestState)
+                            }
+                        },
+                        validator = { file -> geoXDataController.isGeoFileUsable(file, item.fileName, deep = true) },
+                    )
+                    latestState = latestState.copy(
+                        progress = 100,
+                        status = GeoXDownloadStatus.Validating,
+                    )
+                    withContext(Dispatchers.Main.immediate) {
+                        onProgress(item.type, latestState)
+                    }
+                    val promoted = downloaded && geoXDataController.promoteDownloadedGeoFile(item.fileName)
+                    latestState = latestState.copy(
+                        progress = if (promoted) 100 else latestState.progress,
+                        status = if (promoted) GeoXDownloadStatus.Success else GeoXDownloadStatus.Failed,
+                    )
+                    withContext(Dispatchers.Main.immediate) {
+                        onProgress(item.type, latestState)
+                    }
+                    if (promoted) {
+                        successCount++
+                    }
                 }
             }
+            onComplete(successCount, items.size)
+        } catch (_: CancellationException) {
+            // Download was canceled by leaving the sheet/page. Keep the existing usable files untouched.
         }
-        context.toast(MLang.MetaFeature.Download.DownloadComplete.format(successCount, items.size))
     }
 }
 
-private fun isGeoXDownloadUsable(file: File): Boolean {
-    if (!file.isFile || file.length() < MIN_GEO_FILE_SIZE_BYTES) return false
-    return !looksLikeHttpErrorBody(file)
+private fun DownloadProgress.toGeoXProgressState(
+    itemTitle: String,
+    status: GeoXDownloadStatus,
+): GeoXDownloadProgressState {
+    return GeoXDownloadProgressState(
+        itemTitle = itemTitle,
+        progress = progress.coerceIn(0, 100),
+        currentSize = currentSize,
+        totalSize = totalSize,
+        speed = speed,
+        status = status,
+    )
 }
 
-private fun looksLikeHttpErrorBody(file: File): Boolean {
-    return runCatching {
-        val buffer = ByteArray(512)
-        val read = file.inputStream().buffered().use { input -> input.read(buffer) }
-        if (read <= 0) return@runCatching true
+private fun GeoXDownloadProgressState.isInProgress(): Boolean {
+    return status == GeoXDownloadStatus.Pending ||
+        status == GeoXDownloadStatus.Downloading ||
+        status == GeoXDownloadStatus.Validating
+}
 
-        val head = String(buffer, 0, read, Charsets.UTF_8)
-            .trimStart('\uFEFF', ' ', '\t', '\r', '\n')
-            .lowercase()
-        head.startsWith("<!doctype") ||
-            head.startsWith("<html") ||
-            head.startsWith("not found") ||
-            head.startsWith("404") ||
-            head.contains("<title>404") ||
-            head.contains("rate limit")
-    }.getOrDefault(false)
+@Composable
+private fun GeoXDownloadProgressContent(
+    items: List<GeoXDownloadProgressState>,
+    isUpdating: Boolean,
+) {
+    val showUpdatingHeader = isUpdating && items.any(GeoXDownloadProgressState::isInProgress)
+    val spacing = com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.space16, vertical = spacing.space12),
+        verticalArrangement = Arrangement.spacedBy(spacing.space12),
+    ) {
+        if (showUpdatingHeader) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.space12),
+            ) {
+                Md3ELoading(modifier = Modifier.size(spacing.space32))
+                Column {
+                    Text(
+                        text = MLang.MetaFeature.Download.ProgressTitle,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = MLang.MetaFeature.Download.ProgressSummary,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+        items.forEach { item ->
+            GeoXDownloadProgressRow(item)
+        }
+    }
+}
+
+@Composable
+private fun GeoXDownloadProgressRow(item: GeoXDownloadProgressState) {
+    val spacing = com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(spacing.space4),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = item.itemTitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = item.statusLabel(),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Md3EWavyProgressIndicator(
+            progress = if (item.totalSize > 0L || item.progress > 0) item.progress / 100f else null,
+            completed = item.status == GeoXDownloadStatus.Success,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = item.detailText(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun Md3EWavyProgressIndicator(
+    progress: Float?,
+    completed: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val transition = rememberInfiniteTransition(label = "GeoXWavyProgress")
+    val phase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "GeoXWavyProgressPhase",
+    )
+    val straightenPhase by animateFloatAsState(
+        targetValue = if (completed) 1f else 0f,
+        animationSpec = tween(durationMillis = 520, easing = LinearEasing),
+        label = "GeoXWavyProgressStraighten",
+    )
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+    val activeColor = MaterialTheme.colorScheme.primary
+    val normalizedProgress = progress?.coerceIn(0f, 1f)
+
+    Canvas(
+        modifier = modifier.height(8.dp),
+    ) {
+        val strokeWidth = 3.dp.toPx()
+        val centerY = size.height / 2f
+        val waveLength = 20.dp.toPx()
+        val amplitude = 2.4.dp.toPx()
+        val path = Path()
+        val startX: Float
+        val endX: Float
+        if (normalizedProgress == null) {
+            val segmentWidth = size.width * 0.34f
+            startX = -segmentWidth + (size.width + segmentWidth * 2f) * phase
+            endX = startX + segmentWidth
+
+            val visibleStart = startX.coerceIn(0f, size.width)
+            val visibleEnd = endX.coerceIn(0f, size.width)
+            if (visibleStart > 0f) {
+                drawLine(
+                    color = trackColor,
+                    start = Offset(0f, centerY),
+                    end = Offset(visibleStart, centerY),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
+            }
+            if (visibleEnd < size.width) {
+                drawLine(
+                    color = trackColor,
+                    start = Offset(visibleEnd, centerY),
+                    end = Offset(size.width, centerY),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
+            }
+        } else {
+            startX = 0f
+            endX = size.width * normalizedProgress
+            if (endX < size.width) {
+                drawLine(
+                    color = trackColor,
+                    start = Offset(endX, centerY),
+                    end = Offset(size.width, centerY),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                )
+            }
+        }
+
+        if (endX <= startX) return@Canvas
+
+        if (completed && straightenPhase >= 0.995f) {
+            drawLine(
+                color = activeColor,
+                start = Offset(startX.coerceAtLeast(0f), centerY),
+                end = Offset(endX.coerceAtMost(size.width), centerY),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round,
+            )
+            return@Canvas
+        }
+
+        var x = startX.coerceAtLeast(0f)
+        val targetEnd = endX.coerceAtMost(size.width)
+        var firstPoint = true
+        while (x <= targetEnd) {
+            val distanceFromSource = targetEnd - x
+            val baseWave = sin(((distanceFromSource / waveLength) + phase) * 2.0 * PI).toFloat()
+            val localStraighten = if (completed && targetEnd > 0f) {
+                (straightenPhase * (size.width + waveLength) - x) / waveLength
+            } else {
+                0f
+            }.coerceIn(0f, 1f)
+            val y = centerY + baseWave * amplitude * (1f - localStraighten)
+            if (firstPoint) {
+                path.moveTo(x, y)
+                firstPoint = false
+            } else {
+                path.lineTo(x, y)
+            }
+            x += 2f
+        }
+        if (!firstPoint) {
+            drawPath(
+                path = path,
+                color = activeColor,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+            )
+        }
+    }
+}
+
+private fun GeoXDownloadProgressState.statusLabel(): String {
+    return when (status) {
+        GeoXDownloadStatus.Pending -> MLang.MetaFeature.Download.StatusPending
+        GeoXDownloadStatus.Downloading -> MLang.MetaFeature.Download.StatusDownloading.format(progress)
+        GeoXDownloadStatus.Validating -> MLang.MetaFeature.Download.StatusValidating
+        GeoXDownloadStatus.Success -> MLang.MetaFeature.Download.StatusSuccess
+        GeoXDownloadStatus.Failed -> MLang.MetaFeature.Download.StatusFailed
+    }
+}
+
+private fun GeoXDownloadProgressState.detailText(): String {
+    return when {
+        status == GeoXDownloadStatus.Success -> MLang.MetaFeature.Download.ProgressSuccess
+        status == GeoXDownloadStatus.Failed -> MLang.MetaFeature.Download.ProgressFailed
+        totalSize > 0L -> MLang.MetaFeature.Download.ProgressDetail.format(
+            com.github.yumelira.yumebox.common.util.formatBytes(currentSize),
+            com.github.yumelira.yumebox.common.util.formatBytes(totalSize),
+            speed,
+        )
+        currentSize > 0L -> MLang.MetaFeature.Download.ProgressDetailUnknownTotal.format(
+            com.github.yumelira.yumebox.common.util.formatBytes(currentSize),
+            speed,
+        )
+        else -> MLang.MetaFeature.Download.ProgressWaiting
+    }
 }

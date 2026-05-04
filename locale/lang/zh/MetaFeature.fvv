@@ -29,5 +29,17 @@ MetaFeature = {
         DialogTitle = "更新 GeoX"
         SelectFiles = "请选择要更新的文件"
         DownloadComplete = "下载完成：%d/%d"
+        ProgressTitle = "正在更新 GeoX"
+        ProgressSummary = "请保持此页面打开，正在下载并校验文件"
+        StatusPending = "等待中"
+        StatusDownloading = "下载中 %d%%"
+        StatusValidating = "校验中"
+        StatusSuccess = "已完成"
+        StatusFailed = "失败"
+        ProgressDetail = "%s / %s · %s"
+        ProgressDetailUnknownTotal = "%s · %s"
+        ProgressWaiting = "等待开始"
+        ProgressSuccess = "文件已更新并通过校验"
+        ProgressFailed = "下载或校验失败，已保留可用回退文件"
     }
 }

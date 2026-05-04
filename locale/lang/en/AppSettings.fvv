@@ -8,6 +8,7 @@ AppSettings = {
         Privacy = "Privacy"
         Service = "Service"
         Network = "Network"
+        Backup = "Backup"
         Experimental = "Experimental"
     }
 
@@ -44,8 +45,6 @@ AppSettings = {
         ColorThemeCustomSummary = "Current theme color: %s"
         ThemeColorPolarityInvertTitle = "Invert Theme Foreground"
         ThemeColorPolarityInvertSummary = "If themed colors look odd, try enabling this"
-        TopBarBlurTitle = "Blur"
-        TopBarBlurSummary = "Apply a  blur background to"
         AutoHideNavbarTitle = "Auto-hide Navbar"
         AutoHideNavbarSummary = "Hide navbar on scroll down and show on scroll up"
         LegacyNavbarStyleTitle = "Floating Navigation Bar"
@@ -133,6 +132,19 @@ AppSettings = {
     Network = {
         CustomUserAgentTitle = "Custom User-Agent"
         CustomUserAgentSummaryDefault = "Not set, using default"
+    }
+
+    Backup = {
+        ExportTitle = "Export Settings Backup"
+        ExportSummary = "Save app preferences, network options, panel links, and display settings as a JSON file"
+        ImportTitle = "Import Settings Backup"
+        ImportSummary = "Restore settings from a YumeBox backup JSON file"
+        ExportSuccess = "Settings backup exported"
+        ExportFailed = "Failed to export settings backup"
+        ExportFailedDetail = "Failed to export settings backup: %s"
+        ImportSuccess = "Settings backup imported"
+        ImportReadFailed = "Failed to read backup file"
+        ImportFailedDetail = "Failed to import settings backup: %s"
     }
 
     WarningDialog = {

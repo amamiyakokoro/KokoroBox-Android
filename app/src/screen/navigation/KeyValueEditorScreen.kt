@@ -43,7 +43,6 @@ import com.github.yumelira.yumebox.presentation.component.EditorEmptyState
 import com.github.yumelira.yumebox.presentation.component.EditorListItem
 import com.github.yumelira.yumebox.presentation.component.EditorScaffold
 import com.github.yumelira.yumebox.presentation.component.HapticSwitch
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
 import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.Title
@@ -58,7 +57,6 @@ import com.github.yumelira.yumebox.presentation.icon.yume.Undo
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.chrisbanes.haze.hazeSource
 import dev.oom_wg.purejoy.mlang.MLang
 import java.util.UUID
 
@@ -147,7 +145,6 @@ private sealed interface KeyValueDialogState {
 fun StringListEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val topBarHazeState = LocalTopBarHazeState.current
     val items = remember { mutableStateListOf<TextDraftItem>() }
     val title = EditorDataHolder.listEditorTitle
     val placeholder = EditorDataHolder.listEditorPlaceholder
@@ -200,7 +197,6 @@ fun StringListEditorScreen(
                 hint = MLang.Component.Editor.Empty.Hint,
                 modifier = Modifier
                     .fillMaxSize()
-                    .let { mod -> if (topBarHazeState != null) mod.hazeSource(topBarHazeState) else mod }
                     .padding(combinedInnerPadding),
             )
         } else {
@@ -299,7 +295,6 @@ fun StringListEditorScreen(
 fun KeyValueEditorScreen(
     navigator: DestinationsNavigator,
 ) {
-    val topBarHazeState = LocalTopBarHazeState.current
     val items = remember { mutableStateListOf<KeyValueDraftItem>() }
     val title = EditorDataHolder.mapEditorTitle
     val keyPlaceholder = EditorDataHolder.mapEditorKeyPlaceholder
@@ -352,7 +347,6 @@ fun KeyValueEditorScreen(
                 hint = MLang.Component.Editor.Empty.Hint,
                 modifier = Modifier
                     .fillMaxSize()
-                    .let { mod -> if (topBarHazeState != null) mod.hazeSource(topBarHazeState) else mod }
                     .padding(combinedInnerPadding),
             )
         } else {

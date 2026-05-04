@@ -4,23 +4,37 @@ Settings = {
 
     Section = {
         UiSettings = "UI Settings"
+        NetworkSettings = "Network Settings"
+        DataSettings = "Data Settings"
         More = "More"
     }
 
     UiSettings = {
         App = "App"
         AppSummary = "Appearance · Language · Theme"
+    }
+
+    NetworkSettings = {
         Network = "Network"
         NetworkSummary = "DNS · Port · Inbound"
         Override = "Override"
         OverrideSummary = "Rule Override"
         MetaFeatures = "Meta Features"
         MetaFeaturesSummary = "Meta Extensions"
+        Lab = "Lab"
+        LabSummary = "Sub-Store · Experiments"
+    }
+
+    DataSettings = {
+        ExportBackup = "Export Backup"
+        ExportBackupSummary = "Save user settings to a JSON file"
+        ImportBackup = "Import Backup"
+        ImportBackupSummary = "Restore user settings from a backup file"
+        AppDataManagement = "App Data Management"
+        AppDataManagementSummary = "Manage GeoX download history and cache"
     }
 
     More = {
-        Lab = "Lab"
-        LabSummary = "Sub-Store · Experiments"
         Logs = "Logs"
         LogsSummary = "Runtime Logs"
         About = "About"

@@ -22,6 +22,8 @@
 
 package com.github.yumelira.yumebox.core.model
 
+import kotlinx.serialization.Serializable
+
 enum class GeoFileType {
     GeoIP, GeoSite, Country, ASN, Model
 }
@@ -31,6 +33,12 @@ data class GeoXItem(
     val title: String,
     val url: String,
     val fileName: String,
+)
+
+@Serializable
+data class GeoValidationResult(
+    val valid: Boolean,
+    val message: String? = null,
 )
 
 val geoXItems = listOf(

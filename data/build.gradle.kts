@@ -40,6 +40,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:${gropify.dep.version.ktor}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${gropify.dep.version.ktor}")
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
+    implementation("org.tukaani:xz:1.12")
     implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")
 
     val mmkv64 = gropify.dep.version.mmkv64
