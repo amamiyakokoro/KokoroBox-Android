@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,6 +68,7 @@ import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.CenteredText
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
+import com.github.yumelira.yumebox.presentation.component.LocalBottomBarScrollBehavior
 import com.github.yumelira.yumebox.presentation.component.SmallTopBar
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.Chromium
@@ -373,6 +375,18 @@ private fun ProxySurfboardContent(
     val isTesting = !isZakoPage && selectedName?.let(testingGroupNames::contains) == true
     val currentPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { modes.size })
+    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
+    val isGridAtTop by remember(gridState) {
+        derivedStateOf {
+            gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isGridAtTop, bottomBarScrollBehavior) {
+        if (isGridAtTop) {
+            bottomBarScrollBehavior?.showBottomBar()
+        }
+    }
 
     LaunchedEffect(tunnelMode) {
         val targetPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
@@ -404,7 +418,15 @@ private fun ProxySurfboardContent(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 state = gridState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .let { modifier ->
+                        if (bottomBarScrollBehavior != null) {
+                            modifier.nestedScroll(bottomBarScrollBehavior.nestedScrollConnection)
+                        } else {
+                            modifier
+                        }
+                    },
                 contentPadding = PaddingValues(
                     start = UiDp.dp12,
                     end = UiDp.dp12,

@@ -24,7 +24,10 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.github.yumelira.yumebox.common.util.formatBytes
@@ -60,9 +64,12 @@ import com.github.yumelira.yumebox.presentation.component.rememberStandalonePage
 import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.icon.yume.ArrowLeft
 import com.github.yumelira.yumebox.presentation.icon.yume.Delete
+import com.github.yumelira.yumebox.presentation.icon.yume.Share
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import dev.oom_wg.purejoy.mlang.MLang
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.text.DateFormat
 import java.util.Date
@@ -81,6 +88,7 @@ fun AppDataManagementScreen() {
             fileName = uiState.selectedLogFileName.orEmpty(),
             entries = uiState.selectedLogEntries,
             onBack = viewModel::closeLogFile,
+            onExport = { targetUri -> viewModel.exportLogFile(uiState.selectedLogFileName.orEmpty(), targetUri) },
         )
         return
     }
@@ -161,8 +169,29 @@ private fun AppDataLogViewerScreen(
     fileName: String,
     entries: List<LogStore.LogEntry>,
     onBack: () -> Unit,
+    onExport: suspend (Uri) -> Boolean,
 ) {
     BackHandler(onBack = onBack)
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/plain"),
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        scope.launch(Dispatchers.IO) {
+            val success = onExport(uri)
+            if (!success) {
+                launch(Dispatchers.Main) {
+                    android.widget.Toast.makeText(
+                        context,
+                        MLang.Util.Error.UnknownError,
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        }
+    }
 
     val content = remember(entries, fileName) {
         if (entries.isEmpty()) {
@@ -188,6 +217,14 @@ private fun AppDataLogViewerScreen(
                         Icon(
                             imageVector = Yume.ArrowLeft,
                             contentDescription = MLang.Component.Navigation.Back,
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { exportLauncher.launch(fileName) }) {
+                        Icon(
+                            imageVector = Yume.Share,
+                            contentDescription = "Export",
                         )
                     }
                 },

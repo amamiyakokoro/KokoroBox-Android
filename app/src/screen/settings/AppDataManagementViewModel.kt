@@ -24,6 +24,7 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.data.controller.GeoXCacheEntry
@@ -88,6 +89,12 @@ class AppDataManagementViewModel(
             selectedLogFileName = null,
             selectedLogEntries = emptyList(),
         )
+    }
+
+    suspend fun exportLogFile(fileName: String, targetUri: Uri): Boolean {
+        return withContext(Dispatchers.IO) {
+            logStore.exportLogFile(fileName, targetUri)
+        }
     }
 
     fun deleteLogFiles(fileNames: Collection<String>, onComplete: (Int) -> Unit) {
