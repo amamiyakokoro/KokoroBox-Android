@@ -44,8 +44,7 @@ import com.github.yumelira.yumebox.presentation.component.LocalNavigator
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Speed
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
@@ -139,7 +138,7 @@ fun HomePager(
                         },
                     ) {
                         Icon(
-                            imageVector = Yume.Speed,
+                            imageVector = AppMd3Icons.Action.SpeedTest,
                             contentDescription = MLang.Proxy.Action.Test,
                         )
                     }

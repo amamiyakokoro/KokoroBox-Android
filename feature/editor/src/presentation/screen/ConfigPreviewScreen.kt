@@ -25,6 +25,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,18 +41,10 @@ import com.github.yumelira.yumebox.feature.editor.presentation.component.NativeT
 import com.github.yumelira.yumebox.feature.editor.presentation.format.CodeFormatter
 import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.SmallTopBar
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.ArrowLeft
-import com.github.yumelira.yumebox.presentation.icon.yume.ListCollapse
-import com.github.yumelira.yumebox.presentation.icon.yume.Save
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun ConfigPreviewScreen(
@@ -70,16 +66,14 @@ fun ConfigPreviewScreen(
     var content by remember(formattedContent, language) { mutableStateOf(formattedContent) }
     val isModified = content != formattedContent
     val canSave = onSave != null && isModified
-    val scrollBehavior = MiuixScrollBehavior()
-
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             SmallTopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = { navigator.navigateUp() }) {
-                        Icon(Yume.ArrowLeft, contentDescription = MLang.Component.Navigation.Back)
+                        Icon(AppMd3Icons.Navigation.Back, contentDescription = MLang.Component.Navigation.Back)
                     }
                 },
                 actions = {
@@ -92,7 +86,7 @@ fun ConfigPreviewScreen(
                             }
                         }
                     ) {
-                        Icon(Yume.ListCollapse, contentDescription = MLang.Editor.Action.Format)
+                        Icon(AppMd3Icons.Editor.FormatStructured, contentDescription = MLang.Editor.Action.Format)
                     }
                     IconButton(
                         onClick = {
@@ -107,7 +101,7 @@ fun ConfigPreviewScreen(
                         },
                         enabled = canSave
                     ) {
-                        Icon(Yume.Save, contentDescription = MLang.Editor.Action.Save)
+                        Icon(AppMd3Icons.Editor.Save, contentDescription = MLang.Editor.Action.Save)
                     }
                 }
             )
@@ -116,7 +110,7 @@ fun ConfigPreviewScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MiuixTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues),
         ) {
             NativeTextEditor(

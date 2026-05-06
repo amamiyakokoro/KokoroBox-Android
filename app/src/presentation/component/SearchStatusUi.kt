@@ -55,9 +55,7 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.takeOrElse
 import androidx.compose.ui.zIndex
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Close
-import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.Sizes
 import com.github.yumelira.yumebox.presentation.theme.Spacing
@@ -464,7 +462,7 @@ private fun SearchBarLeadingIcon(
     spacing: Spacing,
 ) {
     Icon(
-        imageVector = Yume.`Scan-eye`,
+        imageVector = AppMd3Icons.Action.Search,
         contentDescription = MLang.Component.Editor.Action.Search,
         modifier = Modifier
             .size(componentSizes.searchIconTouchTarget)
@@ -486,7 +484,7 @@ private fun SearchBarClearButton(
         exit = fadeOut() + scaleOut(),
     ) {
         Icon(
-            imageVector = Yume.Close,
+            imageVector = AppMd3Icons.Action.Close,
             contentDescription = MLang.Component.Button.Clear,
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -542,7 +540,7 @@ private fun SearchBarCollapsed(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = Yume.`Scan-eye`,
+                    imageVector = AppMd3Icons.Action.Search,
                     contentDescription = MLang.Component.Editor.Action.Search,
                     modifier = Modifier
                         .size(componentSizes.searchIconTouchTarget)

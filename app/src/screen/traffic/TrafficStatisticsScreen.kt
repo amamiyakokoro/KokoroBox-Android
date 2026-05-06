@@ -59,8 +59,7 @@ import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.TrafficDonutChart
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -94,7 +93,7 @@ fun TrafficStatisticsScreen() {
                         },
                     ) {
                         Icon(
-                            imageVector = Yume.Delete,
+                            imageVector = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.TrafficStatistics.Action.Clear,
                             tint = MaterialTheme.colorScheme.onSurface,
                         )

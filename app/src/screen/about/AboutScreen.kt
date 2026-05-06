@@ -54,8 +54,7 @@ import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -241,7 +240,7 @@ private fun AboutLinkItem(
 @Composable
 private fun ChevronText() {
     Icon(
-        imageVector = Yume.chevron,
+        imageVector = AppMd3Icons.Navigation.Forward,
         contentDescription = null,
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
     )

@@ -40,8 +40,7 @@ import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmA
 import com.github.yumelira.yumebox.presentation.component.EnumSelector
 import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
 import androidx.compose.material3.Icon as MaterialIcon
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Palette
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.colorFromArgb
 import com.github.yumelira.yumebox.presentation.theme.colorToArgbLong
 import dev.oom_wg.purejoy.mlang.MLang
@@ -129,7 +128,7 @@ internal fun ThemeColorPickerItem(
                 runCatching { colorFromArgb(themeSeedColorArgb) }.getOrDefault(Color.White)
             }
             MaterialIcon(
-                Yume.Palette,
+                AppMd3Icons.Action.ThemeColor,
                 tint = previewColor,
                 contentDescription = null,
                 modifier = Modifier.padding(end = UiDp.dp12),

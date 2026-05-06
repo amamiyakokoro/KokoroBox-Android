@@ -33,9 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`List-chevrons-up-down`
-import com.github.yumelira.yumebox.presentation.icon.yume.Speed
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
@@ -144,7 +142,7 @@ fun ProxySheetContent(
                 Box {
                     AppBottomSheetIconAction(
                         action = AppBottomSheetAction(
-                            icon = Yume.`List-chevrons-up-down`,
+                            icon = AppMd3Icons.Action.Sort,
                             contentDescription = MLang.Proxy.Action.Sort,
                             onClick = { showSortPopup.value = true },
                         ),
@@ -161,7 +159,7 @@ fun ProxySheetContent(
         endAction = {
             AppBottomSheetIconAction(
                 action = AppBottomSheetAction(
-                    icon = Yume.Speed,
+                    icon = AppMd3Icons.Action.SpeedTest,
                     contentDescription = MLang.Proxy.Action.Test,
                     onClick = {
                         if (selectedGroup == null) {

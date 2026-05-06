@@ -53,7 +53,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -70,12 +70,7 @@ import com.github.yumelira.yumebox.presentation.component.CenteredText
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.LocalBottomBarScrollBehavior
 import com.github.yumelira.yumebox.presentation.component.SmallTopBar
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Chromium
-import com.github.yumelira.yumebox.presentation.icon.yume.Folders
-import com.github.yumelira.yumebox.presentation.icon.yume.Speed
-import com.github.yumelira.yumebox.presentation.icon.yume.chevron
-import com.github.yumelira.yumebox.presentation.icon.yume.`List-chevrons-up-down`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeCard
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupCard
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
@@ -290,12 +285,12 @@ private fun ProxyTopBar(
             Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
                 if (onNavigateToProviders != null) {
                     IconButton(onClick = onNavigateToProviders) {
-                        Icon(Yume.Folders, contentDescription = MLang.Providers.Title)
+                        Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
                     }
                 }
                 if (onOpenPanel != null) {
                     IconButton(onClick = onOpenPanel) {
-                        Icon(Yume.Chromium, contentDescription = MLang.Proxy.Action.Panel)
+                        Icon(AppMd3Icons.Proxy.Panel, contentDescription = MLang.Proxy.Action.Panel)
                     }
                 }
             }
@@ -306,13 +301,13 @@ private fun ProxyTopBar(
                     modifier = Modifier.padding(end = UiDp.dp12),
                     onClick = onTestDelay,
                 ) {
-                    Icon(Yume.Speed, contentDescription = MLang.Proxy.Action.Test)
+                    Icon(AppMd3Icons.Action.SpeedTest, contentDescription = MLang.Proxy.Action.Test)
                 }
     }
             Box {
                 MdIconButton(onClick = { onShowSortPopupChange(true) }) {
                     MdIcon(
-                        imageVector = Yume.`List-chevrons-up-down`,
+                        imageVector = AppMd3Icons.Action.Sort,
                         contentDescription = MLang.Proxy.Action.Sort,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
@@ -395,24 +390,14 @@ private fun ProxySurfboardContent(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = innerPadding.calculateTopPadding() + UiDp.dp8),
+            .padding(top = innerPadding.calculateTopPadding()),
     ) {
-        ProxyModeSelector(
-            currentMode = tunnelMode,
-            onModeSelected = onTunnelModeSelected,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = UiDp.dp12),
-        )
-
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier = Modifier.fillMaxSize(),
             userScrollEnabled = false,
         ) {
             LazyVerticalGrid(
@@ -430,7 +415,7 @@ private fun ProxySurfboardContent(
                 contentPadding = PaddingValues(
                     start = UiDp.dp12,
                     end = UiDp.dp12,
-                    top = UiDp.dp12,
+                    top = UiDp.dp64,
                     bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
                 ),
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
@@ -510,6 +495,19 @@ private fun ProxySurfboardContent(
                 }
             }
         }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = UiDp.dp8, start = UiDp.dp12, end = UiDp.dp12),
+            contentAlignment = Alignment.Center,
+        ) {
+            ProxyModeSelector(
+                currentMode = tunnelMode,
+                onModeSelected = onTunnelModeSelected,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -525,8 +523,13 @@ private fun ProxyModeSelector(
 
     Row(
         modifier = modifier
+            .shadow(
+                elevation = UiDp.dp8,
+                shape = shape,
+                clip = false,
+            )
             .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.62f))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .padding(UiDp.dp4),
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp4),
         verticalAlignment = Alignment.CenterVertically,
@@ -635,7 +638,7 @@ private fun ProxyGroupTabs(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
             verticalAlignment = Alignment.CenterVertically,
-            contentPadding = PaddingValues(start = UiDp.dp0, end = UiDp.dp4),
+            contentPadding = PaddingValues(start = UiDp.dp4, end = UiDp.dp4),
         ) {
             items(items = groups, key = { it.name }) { group ->
                 ProxyGroupTab(
@@ -661,12 +664,10 @@ private fun ProxyGroupTabs(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Yume.chevron,
+                imageVector = AppMd3Icons.Navigation.DownAngle,
                 contentDescription = MLang.Proxy.Title,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier
-                    .size(UiDp.dp20)
-                    .rotate(90f),
+                modifier = Modifier.size(UiDp.dp20),
             )
         }
     }

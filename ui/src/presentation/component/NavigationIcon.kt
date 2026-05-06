@@ -40,10 +40,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.dropUnlessResumed
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
 
 @Composable
 fun NavigationBackIcon(
@@ -75,7 +74,7 @@ fun NavigationBackIcon(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = MiuixIcons.Back,
+            imageVector = AppMd3Icons.Navigation.Back,
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.onBackground,
         )

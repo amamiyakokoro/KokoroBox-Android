@@ -46,6 +46,8 @@ dependencies {
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3:1.5.0-alpha04")
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.core:core-ktx:${gropify.dep.version.coreKtx}")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:${gropify.dep.version.lifecycle}")
     implementation("io.github.raamcosta.compose-destinations:core:${gropify.dep.version.composeDestinations}")

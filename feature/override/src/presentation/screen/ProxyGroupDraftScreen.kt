@@ -27,8 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Save
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.util.OverrideExtraFieldDraft
 import com.github.yumelira.yumebox.presentation.util.OverrideProxyGroupDraft
 import com.github.yumelira.yumebox.presentation.util.OverrideProxyGroupTypePresets
@@ -118,7 +117,7 @@ fun OverrideProxyGroupDraftEditorScreen(
             OverrideAnimatedFab(
                 controller = saveFabController,
                 visible = true,
-                imageVector = Yume.Save,
+                imageVector = AppMd3Icons.Action.Save,
                 contentDescription = MLang.Override.Editor.SaveProxyGroup,
                 onClick = {
                     if (name.trim().isBlank()) {

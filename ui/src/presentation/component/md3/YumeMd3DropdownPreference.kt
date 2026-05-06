@@ -42,11 +42,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 
 @Composable
 fun YumeMd3DropdownPreference(
@@ -104,18 +102,16 @@ fun YumeMd3DropdownPreference(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Icon(
-                        imageVector = Yume.chevron,
+                        imageVector = AppMd3Icons.Navigation.DownAngle,
                         contentDescription = null,
                         tint = chipContentColor,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .rotate(90f),
+                        modifier = Modifier.size(18.dp),
                     )
                 }
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(20.dp),
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ) {
                     items.forEachIndexed { index, item ->

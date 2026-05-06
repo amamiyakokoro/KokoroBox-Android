@@ -50,8 +50,7 @@ import com.github.yumelira.yumebox.WebViewActivity
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.viewmodel.SettingEvent
 import com.github.yumelira.yumebox.presentation.viewmodel.SettingViewModel
@@ -199,7 +198,7 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                     SettingsEntryItem(
                         title = MLang.Settings.UiSettings.App,
                         summary = MLang.Settings.UiSettings.AppSummary,
-                        imageVector = Yume.`Settings-2`,
+                        imageVector = AppMd3Icons.Settings.App,
                         onClick = { navigator.navigate(AppSettingsScreenDestination) { launchSingleTop = true } },
                     )
                 }
@@ -210,19 +209,19 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                     SettingsEntryItem(
                         title = MLang.Settings.NetworkSettings.Network,
                         summary = MLang.Settings.NetworkSettings.NetworkSummary,
-                        imageVector = Yume.`Wifi-cog`,
+                        imageVector = AppMd3Icons.Settings.Network,
                         onClick = { navigator.navigate(NetworkSettingsScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.NetworkSettings.Override,
                         summary = MLang.Settings.NetworkSettings.OverrideSummary,
-                        imageVector = Yume.`Git-merge`,
+                        imageVector = AppMd3Icons.Settings.Override,
                         onClick = { navigator.navigate(OverrideScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.NetworkSettings.MetaFeatures,
                         summary = MLang.Settings.NetworkSettings.MetaFeaturesSummary,
-                        imageVector = Yume.Meta,
+                        imageVector = AppMd3Icons.Settings.MetaFeatures,
                         onClick = {
                             navigator.navigate(MetaFeatureScreenDestination) {
                                 launchSingleTop = true
@@ -232,7 +231,7 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                     SettingsEntryItem(
                         title = MLang.Settings.NetworkSettings.Lab,
                         summary = MLang.Settings.NetworkSettings.LabSummary,
-                        imageVector = Yume.FlaskConical,
+                        imageVector = AppMd3Icons.Settings.Lab,
                         onClick = {
                             navigator.navigate(FeatureScreenDestination) { launchSingleTop = true }
                         },
@@ -245,19 +244,19 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                     SettingsEntryItem(
                         title = MLang.Settings.DataSettings.ExportBackup,
                         summary = MLang.Settings.DataSettings.ExportBackupSummary,
-                        imageVector = Yume.Save,
+                        imageVector = AppMd3Icons.Settings.ExportBackup,
                         onClick = { exportBackupLauncher.launch("yumebox-settings-backup.json") },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.DataSettings.ImportBackup,
                         summary = MLang.Settings.DataSettings.ImportBackupSummary,
-                        imageVector = Yume.Share,
+                        imageVector = AppMd3Icons.Settings.ImportBackup,
                         onClick = { importBackupLauncher.launch("application/json") },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.DataSettings.AppDataManagement,
                         summary = MLang.Settings.DataSettings.AppDataManagementSummary,
-                        imageVector = Yume.Folders,
+                        imageVector = AppMd3Icons.Settings.AppDataManagement,
                         onClick = { navigator.navigate(AppDataManagementScreenDestination) { launchSingleTop = true } },
                     )
                 }
@@ -269,13 +268,13 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                     SettingsEntryItem(
                         title = MLang.Settings.More.Logs,
                         summary = MLang.Settings.More.LogsSummary,
-                        imageVector = Yume.`Chart-column`,
+                        imageVector = AppMd3Icons.Settings.Logs,
                         onClick = { navigator.navigate(LogScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.More.About,
                         summary = MLang.Settings.More.AboutSummary,
-                        imageVector = Yume.Github,
+                        imageVector = AppMd3Icons.Settings.About,
                         onClick = { navigator.navigate(AboutScreenDestination) { launchSingleTop = true } },
                         endActions = {
                             VersionBadge(versionInfo)

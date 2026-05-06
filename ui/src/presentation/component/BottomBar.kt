@@ -58,11 +58,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Arrow-down-up`
-import com.github.yumelira.yumebox.presentation.icon.yume.Bolt
-import com.github.yumelira.yumebox.presentation.icon.yume.House
-import com.github.yumelira.yumebox.presentation.icon.yume.`Package-check`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.kyant.shapes.Capsule
@@ -549,10 +545,10 @@ private fun RowScope.LegacyBottomNavigationTabItem(
 enum class BottomBarDestination(
     val icon: ImageVector,
 ) {
-    Home(Yume.House),
-    Proxy(Yume.`Arrow-down-up`),
-    Config(Yume.`Package-check`),
-    Setting(Yume.Bolt),
+    Home(AppMd3Icons.Shell.OpenHome),
+    Proxy(AppMd3Icons.Shell.OpenProxy),
+    Config(AppMd3Icons.Shell.OpenProfileConfig),
+    Setting(AppMd3Icons.Shell.OpenSettings),
     ;
 
     val label: String

@@ -47,8 +47,7 @@ import com.github.yumelira.yumebox.common.util.formatBytesForDisplay
 import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.domain.model.TrafficData
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import dev.oom_wg.purejoy.mlang.MLang
@@ -272,9 +271,9 @@ private fun ProxyTypeCapsule(proxyMode: ProxyMode) {
         ) {
             Icon(
                 imageVector = when (proxyMode) {
-                    ProxyMode.Tun -> Yume.PlaneTakeoff
-                    ProxyMode.RootTun -> Yume.Tun
-                    ProxyMode.Http -> Yume.Wifi
+                    ProxyMode.Tun -> AppMd3Icons.Home.ProxyModeVpn
+                    ProxyMode.RootTun -> AppMd3Icons.Home.ProxyModeTun
+                    ProxyMode.Http -> AppMd3Icons.Home.ProxyModeHttp
                 },
                 contentDescription = null,
                 tint = primary,
@@ -333,11 +332,11 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
             ) {
                 Icon(
                     imageVector = when (state) {
-                        HomeProxyControlState.Idle -> Yume.Rocket
+                        HomeProxyControlState.Idle -> AppMd3Icons.Home.StatusIdle
                         HomeProxyControlState.Connecting,
                         HomeProxyControlState.Disconnecting,
-                            -> Yume.Waiting
-                        HomeProxyControlState.Running -> Yume.Activity
+                            -> AppMd3Icons.Home.StatusWaiting
+                        HomeProxyControlState.Running -> AppMd3Icons.Home.StatusRunning
                     },
                     contentDescription = null,
                     tint = primary,

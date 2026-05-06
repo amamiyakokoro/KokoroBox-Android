@@ -26,6 +26,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,17 +44,10 @@ import com.github.yumelira.yumebox.feature.editor.presentation.language.Language
 import com.github.yumelira.yumebox.presentation.component.AppDialog
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Atom
-import com.github.yumelira.yumebox.presentation.icon.yume.Save
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Suppress("unused")
 @Composable
@@ -65,7 +62,6 @@ fun FullscreenEditorScreen(
     val showDiscardDialog = remember { mutableStateOf(false) }
     var content by remember(initialContent, language) { mutableStateOf(initialContent) }
     val isModified = content != initialContent
-    val scrollBehavior = MiuixScrollBehavior()
 
     fun handleBack() {
         if (isModified) {
@@ -80,10 +76,10 @@ fun FullscreenEditorScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopBar(
                 title = title,
-                scrollBehavior = scrollBehavior,
                 actions = {
                     IconButton(
                         modifier = Modifier.padding(end = UiDp.dp12),
@@ -98,7 +94,7 @@ fun FullscreenEditorScreen(
                         },
                     ) {
                         Icon(
-                            imageVector = Yume.Atom,
+                            imageVector = AppMd3Icons.Editor.Format,
                             contentDescription = MLang.Editor.Action.Format
                         )
                     }
@@ -119,7 +115,7 @@ fun FullscreenEditorScreen(
                         },
                     ) {
                         Icon(
-                            imageVector = Yume.Save,
+                            imageVector = AppMd3Icons.Editor.Save,
                             contentDescription = MLang.Editor.Action.Save
                         )
                     }
@@ -130,7 +126,7 @@ fun FullscreenEditorScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MiuixTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             NativeTextEditor(

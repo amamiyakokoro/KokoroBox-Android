@@ -50,10 +50,7 @@ import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
-import com.github.yumelira.yumebox.presentation.icon.yume.Undo
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -172,12 +169,12 @@ fun StringListEditorScreen(
         title = title,
         actions = listOf(
             EditorAction(
-                icon = Yume.Undo,
+                icon = AppMd3Icons.Action.Undo,
                 contentDescription = "Reset",
                 onClick = { dialogState = StringListDialogState.Reset },
             ),
             EditorAction(
-                icon = Yume.`Badge-plus`,
+                icon = AppMd3Icons.Action.Add,
                 contentDescription = "Add",
                 onClick = {
                     dialogState = if (isOverrideRuleEditor) {
@@ -218,7 +215,7 @@ fun StringListEditorScreen(
                         title = item.value,
                         onClick = { dialogState = StringListDialogState.Edit(item.id) },
                         onDelete = { items.removeAll { it.id == item.id } },
-                        deleteIcon = Yume.Delete,
+                        deleteIcon = AppMd3Icons.Action.Delete,
                         deleteContentDescription = "Delete",
                     )
                 }
@@ -328,12 +325,12 @@ fun KeyValueEditorScreen(
         title = title,
         actions = listOf(
             EditorAction(
-                icon = Yume.Undo,
+                icon = AppMd3Icons.Action.Undo,
                 contentDescription = "Reset",
                 onClick = { dialogState = KeyValueDialogState.Reset },
             ),
             EditorAction(
-                icon = Yume.`Badge-plus`,
+                icon = AppMd3Icons.Action.Add,
                 contentDescription = "Add",
                 onClick = { dialogState = KeyValueDialogState.Add },
             ),
@@ -369,7 +366,7 @@ fun KeyValueEditorScreen(
                         summary = item.value,
                         onClick = { dialogState = KeyValueDialogState.Edit(item.id) },
                         onDelete = { items.removeAll { it.id == item.id } },
-                        deleteIcon = Yume.Delete,
+                        deleteIcon = AppMd3Icons.Action.Delete,
                         deleteContentDescription = "Delete",
                     )
                 }

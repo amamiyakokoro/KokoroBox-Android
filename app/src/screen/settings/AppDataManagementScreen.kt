@@ -61,10 +61,7 @@ import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.ArrowLeft
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
-import com.github.yumelira.yumebox.presentation.icon.yume.Share
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import dev.oom_wg.purejoy.mlang.MLang
@@ -215,7 +212,7 @@ private fun AppDataLogViewerScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Yume.ArrowLeft,
+                            imageVector = AppMd3Icons.Navigation.Back,
                             contentDescription = MLang.Component.Navigation.Back,
                         )
                     }
@@ -223,7 +220,7 @@ private fun AppDataLogViewerScreen(
                 actions = {
                     IconButton(onClick = { exportLauncher.launch(fileName) }) {
                         Icon(
-                            imageVector = Yume.Share,
+                            imageVector = AppMd3Icons.Action.Share,
                             contentDescription = "Export",
                         )
                     }
@@ -264,7 +261,7 @@ private fun GeoHistorySheet(
                 onClick = { onDelete(selected.filterValues { it }.keys) },
             ) {
                 Icon(
-                    imageVector = Yume.Delete,
+                    imageVector = AppMd3Icons.Action.Delete,
                     contentDescription = "Delete",
                     tint = MaterialTheme.colorScheme.error,
                 )
@@ -316,7 +313,7 @@ private fun LogFilesSheet(
                 onClick = { onDelete(selected.filterValues { it }.keys) },
             ) {
                 Icon(
-                    imageVector = Yume.Delete,
+                    imageVector = AppMd3Icons.Action.Delete,
                     contentDescription = "Delete",
                     tint = MaterialTheme.colorScheme.error,
             )

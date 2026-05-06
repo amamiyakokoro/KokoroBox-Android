@@ -70,10 +70,7 @@ import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Play
-import com.github.yumelira.yumebox.presentation.icon.yume.PowerOff
-import com.github.yumelira.yumebox.presentation.icon.yume.Share
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.ramcosta.composedestinations.annotation.Destination
@@ -143,7 +140,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
                             onClick = { saveFileLauncher.launch("log_${System.currentTimeMillis()}.txt") }
                         ) {
                             Icon(
-                                imageVector = Yume.Share,
+                                imageVector = AppMd3Icons.Action.Share,
                                 contentDescription = "Save",
                             )
                         }
@@ -193,7 +190,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
                     },
                 ) {
                     Icon(
-                        imageVector = if (isRecording) Yume.PowerOff else Yume.Play,
+                        imageVector = if (isRecording) AppMd3Icons.Status.RecordingStop else AppMd3Icons.Status.RecordingStart,
                         contentDescription = if (isRecording) "Stop recording" else "Start recording",
                     )
                 }

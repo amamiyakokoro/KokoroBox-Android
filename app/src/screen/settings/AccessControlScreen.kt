@@ -53,9 +53,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
-import com.github.yumelira.yumebox.presentation.icon.yume.`Settings-2`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
 import com.ramcosta.composedestinations.annotation.Destination
@@ -137,7 +135,7 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
                             IconButton(
                                 onClick = { showSettingsSheet = true }
                             ) {
-                                Icon(Yume.`Settings-2`, contentDescription = MLang.AccessControl.Settings.Title)
+                                Icon(AppMd3Icons.Action.Settings, contentDescription = MLang.AccessControl.Settings.Title)
                             }
                         }
                     )
@@ -315,7 +313,7 @@ private fun FloatingAccessControlSearchBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = Yume.`Scan-eye`,
+            imageVector = AppMd3Icons.Action.Search,
             contentDescription = MLang.Component.Editor.Action.Search,
             modifier = Modifier
                 .size(componentSizes.searchIconTouchTarget)

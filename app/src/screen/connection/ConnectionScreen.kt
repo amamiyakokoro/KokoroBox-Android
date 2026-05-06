@@ -54,9 +54,7 @@ import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.Connectio
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Arrow-down-up`
-import com.github.yumelira.yumebox.presentation.icon.yume.`Scan-eye`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -154,7 +152,7 @@ fun ConnectionScreen(
                             modifier = Modifier.padding(end = spacing.space12),
                             onClick = { showSortPopup = true }) {
                             Icon(
-                                imageVector = Yume.`Arrow-down-up`,
+                                imageVector = AppMd3Icons.Connection.SortBy,
                                 contentDescription = MLang.Connection.SortBy.trimEnd(':', '：'),
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
@@ -164,7 +162,7 @@ fun ConnectionScreen(
                             onDismissRequest = { showSortPopup = false },
                             modifier = Modifier.widthIn(min = 180.dp),
                             offset = DpOffset(x = (-144).dp, y = spacing.space4),
-                            shape = RoundedCornerShape(AppTheme.radii.radius24),
+                            shape = RoundedCornerShape(20.dp),
                             containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         ) {
                             SortModes.forEachIndexed { index, mode ->
@@ -190,7 +188,7 @@ fun ConnectionScreen(
                     IconButton(
                         onClick = { showSearchBar = !showSearchBar }) {
                         Icon(
-                            imageVector = Yume.`Scan-eye`,
+                            imageVector = AppMd3Icons.Connection.SearchConnection,
                             contentDescription = MLang.Connection.Search,
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
@@ -317,7 +315,7 @@ private fun ConnectionSearchField(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = Yume.`Scan-eye`,
+                    imageVector = AppMd3Icons.Connection.SearchConnection,
                     contentDescription = MLang.Component.Editor.Action.Search,
                     modifier = Modifier
                         .size(componentSizes.searchIconTouchTarget)

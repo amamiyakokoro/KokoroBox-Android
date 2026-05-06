@@ -47,8 +47,7 @@ import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Check
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
@@ -211,7 +210,7 @@ internal fun NodeGroupCard(
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
-                                imageVector = Yume.Check,
+                                imageVector = AppMd3Icons.Action.Check,
                                 contentDescription = null,
                                 tint = palette.trailingBadgeContentColor,
                                 modifier = Modifier.size(spacing.space14),

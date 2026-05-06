@@ -22,19 +22,10 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Checkbox
@@ -43,12 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.model.GeoFileType
 import com.github.yumelira.yumebox.core.model.GeoXItem
@@ -71,8 +57,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import java.io.File
-import kotlin.math.PI
-import kotlin.math.sin
 
 private data class GeoXDownloadProgressState(
     val itemTitle: String,
@@ -440,114 +424,14 @@ private fun Md3EWavyProgressIndicator(
     completed: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val transition = rememberInfiniteTransition(label = "GeoXWavyProgress")
-    val phase by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "GeoXWavyProgressPhase",
-    )
-    val straightenPhase by animateFloatAsState(
-        targetValue = if (completed) 1f else 0f,
-        animationSpec = tween(durationMillis = 520, easing = LinearEasing),
-        label = "GeoXWavyProgressStraighten",
-    )
-    val trackColor = MaterialTheme.colorScheme.surfaceVariant
-    val activeColor = MaterialTheme.colorScheme.primary
     val normalizedProgress = progress?.coerceIn(0f, 1f)
-
-    Canvas(
-        modifier = modifier.height(8.dp),
-    ) {
-        val strokeWidth = 3.dp.toPx()
-        val centerY = size.height / 2f
-        val waveLength = 20.dp.toPx()
-        val amplitude = 2.4.dp.toPx()
-        val path = Path()
-        val startX: Float
-        val endX: Float
-        if (normalizedProgress == null) {
-            val segmentWidth = size.width * 0.34f
-            startX = -segmentWidth + (size.width + segmentWidth * 2f) * phase
-            endX = startX + segmentWidth
-
-            val visibleStart = startX.coerceIn(0f, size.width)
-            val visibleEnd = endX.coerceIn(0f, size.width)
-            if (visibleStart > 0f) {
-                drawLine(
-                    color = trackColor,
-                    start = Offset(0f, centerY),
-                    end = Offset(visibleStart, centerY),
-                    strokeWidth = strokeWidth,
-                    cap = StrokeCap.Round,
-                )
-            }
-            if (visibleEnd < size.width) {
-                drawLine(
-                    color = trackColor,
-                    start = Offset(visibleEnd, centerY),
-                    end = Offset(size.width, centerY),
-                    strokeWidth = strokeWidth,
-                    cap = StrokeCap.Round,
-                )
-            }
-        } else {
-            startX = 0f
-            endX = size.width * normalizedProgress
-            if (endX < size.width) {
-                drawLine(
-                    color = trackColor,
-                    start = Offset(endX, centerY),
-                    end = Offset(size.width, centerY),
-                    strokeWidth = strokeWidth,
-                    cap = StrokeCap.Round,
-                )
-            }
-        }
-
-        if (endX <= startX) return@Canvas
-
-        if (completed && straightenPhase >= 0.995f) {
-            drawLine(
-                color = activeColor,
-                start = Offset(startX.coerceAtLeast(0f), centerY),
-                end = Offset(endX.coerceAtMost(size.width), centerY),
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round,
-            )
-            return@Canvas
-        }
-
-        var x = startX.coerceAtLeast(0f)
-        val targetEnd = endX.coerceAtMost(size.width)
-        var firstPoint = true
-        while (x <= targetEnd) {
-            val distanceFromSource = targetEnd - x
-            val baseWave = sin(((distanceFromSource / waveLength) + phase) * 2.0 * PI).toFloat()
-            val localStraighten = if (completed && targetEnd > 0f) {
-                (straightenPhase * (size.width + waveLength) - x) / waveLength
-            } else {
-                0f
-            }.coerceIn(0f, 1f)
-            val y = centerY + baseWave * amplitude * (1f - localStraighten)
-            if (firstPoint) {
-                path.moveTo(x, y)
-                firstPoint = false
-            } else {
-                path.lineTo(x, y)
-            }
-            x += 2f
-        }
-        if (!firstPoint) {
-            drawPath(
-                path = path,
-                color = activeColor,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
-            )
-        }
+    if (normalizedProgress == null) {
+        Md3EIndeterminateLinearWavyProgressIndicator(modifier = modifier)
+    } else {
+        Md3ELinearWavyProgressIndicator(
+            progress = if (completed) 1f else normalizedProgress,
+            modifier = modifier,
+        )
     }
 }
 

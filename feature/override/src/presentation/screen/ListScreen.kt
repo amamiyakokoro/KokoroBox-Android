@@ -50,8 +50,7 @@ import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3FilledButton
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.Spacing
 import com.github.yumelira.yumebox.presentation.viewmodel.OverrideConfigViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -210,7 +209,7 @@ fun OverrideListScreen(
             OverrideAnimatedFab(
                 controller = createFabController,
                 visible = !showCreateDialog.value,
-                imageVector = Yume.`Badge-plus`,
+                imageVector = AppMd3Icons.Action.Add,
                 contentDescription = MLang.Override.Action.Create,
                 onClick = { showCreateDialog.value = true },
             )
@@ -401,7 +400,9 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                OverrideConfigStateIndicator(inUse = isInUse)
+                if (isInUse) {
+                    OverrideConfigStateIndicator()
+                }
             }
 
             HorizontalDivider(
@@ -413,13 +414,13 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp8)) {
                     OverrideCardActionIconButton(
-                        imageVector = Yume.Copy,
+                        imageVector = AppMd3Icons.Action.Copy,
                         contentDescription = MLang.Override.Card.Copy,
                         onClick = onCopy,
                     )
 
                     OverrideCardActionIconButton(
-                        imageVector = Yume.Share,
+                        imageVector = AppMd3Icons.Action.Share,
                         contentDescription = MLang.Override.Card.Export,
                         onClick = onExport,
                     )
@@ -430,7 +431,7 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
                 AppIconLabelButton(
                     modifier = Modifier.padding(end = UiDp.dp8),
                     text = MLang.Override.Card.EditButton,
-                    imageVector = Yume.Edit,
+                    imageVector = AppMd3Icons.Action.Edit,
                     contentDescription = MLang.Override.Card.Edit,
                     onClick = onEdit,
                     containerColor = colorScheme.primary.copy(alpha = 0.1f),
@@ -439,7 +440,7 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
 
                 AppIconLabelButton(
                     text = MLang.Override.Card.DeleteButton,
-                    imageVector = Yume.Delete,
+                    imageVector = AppMd3Icons.Action.Delete,
                     contentDescription = MLang.Override.Card.Delete,
                     onClick = onDelete,
                     containerColor = colorScheme.secondaryContainer.copy(alpha = 0.78f),
@@ -451,21 +452,15 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
 }
 
 @Composable
-private fun OverrideConfigStateIndicator(inUse: Boolean) {
+private fun OverrideConfigStateIndicator() {
     val colorScheme = MaterialTheme.colorScheme
-    val tint = if (inUse) {
-        colorScheme.primary
-    } else {
-        colorScheme.onSurfaceVariant
-    }
+    val tint = colorScheme.primary
 
     OverrideStatusBadge(
-        imageVector = if (inUse) Yume.ShieldCheck else Yume.ShieldMinus,
-        contentDescription = if (inUse) MLang.Override.Status.InUse else MLang.Override.Status.NotInUse,
+        imageVector = AppMd3Icons.Security.Enabled,
+        contentDescription = MLang.Override.Status.InUse,
         tint = tint,
-        backgroundColor = if (inUse) colorScheme.primary.copy(alpha = 0.1f) else colorScheme.secondaryContainer.copy(
-            alpha = 0.78f
-        ),
+        backgroundColor = colorScheme.primary.copy(alpha = 0.1f),
     )
 }
 
@@ -526,7 +521,7 @@ private fun CreateConfigDialog(
                     startAction = {
                         AppIcon(
                             modifier = Modifier.padding(end = UiDp.dp16),
-                            imageVector = Yume.Share,
+                            imageVector = AppMd3Icons.Action.Share,
                             contentDescription = MLang.Override.Action.ImportFile,
                             tint = MaterialTheme.colorScheme.onBackground,
                         )

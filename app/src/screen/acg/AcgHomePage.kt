@@ -68,10 +68,8 @@ import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.presentation.component.LocalHandlePageChange
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Speed
-import com.github.yumelira.yumebox.presentation.icon.yume.`Redo-dot`
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
@@ -228,12 +226,12 @@ fun AcgHomePage(
     val handlePageChange = LocalHandlePageChange.current
     val sidebarIcons = remember(handlePageChange, homeViewModel) {
         listOf(
-            AcgSidebarIconItem(Yume.Speed) {
+            AcgSidebarIconItem(AppMd3Icons.Action.SpeedTest) {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
                 homeViewModel.testCurrentNodeDelay()
             },
             AcgSidebarIconItem(ShellIcons.OpenProxy) { handlePageChange(1) },
-            AcgSidebarIconItem(ShellIcons.OpenProfiles) { handlePageChange(2) },
+            AcgSidebarIconItem(AppMd3Icons.Shell.OpenProfileConfig) { handlePageChange(2) },
             AcgSidebarIconItem(ShellIcons.OpenSettings) { handlePageChange(3) },
         )
     }
@@ -530,7 +528,7 @@ fun AcgHomePage(
                             }
                         } else {
                             AcgInlineIconButton(
-                                icon = Yume.`Redo-dot`,
+                                icon = AppMd3Icons.Action.Refresh,
                                 contentDescription = MLang.Home.Acg.RefreshQuote,
                                 enabled = dailyQuoteEnabled,
                                 onClick = {

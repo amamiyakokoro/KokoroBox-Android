@@ -39,8 +39,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 
@@ -204,7 +203,7 @@ fun OverrideSectionCardHeader(
     val sizes = AppTheme.sizes
 
     val indicatorRotation = animateFloatAsState(
-        targetValue = if (expanded) 90f else 0f,
+        targetValue = if (expanded) 180f else 0f,
         animationSpec = tween(durationMillis = 180),
         label = "override_section_indicator_rotation",
     )
@@ -218,7 +217,7 @@ fun OverrideSectionCardHeader(
         endActions = {
             if (showIndicator) {
                 AppIcon(
-                    imageVector = Yume.chevron,
+                    imageVector = AppMd3Icons.Navigation.DownAngle,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.rotate(indicatorRotation.value),

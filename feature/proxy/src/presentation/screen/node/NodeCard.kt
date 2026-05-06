@@ -67,10 +67,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Check
-import com.github.yumelira.yumebox.presentation.icon.yume.CircleGauge
-import com.github.yumelira.yumebox.presentation.icon.yume.Cloud
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Icon
@@ -213,24 +210,24 @@ internal fun rememberProxySelectionPalette(
 }
 
 @Composable
-internal fun RotatingCircleGauge(
+internal fun RotatingRefreshIcon(
     isRotating: Boolean,
     modifier: Modifier = Modifier,
     tint: Color = MiuixTheme.colorScheme.primary,
     contentDescription: String? = MLang.Proxy.Action.Test,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "circle_gauge_rotation")
+    val infiniteTransition = rememberInfiniteTransition(label = "node_delay_test_rotation")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 1000, easing = LinearEasing),
         ),
-        label = "circle_gauge_rotation_value",
+        label = "node_delay_test_rotation_value",
     )
 
     Icon(
-        imageVector = Yume.CircleGauge,
+        imageVector = AppMd3Icons.Action.Refresh,
         contentDescription = contentDescription,
         tint = tint,
         modifier = if (isRotating) modifier.rotate(rotation) else modifier,
@@ -378,14 +375,14 @@ internal fun NodeCard(
 
                     onNodeTestClick != null && singleNodeTestEnabled -> {
                         if (isThisProxyTesting || isDelayTesting) {
-                            RotatingCircleGauge(
+                            RotatingRefreshIcon(
                                 isRotating = true,
                                 modifier = Modifier.size(spacing.space18),
                                 tint = palette.supportingColor,
                             )
                         } else {
                             Icon(
-                                imageVector = Yume.Cloud,
+                                imageVector = AppMd3Icons.Proxy.CloudTest,
                                 contentDescription = MLang.Proxy.Action.Test,
                                 tint = palette.supportingColor,
                                 modifier = Modifier
@@ -435,7 +432,7 @@ internal fun NodeCard(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            imageVector = Yume.Check,
+                            imageVector = AppMd3Icons.Action.Check,
                             contentDescription = null,
                             tint = palette.trailingBadgeContentColor,
                             modifier = Modifier.size(spacing.space14),

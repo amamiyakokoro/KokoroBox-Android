@@ -45,9 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import com.github.yumelira.yumebox.common.AppConstants
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Play
-import com.github.yumelira.yumebox.presentation.icon.yume.Square
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
@@ -151,7 +149,7 @@ fun ProxyControlButton(
                 label = "IconTransition"
             ) { running ->
                 Icon(
-                    imageVector = if (running) Yume.Square else Yume.Play,
+                    imageVector = if (running) AppMd3Icons.Shell.StopProxy else AppMd3Icons.Shell.StartProxy,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )

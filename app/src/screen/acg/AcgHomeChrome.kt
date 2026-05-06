@@ -64,9 +64,8 @@ import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Waiting
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.presentation.util.extractFlaggedName
@@ -367,7 +366,7 @@ internal fun AcgLaunchButton(
                     HomeProxyControlState.Running -> ShellIcons.StopProxy
                     HomeProxyControlState.Connecting,
                     HomeProxyControlState.Disconnecting,
-                        -> Yume.Waiting
+                        -> AppMd3Icons.Home.StatusWaiting
                 },
                 contentDescription = null,
                 tint = contentColor,
