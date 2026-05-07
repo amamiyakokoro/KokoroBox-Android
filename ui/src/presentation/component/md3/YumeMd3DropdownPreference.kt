@@ -20,6 +20,8 @@
 
 package com.github.yumelira.yumebox.presentation.component.md3
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -42,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
@@ -81,6 +84,12 @@ fun YumeMd3DropdownPreference(
                 MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
             }
 
+            val arrowRotation by animateFloatAsState(
+                targetValue = if (expanded) 180f else 0f,
+                animationSpec = tween(durationMillis = 180),
+                label = "dropdown_preference_arrow_rotation",
+            )
+
             Box {
                 Row(
                     modifier = Modifier
@@ -105,7 +114,9 @@ fun YumeMd3DropdownPreference(
                         imageVector = AppMd3Icons.Navigation.DownAngle,
                         contentDescription = null,
                         tint = chipContentColor,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier
+                            .size(18.dp)
+                            .rotate(arrowRotation),
                     )
                 }
                 DropdownMenu(

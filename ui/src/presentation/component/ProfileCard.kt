@@ -103,6 +103,8 @@ fun ProfileCard(
 
     val updateBg = remember(colorScheme, opacity) { colorScheme.primary.copy(alpha = opacity.subtle) }
     val updateTint = remember(colorScheme) { colorScheme.primary }
+    val deleteContainer = remember(colorScheme, opacity) { colorScheme.errorContainer.copy(alpha = opacity.strong) }
+    val deleteContentColor = colorScheme.onErrorContainer
 
     Card(
         modifier = modifier
@@ -351,7 +353,7 @@ fun ProfileCard(
                 minWidth = componentSizes.compactActionButtonSize,
                 enabled = !isDownloading,
                 onClick = { if (!isDownloading) onDelete(profile) },
-                containerColor = secondaryContainer,
+                containerColor = deleteContainer,
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = spacing.space10),
@@ -360,13 +362,13 @@ fun ProfileCard(
                     Icon(
                         modifier = Modifier.size(spacing.space20),
                         imageVector = AppMd3Icons.Action.Delete,
-                        tint = actionIconTint,
+                        tint = deleteContentColor,
                         contentDescription = "Delete"
                     )
                     Text(
                         modifier = Modifier.padding(start = spacing.space4, end = componentSizes.textLineCompactSpacing),
                         text = MLang.Component.ProfileCard.Delete,
-                        color = actionIconTint,
+                        color = deleteContentColor,
                         fontWeight = FontWeight.Medium,
                         fontSize = 15.sp
                     )

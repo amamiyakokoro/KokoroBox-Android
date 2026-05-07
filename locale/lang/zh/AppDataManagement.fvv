@@ -13,6 +13,8 @@ AppDataManagement = {
         EmptyHistory = "没有可清理的历史下载"
         EmptyHistorySummary = "校验失败的 GeoX 文件会被直接删除，不会进入这里"
         CacheItemSummary = "%s · %s"
+        DeleteConfirmTitle = "删除 GeoX 文件？"
+        DeleteConfirmMessage = "确定删除已选中的 %d 个历史 GeoX 文件吗？此操作无法撤销。"
         DeleteComplete = "已删除 %d 个历史 GeoX 文件"
     }
 
@@ -23,6 +25,8 @@ AppDataManagement = {
         EmptyLogsSummary = "在日志页面开始记录后，日志文件会显示在这里"
         LogItemSummary = "%s · %s"
         RecordingFileTitle = "%s（记录中）"
+        DeleteConfirmTitle = "删除日志文件？"
+        DeleteConfirmMessage = "确定删除已选中的 %d 个日志文件吗？此操作无法撤销。"
         DeleteComplete = "已删除 %d 个日志文件"
         ViewerTitle = "查看日志：%s"
         EmptyLogContent = "日志为空"

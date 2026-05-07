@@ -104,7 +104,8 @@ internal fun DeleteConfirmDialog(
                 onCancel = onDismiss,
                 onConfirm = onConfirm,
                 cancelText = MLang.ProfilesPage.Button.Cancel,
-                confirmText = MLang.ProfilesPage.DeleteDialog.Confirm
+                confirmText = MLang.ProfilesPage.DeleteDialog.Confirm,
+                confirmDestructive = true,
             )
         })
 }

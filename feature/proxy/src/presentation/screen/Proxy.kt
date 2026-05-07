@@ -18,13 +18,14 @@
  *
  */
 
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package com.github.yumelira.yumebox.presentation.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
@@ -33,6 +34,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -44,7 +46,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon as MdIcon
 import androidx.compose.material3.IconButton as MdIconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,14 +54,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.model.ProxySortMode
@@ -74,7 +79,7 @@ import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeCard
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupCard
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.LocalSpacing
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.viewmodel.ProxyViewModel
@@ -383,10 +388,12 @@ private fun ProxySurfboardContent(
         }
     }
 
-    LaunchedEffect(tunnelMode) {
-        val targetPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
-        if (pagerState.currentPage != targetPage) {
-            pagerState.scrollToPage(targetPage)
+    var optimisticSelectedProxyName by remember(selectedGroup?.name) { mutableStateOf<String?>(null) }
+    val effectiveNow = optimisticSelectedProxyName ?: selectedGroup?.now
+
+    LaunchedEffect(selectedGroup?.now) {
+        if (selectedGroup?.now == optimisticSelectedProxyName) {
+            optimisticSelectedProxyName = null
         }
     }
 
@@ -433,13 +440,13 @@ private fun ProxySurfboardContent(
                     AnimatedVisibility(
                         visible = isTesting,
                         enter = expandVertically(
-                            animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                            animationSpec = AppMotion.fastSpatial<IntSize>(),
                             expandFrom = Alignment.Top,
-                        ) + fadeIn(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.RefreshIndicatorFadeDuration)),
+                        ) + fadeIn(animationSpec = tween(durationMillis = AppMotion.Proxy.RefreshIndicatorFadeDuration)),
                         exit = shrinkVertically(
-                            animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                            animationSpec = AppMotion.fastSpatial<IntSize>(),
                             shrinkTowards = Alignment.Top,
-                        ) + fadeOut(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.RefreshIndicatorFadeDuration)),
+                        ) + fadeOut(animationSpec = tween(durationMillis = AppMotion.Proxy.RefreshIndicatorFadeDuration)),
                     ) {
                         Box(
                             modifier = Modifier
@@ -477,10 +484,15 @@ private fun ProxySurfboardContent(
                     items(items = displayProxies, key = { it.name }) { proxy ->
                         NodeCard(
                             proxy = proxy,
-                            isSelected = proxy.name == selectedGroup.now,
+                            isSelected = proxy.name == effectiveNow,
                             onClick = { proxyName ->
                                 if (selectedGroup.type == com.github.yumelira.yumebox.core.model.Proxy.Type.Selector) {
-                                    onSelectProxy(selectedGroup.name, proxyName, null)
+                                    optimisticSelectedProxyName = proxyName
+                                    onSelectProxy(
+                                        selectedGroup.name,
+                                        proxyName,
+                                        { optimisticSelectedProxyName = null },
+                                    )
                                 } else {
                                     onTestDelay()
                                 }
@@ -518,10 +530,22 @@ private fun ProxyModeSelector(
     modifier: Modifier = Modifier,
 ) {
     val modes = listOf(TunnelState.Mode.Rule, TunnelState.Mode.Global, TunnelState.Mode.Direct)
+    val selectedIndex = modes.indexOf(currentMode).coerceAtLeast(0)
     val hapticFeedback = LocalHapticFeedback.current
+    val density = LocalDensity.current
     val shape = RoundedCornerShape(999.dp)
+    var containerWidthPx by remember { mutableIntStateOf(0) }
+    val indicatorWidthPx = remember(containerWidthPx, modes.size) {
+        (containerWidthPx.toFloat() / modes.size).coerceAtLeast(0f)
+    }
+    val indicatorWidth = with(density) { indicatorWidthPx.toDp() }
+    val indicatorOffset by animateDpAsState(
+        targetValue = with(density) { (indicatorWidthPx * selectedIndex).toDp() },
+        animationSpec = AppMotion.indicator(),
+        label = "proxy_mode_indicator_offset",
+    )
 
-    Row(
+    Box(
         modifier = modifier
             .shadow(
                 elevation = UiDp.dp8,
@@ -531,41 +555,79 @@ private fun ProxyModeSelector(
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .padding(UiDp.dp4),
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp4),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        modes.forEach { mode ->
-            val selected = mode == currentMode
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(UiDp.dp40)
-                    .clip(shape)
-                    .background(
-                        if (selected) MaterialTheme.colorScheme.primaryContainer
-                        else Color.Transparent,
-                    )
-                    .clickable(enabled = !selected) {
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                        onModeSelected(mode)
-                    },
-                contentAlignment = Alignment.Center,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(UiDp.dp40)
+                .onSizeChanged { containerWidthPx = it.width },
+        ) {
+            if (indicatorWidthPx > 0f) {
+                Box(
+                    modifier = Modifier
+                        .graphicsLayer { translationX = indicatorOffset.toPx() }
+                        .width(indicatorWidth)
+                        .fillMaxHeight()
+                        .clip(shape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                )
+            }
+
+            Row(
+                modifier = Modifier.matchParentSize(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                MdText(
-                    text = mode.displayName(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                    color = if (selected) {
+            modes.forEach { mode ->
+                val selected = mode == currentMode
+                val textColor by animateColorAsState(
+                    targetValue = if (selected) {
                         MaterialTheme.colorScheme.onPrimaryContainer
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    animationSpec = AppMotion.color(),
+                    label = "proxy_mode_text_color",
                 )
+                val textScale by animateFloatAsState(
+                    targetValue = if (selected) 1.03f else 1f,
+                    animationSpec = AppMotion.fastSpatial(),
+                    label = "proxy_mode_text_scale",
+                )
+                val itemInteractionSource = remember(mode) { MutableInteractionSource() }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(UiDp.dp40)
+                        .clip(shape)
+                        .clickable(
+                            interactionSource = itemInteractionSource,
+                            indication = null,
+                            enabled = !selected,
+                            onClick = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                                onModeSelected(mode)
+                            },
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    MdText(
+                        text = mode.displayName(),
+                        modifier = Modifier.graphicsLayer {
+                            scaleX = textScale
+                            scaleY = textScale
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                        color = textColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
+}
 }
 
 private fun TunnelState.Mode.displayName(): String = when (this) {
@@ -626,6 +688,11 @@ private fun ProxyGroupTabs(
     onGroupSelected: (String) -> Unit,
 ) {
     var showAllGroups by remember { mutableStateOf(false) }
+    val allGroupsArrowRotation by animateFloatAsState(
+        targetValue = if (showAllGroups) 180f else 0f,
+        animationSpec = tween(durationMillis = 180),
+        label = "proxy_group_all_groups_arrow_rotation",
+    )
     val coroutineScope = rememberCoroutineScope()
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -667,7 +734,9 @@ private fun ProxyGroupTabs(
                 imageVector = AppMd3Icons.Navigation.DownAngle,
                 contentDescription = MLang.Proxy.Title,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(UiDp.dp20),
+                modifier = Modifier
+                    .size(UiDp.dp20)
+                    .rotate(allGroupsArrowRotation),
             )
         }
     }
@@ -718,16 +787,18 @@ private fun ProxyGroupTab(
     val activeColor = colorScheme.primary
     val defaultColor = colorScheme.onSurface
     val transition = updateTransition(targetState = selected, label = "proxy_group_tab_selection")
-    val motionScheme = MaterialTheme.motionScheme
+    val fastEffectsSpec = AppMotion.fastEffects<Color>()
+    val fastSpatialSpec = AppMotion.fastSpatial<Float>()
+    val indicatorSpec = AppMotion.indicator<Float>()
     val selectionScaleX = remember { Animatable(1f) }
     val animatedContainerColor by transition.animateColor(
-        transitionSpec = { motionScheme.fastEffectsSpec() },
+        transitionSpec = { fastEffectsSpec },
         label = "proxy_group_tab_container",
     ) { isSelected ->
         if (isSelected) activeColor.copy(alpha = 0.16f) else Color.Transparent
     }
     val animatedTextColor by transition.animateColor(
-        transitionSpec = { motionScheme.fastEffectsSpec() },
+        transitionSpec = { fastEffectsSpec },
         label = "proxy_group_tab_text",
     ) { isSelected ->
         if (isSelected) activeColor else defaultColor
@@ -735,10 +806,10 @@ private fun ProxyGroupTab(
     LaunchedEffect(selected) {
         if (selected) {
             selectionScaleX.snapTo(1f)
-            selectionScaleX.animateTo(1.06f, animationSpec = motionScheme.fastSpatialSpec())
-            selectionScaleX.animateTo(1f, animationSpec = motionScheme.defaultSpatialSpec())
+            selectionScaleX.animateTo(1.06f, animationSpec = fastSpatialSpec)
+            selectionScaleX.animateTo(1f, animationSpec = indicatorSpec)
         } else {
-            selectionScaleX.animateTo(1f, animationSpec = motionScheme.fastSpatialSpec())
+            selectionScaleX.animateTo(1f, animationSpec = fastSpatialSpec)
         }
     }
 

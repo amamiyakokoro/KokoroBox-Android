@@ -34,6 +34,7 @@ fun DialogButtonRow(
     cancelText: String = MLang.Component.Button.Cancel,
     confirmText: String = MLang.Component.Button.Confirm,
     confirmEnabled: Boolean = true,
+    confirmDestructive: Boolean = false,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
     YumeMd3DialogButtonRow(
@@ -43,6 +44,7 @@ fun DialogButtonRow(
         cancelText = cancelText,
         confirmText = confirmText,
         confirmEnabled = confirmEnabled,
+        confirmDestructive = confirmDestructive,
     )
 }
 
@@ -54,6 +56,8 @@ fun DialogFilledButtonRow(
     primaryText: String = MLang.Component.Button.Confirm,
     secondaryEnabled: Boolean = true,
     primaryEnabled: Boolean = true,
+    secondaryDestructive: Boolean = true,
+    primaryDestructive: Boolean = false,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
     YumeMd3DialogFilledButtonRow(
@@ -64,5 +68,7 @@ fun DialogFilledButtonRow(
         primaryText = primaryText,
         secondaryEnabled = secondaryEnabled,
         primaryEnabled = primaryEnabled,
+        secondaryDestructive = secondaryDestructive,
+        primaryDestructive = primaryDestructive,
     )
 }

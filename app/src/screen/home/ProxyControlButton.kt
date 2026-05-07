@@ -20,11 +20,16 @@
 
 
 package com.github.yumelira.yumebox.screen.home
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.animation.*
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +51,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import com.github.yumelira.yumebox.common.AppConstants
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 
@@ -83,21 +89,15 @@ fun ProxyControlButton(
                 coroutineScope.launch {
                     scaleAnim.animateTo(
                         targetValue = 0.90f,
-                        animationSpec = tween(
-                            AnimationSpecs.DURATION_INSTANT,
-                            easing = AnimationSpecs.EmphasizedAccelerate
-                        )
+                        animationSpec = AppMotion.pressDown
                     )
                     scaleAnim.animateTo(
                         targetValue = 1.02f,
-                        animationSpec = AnimationSpecs.ButtonPressSpring
+                        animationSpec = AppMotion.pressReturn
                     )
                     scaleAnim.animateTo(
                         targetValue = 1f,
-                        animationSpec = spring(
-                            dampingRatio = 1f,
-                            stiffness = 500f
-                        )
+                        animationSpec = AppMotion.pressSettle
                     )
                 }
                 onClick()
@@ -123,25 +123,24 @@ fun ProxyControlButton(
             AnimatedContent(
                 targetState = isRunning,
                 transitionSpec = {
-                    val iconTransition = AnimationSpecs.IconTransition as FiniteAnimationSpec<Float>
                     val enterTransition = slideInVertically(
                         initialOffsetY = { it / 5 },
-                        animationSpec = tween(AnimationSpecs.DURATION_INSTANT + 40, easing = AnimationSpecs.EnterEasing)
+                        animationSpec = tween(AppMotion.DURATION_INSTANT + 40, easing = AppMotion.EnterEasing)
                     ) + fadeIn(
-                        animationSpec = tween(AnimationSpecs.DURATION_INSTANT + 40, easing = AnimationSpecs.EnterEasing)
+                        animationSpec = tween(AppMotion.DURATION_INSTANT + 40, easing = AppMotion.EnterEasing)
                     ) + scaleIn(
                         initialScale = 0.8f,
-                        animationSpec = iconTransition
+                        animationSpec = AppMotion.iconTransition
                     )
 
                     val exitTransition = slideOutVertically(
                         targetOffsetY = { -it / 5 },
-                        animationSpec = tween(AnimationSpecs.DURATION_INSTANT + 20, easing = AnimationSpecs.ExitEasing)
+                        animationSpec = tween(AppMotion.DURATION_INSTANT + 20, easing = AppMotion.ExitEasing)
                     ) + fadeOut(
-                        animationSpec = tween(AnimationSpecs.DURATION_INSTANT + 20, easing = AnimationSpecs.ExitEasing)
+                        animationSpec = tween(AppMotion.DURATION_INSTANT + 20, easing = AppMotion.ExitEasing)
                     ) + scaleOut(
                         targetScale = 0.8f,
-                        animationSpec = iconTransition
+                        animationSpec = AppMotion.iconTransition
                     )
 
                     enterTransition.togetherWith(exitTransition)

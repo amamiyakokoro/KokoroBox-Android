@@ -32,6 +32,7 @@ fun AppConfirmDialog(
     onConfirm: () -> Unit,
     confirmText: String = MLang.Component.Button.Confirm,
     cancelText: String = MLang.Component.Button.Cancel,
+    confirmDestructive: Boolean = false,
 ) {
     AppDialog(
         show = show,
@@ -44,6 +45,7 @@ fun AppConfirmDialog(
             onConfirm = onConfirm,
             cancelText = cancelText,
             confirmText = confirmText,
+            confirmDestructive = confirmDestructive,
         )
     }
 }

@@ -21,8 +21,10 @@
 
 package com.github.yumelira.yumebox.screen.profiles
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.appPressSink
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -174,13 +176,22 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                         reorderableLazyListState,
                         key = profile.uuid.toString()
                     ) { isDragging ->
+                        val dragInteractionSource = remember { MutableInteractionSource() }
                         ProfileCard(
                             profile = profile,
                             workDir = App.instance.filesDir.resolve("imported"),
                             isDownloading = false,
                             isUpdating = profile.uuid in updatingProfileIds,
                             modifier = Modifier
-                                .longPressDraggableHandle()
+                                .appPressSink(
+                                    interactionSource = dragInteractionSource,
+                                    enabled = true,
+                                    pressedScale = 0.98f,
+                                    pressedTranslationY = UiDp.dp1,
+                                    minimumVisibleMillis = 0L,
+                                    forcePressed = isDragging,
+                                )
+                                .longPressDraggableHandle(interactionSource = dragInteractionSource)
                                 .alpha(if (isDragging) 0.9f else 1f),
                             onExport = { profile ->
                                 if (profile.uuid !in updatingProfileIds) {

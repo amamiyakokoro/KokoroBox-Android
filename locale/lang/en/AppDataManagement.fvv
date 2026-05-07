@@ -13,6 +13,8 @@ AppDataManagement = {
         EmptyHistory = "No historical downloads to clean"
         EmptyHistorySummary = "GeoX files that fail validation are deleted immediately and will not appear here"
         CacheItemSummary = "%s · %s"
+        DeleteConfirmTitle = "Delete GeoX files?"
+        DeleteConfirmMessage = "Delete %d selected historical GeoX files? This action cannot be undone."
         DeleteComplete = "Deleted %d historical GeoX files"
     }
 
@@ -23,6 +25,8 @@ AppDataManagement = {
         EmptyLogsSummary = "After starting recording on the Log page, log files will appear here"
         LogItemSummary = "%s · %s"
         RecordingFileTitle = "%s (recording)"
+        DeleteConfirmTitle = "Delete log files?"
+        DeleteConfirmMessage = "Delete %d selected log files? This action cannot be undone."
         DeleteComplete = "Deleted %d log files"
         ViewerTitle = "View Log: %s"
         EmptyLogContent = "Log is empty"

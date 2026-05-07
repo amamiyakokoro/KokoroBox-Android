@@ -443,8 +443,8 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
                     imageVector = AppMd3Icons.Action.Delete,
                     contentDescription = MLang.Override.Card.Delete,
                     onClick = onDelete,
-                    containerColor = colorScheme.secondaryContainer.copy(alpha = 0.78f),
-                    contentColor = colorScheme.onSurface.copy(alpha = 0.85f),
+                    containerColor = colorScheme.error.copy(alpha = 0.10f),
+                    contentColor = colorScheme.error,
                 )
             }
         }
@@ -574,6 +574,7 @@ private fun DeleteConfirmDialog(
                 onConfirm = onConfirm,
                 cancelText = MLang.Override.Dialog.Button.Cancel,
                 confirmText = MLang.Override.Dialog.Button.Delete,
+                confirmDestructive = true,
             )
         }
     }

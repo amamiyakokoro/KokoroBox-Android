@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,11 +40,13 @@ fun YumeMd3TextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    destructive: Boolean = false,
 ) {
     TextButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
+        colors = yumeMd3TextButtonColors(destructive = destructive),
     ) {
         Text(text = text)
     }
@@ -55,15 +58,13 @@ fun YumeMd3FilledButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    destructive: Boolean = false,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-        ),
+        colors = yumeMd3FilledButtonColors(destructive = destructive),
     ) {
         Text(text = text)
     }
@@ -77,6 +78,7 @@ fun YumeMd3DialogButtonRow(
     cancelText: String = MLang.Component.Button.Cancel,
     confirmText: String = MLang.Component.Button.Confirm,
     confirmEnabled: Boolean = true,
+    confirmDestructive: Boolean = false,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -92,6 +94,7 @@ fun YumeMd3DialogButtonRow(
             onClick = onConfirm,
             modifier = Modifier.weight(1f),
             enabled = confirmEnabled,
+            destructive = confirmDestructive,
         )
     }
 }
@@ -105,6 +108,8 @@ fun YumeMd3DialogFilledButtonRow(
     primaryText: String = MLang.Component.Button.Confirm,
     secondaryEnabled: Boolean = true,
     primaryEnabled: Boolean = true,
+    secondaryDestructive: Boolean = true,
+    primaryDestructive: Boolean = false,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -114,6 +119,7 @@ fun YumeMd3DialogFilledButtonRow(
             onClick = onSecondary,
             enabled = secondaryEnabled,
             modifier = Modifier.weight(1f),
+            colors = yumeMd3FilledButtonColors(destructive = secondaryDestructive),
         ) {
             Text(text = secondaryText)
         }
@@ -122,6 +128,29 @@ fun YumeMd3DialogFilledButtonRow(
             onClick = onPrimary,
             modifier = Modifier.weight(1f),
             enabled = primaryEnabled,
+            destructive = primaryDestructive,
         )
     }
+}
+
+@Composable
+private fun yumeMd3FilledButtonColors(destructive: Boolean): ButtonColors = if (destructive) {
+    ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.error,
+        contentColor = MaterialTheme.colorScheme.onError,
+    )
+} else {
+    ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+    )
+}
+
+@Composable
+private fun yumeMd3TextButtonColors(destructive: Boolean): ButtonColors = if (destructive) {
+    ButtonDefaults.textButtonColors(
+        contentColor = MaterialTheme.colorScheme.error,
+    )
+} else {
+    ButtonDefaults.textButtonColors()
 }

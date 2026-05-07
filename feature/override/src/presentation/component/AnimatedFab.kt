@@ -20,8 +20,14 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.animation.*
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
@@ -31,8 +37,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 
 @Stable
 class OverrideFabController internal constructor() {
@@ -70,38 +76,38 @@ fun OverrideAnimatedFab(
         visibleState = fabVisibilityState,
         enter = slideInVertically(
             animationSpec = tween(
-                durationMillis = AnimationSpecs.Proxy.VisibilityDuration,
-                easing = AnimationSpecs.EmphasizedDecelerate,
+                durationMillis = AppMotion.Proxy.VisibilityDuration,
+                easing = AppMotion.EmphasizedDecelerate,
             ),
             initialOffsetY = { it / 2 },
         ) + scaleIn(
-            initialScale = AnimationSpecs.Proxy.VisibilityInitialScale,
+            initialScale = AppMotion.Proxy.VisibilityInitialScale,
             animationSpec = tween(
-                durationMillis = AnimationSpecs.Proxy.VisibilityDuration,
+                durationMillis = AppMotion.Proxy.VisibilityDuration,
                 easing = LinearEasing,
             ),
         ) + fadeIn(
             animationSpec = tween(
-                durationMillis = AnimationSpecs.Proxy.VisibilityFadeDuration,
-                easing = AnimationSpecs.EnterEasing,
+                durationMillis = AppMotion.Proxy.VisibilityFadeDuration,
+                easing = AppMotion.EnterEasing,
             ),
         ),
         exit = slideOutVertically(
             animationSpec = tween(
-                durationMillis = AnimationSpecs.Proxy.VisibilityDuration,
-                easing = AnimationSpecs.EmphasizedAccelerate,
+                durationMillis = AppMotion.Proxy.VisibilityDuration,
+                easing = AppMotion.EmphasizedAccelerate,
             ),
             targetOffsetY = { it / 2 },
         ) + scaleOut(
-            targetScale = AnimationSpecs.Proxy.VisibilityTargetScale,
+            targetScale = AppMotion.Proxy.VisibilityTargetScale,
             animationSpec = tween(
-                durationMillis = AnimationSpecs.Proxy.VisibilityDuration,
+                durationMillis = AppMotion.Proxy.VisibilityDuration,
                 easing = LinearEasing,
             ),
         ) + fadeOut(
             animationSpec = tween(
-                durationMillis = AnimationSpecs.Proxy.VisibilityFadeDuration,
-                easing = AnimationSpecs.ExitEasing,
+                durationMillis = AppMotion.Proxy.VisibilityFadeDuration,
+                easing = AppMotion.ExitEasing,
             ),
         ),
         label = "override_shared_fab_visibility",

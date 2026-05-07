@@ -271,6 +271,7 @@ fun StringListEditorScreen(
                     EditorDataHolder.clearListEditor()
                     navigator.popBackStack()
                 },
+                confirmDestructive = true,
             )
         }
 
@@ -429,6 +430,7 @@ fun KeyValueEditorScreen(
                     EditorDataHolder.clearMapEditor()
                     navigator.popBackStack()
                 },
+                confirmDestructive = true,
             )
         }
     }

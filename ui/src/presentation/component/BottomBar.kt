@@ -33,6 +33,8 @@ import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -59,8 +61,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.kyant.shapes.Capsule
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
@@ -205,6 +207,7 @@ fun BottomBarContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ModernBottomBarContent(
     isVisible: Boolean = true,
@@ -224,30 +227,31 @@ private fun ModernBottomBarContent(
             handlePageChange(index)
         }
     }
+    val indicatorColor = MaterialTheme.colorScheme.primaryContainer
 
     AnimatedVisibility(
         visible = bottomBarVisible,
         enter = fadeIn(
             animationSpec = tween(
                 durationMillis = 240,
-                easing = AnimationSpecs.EmphasizedDecelerate,
+                easing = AppMotion.EmphasizedDecelerate,
             )
         ) + slideInVertically(
             animationSpec = tween(
                 durationMillis = 240,
-                easing = AnimationSpecs.EmphasizedDecelerate,
+                easing = AppMotion.EmphasizedDecelerate,
             ),
             initialOffsetY = { fullHeight -> (fullHeight * 0.92f).toInt() },
         ),
         exit = fadeOut(
             animationSpec = tween(
                 durationMillis = 180,
-                easing = AnimationSpecs.EmphasizedAccelerate,
+                easing = AppMotion.EmphasizedAccelerate,
             )
         ) + slideOutVertically(
             animationSpec = tween(
                 durationMillis = 220,
-                easing = AnimationSpecs.EmphasizedAccelerate,
+                easing = AppMotion.EmphasizedAccelerate,
             ),
             targetOffsetY = { fullHeight -> (fullHeight * 1.08f).toInt() },
         ),
@@ -257,26 +261,28 @@ private fun ModernBottomBarContent(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             tonalElevation = UiDp.dp3,
         ) {
-            BottomBarDestination.entries.forEachIndexed { index, destination ->
-                NavigationBarItem(
-                    selected = page == index,
-                    onClick = { onItemClick(index) },
-                    icon = {
-                        MaterialIcon(
-                            imageVector = destination.icon,
-                            contentDescription = destination.label,
-                        )
-                    },
-                    label = { MaterialText(destination.label) },
-                    enabled = bottomBarVisible,
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    ),
-                )
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                BottomBarDestination.entries.forEachIndexed { index, destination ->
+                    NavigationBarItem(
+                        selected = page == index,
+                        onClick = { onItemClick(index) },
+                        icon = {
+                            MaterialIcon(
+                                imageVector = destination.icon,
+                                contentDescription = destination.label,
+                            )
+                        },
+                        label = { MaterialText(destination.label) },
+                        enabled = bottomBarVisible,
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = indicatorColor,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    )
+                }
             }
         }
     }
@@ -309,9 +315,9 @@ private fun LegacyBottomBarContent(
         animationSpec = tween(
             durationMillis = 240,
             easing = if (bottomBarVisible) {
-                AnimationSpecs.EmphasizedDecelerate
+                AppMotion.EmphasizedDecelerate
             } else {
-                AnimationSpecs.EmphasizedAccelerate
+                AppMotion.EmphasizedAccelerate
             },
         ),
         label = "legacy_bottom_bar_scale",
@@ -321,9 +327,9 @@ private fun LegacyBottomBarContent(
         animationSpec = tween(
             durationMillis = 180,
             easing = if (bottomBarVisible) {
-                AnimationSpecs.EmphasizedDecelerate
+                AppMotion.EmphasizedDecelerate
             } else {
-                AnimationSpecs.EmphasizedAccelerate
+                AppMotion.EmphasizedAccelerate
             },
         ),
         label = "legacy_bottom_bar_alpha",
@@ -334,17 +340,14 @@ private fun LegacyBottomBarContent(
             animatedTranslationY.snapTo(enterOffsetPx)
             animatedTranslationY.animateTo(
                 targetValue = 0f,
-                animationSpec = spring(
-                    dampingRatio = 0.78f,
-                    stiffness = 520f,
-                ),
+                animationSpec = AppMotion.pressReturn,
             )
         } else {
             animatedTranslationY.animateTo(
                 targetValue = exitOffsetPx,
                 animationSpec = tween(
                     durationMillis = 220,
-                    easing = AnimationSpecs.EmphasizedAccelerate,
+                    easing = AppMotion.EmphasizedAccelerate,
                 ),
             )
         }

@@ -18,47 +18,44 @@
  *
  */
 
-
-
 package com.github.yumelira.yumebox.presentation.theme
 
-import androidx.compose.animation.core.*
-
+@Deprecated(
+    message = "Use AppMotion semantic helpers for new UI motion.",
+    replaceWith = ReplaceWith("AppMotion"),
+)
 object AnimationSpecs {
 
-    val EmphasizedDecelerate = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1.0f)
-    val EmphasizedAccelerate = CubicBezierEasing(0.3f, 0.0f, 0.8f, 0.15f)
-    val Legacy = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
-    val StandardEasing = FastOutSlowInEasing
-    val EnterEasing = LinearOutSlowInEasing
-    val ExitEasing = FastOutLinearInEasing
+    val EmphasizedDecelerate = AppMotion.EmphasizedDecelerate
+    val EmphasizedAccelerate = AppMotion.EmphasizedAccelerate
+    val Legacy = AppMotion.Legacy
+    val StandardEasing = AppMotion.StandardEasing
+    val EnterEasing = AppMotion.EnterEasing
+    val ExitEasing = AppMotion.ExitEasing
 
-    const val DURATION_INSTANT = 120
-    const val DURATION_FAST = 280
+    const val DURATION_INSTANT = AppMotion.DURATION_INSTANT
+    const val DURATION_FAST = AppMotion.DURATION_FAST
 
-    val ButtonPress: AnimationSpec<Float> = tween(DURATION_FAST, easing = StandardEasing)
-    val ButtonPressSpring: SpringSpec<Float> = spring(
-        dampingRatio = 0.8f,
-        stiffness = 400f
-    )
-    val IconTransition: AnimationSpec<Float> = tween(320, easing = Legacy)
+    val ButtonPress = AppMotion.pressDown
+    val ButtonPressSpring = AppMotion.pressReturn
+    val IconTransition = AppMotion.iconTransition
 
     object Proxy {
 
-        const val VisibilityDuration = 180
-        const val VisibilityFadeDuration = 140
-        const val VisibilityInitialScale = 0.8f
-        const val VisibilityTargetScale = 0.8f
+        const val VisibilityDuration = AppMotion.Proxy.VisibilityDuration
+        const val VisibilityFadeDuration = AppMotion.Proxy.VisibilityFadeDuration
+        const val VisibilityInitialScale = AppMotion.Proxy.VisibilityInitialScale
+        const val VisibilityTargetScale = AppMotion.Proxy.VisibilityTargetScale
 
-        const val FabDuration = VisibilityDuration
-        const val FabFadeDuration = VisibilityFadeDuration
+        const val FabDuration = AppMotion.Proxy.FabDuration
+        const val FabFadeDuration = AppMotion.Proxy.FabFadeDuration
 
-        const val SheetSlideInDuration = 340
-        const val SheetSlideOutDuration = 300
-        const val SheetFadeInDuration = 140
-        const val SheetFadeOutDuration = 140
+        const val SheetSlideInDuration = AppMotion.Proxy.SheetSlideInDuration
+        const val SheetSlideOutDuration = AppMotion.Proxy.SheetSlideOutDuration
+        const val SheetFadeInDuration = AppMotion.Proxy.SheetFadeInDuration
+        const val SheetFadeOutDuration = AppMotion.Proxy.SheetFadeOutDuration
 
-        const val RefreshIndicatorDuration = 200
-        const val RefreshIndicatorFadeDuration = 150
+        const val RefreshIndicatorDuration = AppMotion.Proxy.RefreshIndicatorDuration
+        const val RefreshIndicatorFadeDuration = AppMotion.Proxy.RefreshIndicatorFadeDuration
     }
 }

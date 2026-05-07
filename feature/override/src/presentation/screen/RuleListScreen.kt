@@ -255,6 +255,7 @@ fun OverrideRuleListEditorScreen(
                 },
                 cancelText = MLang.Override.Dialog.Button.Cancel,
                 confirmText = MLang.Override.Editor.Clear,
+                confirmDestructive = true,
             )
         }
     }

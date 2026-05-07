@@ -35,7 +35,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +56,7 @@ import com.github.yumelira.yumebox.data.model.StatisticsTimeRange
 import com.github.yumelira.yumebox.data.model.TrafficStatisticsBuckets
 import com.github.yumelira.yumebox.feature.meta.presentation.component.TabRowWithContour
 import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.TrafficStatisticsViewModel
+import com.github.yumelira.yumebox.presentation.component.AppConfirmDialog
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.TopBar
@@ -80,6 +84,21 @@ fun TrafficStatisticsScreen() {
     val timeRanges = StatisticsTimeRange.entries
     val selectedTabIndex = timeRanges.indexOf(uiState.selectedTimeRange).coerceAtLeast(0)
     val activeSummary = uiState.summary
+    var showClearConfirmDialog by remember { mutableStateOf(false) }
+
+    AppConfirmDialog(
+        show = showClearConfirmDialog,
+        title = MLang.TrafficStatistics.Action.Clear,
+        message = MLang.TrafficStatistics.Action.ClearConfirmMessage,
+        onDismissRequest = { showClearConfirmDialog = false },
+        onConfirm = {
+            showClearConfirmDialog = false
+            viewModel.clearAllStatistics()
+            context.toast(MLang.TrafficStatistics.Action.ClearSuccess)
+        },
+        confirmText = MLang.TrafficStatistics.Action.Clear,
+        confirmDestructive = true,
+    )
 
     Scaffold(
         topBar = {
@@ -87,15 +106,12 @@ fun TrafficStatisticsScreen() {
                 title = MLang.TrafficStatistics.Title,
                 actions = {
                     IconButton(
-                        onClick = {
-                            viewModel.clearAllStatistics()
-                            context.toast(MLang.TrafficStatistics.Action.ClearSuccess)
-                        },
+                        onClick = { showClearConfirmDialog = true },
                     ) {
                         Icon(
                             imageVector = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.TrafficStatistics.Action.Clear,
-                            tint = MaterialTheme.colorScheme.onSurface,
+                            tint = MaterialTheme.colorScheme.error,
                         )
                     }
                 },

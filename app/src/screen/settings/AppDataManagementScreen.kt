@@ -41,8 +41,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.github.yumelira.yumebox.common.util.formatBytes
@@ -51,8 +53,9 @@ import com.github.yumelira.yumebox.data.store.LogStore
 import com.github.yumelira.yumebox.feature.editor.presentation.editor.CodeEditor
 import com.github.yumelira.yumebox.feature.editor.presentation.editor.rememberConfiguredCodeEditorState
 import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
+import com.github.yumelira.yumebox.presentation.component.AppConfirmDialog
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
@@ -77,8 +80,8 @@ fun AppDataManagementScreen() {
     val viewModel = koinViewModel<AppDataManagementViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val showGeoHistorySheet = remember { androidx.compose.runtime.mutableStateOf(false) }
-    val showLogFilesSheet = remember { androidx.compose.runtime.mutableStateOf(false) }
+    val showGeoHistorySheet = remember { mutableStateOf(false) }
+    val showLogFilesSheet = remember { mutableStateOf(false) }
 
     if (uiState.selectedLogFileName != null) {
         AppDataLogViewerScreen(
@@ -250,6 +253,23 @@ private fun GeoHistorySheet(
     onDelete: (Set<String>) -> Unit,
 ) {
     val selected = remember(entries) { mutableStateMapOf<String, Boolean>() }
+    val selectedPaths = selected.filterValues { it }.keys
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+
+    AppConfirmDialog(
+        show = showDeleteConfirmDialog,
+        title = MLang.AppDataManagement.GeoFiles.DeleteConfirmTitle,
+        message = MLang.AppDataManagement.GeoFiles.DeleteConfirmMessage.format(selectedPaths.size),
+        onDismissRequest = { showDeleteConfirmDialog = false },
+        onConfirm = {
+            val paths = selectedPaths.toSet()
+            showDeleteConfirmDialog = false
+            onDelete(paths)
+        },
+        confirmText = MLang.Component.Button.Delete,
+        confirmDestructive = true,
+    )
+
     AppActionBottomSheet(
         show = show,
         title = MLang.AppDataManagement.GeoFiles.HistoryTitle,
@@ -257,12 +277,12 @@ private fun GeoHistorySheet(
         startAction = { AppBottomSheetCloseAction(onClick = onDismiss) },
         endAction = {
             IconButton(
-                enabled = selected.values.any { it },
-                onClick = { onDelete(selected.filterValues { it }.keys) },
+                enabled = selectedPaths.isNotEmpty(),
+                onClick = { showDeleteConfirmDialog = true },
             ) {
                 Icon(
                     imageVector = AppMd3Icons.Action.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = MLang.Component.Button.Delete,
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
@@ -302,6 +322,23 @@ private fun LogFilesSheet(
     onDelete: (Set<String>) -> Unit,
 ) {
     val selected = remember(entries) { mutableStateMapOf<String, Boolean>() }
+    val selectedNames = selected.filterValues { it }.keys
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+
+    AppConfirmDialog(
+        show = showDeleteConfirmDialog,
+        title = MLang.AppDataManagement.Logs.DeleteConfirmTitle,
+        message = MLang.AppDataManagement.Logs.DeleteConfirmMessage.format(selectedNames.size),
+        onDismissRequest = { showDeleteConfirmDialog = false },
+        onConfirm = {
+            val names = selectedNames.toSet()
+            showDeleteConfirmDialog = false
+            onDelete(names)
+        },
+        confirmText = MLang.Component.Button.Delete,
+        confirmDestructive = true,
+    )
+
     AppActionBottomSheet(
         show = show,
         title = MLang.AppDataManagement.Logs.ManagementTitle,
@@ -309,12 +346,12 @@ private fun LogFilesSheet(
         startAction = { AppBottomSheetCloseAction(onClick = onDismiss) },
         endAction = {
             IconButton(
-                enabled = selected.values.any { it },
-                onClick = { onDelete(selected.filterValues { it }.keys) },
+                enabled = selectedNames.isNotEmpty(),
+                onClick = { showDeleteConfirmDialog = true },
             ) {
                 Icon(
                     imageVector = AppMd3Icons.Action.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = MLang.Component.Button.Delete,
                     tint = MaterialTheme.colorScheme.error,
             )
             }
