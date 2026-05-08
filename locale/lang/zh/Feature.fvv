@@ -26,6 +26,12 @@ Feature = {
         Unknown = "未知面板"
     }
 
+    Node = {
+        Section = "节点"
+        HealthCheckConcurrencyTitle = "测速并发数"
+        HealthCheckConcurrencySummary = "当前选项：%s"
+    }
+
     SubStore = {
         SectionHint = "Sub-Store 资源下载，需要同时安装扩展包和静态资源，首次安装扩展包之后，请退出应用再打开"
         ExtensionInstalled = "扩展包已安装"
@@ -35,6 +41,22 @@ Feature = {
         DownloadHint = "点击前往下载扩展包"
         DownloadResources = "下载资源"
         DownloadResourcesSummary = "一次性下载前端和后端资源"
+        FrontendResourceTitle = "Sub-Store 前端"
+        FrontendResourceSummary = "下载并解压 Sub-Store 前端静态资源"
+        BackendResourceTitle = "Sub-Store 后端"
+        BackendResourceSummary = "下载 Sub-Store 后端 bundle 文件"
+        ProgressTitle = "正在下载 Sub-Store 资源"
+        ProgressSummary = "请保持网络连接，下载完成后会自动校验资源状态"
+        StatusPending = "等待中"
+        StatusDownloading = "下载中 %d%%"
+        StatusSuccess = "已完成"
+        StatusFailed = "失败"
+        ProgressSuccess = "资源已下载完成"
+        ProgressFailed = "资源下载失败"
+        ProgressDetail = "%s / %s · %s"
+        ProgressDetailUnknownTotal = "已下载 %s · %s"
+        ProgressWaiting = "等待下载"
+        ResourcesDownloadComplete = "Sub-Store 资源下载完成：%d/%d"
         Not32Bit = "Sub-Store 不支持 32 位设备"
         InstallExtension = "请先安装扩展包"
         DownloadSubStoreFirst = "请先下载 Sub-Store 资源"

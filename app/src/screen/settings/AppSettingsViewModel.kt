@@ -95,6 +95,7 @@ class AppSettingsViewModel(
     val acgSidebarExpanded: Preference<Boolean> = settings.acgSidebarExpanded
     val pageScale: Preference<Float> = settings.pageScale
     val singleNodeTest: Preference<Boolean> = settings.singleNodeTest
+    val healthCheckConcurrency: Preference<Int> = settings.healthCheckConcurrency
     val screenshotProtectionEnabled: Preference<Boolean> = settings.screenshotProtectionEnabled
     val biometricUnlockEnabled: Preference<Boolean> = settings.biometricUnlockEnabled
     val exitUiWhenBackground: Preference<Boolean> = featureStore.exitUiWhenBackground
@@ -215,6 +216,12 @@ class AppSettingsViewModel(
     fun onExcludeFromRecentsChange(exclude: Boolean) = excludeFromRecents.set(exclude)
     fun onShowTrafficNotificationChange(show: Boolean) = showTrafficNotification.set(show)
     fun onSingleNodeTestChange(enabled: Boolean) = singleNodeTest.set(enabled)
+    fun onHealthCheckConcurrencyChange(concurrency: Int) = healthCheckConcurrency.set(
+        when (concurrency) {
+            16, 24, 32 -> concurrency
+            else -> 8
+        },
+    )
     fun onScreenshotProtectionEnabledChange(enabled: Boolean) = screenshotProtectionEnabled.set(enabled)
     fun onBiometricUnlockEnabledChange(enabled: Boolean) = biometricUnlockEnabled.set(enabled)
     fun onExitUiWhenBackgroundChange(enabled: Boolean) = exitUiWhenBackground.set(enabled)

@@ -23,6 +23,7 @@
 package com.github.yumelira.yumebox.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.core.presentation.ContractStateViewModel
 import com.github.yumelira.yumebox.core.presentation.LoadableState
 import com.github.yumelira.yumebox.core.model.TunnelState
@@ -36,7 +37,12 @@ import com.github.yumelira.yumebox.runtime.client.ProxyGroupSyncPriority
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.launch
 
 class ProxyViewModel(
@@ -61,9 +67,20 @@ class ProxyViewModel(
     val singleNodeTest: StateFlow<Boolean> = appSettings.singleNodeTest.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    val proxyGroups: StateFlow<List<ProxyGroupInfo>> = proxyFacade.proxyGroups
-        .map { groups -> groups.filterNot(ProxyGroupInfo::hidden) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val healthCheckConcurrency: StateFlow<Int> = appSettings.healthCheckConcurrency.state
+        .map(::normalizeHealthCheckConcurrency)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DEFAULT_HEALTH_CHECK_CONCURRENCY)
+
+    private val lockedGroupTestDelays = MutableStateFlow<Map<String, Map<String, Int>>>(emptyMap())
+
+    val proxyGroups: StateFlow<List<ProxyGroupInfo>> = combine(
+        proxyFacade.proxyGroups,
+        lockedGroupTestDelays,
+    ) { groups, lockedDelays ->
+        groups.filterNot(ProxyGroupInfo::hidden).map { group ->
+            group.withLockedDelays(lockedDelays[group.name].orEmpty())
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val activeSyncSources = mutableSetOf<String>()
     private var groupTestJob: Job? = null
@@ -129,19 +146,22 @@ class ProxyViewModel(
             clearError()
             val testMode = tunnelMode.value
             val currentGroups = proxyGroups.value
-            val targetGroupName = groupName ?: currentGroups.firstOrNull()?.name
+            val targetGroup = groupName
+                ?.let { name -> currentGroups.firstOrNull { it.name == name } }
+                ?: currentGroups.firstOrNull()
+            val targetGroupName = targetGroup?.name
             val testingTargets: Set<String> = targetGroupName?.let(::setOf).orEmpty()
             if (testingTargets.isNotEmpty()) {
                 _testingGroupNames.update { it + testingTargets }
             }
 
             val result = runCatching {
-                if (targetGroupName != null) {
+                if (targetGroup != null && targetGroupName != null) {
                     showMessage(MLang.Proxy.Testing.Group.format(targetGroupName))
-                    proxyFacade.healthCheck(targetGroupName)
-                    if (tunnelMode.value == testMode && proxyGroups.value.any { it.name == targetGroupName }) {
-                        proxyFacade.refreshProxyGroup(targetGroupName)
-                    }
+                    runGroupHealthCheck(
+                        group = targetGroup,
+                        testMode = testMode,
+                    )
                     showMessage(MLang.Proxy.Testing.RequestSent)
                 }
             }
@@ -153,8 +173,52 @@ class ProxyViewModel(
             }
 
             result.exceptionOrNull()?.let { error ->
+                if (error is CancellationException) throw error
                 showError(MLang.Proxy.Testing.Failed.format(error.message))
             }
+        }
+    }
+
+    private suspend fun runGroupHealthCheck(
+        group: ProxyGroupInfo,
+        testMode: TunnelState.Mode,
+    ) {
+        val groupName = group.name
+        val targets = group.proxies
+            .filterNot { proxy -> proxy.type.group }
+            .distinctBy(Proxy::name)
+        if (targets.isEmpty()) {
+            proxyFacade.healthCheck(groupName)
+            if (tunnelMode.value == testMode && proxyGroups.value.any { it.name == groupName }) {
+                proxyFacade.refreshProxyGroup(groupName)
+            }
+            return
+        }
+
+        lockedGroupTestDelays.update { it + (groupName to emptyMap()) }
+        val semaphore = Semaphore(healthCheckConcurrency.value)
+        coroutineScope {
+            targets.map { proxy ->
+                async {
+                    semaphore.withPermit {
+                        val proxyName = proxy.name
+                        _testingProxyNames.update { it + proxyName }
+                        try {
+                            val delay = runCatching {
+                                proxyFacade.healthCheckProxy(groupName, proxyName)
+                            }.getOrDefault(-1)
+                            if (tunnelMode.value == testMode && proxyGroups.value.any { it.name == groupName }) {
+                                lockedGroupTestDelays.update { all ->
+                                    val groupDelays = all[groupName].orEmpty() + (proxyName to delay)
+                                    all + (groupName to groupDelays)
+                                }
+                            }
+                        } finally {
+                            _testingProxyNames.update { it - proxyName }
+                        }
+                    }
+                }
+        }.awaitAll()
         }
     }
 
@@ -215,7 +279,15 @@ class ProxyViewModel(
             val testMode = tunnelMode.value
             _testingProxyNames.update { it + proxyName }
             runCatching {
-                proxyFacade.healthCheckProxy(groupName, proxyName)
+                val delay = proxyFacade.healthCheckProxy(groupName, proxyName)
+                lockedGroupTestDelays.update { all ->
+                    val groupDelays = all[groupName]
+                    if (groupDelays == null) {
+                        all
+                    } else {
+                        all + (groupName to (groupDelays + (proxyName to delay)))
+                    }
+                }
                 if (tunnelMode.value == testMode && proxyGroups.value.any { it.name == groupName }) {
                     proxyFacade.refreshProxyGroup(groupName)
                 }
@@ -234,6 +306,23 @@ class ProxyViewModel(
 
     fun clearError() {
         clearErrorState()
+    }
+
+    private fun ProxyGroupInfo.withLockedDelays(lockedDelays: Map<String, Int>): ProxyGroupInfo {
+        if (lockedDelays.isEmpty()) return this
+        val updatedProxies = proxies.map { proxy ->
+            lockedDelays[proxy.name]?.let { delay -> proxy.copy(delay = delay) } ?: proxy
+        }
+        return copy(proxies = updatedProxies)
+    }
+
+    private fun normalizeHealthCheckConcurrency(value: Int): Int {
+        return if (value in SUPPORTED_HEALTH_CHECK_CONCURRENCY) value else DEFAULT_HEALTH_CHECK_CONCURRENCY
+    }
+
+    private companion object {
+        private const val DEFAULT_HEALTH_CHECK_CONCURRENCY = 8
+        private val SUPPORTED_HEALTH_CHECK_CONCURRENCY = setOf(8, 16, 24, 32)
     }
 
     data class ProxyUiState(
