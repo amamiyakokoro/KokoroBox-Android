@@ -31,7 +31,7 @@ Settings = {
         ImportBackup = "Import Backup"
         ImportBackupSummary = "Restore user settings from a backup file"
         AppDataManagement = "App Data Management"
-        AppDataManagementSummary = "Manage GeoX download history and cache"
+        AppDataManagementSummary = "Clean up some cache files"
     }
 
     More = {

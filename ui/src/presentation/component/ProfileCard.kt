@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import com.github.yumelira.yumebox.presentation.util.*
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
@@ -101,10 +102,11 @@ fun ProfileCard(
         profile.isConfigSaved(workDir)
     }
 
+    val destructiveActionColors = yumeDestructiveActionColors()
     val updateBg = remember(colorScheme, opacity) { colorScheme.primary.copy(alpha = opacity.subtle) }
     val updateTint = remember(colorScheme) { colorScheme.primary }
-    val deleteContainer = remember(colorScheme, opacity) { colorScheme.errorContainer.copy(alpha = opacity.strong) }
-    val deleteContentColor = colorScheme.onErrorContainer
+    val deleteContainer = destructiveActionColors.containerColor
+    val deleteContentColor = destructiveActionColors.contentColor
 
     Card(
         modifier = modifier

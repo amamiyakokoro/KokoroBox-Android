@@ -119,6 +119,7 @@ fun OverrideRuleListEditorScreen(
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.DeleteSelectedRules,
+                            destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
                                     val latestValues = OverrideStructuredEditorStore.ruleEditorDraftValues
@@ -138,11 +139,13 @@ fun OverrideRuleListEditorScreen(
                             icon = AppMd3Icons.Action.Undo,
                             contentDescription = MLang.Override.Editor.ClearMode,
                             spacedFromNext = true,
+                            destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            destructive = true,
                             onClick = {
                                 isDeleteMode = true
                                 selectedUiIds = emptySet()

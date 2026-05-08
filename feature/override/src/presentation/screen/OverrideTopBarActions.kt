@@ -22,10 +22,12 @@ package com.github.yumelira.yumebox.presentation.screen
 
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.github.yumelira.yumebox.presentation.component.AppIcon
 import com.github.yumelira.yumebox.presentation.component.AppIconButton
@@ -35,8 +37,11 @@ internal fun RowScope.OverrideTopBarAction(
     icon: ImageVector,
     contentDescription: String,
     spacedFromNext: Boolean = false,
+    destructive: Boolean = false,
     onClick: () -> Unit,
 ) {
+    val destructiveActionColors = yumeDestructiveActionColors()
+
     AppIconButton(
         modifier = if (spacedFromNext) Modifier.padding(end = UiDp.dp12) else Modifier,
         onClick = onClick,
@@ -44,6 +49,7 @@ internal fun RowScope.OverrideTopBarAction(
         AppIcon(
             imageVector = icon,
             contentDescription = contentDescription,
+            tint = if (destructive) destructiveActionColors.contentColor else Color.Unspecified,
         )
     }
 }

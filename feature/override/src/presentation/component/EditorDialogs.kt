@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import com.github.yumelira.yumebox.presentation.util.decodeObjectFields
 import com.github.yumelira.yumebox.presentation.util.encodeObjectFields
 import com.github.yumelira.yumebox.presentation.util.jsonElementToEditorValue
@@ -106,6 +107,7 @@ fun StringMapEditorDialog(
 ) {
     val entries = remember { mutableStateListOf<Pair<String, String>>() }
     val itemKeys = remember { mutableStateListOf<String>() }
+    val destructiveActionColors = yumeDestructiveActionColors()
 
     LaunchedEffect(value) {
         entries.clear()
@@ -173,6 +175,10 @@ fun StringMapEditorDialog(
                         entries[0] = "" to ""
                     }
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = destructiveActionColors.containerColor,
+                    contentColor = destructiveActionColors.contentColor,
+                ),
             ) {
                 Text(MLang.Override.Editor.DeleteLastItem)
             }
@@ -191,6 +197,7 @@ fun JsonObjectListEditorDialog(
     val itemKeys = remember { mutableStateListOf<String>() }
     var editingIndex by remember { mutableIntStateOf(-1) }
     val showItemEditor = remember { mutableStateOf(false) }
+    val destructiveActionColors = yumeDestructiveActionColors()
 
     LaunchedEffect(value) {
         drafts.clear()
@@ -260,6 +267,10 @@ fun JsonObjectListEditorDialog(
                                     drafts.removeAt(index)
                                     itemKeys.removeAt(index)
                                 },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = destructiveActionColors.containerColor,
+                                    contentColor = destructiveActionColors.contentColor,
+                                ),
                             ) {
                                 Text(MLang.Override.Card.Delete)
                             }
@@ -347,6 +358,7 @@ fun JsonObjectMapEditorDialog(
     val itemKeys = remember { mutableStateListOf<String>() }
     var editingIndex by remember { mutableIntStateOf(-1) }
     val showItemEditor = remember { mutableStateOf(false) }
+    val destructiveActionColors = yumeDestructiveActionColors()
 
     LaunchedEffect(value) {
         drafts.clear()
@@ -407,6 +419,10 @@ fun JsonObjectMapEditorDialog(
                                     drafts.removeAt(index)
                                     itemKeys.removeAt(index)
                                 },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = destructiveActionColors.containerColor,
+                                    contentColor = destructiveActionColors.contentColor,
+                                ),
                             ) {
                                 Text(MLang.Override.Card.Delete)
                             }
@@ -700,6 +716,7 @@ private fun SubRuleEntryCard(
     onDelete: () -> Unit,
 ) {
     var nameText by remember(name) { mutableStateOf(name) }
+    val destructiveActionColors = yumeDestructiveActionColors()
 
     Card(
         insideMargin = androidx.compose.foundation.layout.PaddingValues(UiDp.dp12),
@@ -732,6 +749,10 @@ private fun SubRuleEntryCard(
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onDelete,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = destructiveActionColors.containerColor,
+                    contentColor = destructiveActionColors.contentColor,
+                ),
             ) {
                 Text(MLang.Override.Card.Delete)
             }

@@ -26,8 +26,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -61,7 +61,10 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @SuppressLint("UseKtx")
 @Composable
-fun ProfilesPager(mainInnerPadding: PaddingValues) {
+fun ProfilesPager(
+    mainInnerPadding: PaddingValues,
+    lazyListState: LazyListState,
+) {
     val navigator = LocalNavigator.current
     val profilesViewModel = koinViewModel<ProfilesViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
@@ -157,7 +160,6 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                 secondLine = MLang.ProfilesPage.Empty.Hint
             )
         } else {
-            val lazyListState = rememberLazyListState()
             val reorderableLazyListState =
                 rememberReorderableLazyListState(lazyListState) { from, to ->
                     profilesViewModel.reorderProfiles(from.index, to.index)

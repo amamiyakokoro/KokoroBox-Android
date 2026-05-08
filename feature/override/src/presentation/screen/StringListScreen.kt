@@ -110,6 +110,7 @@ fun OverrideStringListEditorScreen(
                     OverrideTopBarAction(
                         icon = AppMd3Icons.Action.Undo,
                         contentDescription = MLang.Override.Editor.ClearCurrentMode,
+                        destructive = true,
                         onClick = { showResetDialog = true },
                     )
                 },
@@ -256,6 +257,7 @@ private fun StringListEntryCard(
                 imageVector = AppMd3Icons.Action.Delete,
                 contentDescription = MLang.Override.Card.Delete,
                 onClick = onDelete,
+                tone = OverrideActionTone.Danger,
             )
         }
     }

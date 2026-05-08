@@ -75,6 +75,7 @@ import com.github.yumelira.yumebox.presentation.component.CenteredText
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.LocalBottomBarScrollBehavior
 import com.github.yumelira.yumebox.presentation.component.SmallTopBar
+import com.github.yumelira.yumebox.presentation.component.rememberRetainedLazyGridState
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeCard
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupCard
@@ -155,7 +156,9 @@ fun ProxyPager(
     val effectiveTestingProxyNames = remember(testingProxyNames, pendingTestProxyName) {
         pendingTestProxyName?.let { testingProxyNames + it } ?: testingProxyNames
     }
-    val gridState = remember(displayTunnelMode, selectedGroupName, effectiveSelectedGroupName) { LazyGridState() }
+    val gridState = rememberRetainedLazyGridState(
+        "main_proxy_${displayTunnelMode.name}_${effectiveSelectedGroupName.orEmpty()}"
+    )
     val modes = remember { listOf(TunnelState.Mode.Rule, TunnelState.Mode.Global, TunnelState.Mode.Direct) }
 
     LaunchedEffect(tunnelMode) {

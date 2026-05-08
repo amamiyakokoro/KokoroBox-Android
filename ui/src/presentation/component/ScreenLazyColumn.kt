@@ -20,7 +20,7 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.theme.LocalSpacing
+import com.github.yumelira.yumebox.presentation.theme.UiDp
+import top.yukonga.miuix.kmp.utils.overScrollVertical
 
 @Composable
 fun ScreenLazyColumn(
@@ -118,6 +120,7 @@ fun ScreenLazyColumn(
         state = lazyListState,
         modifier = modifier
             .fillMaxSize()
+            .overScrollVertical()
             .nestedScroll(fabScrollObserver)
             .let { mod ->
                 if (enableGlobalScroll && bottomBarScrollBehavior != null) {

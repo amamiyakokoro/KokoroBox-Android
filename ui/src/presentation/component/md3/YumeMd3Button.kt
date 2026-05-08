@@ -32,6 +32,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
@@ -135,9 +136,10 @@ fun YumeMd3DialogFilledButtonRow(
 
 @Composable
 private fun yumeMd3FilledButtonColors(destructive: Boolean): ButtonColors = if (destructive) {
+    val destructiveColors = yumeDestructiveActionColors()
     ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.error,
-        contentColor = MaterialTheme.colorScheme.onError,
+        containerColor = destructiveColors.containerColor,
+        contentColor = destructiveColors.contentColor,
     )
 } else {
     ButtonDefaults.buttonColors(
@@ -149,7 +151,7 @@ private fun yumeMd3FilledButtonColors(destructive: Boolean): ButtonColors = if (
 @Composable
 private fun yumeMd3TextButtonColors(destructive: Boolean): ButtonColors = if (destructive) {
     ButtonDefaults.textButtonColors(
-        contentColor = MaterialTheme.colorScheme.error,
+        contentColor = yumeDestructiveActionColors().contentColor,
     )
 } else {
     ButtonDefaults.textButtonColors()

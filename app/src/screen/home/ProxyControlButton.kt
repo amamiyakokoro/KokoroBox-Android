@@ -53,6 +53,7 @@ import com.github.yumelira.yumebox.common.AppConstants
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 
@@ -70,6 +71,8 @@ fun ProxyControlButton(
     val scaleAnim = remember { Animatable(1f) }
     val cornerRadius = AppConstants.UI.BUTTON_CORNER_RADIUS
     val buttonWidthFraction = 0.3f
+
+    val destructiveActionColors = yumeDestructiveActionColors()
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -117,7 +120,18 @@ fun ProxyControlButton(
                     color = MaterialTheme.colorScheme.outline,
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius)
                 ),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isRunning) {
+                    destructiveActionColors.containerColor
+                } else {
+                    MaterialTheme.colorScheme.background
+                },
+                contentColor = if (isRunning) {
+                    destructiveActionColors.contentColor
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
+            ),
             shape = RoundedCornerShape(cornerRadius),
         ) {
             AnimatedContent(
@@ -150,7 +164,7 @@ fun ProxyControlButton(
                 Icon(
                     imageVector = if (running) AppMd3Icons.Shell.StopProxy else AppMd3Icons.Shell.StartProxy,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = if (running) destructiveActionColors.contentColor else MaterialTheme.colorScheme.primary
                 )
             }
         }

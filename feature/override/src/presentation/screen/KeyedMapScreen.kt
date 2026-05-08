@@ -137,6 +137,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.DeleteSelected,
+                            destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
                                     val mode = OverrideStructuredEditorStore.keyedObjectMapEditorSelectedMode
@@ -156,11 +157,13 @@ fun OverrideKeyedObjectMapEditorScreen(
                             icon = AppMd3Icons.Action.Undo,
                             contentDescription = MLang.Override.Editor.ClearMode,
                             spacedFromNext = true,
+                            destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            destructive = true,
                             onClick = {
                                 isDeleteMode = true
                                 clearSelection()

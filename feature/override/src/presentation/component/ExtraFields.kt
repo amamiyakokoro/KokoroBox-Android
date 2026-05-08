@@ -78,6 +78,7 @@ fun OverrideExtraFieldsCard(
                                 imageVector = AppMd3Icons.Action.Delete,
                                 contentDescription = MLang.Override.Draft.DeleteExtraField,
                                 onClick = { onDeleteClick(entry.key) },
+                                tone = OverrideActionTone.Danger,
                             )
                         },
                     )

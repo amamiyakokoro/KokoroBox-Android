@@ -42,6 +42,7 @@ import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTex
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 
 val OverrideSectionSpacing = UiDp.dp12
 val OverrideSectionTitleSpacing = UiDp.dp8
@@ -295,6 +296,7 @@ fun OverrideCardActionIconButton(
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val sizes = AppTheme.sizes
+    val destructiveActionColors = yumeDestructiveActionColors()
     val (backgroundColor, iconTint) = when (tone) {
         OverrideActionTone.Neutral -> {
             colorScheme.secondaryContainer.copy(alpha = 0.78f) to
@@ -307,8 +309,8 @@ fun OverrideCardActionIconButton(
         }
 
         OverrideActionTone.Danger -> {
-            colorScheme.error.copy(alpha = 0.1f) to
-                colorScheme.error.copy(alpha = if (enabled) 1f else 0.45f)
+            destructiveActionColors.containerColor to
+                destructiveActionColors.contentColor.copy(alpha = if (enabled) 1f else 0.45f)
         }
     }
 

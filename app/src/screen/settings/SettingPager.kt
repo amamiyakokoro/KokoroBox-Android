@@ -27,6 +27,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -118,7 +119,10 @@ private fun CircularIcon(
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable
-fun SettingPager(mainInnerPadding: PaddingValues) {
+fun SettingPager(
+    mainInnerPadding: PaddingValues,
+    lazyListState: LazyListState,
+) {
     val viewModel = koinViewModel<SettingViewModel>()
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val navigator = LocalNavigator.current
@@ -190,6 +194,7 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
     ) { innerPadding ->
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, mainInnerPadding),
+            lazyListState = lazyListState,
         ) {
 
             item {

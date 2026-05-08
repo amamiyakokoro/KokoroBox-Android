@@ -73,6 +73,7 @@ import com.github.yumelira.yumebox.presentation.component.rememberStandalonePage
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -129,6 +130,8 @@ fun LogScreen(navigator: DestinationsNavigator) {
         }
     }
 
+    val destructiveActionColors = yumeDestructiveActionColors()
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -182,12 +185,12 @@ fun LogScreen(navigator: DestinationsNavigator) {
                         bottom = componentSizes.floatingActionButtonBottomInset,
                     ),
                     containerColor = if (isRecording) {
-                        MaterialTheme.colorScheme.error
+                        destructiveActionColors.containerColor
                     } else {
                         MaterialTheme.colorScheme.primaryContainer
                     },
                     contentColor = if (isRecording) {
-                        MaterialTheme.colorScheme.onError
+                        destructiveActionColors.contentColor
                     } else {
                         MaterialTheme.colorScheme.onPrimaryContainer
                     },

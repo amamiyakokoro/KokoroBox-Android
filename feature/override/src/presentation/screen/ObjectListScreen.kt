@@ -193,6 +193,7 @@ fun OverrideObjectListEditorScreen(
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.DeleteSelected,
+                            destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
                                     when (editorType) {
@@ -226,11 +227,13 @@ fun OverrideObjectListEditorScreen(
                             icon = AppMd3Icons.Action.Undo,
                             contentDescription = MLang.Override.Editor.ClearCurrentMode,
                             spacedFromNext = true,
+                            destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            destructive = true,
                             onClick = {
                                 isDeleteMode = true
                                 clearSelection()

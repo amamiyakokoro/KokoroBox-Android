@@ -52,6 +52,7 @@ import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTex
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.Spacing
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import com.github.yumelira.yumebox.presentation.viewmodel.OverrideConfigViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
@@ -357,6 +358,7 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
     onDelete: () -> Unit,
 ) {
     val colorScheme = MaterialTheme.colorScheme
+    val destructiveActionColors = yumeDestructiveActionColors()
     val accentTintColor = colorScheme.primary
     val descriptionText = config.description?.takeIf(String::isNotBlank) ?: MLang.Override.Card.NoDescription
 
@@ -443,8 +445,8 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
                     imageVector = AppMd3Icons.Action.Delete,
                     contentDescription = MLang.Override.Card.Delete,
                     onClick = onDelete,
-                    containerColor = colorScheme.error.copy(alpha = 0.10f),
-                    contentColor = colorScheme.error,
+                    containerColor = destructiveActionColors.containerColor,
+                    contentColor = destructiveActionColors.contentColor,
                 )
             }
         }

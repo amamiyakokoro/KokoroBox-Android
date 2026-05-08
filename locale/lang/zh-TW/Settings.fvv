@@ -31,7 +31,7 @@ Settings = {
         ImportBackup = "匯入備份"
         ImportBackupSummary = "從備份檔案還原使用者設定"
         AppDataManagement = "應用程式資料管理"
-        AppDataManagementSummary = "管理 GeoX 歷史下載與快取"
+        AppDataManagementSummary = "清理部分快取檔案"
     }
 
     More = {
