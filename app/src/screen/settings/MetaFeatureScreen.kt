@@ -22,6 +22,8 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +43,7 @@ import com.github.yumelira.yumebox.core.model.GeoXItem
 import com.github.yumelira.yumebox.core.model.geoXItems
 import com.github.yumelira.yumebox.core.util.runtimeHomeDir
 import com.github.yumelira.yumebox.data.controller.GeoXDataController
+import com.github.yumelira.yumebox.data.controller.GeoXUpdateRecord
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.substore.util.DownloadProgress
 import com.github.yumelira.yumebox.substore.util.SubStoreDownloadClient
@@ -57,6 +60,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 private data class GeoXDownloadProgressState(
     val itemTitle: String,
@@ -84,6 +90,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
     val geoXDataController: GeoXDataController = koinInject()
 
     val showGeoXDownloadSheet = remember { mutableStateOf(false) }
+    val showGeoXImportSheet = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -141,6 +148,11 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                         summary = MLang.MetaFeature.GeoX.OnlineUpdateSummary,
                         onClick = { showGeoXDownloadSheet.value = true },
                     )
+                    PreferenceArrowItem(
+                        title = MLang.MetaFeature.GeoX.LocalUpdateTitle,
+                        summary = MLang.MetaFeature.GeoX.LocalUpdateSummary,
+                        onClick = { showGeoXImportSheet.value = true },
+                    )
                 }
             }
         }
@@ -150,6 +162,13 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             context = context,
             scope = scope,
             downloadClient = downloadClient,
+            geoXDataController = geoXDataController,
+        )
+
+        GeoXImportSheet(
+            show = showGeoXImportSheet,
+            context = context,
+            scope = scope,
             geoXDataController = geoXDataController,
         )
     }
@@ -165,6 +184,7 @@ private fun GeoXDownloadSheet(
 ) {
     val selectedItems = remember { mutableStateMapOf<GeoFileType, Boolean>() }
     val progressItems = remember { mutableStateMapOf<GeoFileType, GeoXDownloadProgressState>() }
+    var updateRecords by remember { mutableStateOf(geoXDataController.getGeoFileUpdateRecords()) }
     var isDownloading by remember { mutableStateOf(false) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var downloadSession by remember { mutableIntStateOf(0) }
@@ -226,6 +246,7 @@ private fun GeoXDownloadSheet(
                             if (currentSession == downloadSession) {
                                 isDownloading = false
                                 downloadJob = null
+                                updateRecords = geoXDataController.getGeoFileUpdateRecords()
                                 context.toast(MLang.MetaFeature.Download.DownloadComplete.format(successCount, totalCount))
                             }
                         },
@@ -238,6 +259,7 @@ private fun GeoXDownloadSheet(
                 geoXItems.forEach { item ->
                     PreferenceListItem(
                         title = item.title,
+                        summary = item.lastUpdateSummary(updateRecords[item.fileName]),
                         endActions = {
                             Checkbox(
                                 checked = selectedItems[item.type] ?: false,
@@ -254,12 +276,78 @@ private fun GeoXDownloadSheet(
                 }
                 if (isDownloading || progressItems.isNotEmpty()) {
                     GeoXDownloadProgressContent(
-                        items = progressItems.values.toList(),
+                        items = geoXItems.mapNotNull { progressItems[it.type] },
                         isUpdating = isDownloading,
                     )
                 }
             }
         })
+}
+
+@Composable
+private fun GeoXImportSheet(
+    show: MutableState<Boolean>,
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    geoXDataController: GeoXDataController,
+) {
+    var importTargetItem by remember { mutableStateOf<GeoXItem?>(null) }
+    var updateRecords by remember { mutableStateOf(geoXDataController.getGeoFileUpdateRecords()) }
+    var isImporting by remember { mutableStateOf(false) }
+
+    val importGeoFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri ->
+        val targetItem = importTargetItem
+        importTargetItem = null
+        if (uri == null || targetItem == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            isImporting = true
+            val imported = withContext(Dispatchers.IO) {
+                geoXDataController.importGeoFile(targetItem.fileName, uri)
+            }
+            updateRecords = geoXDataController.getGeoFileUpdateRecords()
+            isImporting = false
+            context.toast(
+                if (imported) {
+                    MLang.MetaFeature.Download.ImportSuccess.format(targetItem.title)
+                } else {
+                    MLang.MetaFeature.Download.ImportFailed.format(targetItem.title)
+                }
+            )
+        }
+    }
+
+    AppActionBottomSheet(
+        show = show.value,
+        title = MLang.MetaFeature.Download.LocalDialogTitle,
+        onDismissRequest = { if (!isImporting) show.value = false },
+        startAction = {
+            AppBottomSheetCloseAction(
+                enabled = !isImporting,
+                onClick = { show.value = false },
+            )
+        },
+        content = {
+            Column {
+                geoXItems.forEach { item ->
+                    PreferenceListItem(
+                        title = item.title,
+                        summary = item.lastUpdateSummary(updateRecords[item.fileName]),
+                        enabled = !isImporting,
+                        onClick = if (isImporting) {
+                            null
+                        } else {
+                            {
+                                importTargetItem = item
+                                importGeoFileLauncher.launch("*/*")
+                            }
+                        },
+                    )
+                }
+            }
+        },
+    )
 }
 
 private fun downloadGeoXFiles(
@@ -322,6 +410,24 @@ private fun downloadGeoXFiles(
             // Download was canceled by leaving the sheet/page. Keep the existing usable files untouched.
         }
     }
+}
+
+private fun GeoXItem.lastUpdateSummary(record: GeoXUpdateRecord?): String {
+    if (record == null) return MLang.MetaFeature.Download.LastUpdateNever
+    return MLang.MetaFeature.Download.LastUpdate.format(
+        record.source.displayName,
+        formatGeoXUpdateTime(record.timestamp),
+    )
+}
+
+private val com.github.yumelira.yumebox.data.controller.GeoXUpdateSource.displayName: String
+    get() = when (name) {
+        "Local" -> MLang.MetaFeature.Download.LastUpdateSourceLocal
+        else -> MLang.MetaFeature.Download.LastUpdateSourceOnline
+    }
+
+private fun formatGeoXUpdateTime(timestamp: Long): String {
+    return SimpleDateFormat("yy/MM/dd HH:mm:ss", Locale.getDefault()).format(Date(timestamp))
 }
 
 private fun DownloadProgress.toGeoXProgressState(

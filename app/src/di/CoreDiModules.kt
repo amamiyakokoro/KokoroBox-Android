@@ -90,7 +90,8 @@ val appFoundationModule = module {
     single { ProxyDisplaySettingsStore(get(named("proxy_display"))) }
     single { TrafficStatisticsStore(get(named("traffic_statistics"))) }
     single { AcgWallpaperStorage(androidContext()) }
-    single { UserSettingsBackupController(get(), get(), get(), get(), get(), get()) }
+    single { OverrideConfigStore(androidContext()) }
+    single { UserSettingsBackupController(get(), get(), get(), get(), get(), get(), get()) }
     single { GeoXDataController(androidContext()) }
 }
 
@@ -130,7 +131,6 @@ val appDataRuntimeModule = module {
         }
     }
 
-    single { OverrideConfigStore(androidContext()) }
     single<OverrideConfigProvider> { get<OverrideConfigStore>() }
 
     single { ProfileBindingStore(androidContext()) }

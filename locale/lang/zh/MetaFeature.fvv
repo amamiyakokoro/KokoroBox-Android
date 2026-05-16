@@ -9,8 +9,10 @@ MetaFeature = {
     }
 
     GeoX = {
-        OnlineUpdateTitle = "更新 GeoX"
-        OnlineUpdateSummary = "下载数据库文件"
+        OnlineUpdateTitle = "在线更新 GeoX"
+        OnlineUpdateSummary = "从远程源下载数据库文件"
+        LocalUpdateTitle = "本地更新 GeoX"
+        LocalUpdateSummary = "从本地文件导入并应用数据库"
         RuntimeHomeInfo = "GeoX 数据库文件下载并存放在内核目录：%s"
     }
 
@@ -26,7 +28,8 @@ MetaFeature = {
     }
 
     Download = {
-        DialogTitle = "更新 GeoX"
+        DialogTitle = "在线更新 GeoX"
+        LocalDialogTitle = "本地更新 GeoX"
         SelectFiles = "请选择要更新的文件"
         DownloadComplete = "下载完成：%d/%d"
         ProgressTitle = "正在更新 GeoX"
@@ -41,5 +44,11 @@ MetaFeature = {
         ProgressWaiting = "等待开始"
         ProgressSuccess = "文件已更新并通过校验"
         ProgressFailed = "下载或校验失败，已保留可用回退文件"
+        LastUpdate = "上次更新（%s）：%s"
+        LastUpdateSourceOnline = "在线"
+        LastUpdateSourceLocal = "本地"
+        LastUpdateNever = "暂无记录"
+        ImportSuccess = "%s 已导入并应用"
+        ImportFailed = "%s 导入失败：文件无效或校验未通过"
     }
 }

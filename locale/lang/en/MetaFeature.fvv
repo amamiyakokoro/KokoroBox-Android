@@ -9,8 +9,10 @@ MetaFeature = {
     }
 
     GeoX = {
-        OnlineUpdateTitle = "Update GeoX"
-        OnlineUpdateSummary = "Download Database"
+        OnlineUpdateTitle = "Update GeoX Online"
+        OnlineUpdateSummary = "Download database files from remote sources"
+        LocalUpdateTitle = "Update GeoX Locally"
+        LocalUpdateSummary = "Import and apply database files from local storage"
         RuntimeHomeInfo = "GeoX data downloads into the core directory: %s"
     }
 
@@ -27,6 +29,7 @@ MetaFeature = {
 
     Download = {
         DialogTitle = "Update GeoX Online"
+        LocalDialogTitle = "Update GeoX Locally"
         SelectFiles = "Please select files to update"
         DownloadComplete = "Download complete: %d/%d"
         ProgressTitle = "Updating GeoX"
@@ -41,5 +44,11 @@ MetaFeature = {
         ProgressWaiting = "Waiting to start"
         ProgressSuccess = "File updated and validated"
         ProgressFailed = "Download or validation failed; usable fallback file was kept"
+        LastUpdate = "Last update (%s): %s"
+        LastUpdateSourceOnline = "online"
+        LastUpdateSourceLocal = "local"
+        LastUpdateNever = "No record"
+        ImportSuccess = "%s imported and applied"
+        ImportFailed = "%s import failed: invalid file or validation failed"
     }
 }

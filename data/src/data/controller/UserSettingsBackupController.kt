@@ -42,6 +42,8 @@ import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.data.store.ProfileLink
 import com.github.yumelira.yumebox.data.store.ProfileLinksStore
 import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
+import com.github.yumelira.yumebox.data.store.OverrideConfigBackupEntry
+import com.github.yumelira.yumebox.data.store.OverrideConfigStore
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -76,10 +78,11 @@ class UserSettingsBackupController(
     private val profileLinksStore: ProfileLinksStore,
     private val proxyDisplaySettingsStore: ProxyDisplaySettingsStore,
     private val acgWallpaperStorage: AcgWallpaperStorage,
+    private val overrideConfigStore: OverrideConfigStore,
 ) {
     companion object {
         const val BACKUP_FORMAT = "YumeBoxUserSettingsBackup"
-        const val BACKUP_VERSION = 2
+        const val BACKUP_VERSION = 3
     }
 
     private val json = Json {
@@ -88,7 +91,7 @@ class UserSettingsBackupController(
         encodeDefaults = true
     }
 
-    fun exportToJson(): String {
+    suspend fun exportToJson(): String {
         val backup = UserSettingsBackup(
             stores = buildJsonObject {
                 put("app", exportAppSettings())
@@ -96,13 +99,14 @@ class UserSettingsBackupController(
                 put("network", exportNetworkSettings())
                 put("profileLinks", exportProfileLinks())
                 put("proxyDisplay", exportProxyDisplaySettings())
+                put("overrideConfigs", exportOverrideConfigs())
             },
             assets = exportAssets(),
         )
         return json.encodeToString(UserSettingsBackup.serializer(), backup)
     }
 
-    fun importFromJson(rawJson: String) {
+    suspend fun importFromJson(rawJson: String) {
         val backup = json.decodeFromString(UserSettingsBackup.serializer(), rawJson)
         require(backup.format == BACKUP_FORMAT) { "Unsupported backup format" }
         require(backup.version <= BACKUP_VERSION) { "Unsupported backup version" }
@@ -112,6 +116,7 @@ class UserSettingsBackupController(
         backup.stores["network"]?.jsonObject?.let(::importNetworkSettings)
         backup.stores["profileLinks"]?.jsonObject?.let(::importProfileLinks)
         backup.stores["proxyDisplay"]?.jsonObject?.let(::importProxyDisplaySettings)
+        backup.stores["overrideConfigs"]?.jsonObject?.let { obj -> importOverrideConfigs(obj) }
         importAssets(backup.assets)
     }
 
@@ -150,6 +155,7 @@ class UserSettingsBackupController(
         put("invertOnPrimaryColors", appSettingsStore.invertOnPrimaryColors.value)
         put("automaticRestart", appSettingsStore.automaticRestart.value)
         put("autoUpdateCurrentProfileOnStart", appSettingsStore.autoUpdateCurrentProfileOnStart.value)
+        put("hideAppIcon", appSettingsStore.hideAppIcon.value)
         put("excludeFromRecents", appSettingsStore.excludeFromRecents.value)
         put("showTrafficNotification", appSettingsStore.showTrafficNotification.value)
         put("bottomBarAutoHide", appSettingsStore.bottomBarAutoHide.value)
@@ -173,6 +179,7 @@ class UserSettingsBackupController(
         put("acgSidebarExpanded", appSettingsStore.acgSidebarExpanded.value)
         put("pageScale", appSettingsStore.pageScale.value)
         put("singleNodeTest", appSettingsStore.singleNodeTest.value)
+        put("healthCheckConcurrency", appSettingsStore.healthCheckConcurrency.value)
         put("screenshotProtectionEnabled", appSettingsStore.screenshotProtectionEnabled.value)
         put("biometricUnlockEnabled", appSettingsStore.biometricUnlockEnabled.value)
         put("customUserAgent", appSettingsStore.customUserAgent.value)
@@ -190,6 +197,7 @@ class UserSettingsBackupController(
         obj.bool("invertOnPrimaryColors")?.let(appSettingsStore.invertOnPrimaryColors::set)
         obj.bool("automaticRestart")?.let(appSettingsStore.automaticRestart::set)
         obj.bool("autoUpdateCurrentProfileOnStart")?.let(appSettingsStore.autoUpdateCurrentProfileOnStart::set)
+        obj.bool("hideAppIcon")?.let(appSettingsStore.hideAppIcon::set)
         obj.bool("excludeFromRecents")?.let(appSettingsStore.excludeFromRecents::set)
         obj.bool("showTrafficNotification")?.let(appSettingsStore.showTrafficNotification::set)
         obj.bool("bottomBarAutoHide")?.let(appSettingsStore.bottomBarAutoHide::set)
@@ -213,6 +221,14 @@ class UserSettingsBackupController(
         obj.bool("acgSidebarExpanded")?.let(appSettingsStore.acgSidebarExpanded::set)
         obj.float("pageScale")?.let(appSettingsStore.pageScale::set)
         obj.bool("singleNodeTest")?.let(appSettingsStore.singleNodeTest::set)
+        obj.int("healthCheckConcurrency")?.let { concurrency ->
+            appSettingsStore.healthCheckConcurrency.set(
+                when (concurrency) {
+                    16, 24, 32 -> concurrency
+                    else -> 8
+                },
+            )
+        }
         obj.bool("screenshotProtectionEnabled")?.let(appSettingsStore.screenshotProtectionEnabled::set)
         obj.bool("biometricUnlockEnabled")?.let(appSettingsStore.biometricUnlockEnabled::set)
         obj.string("customUserAgent")?.let(appSettingsStore.customUserAgent::set)
@@ -298,6 +314,25 @@ class UserSettingsBackupController(
             }.getOrNull()?.let(profileLinksStore.links::set)
         }
         obj.string("defaultLinkId")?.let(profileLinksStore.defaultLinkId::set)
+    }
+
+    private suspend fun exportOverrideConfigs(): JsonObject = buildJsonObject {
+        put(
+            "configs",
+            json.encodeToJsonElement(
+                ListSerializer(OverrideConfigBackupEntry.serializer()),
+                overrideConfigStore.exportUserConfigBackup(),
+            ),
+        )
+    }
+
+    private suspend fun importOverrideConfigs(obj: JsonObject) {
+        val entries = obj["configs"]?.let { element ->
+            runCatching {
+                json.decodeFromJsonElement(ListSerializer(OverrideConfigBackupEntry.serializer()), element)
+            }.getOrNull()
+        } ?: return
+        overrideConfigStore.importUserConfigBackup(entries)
     }
 
     private fun exportProxyDisplaySettings(): JsonObject = buildJsonObject {

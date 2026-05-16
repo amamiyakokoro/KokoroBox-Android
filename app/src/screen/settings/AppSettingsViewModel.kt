@@ -38,6 +38,7 @@ import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEM
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -229,11 +230,15 @@ class AppSettingsViewModel(
     fun applyCustomUserAgent(userAgent: String) = controller.applyCustomUserAgent(userAgent)
 
     fun exportUserSettingsBackup(): Result<String> = runCatching {
-        userSettingsBackupController.exportToJson()
+        runBlocking {
+            userSettingsBackupController.exportToJson()
+        }
     }
 
     fun importUserSettingsBackup(rawJson: String): Result<Unit> = runCatching {
-        userSettingsBackupController.importFromJson(rawJson)
+        runBlocking {
+            userSettingsBackupController.importFromJson(rawJson)
+        }
         controller.applyAppLanguage(appLanguage.value)
         controller.applyCustomUserAgent(customUserAgent.value)
     }

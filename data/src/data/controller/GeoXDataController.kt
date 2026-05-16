@@ -32,6 +32,7 @@
 package com.github.yumelira.yumebox.data.controller
 
 import android.content.Context
+import android.net.Uri
 import com.github.yumelira.yumebox.core.Clash
 import com.github.yumelira.yumebox.core.model.GeoFileType
 import com.github.yumelira.yumebox.core.util.runtimeHomeDir
@@ -41,14 +42,26 @@ import java.io.IOException
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.Properties
 
 private const val MIN_GEO_FILE_SIZE_BYTES = 64 * 1024L
+private const val GEO_UPDATE_RECORD_FILE = "geo-update.properties"
 private val MANAGED_GEO_FILES = listOf("geoip.metadb", "geosite.dat", "country.mmdb", "ASN.mmdb")
 private val GEO_FILE_TYPE_BY_NAME = mapOf(
     "geoip.metadb" to GeoFileType.GeoIP,
     "geosite.dat" to GeoFileType.GeoSite,
     "ASN.mmdb" to GeoFileType.ASN,
     "country.mmdb" to GeoFileType.Country,
+)
+
+enum class GeoXUpdateSource {
+    Online,
+    Local,
+}
+
+data class GeoXUpdateRecord(
+    val timestamp: Long,
+    val source: GeoXUpdateSource,
 )
 
 data class GeoXCacheEntry(
@@ -65,6 +78,7 @@ class GeoXDataController(
     private val fallbackDir: File get() = runtimeHome.resolve("geo-fallback")
     private val fallbackOldDir: File get() = runtimeHome.resolve("geo-fallback-old")
     private val cacheDir: File get() = runtimeHome.resolve("geo-cache")
+    private val updateRecordFile: File get() = runtimeHome.resolve(GEO_UPDATE_RECORD_FILE)
 
     fun ensureGeoFiles() {
         runtimeHome.mkdirs()
@@ -90,6 +104,41 @@ class GeoXDataController(
             return false
         }
 
+        return promoteGeoFile(active, filename, GeoXUpdateSource.Online)
+    }
+
+    fun importGeoFile(filename: String, sourceUri: Uri): Boolean {
+        if (filename !in MANAGED_GEO_FILES) return false
+        runtimeHome.mkdirs()
+        val tempFile = File(runtimeHome, "$filename.${System.currentTimeMillis()}.import.tmp")
+        return try {
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                tempFile.outputStream().buffered().use { output -> input.copyTo(output) }
+            } ?: return false
+            if (!isGeoFileUsable(tempFile, filename, deep = true)) {
+                tempFile.delete()
+                return false
+            }
+            promoteGeoFile(tempFile, filename, GeoXUpdateSource.Local)
+        } catch (error: Exception) {
+            tempFile.delete()
+            Timber.w(error, "Failed to import geo file: %s", filename)
+            false
+        }
+    }
+
+    private fun promoteGeoFile(source: File, filename: String, updateSource: GeoXUpdateSource): Boolean {
+        if (!isGeoFileUsable(source, filename, deep = true)) {
+            source.delete()
+            restoreBestFallback(filename)
+            return false
+        }
+
+        val active = runtimeHome.resolve(filename)
+        if (source.canonicalPath != active.canonicalPath) {
+            replaceFile(source, active)
+        }
+
         fallbackDir.mkdirs()
         cacheDir.mkdirs()
         ensureBundledOldFallback(filename)
@@ -102,7 +151,23 @@ class GeoXDataController(
         }
 
         copyFile(active, currentFallback)
+        recordGeoFileUpdate(filename, updateSource)
         return true
+    }
+
+    fun getGeoFileUpdateRecords(): Map<String, GeoXUpdateRecord> {
+        val records = loadUpdateRecords()
+        return MANAGED_GEO_FILES.mapNotNull { filename ->
+            val timestamp = records.getProperty(filename)?.toLongOrNull()?.takeIf { it > 0L } ?: return@mapNotNull null
+            val source = records.getProperty("$filename.source")
+                ?.let { value -> GeoXUpdateSource.entries.firstOrNull { it.name == value } }
+                ?: GeoXUpdateSource.Online
+            filename to GeoXUpdateRecord(timestamp, source)
+        }.toMap()
+    }
+
+    fun getGeoFileUpdateTimes(): Map<String, Long> {
+        return getGeoFileUpdateRecords().mapValues { it.value.timestamp }
     }
 
     fun listHistoryCache(): List<GeoXCacheEntry> {
@@ -243,6 +308,34 @@ class GeoXDataController(
         replaceFile(file, cacheFile)
     }
 
+    private fun recordGeoFileUpdate(filename: String, source: GeoXUpdateSource) {
+        runCatching {
+            runtimeHome.mkdirs()
+            val records = loadUpdateRecords()
+            records.setProperty(filename, System.currentTimeMillis().toString())
+            records.setProperty("$filename.source", source.name)
+            val tempFile = File(runtimeHome, "$GEO_UPDATE_RECORD_FILE.${System.currentTimeMillis()}.tmp")
+            tempFile.outputStream().buffered().use { output ->
+                records.store(output, null)
+            }
+            replaceFile(tempFile, updateRecordFile)
+        }.onFailure {
+            Timber.w(it, "Failed to record geo file update: %s", filename)
+        }
+    }
+
+    private fun loadUpdateRecords(): Properties {
+        val records = Properties()
+        if (updateRecordFile.isFile) {
+            runCatching {
+                updateRecordFile.inputStream().buffered().use(records::load)
+            }.onFailure {
+                Timber.w(it, "Failed to load geo file update records")
+            }
+        }
+        return records
+    }
+
     private fun copyFile(source: File, target: File) {
         target.parentFile?.mkdirs()
         source.inputStream().use { input ->
@@ -266,7 +359,7 @@ class GeoXDataController(
 
     private fun cleanupBrokenTemporaryFiles() {
         runtimeHome.listFiles()?.forEach { file ->
-            if (file.isFile && (file.name.endsWith(".download") || file.name.endsWith(".asset.tmp") || file.name.endsWith(".copy.tmp"))) {
+            if (file.isFile && (file.name.endsWith(".download") || file.name.endsWith(".import.tmp") || file.name.endsWith(".asset.tmp") || file.name.endsWith(".copy.tmp"))) {
                 file.delete()
             }
         }
