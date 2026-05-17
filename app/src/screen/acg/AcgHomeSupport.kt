@@ -93,12 +93,9 @@ internal object AcgUi {
         val dividerWidth = acgSizes.settingsIconGlyphSize
         val dividerHeight = acgSpacing.space2
         val iconSpacing = acgSpacing.space20
-        val iconPillHorizontalPadding = acgSpacing.space10
-        val iconPillVerticalPadding = acgSpacing.space10
         val iconSize = UiDp.dp22
         val iconContainerSize = UiDp.dp48
         val modeLetterSpacing = 1.4.sp
-        val IconPillAlpha = 0.10f
         val IconButtonPressedAlpha = 0.18f
         val digitLetterSpacing = 1.6.sp
         val TimeAlpha = 0.92f
@@ -216,15 +213,7 @@ private fun AcgSidebarValueStack(
 private fun AcgSidebarIconRail(
     icons: List<AcgSidebarIconItem>,
 ) {
-    val colorScheme = MiuixTheme.colorScheme
     Column(
-        modifier = Modifier
-            .clip(AcgUi.Shape.launchButton)
-            .background(colorScheme.surface.copy(alpha = AcgUi.Sidebar.IconPillAlpha))
-            .padding(
-                horizontal = AcgUi.Sidebar.iconPillHorizontalPadding,
-                vertical = AcgUi.Sidebar.iconPillVerticalPadding,
-            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(AcgUi.Sidebar.iconSpacing),
     ) {

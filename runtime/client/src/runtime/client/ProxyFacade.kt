@@ -584,6 +584,9 @@ class ProxyFacade(
             }
 
             if (groups != null) {
+                if (snapshot.phase == RuntimePhase.Running) {
+                    syncObservedRuntimeSelections(groups)
+                }
                 val normalizedGroups = groupsForMode(requestedMode, groups)
                 val groupsToPublish = normalizedGroups.ifEmpty {
                     if (!snapshot.running) fallbackPreviewGroups(snapshot, requestedMode).orEmpty() else emptyList()
@@ -636,6 +639,7 @@ class ProxyFacade(
             } ?: return
 
             val requestedMode = proxyDisplaySettingsStorage.proxyMode.value
+            syncObservedRuntimeSelections(listOf(updatedGroup))
             val updatedGroups = groupsForMode(requestedMode, updateCachedProxyGroup(updatedGroup))
             if (proxyDisplaySettingsStorage.proxyMode.value == requestedMode) {
                 publishProxyGroups(updatedGroups, cacheForPreview = true, mode = requestedMode)
@@ -1420,6 +1424,49 @@ class ProxyFacade(
                 hidden = false,
             ),
         )
+    }
+
+    private suspend fun syncObservedRuntimeSelections(groups: List<ProxyGroupInfo>) {
+        val snapshot = _runtimeSnapshot.value
+        if (snapshot.phase != RuntimePhase.Running || !snapshot.running || groups.isEmpty()) {
+            return
+        }
+        val profileUuid = _currentProfile.value?.uuid
+            ?: snapshot.profileUuid?.let { raw -> runCatching { UUID.fromString(raw) }.getOrNull() }
+            ?: return
+
+        withContext(Dispatchers.IO) {
+            val rememberedSelections = SelectionDao.querySelections(profileUuid)
+                .associate { selection -> selection.proxy.trim() to selection.selected.trim() }
+            groups.forEach { group ->
+                val groupName = group.name.trim()
+                val selectedProxy = group.now.trim()
+                if (!group.isRestorableSelectorSelection(groupName, selectedProxy)) {
+                    return@forEach
+                }
+                if (rememberedSelections[groupName] == selectedProxy) {
+                    return@forEach
+                }
+                Timber.d(
+                    "Sync observed selector selection: profile=%s group=%s proxy=%s",
+                    profileUuid,
+                    groupName,
+                    selectedProxy,
+                )
+                SelectionDao.upsertManualSelection(profileUuid, groupName, selectedProxy)
+            }
+        }
+    }
+
+    private fun ProxyGroupInfo.isRestorableSelectorSelection(
+        groupName: String,
+        selectedProxy: String,
+    ): Boolean {
+        if (groupName.isEmpty() || selectedProxy.isEmpty()) return false
+        if (type != Proxy.Type.Selector) return false
+        if (groupName.equals(ZAKO_GROUP_NAME, ignoreCase = true)) return false
+        if (groupName.equals("DIRECT", ignoreCase = true) && proxies.size == 1) return false
+        return proxies.any { proxy -> proxy.name == selectedProxy }
     }
 
     private fun publishProxyGroups(
