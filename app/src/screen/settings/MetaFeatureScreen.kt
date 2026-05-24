@@ -91,6 +91,11 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
 
     val showGeoXDownloadSheet = remember { mutableStateOf(false) }
     val showGeoXImportSheet = remember { mutableStateOf(false) }
+    var geoXUpdateRecords by remember { mutableStateOf(geoXDataController.getGeoFileUpdateRecords()) }
+
+    fun refreshGeoXUpdateRecords() {
+        geoXUpdateRecords = geoXDataController.getGeoFileUpdateRecords()
+    }
 
     Scaffold(
         topBar = {
@@ -146,12 +151,18 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                     PreferenceArrowItem(
                         title = MLang.MetaFeature.GeoX.OnlineUpdateTitle,
                         summary = MLang.MetaFeature.GeoX.OnlineUpdateSummary,
-                        onClick = { showGeoXDownloadSheet.value = true },
+                        onClick = {
+                            refreshGeoXUpdateRecords()
+                            showGeoXDownloadSheet.value = true
+                        },
                     )
                     PreferenceArrowItem(
                         title = MLang.MetaFeature.GeoX.LocalUpdateTitle,
                         summary = MLang.MetaFeature.GeoX.LocalUpdateSummary,
-                        onClick = { showGeoXImportSheet.value = true },
+                        onClick = {
+                            refreshGeoXUpdateRecords()
+                            showGeoXImportSheet.value = true
+                        },
                     )
                 }
             }
@@ -163,6 +174,9 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             scope = scope,
             downloadClient = downloadClient,
             geoXDataController = geoXDataController,
+            updateRecords = geoXUpdateRecords,
+            onUpdateRecordsChanged = { geoXUpdateRecords = it },
+            onRefreshUpdateRecords = ::refreshGeoXUpdateRecords,
         )
 
         GeoXImportSheet(
@@ -170,6 +184,9 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             context = context,
             scope = scope,
             geoXDataController = geoXDataController,
+            updateRecords = geoXUpdateRecords,
+            onUpdateRecordsChanged = { geoXUpdateRecords = it },
+            onRefreshUpdateRecords = ::refreshGeoXUpdateRecords,
         )
     }
 }
@@ -181,10 +198,12 @@ private fun GeoXDownloadSheet(
     scope: kotlinx.coroutines.CoroutineScope,
     downloadClient: SubStoreDownloadClient,
     geoXDataController: GeoXDataController,
+    updateRecords: Map<String, GeoXUpdateRecord>,
+    onUpdateRecordsChanged: (Map<String, GeoXUpdateRecord>) -> Unit,
+    onRefreshUpdateRecords: () -> Unit,
 ) {
     val selectedItems = remember { mutableStateMapOf<GeoFileType, Boolean>() }
     val progressItems = remember { mutableStateMapOf<GeoFileType, GeoXDownloadProgressState>() }
-    var updateRecords by remember { mutableStateOf(geoXDataController.getGeoFileUpdateRecords()) }
     var isDownloading by remember { mutableStateOf(false) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var downloadSession by remember { mutableIntStateOf(0) }
@@ -205,6 +224,10 @@ private fun GeoXDownloadSheet(
 
     DisposableEffect(Unit) {
         onDispose { resetDownloadState() }
+    }
+
+    LaunchedEffect(show.value) {
+        if (show.value) onRefreshUpdateRecords()
     }
 
     AppActionBottomSheet(
@@ -246,7 +269,7 @@ private fun GeoXDownloadSheet(
                             if (currentSession == downloadSession) {
                                 isDownloading = false
                                 downloadJob = null
-                                updateRecords = geoXDataController.getGeoFileUpdateRecords()
+                                onUpdateRecordsChanged(geoXDataController.getGeoFileUpdateRecords())
                                 context.toast(MLang.MetaFeature.Download.DownloadComplete.format(successCount, totalCount))
                             }
                         },
@@ -290,10 +313,16 @@ private fun GeoXImportSheet(
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
     geoXDataController: GeoXDataController,
+    updateRecords: Map<String, GeoXUpdateRecord>,
+    onUpdateRecordsChanged: (Map<String, GeoXUpdateRecord>) -> Unit,
+    onRefreshUpdateRecords: () -> Unit,
 ) {
     var importTargetItem by remember { mutableStateOf<GeoXItem?>(null) }
-    var updateRecords by remember { mutableStateOf(geoXDataController.getGeoFileUpdateRecords()) }
     var isImporting by remember { mutableStateOf(false) }
+
+    LaunchedEffect(show.value) {
+        if (show.value) onRefreshUpdateRecords()
+    }
 
     val importGeoFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -306,7 +335,7 @@ private fun GeoXImportSheet(
             val imported = withContext(Dispatchers.IO) {
                 geoXDataController.importGeoFile(targetItem.fileName, uri)
             }
-            updateRecords = geoXDataController.getGeoFileUpdateRecords()
+            onUpdateRecordsChanged(geoXDataController.getGeoFileUpdateRecords())
             isImporting = false
             context.toast(
                 if (imported) {

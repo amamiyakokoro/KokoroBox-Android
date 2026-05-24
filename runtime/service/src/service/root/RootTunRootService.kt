@@ -25,6 +25,7 @@ package com.github.yumelira.yumebox.service.root
 import android.content.Intent
 import android.os.IBinder
 import com.github.yumelira.yumebox.core.Global
+import com.github.yumelira.yumebox.service.common.util.ServiceLanguageRuntime
 import com.github.yumelira.yumebox.service.common.util.initializeServiceGlobal
 import com.github.yumelira.yumebox.service.runtime.session.RootTunTransport
 import com.github.yumelira.yumebox.service.runtime.session.RuntimeSpec
@@ -204,6 +205,7 @@ class RootTunRootService : RootService() {
         Global.init(this)
         initializeServiceGlobal(this)
         MMKV.initialize(this)
+        ServiceLanguageRuntime.applyAppLanguage()
         stateStore = RootTunStateStore(this)
         startupLogStore = RootTunStartupLogStore(this)
         runtimeSpecFactory = SessionRuntimeSpecFactory(this)

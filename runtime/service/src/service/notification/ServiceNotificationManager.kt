@@ -27,6 +27,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.os.SystemClock
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -54,7 +55,10 @@ class ServiceNotificationManager(
 
     private val serviceStore by lazy { ServiceStore() }
     private val settingsStore by lazy { MMKV.mmkvWithID("settings", MMKV.MULTI_PROCESS_MODE) }
+    private val todayTrafficReader by lazy { TodayTrafficNotificationReader() }
     private val notificationManager by lazy { NotificationManagerCompat.from(service) }
+    private var cachedTodayTrafficBytes: Long = 0L
+    private var lastTodayTrafficRefreshAt: Long = 0L
     private var lastNotificationFingerprint: String? = null
 
     fun createChannel() {
@@ -76,7 +80,8 @@ class ServiceNotificationManager(
             PollingTimers.ticks(PollingTimerSpecs.ServiceTrafficNotification).collect {
                 val notification = buildRunningNotification()
                 val fingerprint = "${notification.extras.getCharSequence(Notification.EXTRA_TITLE)}|" +
-                    "${notification.extras.getCharSequence(Notification.EXTRA_TEXT)}"
+                    "${notification.extras.getCharSequence(Notification.EXTRA_TEXT)}|" +
+                    "${notification.extras.getCharSequence(Notification.EXTRA_SUB_TEXT)}"
                 if (fingerprint != lastNotificationFingerprint) {
                     lastNotificationFingerprint = fingerprint
                     notificationManager.notify(config.notificationId, notification)
@@ -98,11 +103,13 @@ class ServiceNotificationManager(
 
         val now = runCatching { Clash.queryTrafficNow() }.getOrDefault(0L)
         val total = runCatching { Clash.queryTrafficTotal() }.getOrDefault(0L)
+        val todayTrafficBytes = queryCachedTodayTrafficBytes()
         return buildNotification(
             NotificationPresentationFactory.createRunning(
                 profileName = profileName,
                 trafficNow = now,
-                trafficTotal = total,
+                todayTrafficBytes = todayTrafficBytes,
+                fallbackTrafficTotal = total,
             ),
         )
     }
@@ -157,7 +164,19 @@ class ServiceNotificationManager(
         return serviceStore.showTrafficNotification
     }
 
+    private fun queryCachedTodayTrafficBytes(): Long {
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastTodayTrafficRefreshAt < TODAY_TRAFFIC_REFRESH_INTERVAL_MS) {
+            return cachedTodayTrafficBytes
+        }
+        cachedTodayTrafficBytes = runCatching { todayTrafficReader.readTodayTotalBytes() }.getOrDefault(0L)
+        lastTodayTrafficRefreshAt = now
+        return cachedTodayTrafficBytes
+    }
+
     companion object {
+        private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 5_000L
+
         val VPN_CONFIG = Config(
             notificationId = 1001,
             channelId = "clash_vpn_service",

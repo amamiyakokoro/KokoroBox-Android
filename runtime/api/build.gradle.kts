@@ -29,6 +29,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":locale"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
 
     val mmkv64 = gropify.dep.version.mmkv64

@@ -3,6 +3,8 @@ Service = {
     Notification = {
         Running = "Running"
         TrafficFormat = "Total: %s"
+        TodayTrafficFormat = "Today's traffic %s"
+        SpeedFormat = "Down %s  Up %s"
         UnknownProfile = "Unknown profile"
     }
 

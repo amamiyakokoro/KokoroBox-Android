@@ -23,6 +23,7 @@ package com.github.yumelira.yumebox.service.notification
 import com.github.yumelira.yumebox.common.util.formatBytes
 import com.github.yumelira.yumebox.common.util.formatSpeed
 import com.github.yumelira.yumebox.core.model.ProxyGroup
+import dev.oom_wg.purejoy.mlang.MLang
 
 internal data class NotificationPresentation(
     val title: String,
@@ -35,10 +36,11 @@ internal object NotificationPresentationFactory {
     fun createRunning(
         profileName: String,
         trafficNow: Long,
-        trafficTotal: Long,
+        todayTrafficBytes: Long,
+        fallbackTrafficTotal: Long,
     ): NotificationPresentation {
         val speedLine = buildSpeedLine(trafficNow)
-        val totalLine = buildTotalLine(trafficTotal)
+        val totalLine = buildTodayTotalLine(todayTrafficBytes, fallbackTrafficTotal)
         return NotificationPresentation(
             title = profileName,
             content = speedLine,
@@ -145,13 +147,18 @@ internal object NotificationPresentationFactory {
     private fun buildSpeedLine(trafficNow: Long): String {
         val upNow = decodeTrafficHalf(trafficNow ushr 32)
         val downNow = decodeTrafficHalf(trafficNow and 0xFFFFFFFFL)
-        return "下行 ${formatSpeed(downNow)}  上行 ${formatSpeed(upNow)}"
+        return MLang.Service.Notification.SpeedFormat.format(formatSpeed(downNow), formatSpeed(upNow))
     }
 
-    private fun buildTotalLine(trafficTotal: Long): String {
+    private fun buildTodayTotalLine(todayTrafficBytes: Long, fallbackTrafficTotal: Long): String {
+        val totalBytes = todayTrafficBytes.takeIf { it > 0L } ?: decodeTrafficTotal(fallbackTrafficTotal)
+        return MLang.Service.Notification.TodayTrafficFormat.format(formatBytes(totalBytes))
+    }
+
+    private fun decodeTrafficTotal(trafficTotal: Long): Long {
         val upTotal = decodeTrafficHalf(trafficTotal ushr 32)
         val downTotal = decodeTrafficHalf(trafficTotal and 0xFFFFFFFFL)
-        return "总流量 ${formatBytes(upTotal + downTotal)}"
+        return upTotal + downTotal
     }
 
     private fun isSelectableGroup(group: ProxyGroup): Boolean {

@@ -3,6 +3,8 @@ Service = {
     Notification = {
         Running = "執行中"
         TrafficFormat = "總計：%s"
+        TodayTrafficFormat = "今日流量 %s"
+        SpeedFormat = "下行 %s  上行 %s"
         UnknownProfile = "未知設定"
     }
 

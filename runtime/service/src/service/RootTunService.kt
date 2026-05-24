@@ -40,6 +40,7 @@ import com.github.yumelira.yumebox.service.common.constants.Components
 import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
 import com.github.yumelira.yumebox.service.notification.NotificationPresentation
 import com.github.yumelira.yumebox.service.notification.NotificationPresentationFactory
+import com.github.yumelira.yumebox.service.notification.TodayTrafficNotificationReader
 import com.github.yumelira.yumebox.service.root.RootTunServiceBridge
 import com.github.yumelira.yumebox.service.root.RootTunState
 import com.github.yumelira.yumebox.service.root.RootTunStateStore
@@ -52,7 +53,10 @@ import kotlinx.coroutines.flow.collect
 
 class RootTunService : BaseService() {
     private val stateStore by lazy { RootTunStateStore(appContextOrSelf) }
+    private val todayTrafficReader by lazy { TodayTrafficNotificationReader() }
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
+    private var cachedTodayTrafficBytes: Long = 0L
+    private var lastTodayTrafficRefreshAt: Long = 0L
     private var notificationJob: Job? = null
 
     override fun onCreate() {
@@ -194,7 +198,8 @@ class RootTunService : BaseService() {
         return NotificationPresentationFactory.createRunning(
             profileName = profileName,
             trafficNow = now,
-            trafficTotal = total,
+            todayTrafficBytes = queryCachedTodayTrafficBytes(),
+            fallbackTrafficTotal = total,
         )
     }
 
@@ -269,12 +274,23 @@ class RootTunService : BaseService() {
         }
     }
 
+    private fun queryCachedTodayTrafficBytes(): Long {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastTodayTrafficRefreshAt < TODAY_TRAFFIC_REFRESH_INTERVAL_MS) {
+            return cachedTodayTrafficBytes
+        }
+        cachedTodayTrafficBytes = runCatching { todayTrafficReader.readTodayTotalBytes() }.getOrDefault(0L)
+        lastTodayTrafficRefreshAt = now
+        return cachedTodayTrafficBytes
+    }
+
     companion object {
         private const val ACTION_START = "com.github.yumelira.yumebox.ROOT_TUN_SERVICE_START"
         private const val ACTION_STOP = "com.github.yumelira.yumebox.ROOT_TUN_SERVICE_STOP"
         private const val NOTIFICATION_ID = 1003
         private const val CHANNEL_ID = "clash_root_tun_service"
         private const val CHANNEL_NAME = "Clash RootTun Service"
+        private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 5_000L
 
         fun start(context: Context) {
             val intent = Intent(context, RootTunService::class.java).setAction(ACTION_START)

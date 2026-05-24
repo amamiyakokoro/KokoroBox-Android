@@ -23,6 +23,7 @@
 package com.github.yumelira.yumebox.service
 
 import android.app.Service
+import com.github.yumelira.yumebox.service.common.util.ServiceLanguageRuntime
 import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
 import com.github.yumelira.yumebox.service.common.util.initializeServiceGlobal
 import com.github.yumelira.yumebox.service.runtime.util.cancelAndJoinBlocking
@@ -34,6 +35,7 @@ abstract class BaseService : Service(), CoroutineScope by CoroutineScope(Dispatc
         super.onCreate()
 
         initializeServiceGlobal(appContextOrSelf)
+        ServiceLanguageRuntime.applyAppLanguage()
     }
 
     override fun onDestroy() {
