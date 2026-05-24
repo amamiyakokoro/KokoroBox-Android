@@ -452,7 +452,7 @@ class CppBuilder(private val config: ProjectConfig, private val ndkTools: NdkToo
     }
 
     fun generateGitInfo(): File {
-        val mihomoDir = File("lib/mihomo/mihomo")
+        val projectRoot = File(".")
         gitInfoDir.mkdirs()
 
         val gitInfo = mutableMapOf(
@@ -462,26 +462,24 @@ class CppBuilder(private val config: ProjectConfig, private val ndkTools: NdkToo
             "BUILD_TIMESTAMP" to ""
         )
 
-        if (mihomoDir.exists()) {
-            val commitResult = executeCommand(
-                command = listOf("git", "rev-parse", "--short", "HEAD"),
-                workingDir = mihomoDir,
-                printStdout = false,
-                printStderr = false
-            )
-            if (commitResult.success) {
-                gitInfo["GIT_COMMIT_HASH"] = commitResult.output.trim()
-            }
+        val commitResult = executeCommand(
+            command = listOf("git", "rev-parse", "--short", "HEAD"),
+            workingDir = projectRoot,
+            printStdout = false,
+            printStderr = false
+        )
+        if (commitResult.success) {
+            gitInfo["GIT_COMMIT_HASH"] = commitResult.output.trim()
+        }
 
-            val branchResult = executeCommand(
-                command = listOf("git", "branch", "--show-current"),
-                workingDir = mihomoDir,
-                printStdout = false,
-                printStderr = false
-            )
-            if (branchResult.success) {
-                gitInfo["GIT_BRANCH"] = branchResult.output.trim()
-            }
+        val branchResult = executeCommand(
+            command = listOf("git", "branch", "--show-current"),
+            workingDir = projectRoot,
+            printStdout = false,
+            printStderr = false
+        )
+        if (branchResult.success) {
+            gitInfo["GIT_BRANCH"] = branchResult.output.trim().ifEmpty { "unknown" }
         }
 
         if (config.getBoolean("external.mihomo.includeTimestamp", false)) {
