@@ -8,6 +8,7 @@ AppSettings = {
         Privacy = "隐私"
         Service = "服务"
         Network = "网络"
+        Backup = "备份"
         Experimental = "实验性内容"
     }
 
@@ -44,8 +45,6 @@ AppSettings = {
         ColorThemeCustomSummary = "当前主题色：%s"
         ThemeColorPolarityInvertTitle = "反转主题前景色"
         ThemeColorPolarityInvertSummary = "当主题取色看起来怪异时可尝试开启"
-        TopBarBlurTitle = "背景模糊"
-        TopBarBlurSummary = "应用模糊背景"
         AutoHideNavbarTitle = "滑动隐藏底栏"
         AutoHideNavbarSummary = "向下滑动时自动隐藏底栏，向上滑动时显示"
         LegacyNavbarStyleTitle = "浮动导航栏"
@@ -83,6 +82,8 @@ AppSettings = {
     }
 
     Experimental = {
+        HealthCheckConcurrencyTitle = "测速并发数"
+        HealthCheckConcurrencySummary = "当前选项：%s"
         AcgHomeTitle = "ACG 实验首页"
         AcgHomeSummary = "启用新的 ACG 风格首页布局"
         AcgQuoteDefault = "在安静的线路上，等一朵云完成漫游"
@@ -133,6 +134,19 @@ AppSettings = {
     Network = {
         CustomUserAgentTitle = "自定义 User-Agent"
         CustomUserAgentSummaryDefault = "未设置，使用默认值"
+    }
+
+    Backup = {
+        ExportTitle = "导出设置备份"
+        ExportSummary = "将应用偏好、网络选项、面板链接和显示设置保存为 JSON 文件"
+        ImportTitle = "导入设置备份"
+        ImportSummary = "从 YumeBox 备份 JSON 文件恢复设置"
+        ExportSuccess = "已导出设置备份"
+        ExportFailed = "导出设置备份失败"
+        ExportFailedDetail = "导出设置备份失败：%s"
+        ImportSuccess = "已导入设置备份"
+        ImportReadFailed = "读取备份文件失败"
+        ImportFailedDetail = "导入设置备份失败：%s"
     }
 
     WarningDialog = {

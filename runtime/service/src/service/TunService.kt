@@ -33,6 +33,7 @@ import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.service.common.constants.Intents
 import com.github.yumelira.yumebox.service.common.log.Log
 import com.github.yumelira.yumebox.service.common.util.CoreRuntimeConfig
+import com.github.yumelira.yumebox.service.common.util.ServiceLanguageRuntime
 import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
 import com.github.yumelira.yumebox.service.common.util.initializeServiceGlobal
 import com.github.yumelira.yumebox.service.notification.ServiceNotificationManager
@@ -83,6 +84,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         super.onCreate()
         runCatching {
             initializeServiceGlobal(appContextOrSelf)
+            ServiceLanguageRuntime.applyAppLanguage()
             startupLogStore.append("LOCAL_TUN service: onCreate begin")
 
             notificationManager.createChannel()

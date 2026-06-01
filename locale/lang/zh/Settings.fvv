@@ -4,23 +4,37 @@ Settings = {
 
     Section = {
         UiSettings = "界面设置"
+        NetworkSettings = "网络设置"
+        DataSettings = "数据设置"
         More = "更多"
     }
 
     UiSettings = {
         App = "应用"
         AppSummary = "外观 · 语言 · 主题"
+    }
+
+    NetworkSettings = {
         Network = "网络"
         NetworkSummary = "DNS · 端口 · 入站"
         Override = "覆写"
         OverrideSummary = "规则覆写"
         MetaFeatures = "Meta 功能"
         MetaFeaturesSummary = "Meta 扩展"
+        Lab = "实验室"
+        LabSummary = "Sub-Store · 实验功能"
+    }
+
+    DataSettings = {
+        ExportBackup = "导出备份"
+        ExportBackupSummary = "将用户设置保存为 JSON 文件"
+        ImportBackup = "导入备份"
+        ImportBackupSummary = "从备份文件恢复用户设置"
+        AppDataManagement = "应用数据管理"
+        AppDataManagementSummary = "清理部分缓存文件"
     }
 
     More = {
-        Lab = "实验室"
-        LabSummary = "Sub-Store · 实验功能"
         Logs = "日志"
         LogsSummary = "运行日志"
         About = "关于"

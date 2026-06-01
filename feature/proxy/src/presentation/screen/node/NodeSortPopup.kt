@@ -49,7 +49,7 @@ internal fun NodeSortPopup(
         expanded = show,
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         tonalElevation = 6.dp,
     ) {
         NodeSortModes.forEachIndexed { index, mode ->

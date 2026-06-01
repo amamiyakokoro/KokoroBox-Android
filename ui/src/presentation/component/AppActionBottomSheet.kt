@@ -23,6 +23,7 @@
 package com.github.yumelira.yumebox.presentation.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -108,7 +109,7 @@ fun AppActionBottomSheet(
     endAction: (@Composable (() -> Unit))? = null,
     backgroundColor: Color = Color.Unspecified,
     enableWindowDim: Boolean = true,
-    cornerRadius: androidx.compose.ui.unit.Dp = UiDp.dp28,
+    cornerRadius: androidx.compose.ui.unit.Dp = UiDp.dp32,
     sheetMaxWidth: androidx.compose.ui.unit.Dp = UiDp.dp560,
     onDismissFinished: (() -> Unit)? = null,
     outsideMargin: DpSize = DpSize(UiDp.dp16, UiDp.dp0),
@@ -116,9 +117,10 @@ fun AppActionBottomSheet(
     defaultWindowInsetsPadding: Boolean = true,
     dragHandleColor: Color = Color.Unspecified,
     allowDismiss: Boolean = true,
-    enableNestedScroll: Boolean = true,
+    enableNestedScroll: Boolean = false,
     renderInRootScaffold: Boolean = true,
-    content: @Composable () -> Unit,
+    contentScrollEnabled: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     YumeMd3ActionBottomSheet(
         show = show,
@@ -139,6 +141,7 @@ fun AppActionBottomSheet(
         allowDismiss = allowDismiss,
         enableNestedScroll = enableNestedScroll,
         renderInRootScaffold = renderInRootScaffold,
+        contentScrollEnabled = contentScrollEnabled,
         content = content,
     )
 }

@@ -58,6 +58,7 @@ internal fun AppConfirmDialogContent(
     cancelText: String = MLang.Component.Button.Cancel,
     confirmText: String = MLang.Component.Button.Confirm,
     confirmEnabled: Boolean = true,
+    confirmDestructive: Boolean = false,
 ) {
     AppDialogColumn {
         AppDialogMessage(message = message)
@@ -67,6 +68,7 @@ internal fun AppConfirmDialogContent(
             cancelText = cancelText,
             confirmText = confirmText,
             confirmEnabled = confirmEnabled,
+            confirmDestructive = confirmDestructive,
         )
     }
 }

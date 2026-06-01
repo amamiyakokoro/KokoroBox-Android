@@ -29,8 +29,8 @@ import com.github.yumelira.yumebox.common.util.AppLanguageManager
 import com.github.yumelira.yumebox.common.util.PlatformIdentifier
 import com.github.yumelira.yumebox.core.Global
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
-import com.github.yumelira.yumebox.core.util.runtimeHomeDir
 import com.github.yumelira.yumebox.data.controller.AppTrafficStatisticsCollector
+import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.di.appModule
@@ -47,21 +47,14 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.Koin
-import org.tukaani.xz.XZInputStream
 import timber.log.Timber
-import java.io.File
-import java.io.IOException
-import java.nio.file.AtomicMoveNotSupportedException
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 class App : Application() {
     private val startupScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private lateinit var geoXDataController: GeoXDataController
 
     companion object {
-        private const val MIN_GEO_FILE_SIZE_BYTES = 64 * 1024L
         private const val GEO_FILE_GUARD_INTERVAL_MS = 10_000L
-        private val GEO_FILE_NAMES = listOf("geoip.metadb", "geosite.dat", "ASN.mmdb")
 
         lateinit var instance: App
             private set
@@ -86,7 +79,8 @@ class App : Application() {
         val appSettingsStorage: AppSettingsStore = koinApp.koin.get()
         AppLanguageManager.apply(appSettingsStorage.appLanguage.value)
 
-        extractGeoFiles()
+        geoXDataController = koinApp.koin.get()
+        geoXDataController.ensureGeoFiles()
         startGeoFileGuard()
         val featureStore: FeatureStore = koinApp.koin.get()
         featureStore.syncAppVersion(BuildConfig.VERSION_CODE)
@@ -100,131 +94,13 @@ class App : Application() {
         AppLanguageManager.refreshSystemLanguage()
     }
 
-    private fun extractGeoFiles() {
-        val mihomoDir = runtimeHomeDir.apply { mkdirs() }
-        val geoFiles = GEO_FILE_NAMES
-        val failedFiles = mutableListOf<String>()
-
-        geoFiles.forEach { filename ->
-            val targetFile = File(mihomoDir, filename)
-            if (!isGeoFileUsable(targetFile)) {
-                if (!extractBundledGeoFile(filename, targetFile)) {
-                    failedFiles += filename
-                }
-            }
-        }
-
-        if (failedFiles.isNotEmpty()) {
-            Timber.w("Failed to extract geo files: ${failedFiles.joinToString()}")
-        }
-    }
-
-    private fun isGeoFileUsable(file: File): Boolean {
-        if (!file.isFile || file.length() < MIN_GEO_FILE_SIZE_BYTES) return false
-        return !looksLikeHttpErrorBody(file)
-    }
-
-    private fun looksLikeHttpErrorBody(file: File): Boolean {
-        return runCatching {
-            val buffer = ByteArray(512)
-            val read = file.inputStream().buffered().use { input -> input.read(buffer) }
-            if (read <= 0) return@runCatching true
-
-            val head = String(buffer, 0, read, Charsets.UTF_8)
-                .trimStart('\uFEFF', ' ', '\t', '\r', '\n')
-                .lowercase()
-            head.startsWith("<!doctype") ||
-                head.startsWith("<html") ||
-                head.startsWith("not found") ||
-                head.startsWith("404") ||
-                head.contains("<title>404") ||
-                head.contains("rate limit")
-        }.getOrDefault(false)
-    }
-
     private fun startGeoFileGuard() {
         startupScope.launch(Dispatchers.IO) {
             while (isActive) {
                 delay(GEO_FILE_GUARD_INTERVAL_MS)
-                verifyGeoFilesOrRestoreBundled()
+                runCatching { geoXDataController.ensureGeoFiles() }
+                    .onFailure { Timber.w(it, "Geo file guard failed") }
             }
-        }
-    }
-
-    private fun verifyGeoFilesOrRestoreBundled() {
-        val mihomoDir = runtimeHomeDir.apply { mkdirs() }
-        GEO_FILE_NAMES.forEach { filename ->
-            val targetFile = File(mihomoDir, filename)
-            if (!isGeoFileUsable(targetFile)) {
-                Timber.w("Geo file is invalid, restoring bundled asset: %s", filename)
-                if (!extractBundledGeoFile(filename, targetFile)) {
-                    Timber.w("Failed to restore bundled geo file: %s", filename)
-                }
-            }
-        }
-    }
-
-    private fun extractBundledGeoFile(filename: String, targetFile: File): Boolean {
-        val tempFile = File(targetFile.parentFile, "${targetFile.name}.asset.tmp")
-        return try {
-            if (tempFile.exists()) tempFile.delete()
-            val extracted = extractCompressedAssetIfExists("$filename.xz", tempFile) ||
-                extractRawAssetIfExists(filename, tempFile)
-            if (!extracted || !isGeoFileUsable(tempFile)) {
-                tempFile.delete()
-                return false
-            }
-            replaceFile(tempFile, targetFile)
-            true
-        } catch (error: Exception) {
-            tempFile.delete()
-            Timber.w(error, "Failed to extract bundled geo file: %s", filename)
-            false
-        }
-    }
-
-    private fun extractRawAssetIfExists(assetName: String, targetFile: File): Boolean {
-        return try {
-            assets.open(assetName).use { input ->
-                targetFile.outputStream().buffered().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            true
-        } catch (_: IOException) {
-            false
-        }
-    }
-
-    private fun extractCompressedAssetIfExists(assetName: String, targetFile: File): Boolean {
-        return try {
-            assets.open(assetName).use { input ->
-                XZInputStream(input.buffered()).use { xzInput ->
-                    targetFile.outputStream().buffered().use { output ->
-                        xzInput.copyTo(output)
-                    }
-                }
-            }
-            true
-        } catch (_: IOException) {
-            false
-        }
-    }
-
-    private fun replaceFile(source: File, target: File) {
-        try {
-            Files.move(
-                source.toPath(),
-                target.toPath(),
-                StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE,
-            )
-        } catch (_: AtomicMoveNotSupportedException) {
-            Files.move(
-                source.toPath(),
-                target.toPath(),
-                StandardCopyOption.REPLACE_EXISTING,
-            )
         }
     }
 

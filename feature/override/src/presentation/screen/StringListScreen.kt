@@ -36,10 +36,7 @@ import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPre
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3FilledButton
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
-import com.github.yumelira.yumebox.presentation.icon.yume.Undo
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.util.OverrideListEditorMode
 import com.github.yumelira.yumebox.presentation.util.OverrideListModeValues
 import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
@@ -97,7 +94,7 @@ fun OverrideStringListEditorScreen(
             OverrideAnimatedFab(
                 controller = addFabController,
                 visible = showAddFab,
-                imageVector = Yume.`Badge-plus`,
+                imageVector = AppMd3Icons.Action.Add,
                 contentDescription = MLang.Override.Editor.AddItem,
                 onClick = {
                     editingIndex = -1
@@ -111,8 +108,9 @@ fun OverrideStringListEditorScreen(
                 title = title,
                 actions = {
                     OverrideTopBarAction(
-                        icon = Yume.Undo,
+                        icon = AppMd3Icons.Action.Undo,
                         contentDescription = MLang.Override.Editor.ClearCurrentMode,
+                        destructive = true,
                         onClick = { showResetDialog = true },
                     )
                 },
@@ -219,6 +217,7 @@ fun OverrideStringListEditorScreen(
                 },
                 cancelText = MLang.Override.Dialog.Button.Cancel,
                 confirmText = MLang.Override.Editor.Clear,
+                confirmDestructive = true,
             )
         }
     }
@@ -255,9 +254,10 @@ private fun StringListEntryCard(
                     .padding(end = UiDp.dp8),
             )
             OverrideCardActionIconButton(
-                imageVector = Yume.Delete,
+                imageVector = AppMd3Icons.Action.Delete,
                 contentDescription = MLang.Override.Card.Delete,
                 onClick = onDelete,
+                tone = OverrideActionTone.Danger,
             )
         }
     }

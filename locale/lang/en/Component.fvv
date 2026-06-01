@@ -51,6 +51,7 @@ Component = {
         Confirm = "Confirm"
         Clear = "Clear"
         Copy = "Copy"
+        Delete = "Delete"
     }
 
     Flag = {

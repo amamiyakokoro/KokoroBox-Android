@@ -26,8 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import dev.oom_wg.purejoy.mlang.MLang
 
 private val SelectionSheetListMaxHeight = UiDp.dp420
@@ -235,7 +234,7 @@ private fun SelectionAddCustomCard(
             title = title,
             endActions = {
                 AppIcon(
-                    imageVector = Yume.`Badge-plus`,
+                    imageVector = AppMd3Icons.Action.Add,
                     contentDescription = title,
                 )
             },

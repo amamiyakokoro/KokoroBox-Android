@@ -28,8 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Save
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.util.OverrideRuleDraft
 import com.github.yumelira.yumebox.presentation.util.OverrideRuleTypePresets
 import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
@@ -111,7 +110,7 @@ fun OverrideRuleDraftEditorScreen(
             OverrideAnimatedFab(
                 controller = saveFabController,
                 visible = true,
-                imageVector = Yume.Save,
+                imageVector = AppMd3Icons.Action.Save,
                 contentDescription = MLang.Override.Editor.SaveRule,
                 onClick = {
                     val normalizedType = ruleType.trim().uppercase()

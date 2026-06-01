@@ -68,6 +68,14 @@ class BottomBarScrollBehavior {
         }
     }
 
+    fun forceShowBottomBar() {
+        accumulatedScroll = 0f
+        if (!isBottomBarVisible) {
+            isBottomBarVisible = true
+            lastToggleTime = System.currentTimeMillis()
+        }
+    }
+
     fun showBottomBar() {
         val currentTime = System.currentTimeMillis()
         if (!isBottomBarVisible && currentTime - lastToggleTime >= toggleDelay) {

@@ -77,6 +77,8 @@ class ProxyFacade(
         const val PROXY_SELECT_FULL_REFRESH_DELAY_MS = 400L
         const val ROOT_TUN_BOOTSTRAP_ATTEMPTS = 20
         const val ROOT_TUN_BOOTSTRAP_DELAY_MS = 300L
+        const val GLOBAL_GROUP_NAME = "GLOBAL"
+        const val ZAKO_GROUP_NAME = "zako"
     }
 
     private val appContext: Context = context.appContextOrSelf
@@ -565,13 +567,6 @@ class ProxyFacade(
                         error("RootTun runtime not ready")
                     }
 
-                    val preferredMode = requestedMode
-                    if (preferredMode == TunnelState.Mode.Global) {
-                        queryRuntimeProxyGroupInfo(snapshot, "GLOBAL")?.let { globalGroup ->
-                            return@runCatching listOf(globalGroup)
-                        }
-                    }
-
                     if (snapshot.owner == RuntimeOwner.RootTun) {
                         RootTunController.queryAllProxyGroups(
                             context = appContext,
@@ -589,6 +584,9 @@ class ProxyFacade(
             }
 
             if (groups != null) {
+                if (snapshot.phase == RuntimePhase.Running) {
+                    syncObservedRuntimeSelections(groups)
+                }
                 val normalizedGroups = groupsForMode(requestedMode, groups)
                 val groupsToPublish = normalizedGroups.ifEmpty {
                     if (!snapshot.running) fallbackPreviewGroups(snapshot, requestedMode).orEmpty() else emptyList()
@@ -641,6 +639,7 @@ class ProxyFacade(
             } ?: return
 
             val requestedMode = proxyDisplaySettingsStorage.proxyMode.value
+            syncObservedRuntimeSelections(listOf(updatedGroup))
             val updatedGroups = groupsForMode(requestedMode, updateCachedProxyGroup(updatedGroup))
             if (proxyDisplaySettingsStorage.proxyMode.value == requestedMode) {
                 publishProxyGroups(updatedGroups, cacheForPreview = true, mode = requestedMode)
@@ -1357,16 +1356,36 @@ class ProxyFacade(
         return when (mode) {
             TunnelState.Mode.Direct -> directProxyGroups()
             TunnelState.Mode.Global -> globalProxyGroups(groups)
-            else -> groups.filterNot { it.name.equals("GLOBAL", ignoreCase = true) }
+            else -> groups.filterNot { it.name.equals(GLOBAL_GROUP_NAME, ignoreCase = true) }
                 .ifEmpty { groups }
         }
     }
 
     private fun globalProxyGroups(groups: List<ProxyGroupInfo>): List<ProxyGroupInfo> {
         if (groups.isEmpty()) return groups
-        return groups.firstOrNull { it.name.equals("GLOBAL", ignoreCase = true) }
-            ?.let { listOf(it.withRememberedGlobalSelection()) }
-            ?: emptyList()
+        val globalGroup = groups.firstOrNull { it.name.equals(GLOBAL_GROUP_NAME, ignoreCase = true) }
+            ?.withRememberedGlobalSelection()
+            ?: return emptyList()
+        val otherGroups = groups.filterNot { group ->
+            group.name.equals(GLOBAL_GROUP_NAME, ignoreCase = true) ||
+                group.name.equals(ZAKO_GROUP_NAME, ignoreCase = true)
+        }
+        return buildList(capacity = otherGroups.size + 2) {
+            add(globalGroup)
+            add(zakoProxyGroup())
+            addAll(otherGroups)
+        }
+    }
+
+    private fun zakoProxyGroup(): ProxyGroupInfo {
+        return ProxyGroupInfo(
+            name = ZAKO_GROUP_NAME,
+            type = Proxy.Type.Selector,
+            proxies = emptyList(),
+            now = "",
+            icon = null,
+            hidden = false,
+        )
     }
 
     private fun ProxyGroupInfo.withRememberedGlobalSelection(): ProxyGroupInfo {
@@ -1381,7 +1400,7 @@ class ProxyFacade(
     private fun rememberedGlobalSelection(): String? {
         val profile = _currentProfile.value ?: return null
         return SelectionDao.querySelections(profile.uuid)
-            .firstOrNull { it.proxy.equals("GLOBAL", ignoreCase = true) }
+            .firstOrNull { it.proxy.equals(GLOBAL_GROUP_NAME, ignoreCase = true) }
             ?.selected
             ?.trim()
             ?.takeIf(String::isNotEmpty)
@@ -1405,6 +1424,49 @@ class ProxyFacade(
                 hidden = false,
             ),
         )
+    }
+
+    private suspend fun syncObservedRuntimeSelections(groups: List<ProxyGroupInfo>) {
+        val snapshot = _runtimeSnapshot.value
+        if (snapshot.phase != RuntimePhase.Running || !snapshot.running || groups.isEmpty()) {
+            return
+        }
+        val profileUuid = _currentProfile.value?.uuid
+            ?: snapshot.profileUuid?.let { raw -> runCatching { UUID.fromString(raw) }.getOrNull() }
+            ?: return
+
+        withContext(Dispatchers.IO) {
+            val rememberedSelections = SelectionDao.querySelections(profileUuid)
+                .associate { selection -> selection.proxy.trim() to selection.selected.trim() }
+            groups.forEach { group ->
+                val groupName = group.name.trim()
+                val selectedProxy = group.now.trim()
+                if (!group.isRestorableSelectorSelection(groupName, selectedProxy)) {
+                    return@forEach
+                }
+                if (rememberedSelections[groupName] == selectedProxy) {
+                    return@forEach
+                }
+                Timber.d(
+                    "Sync observed selector selection: profile=%s group=%s proxy=%s",
+                    profileUuid,
+                    groupName,
+                    selectedProxy,
+                )
+                SelectionDao.upsertManualSelection(profileUuid, groupName, selectedProxy)
+            }
+        }
+    }
+
+    private fun ProxyGroupInfo.isRestorableSelectorSelection(
+        groupName: String,
+        selectedProxy: String,
+    ): Boolean {
+        if (groupName.isEmpty() || selectedProxy.isEmpty()) return false
+        if (type != Proxy.Type.Selector) return false
+        if (groupName.equals(ZAKO_GROUP_NAME, ignoreCase = true)) return false
+        if (groupName.equals("DIRECT", ignoreCase = true) && proxies.size == 1) return false
+        return proxies.any { proxy -> proxy.name == selectedProxy }
     }
 
     private fun publishProxyGroups(

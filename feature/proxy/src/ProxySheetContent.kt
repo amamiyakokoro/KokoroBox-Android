@@ -20,8 +20,13 @@
 
 
 package com.github.yumelira.yumebox
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.animation.*
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
@@ -33,14 +38,13 @@ import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`List-chevrons-up-down`
-import com.github.yumelira.yumebox.presentation.icon.yume.Speed
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
 import com.github.yumelira.yumebox.presentation.screen.rememberProxyGroupSelectionState
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.viewmodel.ProxyViewModel
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -144,7 +148,7 @@ fun ProxySheetContent(
                 Box {
                     AppBottomSheetIconAction(
                         action = AppBottomSheetAction(
-                            icon = Yume.`List-chevrons-up-down`,
+                            icon = AppMd3Icons.Action.Sort,
                             contentDescription = MLang.Proxy.Action.Sort,
                             onClick = { showSortPopup.value = true },
                         ),
@@ -161,7 +165,7 @@ fun ProxySheetContent(
         endAction = {
             AppBottomSheetIconAction(
                 action = AppBottomSheetAction(
-                    icon = Yume.Speed,
+                    icon = AppMd3Icons.Action.SpeedTest,
                     contentDescription = MLang.Proxy.Action.Test,
                     onClick = {
                         if (selectedGroup == null) {
@@ -191,33 +195,33 @@ fun ProxySheetContent(
                 if (targetState != null) {
                     (slideInHorizontally(
                         animationSpec = tween(
-                            durationMillis = AnimationSpecs.Proxy.SheetSlideInDuration,
-                            easing = AnimationSpecs.Legacy
+                            durationMillis = AppMotion.Proxy.SheetSlideInDuration,
+                            easing = AppMotion.Legacy
                         ),
                         initialOffsetX = { it },
-                    ) + fadeIn(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.SheetFadeInDuration))) togetherWith
+                    ) + fadeIn(animationSpec = tween(durationMillis = AppMotion.Proxy.SheetFadeInDuration))) togetherWith
                         (slideOutHorizontally(
                             animationSpec = tween(
-                                durationMillis = AnimationSpecs.Proxy.SheetSlideOutDuration,
-                                easing = AnimationSpecs.Legacy
+                                durationMillis = AppMotion.Proxy.SheetSlideOutDuration,
+                                easing = AppMotion.Legacy
                             ),
                             targetOffsetX = { -it / 3 },
-                        ) + fadeOut(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.SheetFadeOutDuration)))
+                        ) + fadeOut(animationSpec = tween(durationMillis = AppMotion.Proxy.SheetFadeOutDuration)))
                 } else {
                     (slideInHorizontally(
                         animationSpec = tween(
-                            durationMillis = AnimationSpecs.Proxy.SheetSlideOutDuration,
-                            easing = AnimationSpecs.Legacy
+                            durationMillis = AppMotion.Proxy.SheetSlideOutDuration,
+                            easing = AppMotion.Legacy
                         ),
                         initialOffsetX = { -it / 3 },
-                    ) + fadeIn(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.SheetFadeInDuration - 20))) togetherWith
+                    ) + fadeIn(animationSpec = tween(durationMillis = AppMotion.Proxy.SheetFadeInDuration - 20))) togetherWith
                         (slideOutHorizontally(
                             animationSpec = tween(
-                                durationMillis = AnimationSpecs.Proxy.SheetSlideInDuration - 20,
-                                easing = AnimationSpecs.Legacy
+                                durationMillis = AppMotion.Proxy.SheetSlideInDuration - 20,
+                                easing = AppMotion.Legacy
                             ),
                             targetOffsetX = { it },
-                        ) + fadeOut(animationSpec = tween(durationMillis = AnimationSpecs.Proxy.SheetFadeOutDuration)))
+                        ) + fadeOut(animationSpec = tween(durationMillis = AppMotion.Proxy.SheetFadeOutDuration)))
                 }
             },
             label = "notification_node_sheet_content",

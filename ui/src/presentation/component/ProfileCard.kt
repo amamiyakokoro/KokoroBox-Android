@@ -37,6 +37,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.Switch as Md3Switch
 import androidx.compose.material3.SwitchDefaults as Md3SwitchDefaults
 import androidx.compose.runtime.Composable
@@ -56,17 +61,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Circle-fading-arrow-up`
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
-import com.github.yumelira.yumebox.presentation.icon.yume.Edit
-import com.github.yumelira.yumebox.presentation.icon.yume.Share
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import com.github.yumelira.yumebox.presentation.util.*
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.io.File
 
 @Composable
@@ -89,7 +89,7 @@ fun ProfileCard(
     val hapticFeedback = LocalHapticFeedback.current
     val density = LocalDensity.current
 
-    val colorScheme = MiuixTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
 
     val isDark = isSystemInDarkTheme()
     val secondaryContainer = colorScheme.secondaryContainer.copy(alpha = opacity.strong)
@@ -102,8 +102,11 @@ fun ProfileCard(
         profile.isConfigSaved(workDir)
     }
 
+    val destructiveActionColors = yumeDestructiveActionColors()
     val updateBg = remember(colorScheme, opacity) { colorScheme.primary.copy(alpha = opacity.subtle) }
     val updateTint = remember(colorScheme) { colorScheme.primary }
+    val deleteContainer = destructiveActionColors.containerColor
+    val deleteContentColor = destructiveActionColors.contentColor
 
     Card(
         modifier = modifier
@@ -136,7 +139,7 @@ fun ProfileCard(
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = spacing.space2),
                     fontWeight = FontWeight(550),
-                    color = colorScheme.onSurfaceVariantSummary,
+                    color = colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -150,15 +153,15 @@ fun ProfileCard(
                     onToggleEnabled(profile)
                 },
                 colors = Md3SwitchDefaults.colors(
-                    checkedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
-                    checkedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                    uncheckedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.outline,
-                    uncheckedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerHighest,
-                    uncheckedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.outline,
-                    disabledCheckedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    disabledCheckedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                    disabledUncheckedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                    disabledUncheckedTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    uncheckedBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledCheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                    disabledCheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    disabledUncheckedThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                    disabledUncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 ),
             )
         }
@@ -187,7 +190,7 @@ fun ProfileCard(
                             Text(
                                 text = expireText,
                                 fontSize = 14.sp,
-                                color = colorScheme.onSurfaceVariantSummary,
+                                color = colorScheme.onSurfaceVariant,
                                 lineHeight = 20.sp,
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
@@ -211,7 +214,7 @@ fun ProfileCard(
                         Text(
                             text = line,
                             fontSize = 14.sp,
-                            color = colorScheme.onSurfaceVariantSummary,
+                            color = colorScheme.onSurfaceVariant,
                             lineHeight = 20.sp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1
@@ -229,8 +232,8 @@ fun ProfileCard(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
-            IconButton(
-                backgroundColor = secondaryContainer,
+            Md3TonalIconButton(
+                containerColor = secondaryContainer,
                 minHeight = componentSizes.compactActionButtonSize,
                 minWidth = componentSizes.compactActionButtonSize,
                 enabled = isConfigSaved && !isDownloading,
@@ -239,7 +242,7 @@ fun ProfileCard(
                     modifier = Modifier
                         .size(spacing.space20)
                         .alpha(if (isConfigSaved) 1f else opacity.disabledSecondary),
-                    imageVector = Yume.Share,
+                    imageVector = AppMd3Icons.Action.Share,
                     tint = actionIconTint.copy(alpha = if (isConfigSaved) 1f else opacity.disabledSecondary),
                     contentDescription = "Export"
                 )
@@ -247,15 +250,15 @@ fun ProfileCard(
 
             Spacer(Modifier.width(spacing.space8))
 
-            IconButton(
-                backgroundColor = secondaryContainer,
+            Md3TonalIconButton(
+                containerColor = secondaryContainer,
                 minHeight = componentSizes.compactActionButtonSize,
                 minWidth = componentSizes.compactActionButtonSize,
                 enabled = !isDownloading,
                 onClick = { if (!isDownloading) onEdit(profile) }) {
                 Icon(
                     modifier = Modifier.size(spacing.space20),
-                    imageVector = Yume.Edit,
+                    imageVector = AppMd3Icons.Action.Edit,
                     tint = actionIconTint,
                     contentDescription = "Edit"
                 )
@@ -329,7 +332,7 @@ fun ProfileCard(
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(spacing.space20),
-                                        imageVector = Yume.`Circle-fading-arrow-up`,
+                                        imageVector = AppMd3Icons.Action.Sync,
                                         tint = updateTint,
                                         contentDescription = "Update",
                                     )
@@ -347,12 +350,12 @@ fun ProfileCard(
                 }
             }
 
-            IconButton(
+            Md3TonalIconButton(
                 minHeight = componentSizes.compactActionButtonSize,
                 minWidth = componentSizes.compactActionButtonSize,
                 enabled = !isDownloading,
                 onClick = { if (!isDownloading) onDelete(profile) },
-                backgroundColor = secondaryContainer,
+                containerColor = deleteContainer,
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = spacing.space10),
@@ -360,19 +363,48 @@ fun ProfileCard(
                 ) {
                     Icon(
                         modifier = Modifier.size(spacing.space20),
-                        imageVector = Yume.Delete,
-                        tint = actionIconTint,
+                        imageVector = AppMd3Icons.Action.Delete,
+                        tint = deleteContentColor,
                         contentDescription = "Delete"
                     )
                     Text(
                         modifier = Modifier.padding(start = spacing.space4, end = componentSizes.textLineCompactSpacing),
                         text = MLang.Component.ProfileCard.Delete,
-                        color = actionIconTint,
+                        color = deleteContentColor,
                         fontWeight = FontWeight.Medium,
                         fontSize = 15.sp
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun Md3TonalIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.secondaryContainer,
+    minHeight: androidx.compose.ui.unit.Dp = 40.dp,
+    minWidth: androidx.compose.ui.unit.Dp = 40.dp,
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = CircleShape,
+        color = containerColor,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    ) {
+        Box(
+            modifier = Modifier
+                .height(minHeight)
+                .widthIn(min = minWidth),
+            contentAlignment = Alignment.Center,
+        ) {
+            content()
         }
     }
 }

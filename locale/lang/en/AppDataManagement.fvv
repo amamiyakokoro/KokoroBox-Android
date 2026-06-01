@@ -1,0 +1,38 @@
+<App Data Management Page>
+AppDataManagement = {
+    Title = "App Data Management"
+
+    Section = {
+        GeoFiles = "Geo Files"
+        Logs = "Logs"
+    }
+
+    GeoFiles = {
+        HistoryTitle = "Manage GeoX Files"
+        HistorySummary = "Historical download cache: %d"
+        EmptyHistory = "No historical downloads to clean"
+        EmptyHistorySummary = "GeoX files that fail validation are deleted immediately and will not appear here"
+        CacheItemSummary = "%s · %s"
+        DeleteConfirmTitle = "Delete GeoX files?"
+        DeleteConfirmMessage = "Delete %d selected historical GeoX files? This action cannot be undone."
+        DeleteComplete = "Deleted %d historical GeoX files"
+    }
+
+    Logs = {
+        ManagementTitle = "Manage Logs"
+        ManagementSummary = "Log files: %d"
+        EmptyLogs = "No logs to clean"
+        EmptyLogsSummary = "After starting recording on the Log page, log files will appear here"
+        LogItemSummary = "%s · %s"
+        RecordingFileTitle = "%s (recording)"
+        DeleteConfirmTitle = "Delete log files?"
+        DeleteConfirmMessage = "Delete %d selected log files? This action cannot be undone."
+        DeleteComplete = "Deleted %d log files"
+        ViewerTitle = "View Log: %s"
+        EmptyLogContent = "Log is empty"
+        EmptyLogContentSummary = "This file has no displayable log entries"
+        ViewerLimitHint = "Showing recent logs only"
+        ViewerLimitSummary = "Currently showing the latest %d entries"
+        LogLineTitle = "[%s] [%s]"
+    }
+}

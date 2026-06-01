@@ -26,6 +26,12 @@ Feature = {
         Unknown = "Unknown Panel"
     }
 
+    Node = {
+        Section = "Nodes"
+        HealthCheckConcurrencyTitle = "Health Check Concurrency"
+        HealthCheckConcurrencySummary = "Current option: %s"
+    }
+
     SubStore = {
         SectionHint = "Sub-Store resource download, both extension and static resources are required. After installing extension for the first time, please restart the app"
         ExtensionInstalled = "Extension Installed"
@@ -35,6 +41,22 @@ Feature = {
         DownloadHint = "Click to download extension"
         DownloadResources = "Download Resources"
         DownloadResourcesSummary = "Download frontend and backend resources at once"
+        FrontendResourceTitle = "Sub-Store Frontend"
+        FrontendResourceSummary = "Download and extract Sub-Store frontend static resources"
+        BackendResourceTitle = "Sub-Store Backend"
+        BackendResourceSummary = "Download Sub-Store backend bundle file"
+        ProgressTitle = "Downloading Sub-Store resources"
+        ProgressSummary = "Keep the network connected. Resource status will be checked after download"
+        StatusPending = "Pending"
+        StatusDownloading = "Downloading %d%%"
+        StatusSuccess = "Done"
+        StatusFailed = "Failed"
+        ProgressSuccess = "Resource downloaded"
+        ProgressFailed = "Resource download failed"
+        ProgressDetail = "%s / %s · %s"
+        ProgressDetailUnknownTotal = "Downloaded %s · %s"
+        ProgressWaiting = "Waiting"
+        ResourcesDownloadComplete = "Sub-Store resources downloaded: %d/%d"
         Not32Bit = "Sub-Store does not support 32-bit devices"
         InstallExtension = "Please install extension first"
         DownloadSubStoreFirst = "Please download Sub-Store resources first"

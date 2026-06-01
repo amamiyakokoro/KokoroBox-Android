@@ -26,6 +26,12 @@ Feature = {
         Unknown = "未知面板"
     }
 
+    Node = {
+        Section = "節點"
+        HealthCheckConcurrencyTitle = "測速並發數"
+        HealthCheckConcurrencySummary = "目前選項：%s"
+    }
+
     SubStore = {
         SectionHint = "Sub-Store 資源下載，需要同時安裝擴充套件包和靜態資源，首次安裝擴充套件包之後，請結束應用程式再開啟"
         ExtensionInstalled = "擴充套件包已安裝"
@@ -35,6 +41,22 @@ Feature = {
         DownloadHint = "點選前往下載擴充套件包"
         DownloadResources = "下載資源"
         DownloadResourcesSummary = "一次性下載前端和後端資源"
+        FrontendResourceTitle = "Sub-Store 前端"
+        FrontendResourceSummary = "下載並解壓 Sub-Store 前端靜態資源"
+        BackendResourceTitle = "Sub-Store 後端"
+        BackendResourceSummary = "下載 Sub-Store 後端 bundle 檔案"
+        ProgressTitle = "正在下載 Sub-Store 資源"
+        ProgressSummary = "請保持網路連線，下載完成後會自動檢查資源狀態"
+        StatusPending = "等待中"
+        StatusDownloading = "下載中 %d%%"
+        StatusSuccess = "已完成"
+        StatusFailed = "失敗"
+        ProgressSuccess = "資源已下載完成"
+        ProgressFailed = "資源下載失敗"
+        ProgressDetail = "%s / %s · %s"
+        ProgressDetailUnknownTotal = "已下載 %s · %s"
+        ProgressWaiting = "等待下載"
+        ResourcesDownloadComplete = "Sub-Store 資源下載完成：%d/%d"
         Not32Bit = "Sub-Store 不支援 32 位裝置"
         InstallExtension = "請先安裝擴充套件包"
         DownloadSubStoreFirst = "請先下載 Sub-Store 資源"

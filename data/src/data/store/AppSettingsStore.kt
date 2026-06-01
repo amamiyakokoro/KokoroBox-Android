@@ -50,7 +50,6 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val showTrafficNotification by boolFlow(true)
     val bottomBarAutoHide by boolFlow(true)
     val bottomBarUseLegacyStyle by boolFlow(false)
-    val topBarBlurEnabled by boolFlow(false)
     val acgMainUiEnabled by boolFlow(false)
     val acgWallpaperUri by strFlow("")
     val acgWallpaperZoom by floatFlow(1.0f)
@@ -70,12 +69,16 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val acgSidebarExpanded by boolFlow(true)
     val pageScale by floatFlow(1.0f)
     val singleNodeTest by boolFlow(true)
+    val healthCheckConcurrency by intFlow(DEFAULT_HEALTH_CHECK_CONCURRENCY)
     val screenshotProtectionEnabled by boolFlow(false)
     val biometricUnlockEnabled by boolFlow(false)
 
     val customUserAgent by strFlow("")
 
 }
+
+const val DEFAULT_HEALTH_CHECK_CONCURRENCY = 8
+val SUPPORTED_HEALTH_CHECK_CONCURRENCY = listOf(8, 16, 24, 32)
 
 const val DEFAULT_ACG_CUSTOM_QUOTE_LIST_JSON = """[
   {

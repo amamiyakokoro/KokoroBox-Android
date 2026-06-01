@@ -20,18 +20,36 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.animation.*
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
-import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 typealias OpenStringListModifiersEditor = (
     title: String,
@@ -54,7 +72,7 @@ fun PortInputContent(
     var textValue by remember { mutableStateOf(value?.toString() ?: "") }
     var inputValue by remember { mutableStateOf("") }
 
-    ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = if (value != null) "$value" else MLang.Component.Selector.NotModify,
         onClick = {
@@ -96,7 +114,7 @@ fun StringInputContent(
     val showDialog = remember { mutableStateOf(false) }
     var textValue by remember { mutableStateOf(value ?: "") }
 
-    ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = value?.takeIf { it.isNotEmpty() } ?: MLang.Component.Selector.NotModify,
         onClick = {
@@ -129,7 +147,7 @@ fun StringListInputContent(
         MLang.Component.Selector.NotModify
     }
 
-    ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = displayValue,
         onClick = onClick,
@@ -149,7 +167,7 @@ fun StringMapInputContent(
         MLang.Component.Selector.NotModify
     }
 
-    ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = displayValue,
         onClick = onClick,
@@ -182,7 +200,7 @@ private fun ConfigTextInputDialog(
                 .padding(vertical = UiDp.dp8),
             verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
         ) {
-            TextField(
+            YumeMd3OutlinedTextField(
                 value = textValue,
                 onValueChange = onTextValueChange,
                 label = label,
@@ -222,7 +240,7 @@ fun StringListWithModifiersInput(
         }.joinToString(" · ").ifEmpty { MLang.Component.Selector.NotModify }
     }
 
-    ArrowPreference(
+    PreferenceArrowItem(
         title = title,
         summary = summary,
         onClick = {
@@ -261,7 +279,7 @@ fun StringMapWithModifiersInput(
     }
 
     Column {
-        ArrowPreference(
+        PreferenceArrowItem(
             title = title,
             summary = summary,
             holdDownState = expanded,
@@ -333,8 +351,8 @@ fun StringMapWithModifiersInput(
                 Spacer(modifier = Modifier.height(UiDp.dp10))
                 Text(
                     text = "Merge mode only modifies specified keys; unmodified keys remain unchanged.",
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -356,18 +374,18 @@ private fun ModifierModeCard(
     ) {
         Text(
             text = title,
-            color = MiuixTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
             text = summary,
             modifier = Modifier.padding(top = UiDp.dp6),
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = helperText,
             modifier = Modifier.padding(top = UiDp.dp6),
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.outline,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.outline,
         )
         Spacer(modifier = Modifier.height(UiDp.dp10))
         Row(

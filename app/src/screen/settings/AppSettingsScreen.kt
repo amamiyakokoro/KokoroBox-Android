@@ -142,7 +142,6 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
     val invertOnPrimaryColors by viewModel.invertOnPrimaryColors.state.collectAsState()
     val bottomBarAutoHide by viewModel.bottomBarAutoHide.state.collectAsState()
     val bottomBarUseLegacyStyle by viewModel.bottomBarUseLegacyStyle.state.collectAsState()
-    val topBarBlurEnabled by viewModel.topBarBlurEnabled.state.collectAsState()
     val pageScale by viewModel.pageScale.state.collectAsState()
 
     Title(MLang.AppSettings.Interface.ColorThemeTitle)
@@ -226,12 +225,6 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             summary = MLang.AppSettings.Interface.LegacyNavbarStyleSummary,
             checked = bottomBarUseLegacyStyle,
             onCheckedChange = viewModel::onBottomBarUseLegacyStyleChange,
-        )
-        PreferenceSwitchItem(
-            title = MLang.AppSettings.Interface.TopBarBlurTitle,
-            summary = MLang.AppSettings.Interface.TopBarBlurSummary,
-            checked = topBarBlurEnabled,
-            onCheckedChange = viewModel::onTopBarBlurEnabledChange,
         )
         PageScalePreferenceItem(
             pageScale = pageScale,
@@ -664,12 +657,6 @@ private fun AcgWallpaperPreferenceItem(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        runCatching {
-            context.contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION,
-            )
-        }
         navigator.navigate(
             AcgWallpaperCropScreenDestination(
                 wallpaperUri = uri.toString(),

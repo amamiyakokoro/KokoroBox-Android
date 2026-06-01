@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of YumeBox.
  *
  * YumeBox is free software: you can redistribute it and/or modify
@@ -49,8 +49,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.data.model.ThemeMode
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.yume.Github
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
 import com.github.yumelira.yumebox.screen.settings.component.ThemeModeSelectorItem
@@ -207,7 +208,7 @@ internal fun PermissionContent(state: PermissionState) {
 
     DetailGroup {
         PermissionRow(
-            icon = Yume.Message,
+            icon = AppMd3Icons.Onboarding.Notification,
             title = MLang.Onboarding.Permission.Notification.Title,
             summary = notificationSummary,
             granted = state.notificationGranted,
@@ -223,7 +224,7 @@ internal fun PermissionContent(state: PermissionState) {
         )
         DetailDivider()
         PermissionRow(
-            icon = Yume.List,
+            icon = AppMd3Icons.Onboarding.AppList,
             title = MLang.Onboarding.Permission.AppList.Title,
             summary = if (state.appListGranted) {
                 MLang.Onboarding.Permission.Common.Granted
@@ -359,7 +360,7 @@ internal fun FinishHeroShell(
             delayMillis = 0,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         ) {
-            DetailPreviewBadge(icon = Yume.CircleCheckBig)
+            DetailPreviewBadge(icon = AppMd3Icons.Onboarding.Complete)
         }
 
         Spacer(modifier = Modifier.height(UiDp.dp32))
@@ -385,7 +386,7 @@ internal fun FinishHeroShell(
                     )
                     DetailDivider()
                     ProjectLinkRow(
-                        icon = Yume.Message,
+                        icon = AppMd3Icons.Onboarding.Community,
                         title = MLang.Onboarding.Project.Community.Title,
                         summary = MLang.Onboarding.Project.Community.Summary,
                         onClick = onCommunityClick,

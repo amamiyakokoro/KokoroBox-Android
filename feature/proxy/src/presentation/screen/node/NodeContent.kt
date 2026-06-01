@@ -19,8 +19,6 @@
  */
 
 
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
-
 package com.github.yumelira.yumebox.presentation.screen.node
 
 import android.annotation.SuppressLint
@@ -42,7 +40,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,23 +48,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.data.model.normalizeProxySheetHeightFraction
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeState
-import com.github.yumelira.yumebox.presentation.component.LocalTopBarHazeStyle
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.UiDp
-import dev.chrisbanes.haze.HazeProgressive
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.hazeEffect
 import top.yukonga.miuix.kmp.utils.overScrollHorizontal
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 
@@ -82,20 +76,6 @@ private fun LazyListState.isScrolledFromTop(): Boolean {
     return firstVisibleItemIndex > 0 || firstVisibleItemScrollOffset > 0
 }
 
-private fun Modifier.nodeTabHaze(state: HazeState?, style: HazeStyle?): Modifier {
-    if (state == null || style == null) return this
-    return hazeEffect(state) {
-        this.style = style
-        blurRadius = UiDp.dp30
-        noiseFactor = 0f
-        progressive = HazeProgressive.verticalGradient(
-            startIntensity = 1f,
-            endIntensity = 0f,
-            preferPerformance = true,
-        )
-    }
-}
-
 @Suppress("unused")
 @Composable
 internal fun NodeTabs(
@@ -103,8 +83,6 @@ internal fun NodeTabs(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
 ) {
-    val hazeState = LocalTopBarHazeState.current
-    val hazeStyle = LocalTopBarHazeStyle.current
     val hapticFeedback = LocalHapticFeedback.current
     val listState = rememberLazyListState()
 
@@ -120,7 +98,6 @@ internal fun NodeTabs(
         state = listState,
         modifier = Modifier
             .fillMaxWidth()
-            .nodeTabHaze(hazeState, hazeStyle)
             .background(MaterialTheme.colorScheme.surface)
             .overScrollHorizontal(),
         contentPadding = PaddingValues(start = UiDp.dp14, end = UiDp.dp14, top = UiDp.dp10, bottom = UiDp.dp10),
@@ -129,7 +106,9 @@ internal fun NodeTabs(
     ) {
         itemsIndexed(groups, key = { _, group -> group.name }) { index, group ->
             val selected = index == selectedIndex
-            val motionScheme = MaterialTheme.motionScheme
+            val fastEffectsSpec = AppMotion.fastEffects<Color>()
+            val fastSpatialSpec = AppMotion.fastSpatial<Float>()
+            val indicatorSpec = AppMotion.indicator<Float>()
             val selectionScaleX = remember { Animatable(1f) }
             val background = animateColorAsState(
                 targetValue = if (selected) {
@@ -137,7 +116,7 @@ internal fun NodeTabs(
                 } else {
                     MaterialTheme.colorScheme.surfaceContainer
                 },
-                animationSpec = motionScheme.fastEffectsSpec(),
+                animationSpec = fastEffectsSpec,
                 label = "node_tab_background",
             ).value
             val textColor = animateColorAsState(
@@ -146,16 +125,16 @@ internal fun NodeTabs(
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
-                animationSpec = motionScheme.fastEffectsSpec(),
+                animationSpec = fastEffectsSpec,
                 label = "node_tab_text",
             ).value
             LaunchedEffect(selected) {
                 if (selected) {
                     selectionScaleX.snapTo(1f)
-                    selectionScaleX.animateTo(1.06f, animationSpec = motionScheme.fastSpatialSpec())
-                    selectionScaleX.animateTo(1f, animationSpec = motionScheme.defaultSpatialSpec())
+                    selectionScaleX.animateTo(1.06f, animationSpec = fastSpatialSpec)
+                    selectionScaleX.animateTo(1f, animationSpec = indicatorSpec)
                 } else {
-                    selectionScaleX.animateTo(1f, animationSpec = motionScheme.fastSpatialSpec())
+                    selectionScaleX.animateTo(1f, animationSpec = fastSpatialSpec)
                 }
             }
 
@@ -269,11 +248,11 @@ fun NodeSheetContent(
             AnimatedVisibility(
                 visible = isDelayTesting,
                 enter = expandVertically(
-                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                    animationSpec = AppMotion.fastSpatial<IntSize>(),
                     expandFrom = Alignment.Top,
                 ) + fadeIn(animationSpec = tween(durationMillis = 150)),
                 exit = shrinkVertically(
-                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                    animationSpec = AppMotion.fastSpatial<IntSize>(),
                     shrinkTowards = Alignment.Top,
                 ) + fadeOut(animationSpec = tween(durationMillis = 150)),
             ) {

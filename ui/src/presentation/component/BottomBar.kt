@@ -25,19 +25,16 @@ import com.github.yumelira.yumebox.presentation.theme.UiDp
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -47,52 +44,33 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Arrow-down-up`
-import com.github.yumelira.yumebox.presentation.icon.yume.Bolt
-import com.github.yumelira.yumebox.presentation.icon.yume.House
-import com.github.yumelira.yumebox.presentation.icon.yume.`Package-check`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.kyant.shapes.Capsule
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.chrisbanes.haze.*
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.shapes.SmoothUnevenRoundedCornerShape
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -159,8 +137,6 @@ val LocalPagerState = compositionLocalOf<PagerState> { error("LocalPagerState is
 val LocalMainPagerState = compositionLocalOf<MainPagerState> { error("LocalMainPagerState is not provided") }
 val LocalHandlePageChange = compositionLocalOf<(Int) -> Unit> { error("LocalHandlePageChange is not provided") }
 val LocalNavigator = compositionLocalOf<DestinationsNavigator> { error("LocalNavigator is not provided") }
-val LocalBottomBarHazeState = compositionLocalOf<HazeState?> { null }
-val LocalBottomBarHazeStyle = compositionLocalOf<HazeStyle?> { null }
 val LocalBottomBarUseLegacyStyle = compositionLocalOf { false }
 
 object MainBottomBarDefaults {
@@ -219,71 +195,6 @@ fun rememberBottomBarReservedHeight(
     }
 }
 
-@OptIn(ExperimentalHazeApi::class)
-private fun Modifier.bottomBarHazeEffect(
-    state: HazeState?,
-    style: HazeStyle?,
-): Modifier {
-    if (state == null || style == null) return this
-
-    return hazeEffect(state) {
-        this.style = style
-        blurRadius = UiDp.dp26
-        inputScale = HazeInputScale.Fixed(0.24f)
-        noiseFactor = 0f
-        forceInvalidateOnPreDraw = false
-    }
-}
-
-private fun Modifier.bottomBarOutline(
-    shape: Shape,
-    color: Color,
-    edgeFadeAlpha: Float,
-    middleFadeAlpha: Float,
-): Modifier = graphicsLayer(
-    compositingStrategy = CompositingStrategy.Offscreen,
-).drawWithCache {
-    val strokeWidth = max(MainBottomBarDefaults.BorderWidth.toPx(), 1f)
-    val outline = shape.createOutline(size, layoutDirection, this)
-    val topBorderHeight = MainBottomBarDefaults.CornerRadius.toPx() + strokeWidth * 2f
-    val fadeMaskBrush = Brush.horizontalGradient(
-        colorStops = arrayOf(
-            0f to Color.Transparent,
-            0.01f to Black.copy(alpha = edgeFadeAlpha),
-            0.025f to Black.copy(alpha = middleFadeAlpha),
-            0.045f to Black,
-            0.955f to Black,
-            0.975f to Black.copy(alpha = middleFadeAlpha),
-            0.99f to Black.copy(alpha = edgeFadeAlpha),
-            1f to Color.Transparent,
-        )
-    )
-    val layerBounds = Rect(0f, 0f, size.width, size.height)
-    val layerPaint = Paint()
-
-    onDrawWithContent {
-        drawContent()
-        drawIntoCanvas { canvas ->
-            canvas.saveLayer(layerBounds, layerPaint)
-        }
-        clipRect(bottom = topBorderHeight) {
-            drawOutline(
-                outline = outline,
-                color = color,
-                style = Stroke(width = strokeWidth),
-            )
-        }
-        drawIntoCanvas { canvas ->
-            drawRect(
-                brush = fadeMaskBrush,
-                size = size,
-                blendMode = BlendMode.DstIn,
-            )
-            canvas.restore()
-        }
-    }
-}
-
 @Composable
 fun BottomBarContent(
     isVisible: Boolean = true,
@@ -296,6 +207,7 @@ fun BottomBarContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ModernBottomBarContent(
     isVisible: Boolean = true,
@@ -315,30 +227,31 @@ private fun ModernBottomBarContent(
             handlePageChange(index)
         }
     }
+    val indicatorColor = MaterialTheme.colorScheme.primaryContainer
 
     AnimatedVisibility(
         visible = bottomBarVisible,
         enter = fadeIn(
             animationSpec = tween(
                 durationMillis = 240,
-                easing = AnimationSpecs.EmphasizedDecelerate,
+                easing = AppMotion.EmphasizedDecelerate,
             )
         ) + slideInVertically(
             animationSpec = tween(
                 durationMillis = 240,
-                easing = AnimationSpecs.EmphasizedDecelerate,
+                easing = AppMotion.EmphasizedDecelerate,
             ),
             initialOffsetY = { fullHeight -> (fullHeight * 0.92f).toInt() },
         ),
         exit = fadeOut(
             animationSpec = tween(
                 durationMillis = 180,
-                easing = AnimationSpecs.EmphasizedAccelerate,
+                easing = AppMotion.EmphasizedAccelerate,
             )
         ) + slideOutVertically(
             animationSpec = tween(
                 durationMillis = 220,
-                easing = AnimationSpecs.EmphasizedAccelerate,
+                easing = AppMotion.EmphasizedAccelerate,
             ),
             targetOffsetY = { fullHeight -> (fullHeight * 1.08f).toInt() },
         ),
@@ -348,124 +261,30 @@ private fun ModernBottomBarContent(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             tonalElevation = UiDp.dp3,
         ) {
-            BottomBarDestination.entries.forEachIndexed { index, destination ->
-                NavigationBarItem(
-                    selected = page == index,
-                    onClick = { onItemClick(index) },
-                    icon = {
-                        MaterialIcon(
-                            imageVector = destination.icon,
-                            contentDescription = destination.label,
-                        )
-                    },
-                    label = { MaterialText(destination.label) },
-                    enabled = bottomBarVisible,
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    ),
-                )
+            CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                BottomBarDestination.entries.forEachIndexed { index, destination ->
+                    NavigationBarItem(
+                        selected = page == index,
+                        onClick = { onItemClick(index) },
+                        icon = {
+                            MaterialIcon(
+                                imageVector = destination.icon,
+                                contentDescription = destination.label,
+                            )
+                        },
+                        label = { MaterialText(destination.label) },
+                        enabled = bottomBarVisible,
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = indicatorColor,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-private fun BottomBarLayout(
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit,
-) {
-    val captionBarBottomPadding = WindowInsets.captionBar
-        .only(WindowInsetsSides.Bottom)
-        .asPaddingValues()
-        .calculateBottomPadding()
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MainBottomBarDefaults.ItemHeight),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            content = content,
-        )
-
-        val navigationBarsPadding = WindowInsets.navigationBars.asPaddingValues()
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(navigationBarsPadding.calculateBottomPadding() + captionBarBottomPadding)
-                .pointerInput(Unit) {
-                    detectTapGestures { }
-                },
-        )
-    }
-}
-
-@Composable
-private fun RowScope.BottomBarItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: ImageVector,
-    label: String,
-    enabled: Boolean,
-    selectedColor: Color,
-    unselectedColor: Color,
-) {
-    val opacity = AppTheme.opacity
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val tint = when {
-        isPressed -> if (selected) {
-            selectedColor.copy(alpha = opacity.medium)
-        } else {
-            unselectedColor.copy(alpha = opacity.secondaryText)
-        }
-
-        selected -> selectedColor
-        else -> unselectedColor
-    }
-
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight()
-            .clickable(
-                enabled = enabled,
-                interactionSource = interactionSource,
-                indication = null,
-                role = Role.Tab,
-                onClick = onClick,
-            )
-            .semantics(mergeDescendants = true) {
-                this.selected = selected
-                this.role = Role.Tab
-            },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier
-                .size(MainBottomBarDefaults.IconSize),
-        )
-        Spacer(modifier = Modifier.height(MainBottomBarDefaults.IconLabelSpacing))
-        BasicText(
-            text = label,
-            style = TextStyle(
-                color = tint,
-                fontSize = MainBottomBarDefaults.LabelFontSize,
-                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                textAlign = TextAlign.Center,
-            ),
-        )
     }
 }
 
@@ -488,7 +307,6 @@ private fun LegacyBottomBarContent(
     }
     val bottomBarVisible = isVisible && (bottomBarScrollBehavior?.isBottomBarVisible ?: true)
     val density = LocalDensity.current
-    val opacity = AppTheme.opacity
     val enterOffsetPx = remember(density) { with(density) { MainBottomBarDefaults.EnterOffset.toPx() } }
     val exitOffsetPx = remember(density) { with(density) { MainBottomBarDefaults.ExitOffset.toPx() } }
     val animatedTranslationY = remember { Animatable(if (bottomBarVisible) 0f else exitOffsetPx) }
@@ -497,9 +315,9 @@ private fun LegacyBottomBarContent(
         animationSpec = tween(
             durationMillis = 240,
             easing = if (bottomBarVisible) {
-                AnimationSpecs.EmphasizedDecelerate
+                AppMotion.EmphasizedDecelerate
             } else {
-                AnimationSpecs.EmphasizedAccelerate
+                AppMotion.EmphasizedAccelerate
             },
         ),
         label = "legacy_bottom_bar_scale",
@@ -509,9 +327,9 @@ private fun LegacyBottomBarContent(
         animationSpec = tween(
             durationMillis = 180,
             easing = if (bottomBarVisible) {
-                AnimationSpecs.EmphasizedDecelerate
+                AppMotion.EmphasizedDecelerate
             } else {
-                AnimationSpecs.EmphasizedAccelerate
+                AppMotion.EmphasizedAccelerate
             },
         ),
         label = "legacy_bottom_bar_alpha",
@@ -522,17 +340,14 @@ private fun LegacyBottomBarContent(
             animatedTranslationY.snapTo(enterOffsetPx)
             animatedTranslationY.animateTo(
                 targetValue = 0f,
-                animationSpec = spring(
-                    dampingRatio = 0.78f,
-                    stiffness = 520f,
-                ),
+                animationSpec = AppMotion.pressReturn,
             )
         } else {
             animatedTranslationY.animateTo(
                 targetValue = exitOffsetPx,
                 animationSpec = tween(
                     durationMillis = 220,
-                    easing = AnimationSpecs.EmphasizedAccelerate,
+                    easing = AppMotion.EmphasizedAccelerate,
                 ),
             )
         }
@@ -552,10 +367,11 @@ private fun LegacyBottomBarContent(
         val gestureBottom = WindowInsets.systemGestures.getBottom(this)
         max(navigationBottom, gestureBottom).toDp()
     }
-    val selectedColor = MiuixTheme.colorScheme.primary
-    val unselectedColor = MiuixTheme.colorScheme.onSurface.copy(alpha = opacity.secondaryText)
-    val containerColor = MiuixTheme.colorScheme.background
-    val indicatorContainerColor = selectedColor.copy(alpha = opacity.subtle)
+    val selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val selectedTextColor = MaterialTheme.colorScheme.primary
+    val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val containerColor = MaterialTheme.colorScheme.surfaceContainer
+    val indicatorContainerColor = MaterialTheme.colorScheme.primaryContainer
 
     LegacyBottomNavigationBar(
         selectedIndex = page,
@@ -580,7 +396,8 @@ private fun LegacyBottomBarContent(
             },
     ) {
         BottomBarDestination.entries.forEachIndexed { index, destination ->
-            val itemColor = if (page == index) selectedColor else unselectedColor
+            val itemIconColor = if (page == index) selectedIconColor else unselectedColor
+            val itemTextColor = if (page == index) selectedTextColor else unselectedColor
             LegacyBottomNavigationTabItem(
                 enabled = bottomBarVisible,
                 onClick = { onItemClick(index) },
@@ -589,16 +406,16 @@ private fun LegacyBottomBarContent(
                     modifier = Modifier.size(UiDp.dp20),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(
+                    MaterialIcon(
                         imageVector = destination.icon,
                         contentDescription = destination.label,
-                        tint = itemColor,
+                        tint = itemIconColor,
                     )
                 }
                 BasicText(
                     text = destination.label,
                     style = TextStyle(
-                        color = itemColor,
+                        color = itemTextColor,
                         fontSize = 11.sp,
                         fontWeight = if (page == index) FontWeight.SemiBold else FontWeight.Medium,
                     ),
@@ -620,7 +437,6 @@ private fun LegacyBottomNavigationBar(
 ) {
     val opacity = AppTheme.opacity
     val density = LocalDensity.current
-    val isLightTheme = !isSystemInDarkTheme()
     val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
     val surfaceWidthPx = remember { mutableIntStateOf(0) }
     val safeSelectedIndex = selectedIndex.coerceIn(0, tabsCount - 1)
@@ -634,21 +450,7 @@ private fun LegacyBottomNavigationBar(
         innerWidthPx - (safeIndicatorProgress + 1f) * tabWidthPx
     }
     val indicatorScale = remember { Animatable(1f) }
-    val borderShadowColor = if (isLightTheme) {
-        Black.copy(alpha = opacity.subtle)
-    } else {
-        Black.copy(alpha = opacity.surfaceSoft)
-    }
-    val outerBorderColor = if (isLightTheme) {
-        White.copy(alpha = opacity.disabledSecondary)
-    } else {
-        Black.copy(alpha = opacity.mediumOverlay)
-    }
-    val innerBorderColor = if (isLightTheme) {
-        Black.copy(alpha = opacity.ultraSubtle)
-    } else {
-        White.copy(alpha = opacity.verySubtle)
-    }
+    val borderShadowColor = Black.copy(alpha = opacity.surfaceSoft)
 
     LaunchedEffect(safeSelectedIndex) {
         launch {
@@ -693,11 +495,6 @@ private fun LegacyBottomNavigationBar(
             verticalAlignment = Alignment.CenterVertically,
             content = content,
         )
-
-        LegacyBottomNavigationBorders(
-            outerBorderColor = outerBorderColor,
-            innerBorderColor = innerBorderColor,
-        )
     }
 }
 
@@ -720,33 +517,6 @@ private fun LegacyBottomNavigationIndicator(
                 scaleY = indicatorScale
             }
             .background(indicatorContainerColor, Capsule()),
-    )
-}
-
-@Composable
-private fun BoxScope.LegacyBottomNavigationBorders(
-    outerBorderColor: Color,
-    innerBorderColor: Color,
-) {
-    Box(
-        modifier = Modifier
-            .matchParentSize()
-            .border(
-                width = UiDp.dp0_3,
-                color = outerBorderColor,
-                shape = Capsule(),
-            ),
-    )
-
-    Box(
-        modifier = Modifier
-            .matchParentSize()
-            .padding(UiDp.dp1)
-            .border(
-                width = UiDp.dp0_2,
-                color = innerBorderColor,
-                shape = Capsule(),
-            ),
     )
 }
 
@@ -778,10 +548,10 @@ private fun RowScope.LegacyBottomNavigationTabItem(
 enum class BottomBarDestination(
     val icon: ImageVector,
 ) {
-    Home(Yume.House),
-    Proxy(Yume.`Arrow-down-up`),
-    Config(Yume.`Package-check`),
-    Setting(Yume.Bolt),
+    Home(AppMd3Icons.Shell.OpenHome),
+    Proxy(AppMd3Icons.Shell.OpenProxy),
+    Config(AppMd3Icons.Shell.OpenProfileConfig),
+    Setting(AppMd3Icons.Shell.OpenSettings),
     ;
 
     val label: String

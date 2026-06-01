@@ -32,6 +32,22 @@ Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeReset(JNIEnv *env, job
     reset();
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeValidateGeoFile(JNIEnv *env, jobject thiz,
+                                                                        jstring path,
+                                                                        jstring type) {
+    TRACE_METHOD();
+
+    scoped_string _path = get_string(path);
+    scoped_string _type = get_string(type);
+    scoped_string response = validateGeoFile(_path, _type);
+
+    if (response == NULL)
+        return new_string("{\"valid\":false,\"message\":\"native validation returned null\"}");
+
+    return new_string(response);
+}
+
 JNIEXPORT void JNICALL
 Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeForceGc(JNIEnv *env, jobject thiz) {
     TRACE_METHOD();

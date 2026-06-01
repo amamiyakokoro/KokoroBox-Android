@@ -22,6 +22,7 @@
 package com.github.yumelira.yumebox.presentation.component
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -98,6 +99,8 @@ fun EditorListItem(
     deleteIcon: ImageVector,
     deleteContentDescription: String,
 ) {
+    val destructiveActionColors = yumeDestructiveActionColors()
+
     Card(modifier = modifier.padding(vertical = UiDp.dp4)) {
         Row(
             modifier = Modifier
@@ -146,7 +149,7 @@ fun EditorListItem(
                 Icon(
                     imageVector = deleteIcon,
                     contentDescription = deleteContentDescription,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = destructiveActionColors.contentColor,
                 )
             }
         }

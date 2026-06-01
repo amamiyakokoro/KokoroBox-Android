@@ -27,8 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 
 @Composable
 fun LinkItem(
@@ -44,7 +43,7 @@ fun LinkItem(
         trailingContent = if (showArrow) {
             {
                 Icon(
-                    imageVector = Yume.chevron,
+                    imageVector = AppMd3Icons.Navigation.Forward,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

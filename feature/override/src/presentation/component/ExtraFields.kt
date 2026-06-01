@@ -26,11 +26,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.github.yumelira.yumebox.presentation.icon.Yume
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.icon.yume.`Badge-plus`
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.util.*
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
@@ -60,7 +58,7 @@ fun OverrideExtraFieldsCard(
                 },
                 endActions = {
                     OverrideCardActionIconButton(
-                        imageVector = Yume.`Badge-plus`,
+                        imageVector = AppMd3Icons.Action.Add,
                         contentDescription = MLang.Override.Draft.AddExtraField,
                         onClick = onAddClick,
                         tone = OverrideActionTone.Primary,
@@ -77,9 +75,10 @@ fun OverrideExtraFieldsCard(
                         onClick = { onEditClick(entry.key, entry.value) },
                         endActions = {
                             OverrideCardActionIconButton(
-                                imageVector = Yume.Delete,
+                                imageVector = AppMd3Icons.Action.Delete,
                                 contentDescription = MLang.Override.Draft.DeleteExtraField,
                                 onClick = { onDeleteClick(entry.key) },
+                                tone = OverrideActionTone.Danger,
                             )
                         },
                     )

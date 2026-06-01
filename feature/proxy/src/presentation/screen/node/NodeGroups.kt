@@ -47,8 +47,7 @@ import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Check
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
@@ -60,7 +59,11 @@ private data class GroupBadge(
     val label: String,
 )
 
+private const val ZAKO_GROUP_NAME = "zako"
+
 private fun groupBadge(type: Proxy.Type): GroupBadge = GroupBadge(type.name)
+
+private fun ProxyGroupInfo.isZakoGroup(): Boolean = name.equals(ZAKO_GROUP_NAME, ignoreCase = true)
 
 internal fun LazyListScope.nodeGroupItems(
     groups: List<ProxyGroupInfo>,
@@ -88,7 +91,7 @@ internal fun LazyListScope.nodeGroupItems(
 internal fun NodeGroupCard(
     group: ProxyGroupInfo,
     isDelayTesting: Boolean,
-    onClick: (ProxyGroupInfo) -> Unit,
+    onClick: ((ProxyGroupInfo) -> Unit)?,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     showTrailingIndicator: Boolean = true,
@@ -108,13 +111,19 @@ internal fun NodeGroupCard(
             title = currentProxy?.title,
         )
     }
-    val currentNodeName = remember(currentNode.displayName, group.now) {
-        currentNode.displayName.ifBlank { group.now.trim() }.ifBlank { MLang.Proxy.Mode.Direct }
+    val isZakoGroup = remember(group.name) { group.isZakoGroup() }
+    val currentNodeName = if (isZakoGroup) {
+        MLang.Proxy.Zako.Others
+    } else {
+        remember(currentNode.displayName, group.now) {
+            currentNode.displayName.ifBlank { group.now.trim() }.ifBlank { MLang.Proxy.Mode.Direct }
+        }
     }
-    val currentDelay = remember(currentProxy) { currentProxy?.delay }
+    val currentDelay = remember(currentProxy, isZakoGroup) { currentProxy?.delay?.takeUnless { isZakoGroup } }
     val badge = remember(group.type) { groupBadge(group.type) }
+    val badgeLabel = if (isZakoGroup) MLang.Proxy.Zako.Badge else badge.label
     val delayLabel = nodeLatencyLabel(currentDelay)
-    val onCardClick = remember(group, onClick) { { onClick(group) } }
+    val onCardClick = remember(group, onClick) { onClick?.let { click -> { click(group) } } }
 
     NodeSelectableCard(
         isSelected = isSelected,
@@ -181,7 +190,7 @@ internal fun NodeGroupCard(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    text = badge.label,
+                    text = badgeLabel,
                     style = MiuixTheme.textStyles.footnote1.copy(fontSize = 11.sp),
                     fontWeight = FontWeight.SemiBold,
                     color = palette.chipContentColor,
@@ -201,7 +210,7 @@ internal fun NodeGroupCard(
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
-                                imageVector = Yume.Check,
+                                imageVector = AppMd3Icons.Action.Check,
                                 contentDescription = null,
                                 tint = palette.trailingBadgeContentColor,
                                 modifier = Modifier.size(spacing.space14),

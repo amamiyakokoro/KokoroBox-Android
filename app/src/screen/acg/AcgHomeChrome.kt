@@ -29,7 +29,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,11 +63,10 @@ import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Waiting
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import com.github.yumelira.yumebox.presentation.util.extractFlaggedName
 import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
 import com.github.yumelira.yumebox.screen.home.displayableExternalIp
@@ -277,7 +275,7 @@ internal fun AcgInlineIconButton(
     val tint = colorScheme.primary.copy(alpha = if (enabled) 0.92f else 0.38f)
     val pressScale by animateFloatAsState(
         targetValue = if (isPressed && enabled) 0.92f else 1f,
-        animationSpec = spring(dampingRatio = 0.48f, stiffness = 560f),
+        animationSpec = AppMotion.press(),
         label = "acg_inline_icon_button_press_scale",
     )
 
@@ -317,21 +315,24 @@ internal fun AcgLaunchButton(
     val colorScheme = MiuixTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    val isDestructiveAction = controlState == HomeProxyControlState.Running
+    val isDarkSurface = colorScheme.surface.luminance() < 0.5f
     val background = when {
-        !enabled -> colorScheme.primaryContainer.copy(alpha = 0.48f)
+        !enabled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f)
+        isDestructiveAction && isDarkSurface -> MaterialTheme.colorScheme.error.copy(alpha = 0.22f)
+        isDestructiveAction -> MaterialTheme.colorScheme.errorContainer
         else -> colorScheme.primary
     }
     val contentColor = when {
-        !enabled -> colorScheme.onPrimaryContainer.copy(alpha = 0.56f)
+        !enabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.56f)
+        isDestructiveAction && isDarkSurface -> MaterialTheme.colorScheme.error.copy(alpha = 0.92f)
+        isDestructiveAction -> MaterialTheme.colorScheme.onErrorContainer
         else -> colorScheme.onPrimary
     }
     val containerAlpha = if (enabled) 1f else 0.88f
     val pressScale by animateFloatAsState(
         targetValue = if (isPressed && enabled) AcgUi.Button.PressedScale else 1f,
-        animationSpec = spring(
-            dampingRatio = 0.42f,
-            stiffness = 520f,
-        ),
+        animationSpec = AppMotion.press(),
         label = "acg_launch_button_press_scale",
     )
 
@@ -367,7 +368,7 @@ internal fun AcgLaunchButton(
                     HomeProxyControlState.Running -> ShellIcons.StopProxy
                     HomeProxyControlState.Connecting,
                     HomeProxyControlState.Disconnecting,
-                        -> Yume.Waiting
+                        -> AppMd3Icons.Home.StatusWaiting
                 },
                 contentDescription = null,
                 tint = contentColor,
@@ -385,26 +386,26 @@ internal fun AcgLaunchButton(
                             slideInVertically(
                                 initialOffsetY = { it / 2 },
                                 animationSpec = tween(
-                                    durationMillis = AnimationSpecs.DURATION_FAST,
-                                    easing = AnimationSpecs.EmphasizedDecelerate,
+                                    durationMillis = AppMotion.DURATION_FAST,
+                                    easing = AppMotion.EmphasizedDecelerate,
                                 ),
                             ) + fadeIn(
                                 animationSpec = tween(
-                                    durationMillis = AnimationSpecs.DURATION_FAST,
-                                    easing = AnimationSpecs.EnterEasing,
+                                    durationMillis = AppMotion.DURATION_FAST,
+                                    easing = AppMotion.EnterEasing,
                                 ),
                             )
                         ).togetherWith(
                             slideOutVertically(
                                 targetOffsetY = { -it / 2 },
                                 animationSpec = tween(
-                                    durationMillis = AnimationSpecs.DURATION_INSTANT,
-                                    easing = AnimationSpecs.EmphasizedAccelerate,
+                                    durationMillis = AppMotion.DURATION_INSTANT,
+                                    easing = AppMotion.EmphasizedAccelerate,
                                 ),
                             ) + fadeOut(
                                 animationSpec = tween(
-                                    durationMillis = AnimationSpecs.DURATION_INSTANT,
-                                    easing = AnimationSpecs.ExitEasing,
+                                    durationMillis = AppMotion.DURATION_INSTANT,
+                                    easing = AppMotion.ExitEasing,
                                 ),
                             )
                         ).using(

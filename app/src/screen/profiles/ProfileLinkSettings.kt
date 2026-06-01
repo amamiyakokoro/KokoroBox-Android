@@ -52,8 +52,7 @@ import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
 import com.github.yumelira.yumebox.presentation.component.SectionCard
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Delete
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
@@ -155,7 +154,7 @@ internal fun LinkSettingsDialog(
                                     IconButton(
                                         onClick = { onDeleteLink(link.id) }) {
                                         Icon(
-                                            imageVector = Yume.Delete,
+                                            imageVector = AppMd3Icons.Action.Delete,
                                             contentDescription = "Delete",
                                             tint = MaterialTheme.colorScheme.error
                                         )

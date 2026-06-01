@@ -44,6 +44,7 @@ import com.github.yumelira.yumebox.core.model.ConnectionInfo
 import com.github.yumelira.yumebox.common.util.formatBytes
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
@@ -220,13 +221,15 @@ private fun InterruptConnectionButton(
     isInterrupting: Boolean,
     onInterrupt: () -> Unit,
 ) {
+    val destructiveActionColors = yumeDestructiveActionColors()
+
     Button(
         onClick = onInterrupt,
         enabled = !isInterrupting,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            containerColor = destructiveActionColors.containerColor,
+            contentColor = destructiveActionColors.contentColor,
         ),
     ) {
         Text(
@@ -235,7 +238,7 @@ private fun InterruptConnectionButton(
             } else {
                 MLang.Connection.Detail.Action.Interrupt
             },
-            color = MaterialTheme.colorScheme.onErrorContainer,
+            color = destructiveActionColors.contentColor,
         )
     }
 }

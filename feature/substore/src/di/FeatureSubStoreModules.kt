@@ -33,7 +33,7 @@ import org.koin.dsl.module
 val featureSubStoreViewModelModule = module {
     single { SubStoreDownloadClient(androidApplication(), get()) }
     viewModel { SettingViewModel(get()) }
-    viewModel { FeatureViewModel(get(), androidApplication(), get()) }
+    viewModel { FeatureViewModel(get(), get(), androidApplication(), get()) }
 }
 
 val featureSubStoreModules: List<Module> = listOf(

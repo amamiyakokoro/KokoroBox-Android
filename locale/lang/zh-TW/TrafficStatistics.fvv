@@ -31,6 +31,7 @@ TrafficStatistics = {
 
     Action = {
         Clear = "清空統計"
+        ClearConfirmMessage = "清空後將無法復原所有流量統計資料。"
         ClearSuccess = "統計資料已清空"
     }
 

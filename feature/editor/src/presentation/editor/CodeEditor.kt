@@ -72,9 +72,9 @@ fun CodeEditor(
     }
 
     val editorThemeState = EditorThemeManager.rememberEditorTheme()
-    LaunchedEffect(editorThemeState.isDark) {
+    LaunchedEffect(editorThemeState) {
         editorRef.value?.let { editor ->
-            EditorThemeManager.updateTheme(editor, editorThemeState.isDark)
+            EditorThemeManager.updateTheme(editor, editorThemeState)
         }
     }
 
@@ -95,7 +95,7 @@ fun CodeEditor(
 
     AndroidView(
         factory = { ctx ->
-            createCodeEditor(ctx, state, editorThemeState.isDark) { text ->
+            createCodeEditor(ctx, state, editorThemeState) { text ->
                 pendingTextChange = text
             }.also { editor ->
                 state.editor = editor
@@ -117,7 +117,7 @@ fun CodeEditor(
 private fun createCodeEditor(
     context: android.content.Context,
     state: CodeEditorState,
-    isDark: Boolean,
+    theme: com.github.yumelira.yumebox.feature.editor.presentation.theme.EditorThemeState,
     onTextChange: ((String) -> Unit)?
 ): CodeEditor {
 
@@ -137,7 +137,7 @@ private fun createCodeEditor(
 
         setText(state.content)
 
-        EditorThemeManager.applyTheme(this, isDark)
+        EditorThemeManager.applyTheme(this, theme)
         TextMateInitializer.setLanguage(this, state.language)
 
         subscribeAlways<ContentChangeEvent> {

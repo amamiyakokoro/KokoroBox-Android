@@ -32,8 +32,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3SwitchPreferenceItem
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.chevron
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 
 @Composable
 fun PreferenceSwitchItem(
@@ -79,7 +78,7 @@ fun PreferenceArrowItem(
             endActions?.invoke(this)
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                imageVector = Yume.chevron,
+                imageVector = AppMd3Icons.Navigation.Forward,
                 contentDescription = null,
                 tint = if (enabled) {
                     MaterialTheme.colorScheme.onSurfaceVariant

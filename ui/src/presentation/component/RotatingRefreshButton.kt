@@ -29,8 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Refresh
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 
 @Composable
 fun RotatingRefreshButton(
@@ -55,7 +54,7 @@ fun RotatingRefreshButton(
         enabled = !isRotating
     ) {
         Icon(
-            imageVector = MiuixIcons.Refresh,
+            imageVector = AppMd3Icons.Action.Refresh,
             contentDescription = contentDescription,
             modifier = if (isRotating) Modifier.rotate(rotation) else Modifier
         )

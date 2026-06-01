@@ -21,11 +21,13 @@
 
 package com.github.yumelira.yumebox.screen.profiles
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.yumelira.yumebox.presentation.theme.appPressSink
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -59,7 +61,10 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @SuppressLint("UseKtx")
 @Composable
-fun ProfilesPager(mainInnerPadding: PaddingValues) {
+fun ProfilesPager(
+    mainInnerPadding: PaddingValues,
+    lazyListState: LazyListState,
+) {
     val navigator = LocalNavigator.current
     val profilesViewModel = koinViewModel<ProfilesViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
@@ -155,7 +160,6 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                 secondLine = MLang.ProfilesPage.Empty.Hint
             )
         } else {
-            val lazyListState = rememberLazyListState()
             val reorderableLazyListState =
                 rememberReorderableLazyListState(lazyListState) { from, to ->
                     profilesViewModel.reorderProfiles(from.index, to.index)
@@ -174,13 +178,22 @@ fun ProfilesPager(mainInnerPadding: PaddingValues) {
                         reorderableLazyListState,
                         key = profile.uuid.toString()
                     ) { isDragging ->
+                        val dragInteractionSource = remember { MutableInteractionSource() }
                         ProfileCard(
                             profile = profile,
                             workDir = App.instance.filesDir.resolve("imported"),
                             isDownloading = false,
                             isUpdating = profile.uuid in updatingProfileIds,
                             modifier = Modifier
-                                .longPressDraggableHandle()
+                                .appPressSink(
+                                    interactionSource = dragInteractionSource,
+                                    enabled = true,
+                                    pressedScale = 0.98f,
+                                    pressedTranslationY = UiDp.dp1,
+                                    minimumVisibleMillis = 0L,
+                                    forcePressed = isDragging,
+                                )
+                                .longPressDraggableHandle(interactionSource = dragInteractionSource)
                                 .alpha(if (isDragging) 0.9f else 1f),
                             onExport = { profile ->
                                 if (profile.uuid !in updatingProfileIds) {

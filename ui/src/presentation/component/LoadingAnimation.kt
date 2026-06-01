@@ -20,9 +20,20 @@
 
 
 package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -37,8 +48,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.sp
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
@@ -127,13 +139,13 @@ fun StartupLoadingOverlay(
     AnimatedVisibility(
         visible = isVisible,
         enter = fadeIn(
-            animationSpec = tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EnterEasing)
+            animationSpec = tween(AppMotion.DURATION_FAST, easing = AppMotion.EnterEasing)
         ) + scaleIn(
             initialScale = 0.9f,
-            animationSpec = tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.StandardEasing)
+            animationSpec = tween(AppMotion.DURATION_FAST, easing = AppMotion.StandardEasing)
         ),
         exit = fadeOut(
-            animationSpec = tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.ExitEasing)
+            animationSpec = tween(AppMotion.DURATION_FAST, easing = AppMotion.ExitEasing)
         ),
         modifier = modifier
     ) {
@@ -152,10 +164,10 @@ fun StartupLoadingOverlay(
                 targetState = loadingText ?: MLang.Component.Loading.Starting,
                 transitionSpec = {
                     fadeIn(
-                        animationSpec = tween(AnimationSpecs.DURATION_INSTANT, easing = AnimationSpecs.EnterEasing)
+                        animationSpec = tween(AppMotion.DURATION_INSTANT, easing = AppMotion.EnterEasing)
                     ) togetherWith
                             fadeOut(
-                                animationSpec = tween(AnimationSpecs.DURATION_INSTANT, easing = AnimationSpecs.ExitEasing)
+                                animationSpec = tween(AppMotion.DURATION_INSTANT, easing = AppMotion.ExitEasing)
                             )
                 },
                 label = "loadingText"

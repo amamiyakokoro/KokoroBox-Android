@@ -63,10 +63,10 @@ import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAct
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
+import com.github.yumelira.yumebox.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.`Package-check`
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
@@ -499,7 +499,7 @@ private fun DownloadProgressContent(
         ) { complete ->
             if (complete) {
                 Icon(
-                    imageVector = Yume.`Package-check`,
+                    imageVector = AppMd3Icons.Shell.PackageComplete,
                     contentDescription = "Complete",
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
@@ -509,7 +509,7 @@ private fun DownloadProgressContent(
                         .padding(UiDp.dp10),
                 )
             } else {
-                Md3ELoading(
+                Md3EIndeterminateCircularWavyProgressIndicator(
                     modifier = Modifier.size(UiDp.dp48),
                 )
             }

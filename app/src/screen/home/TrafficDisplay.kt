@@ -22,7 +22,14 @@
 
 package com.github.yumelira.yumebox.screen.home
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,10 +54,9 @@ import com.github.yumelira.yumebox.common.util.formatBytesForDisplay
 import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.domain.model.TrafficData
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
@@ -233,19 +239,19 @@ private fun UploadSection(
         Row(
             horizontalArrangement = Arrangement.spacedBy(spacing.space8),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.animateContentSize(tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EmphasizedDecelerate))
+            modifier = Modifier.animateContentSize(tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate))
         ) {
             ProxyStatusCapsule(controlState = controlState)
             AnimatedVisibility(
                 visible = isRunning,
                 enter = slideInHorizontally(
                     initialOffsetX = { it },
-                    animationSpec = tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EmphasizedDecelerate)
-                ) + fadeIn(tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EnterEasing)),
+                    animationSpec = tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate)
+                ) + fadeIn(tween(AppMotion.DURATION_FAST, easing = AppMotion.EnterEasing)),
                 exit = slideOutHorizontally(
                     targetOffsetX = { it },
-                    animationSpec = tween(AnimationSpecs.DURATION_INSTANT, easing = AnimationSpecs.EmphasizedAccelerate)
-                ) + fadeOut(tween(AnimationSpecs.DURATION_INSTANT, easing = AnimationSpecs.ExitEasing))
+                    animationSpec = tween(AppMotion.DURATION_INSTANT, easing = AppMotion.EmphasizedAccelerate)
+                ) + fadeOut(tween(AppMotion.DURATION_INSTANT, easing = AppMotion.ExitEasing))
             ) {
                 ProxyTypeCapsule(proxyMode = proxyMode)
             }
@@ -272,9 +278,9 @@ private fun ProxyTypeCapsule(proxyMode: ProxyMode) {
         ) {
             Icon(
                 imageVector = when (proxyMode) {
-                    ProxyMode.Tun -> Yume.PlaneTakeoff
-                    ProxyMode.RootTun -> Yume.Tun
-                    ProxyMode.Http -> Yume.Wifi
+                    ProxyMode.Tun -> AppMd3Icons.Home.ProxyModeVpn
+                    ProxyMode.RootTun -> AppMd3Icons.Home.ProxyModeTun
+                    ProxyMode.Http -> AppMd3Icons.Home.ProxyModeHttp
                 },
                 contentDescription = null,
                 tint = primary,
@@ -308,20 +314,20 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
         shape = RoundedCornerShape(50),
         modifier = Modifier
             .height(componentSizes.statusCapsuleHeight)
-            .animateContentSize(tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EmphasizedDecelerate))
+            .animateContentSize(tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate))
     ) {
         AnimatedContent(
             targetState = controlState,
             transitionSpec = {
                 (slideInHorizontally(
                     initialOffsetX = { it / 2 },
-                    animationSpec = tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EmphasizedDecelerate)
-                ) + fadeIn(tween(AnimationSpecs.DURATION_FAST, easing = AnimationSpecs.EnterEasing))
+                    animationSpec = tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate)
+                ) + fadeIn(tween(AppMotion.DURATION_FAST, easing = AppMotion.EnterEasing))
                 ).togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { -it / 2 },
-                        animationSpec = tween(AnimationSpecs.DURATION_INSTANT, easing = AnimationSpecs.EmphasizedAccelerate)
-                    ) + fadeOut(tween(AnimationSpecs.DURATION_INSTANT, easing = AnimationSpecs.ExitEasing))
+                        animationSpec = tween(AppMotion.DURATION_INSTANT, easing = AppMotion.EmphasizedAccelerate)
+                    ) + fadeOut(tween(AppMotion.DURATION_INSTANT, easing = AppMotion.ExitEasing))
                 )
             },
             label = "CapsuleStateTransition"
@@ -333,11 +339,11 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
             ) {
                 Icon(
                     imageVector = when (state) {
-                        HomeProxyControlState.Idle -> Yume.Rocket
+                        HomeProxyControlState.Idle -> AppMd3Icons.Home.StatusIdle
                         HomeProxyControlState.Connecting,
                         HomeProxyControlState.Disconnecting,
-                            -> Yume.Waiting
-                        HomeProxyControlState.Running -> Yume.Activity
+                            -> AppMd3Icons.Home.StatusWaiting
+                        HomeProxyControlState.Running -> AppMd3Icons.Home.StatusRunning
                     },
                     contentDescription = null,
                     tint = primary,

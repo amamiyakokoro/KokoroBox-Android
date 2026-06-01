@@ -23,7 +23,6 @@ package com.github.yumelira.yumebox.feature.editor.presentation.component
 import android.text.Editable
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import androidx.appcompat.widget.AppCompatEditText
 import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 
 internal data class SyntaxHighlightColors(
@@ -36,7 +35,6 @@ internal data class SyntaxHighlightColors(
 
 internal object LightweightSyntaxHighlighter {
     private const val MAX_HIGHLIGHT_CHARS = 300_000
-    private const val HIGHLIGHT_DELAY_MS = 120L
 
     private val quotedStringRegex = Regex("\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'")
     private val yamlKeyRegex = Regex("(?m)^\\s*-?\\s*([A-Za-z0-9_.@/+$\\-]+|\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*')\\s*:")
@@ -44,19 +42,6 @@ internal object LightweightSyntaxHighlighter {
     private val numberRegex = Regex("(?<![A-Za-z0-9_.-])-?\\b\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?\\b")
     private val keywordRegex = Regex("\\b(?:true|false|null|yes|no|on|off)\\b", RegexOption.IGNORE_CASE)
     private val yamlCommentRegex = Regex("(?m)#.*$")
-
-    fun schedule(
-        editText: NativeConfigEditText,
-        language: LanguageScope,
-        colors: SyntaxHighlightColors,
-        enabled: Boolean,
-    ) {
-        editText.highlightRunnable?.let(editText::removeCallbacks)
-        editText.highlightRunnable = Runnable {
-            apply(editText.text, language, colors, enabled)
-        }
-        editText.postDelayed(editText.highlightRunnable, HIGHLIGHT_DELAY_MS)
-    }
 
     fun apply(
         editable: Editable?,

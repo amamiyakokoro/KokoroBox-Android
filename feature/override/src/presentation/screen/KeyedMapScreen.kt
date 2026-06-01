@@ -32,8 +32,7 @@ import androidx.compose.ui.draw.alpha
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
@@ -101,7 +100,7 @@ fun OverrideKeyedObjectMapEditorScreen(
             OverrideAnimatedFab(
                 controller = addFabController,
                 visible = showAddFab,
-                imageVector = Yume.`Badge-plus`,
+                imageVector = AppMd3Icons.Action.Add,
                 contentDescription = MLang.Override.Editor.New + editorType.itemLabel,
                 onClick = {
                     onOpenDraftEditor(
@@ -127,7 +126,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                 actions = {
                     if (isDeleteMode) {
                         OverrideTopBarAction(
-                            icon = Yume.Cancel,
+                            icon = AppMd3Icons.Action.Cancel,
                             contentDescription = MLang.Override.Editor.CancelDelete,
                             spacedFromNext = true,
                             onClick = {
@@ -136,8 +135,9 @@ fun OverrideKeyedObjectMapEditorScreen(
                             },
                         )
                         OverrideTopBarAction(
-                            icon = Yume.Delete,
+                            icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.DeleteSelected,
+                            destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
                                     val mode = OverrideStructuredEditorStore.keyedObjectMapEditorSelectedMode
@@ -154,14 +154,16 @@ fun OverrideKeyedObjectMapEditorScreen(
                         )
                     } else {
                         OverrideTopBarAction(
-                            icon = Yume.Undo,
+                            icon = AppMd3Icons.Action.Undo,
                             contentDescription = MLang.Override.Editor.ClearMode,
                             spacedFromNext = true,
+                            destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
-                            icon = Yume.Delete,
+                            icon = AppMd3Icons.Action.Delete,
                             contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            destructive = true,
                             onClick = {
                                 isDeleteMode = true
                                 clearSelection()
@@ -280,6 +282,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                 },
                 cancelText = MLang.Override.Dialog.Button.Cancel,
                 confirmText = MLang.Override.Editor.Clear,
+                confirmDestructive = true,
             )
         }
     }
@@ -309,7 +312,7 @@ private fun ReorderableCollectionItemScope.KeyedObjectCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AppIcon(
-                    imageVector = Yume.List,
+                    imageVector = AppMd3Icons.Action.List,
                     contentDescription = MLang.Override.Editor.DragToSort,
                     
                 )
@@ -332,7 +335,7 @@ private fun ReorderableCollectionItemScope.KeyedObjectCard(
                         )
                     } else {
                         AppIcon(
-                            imageVector = Yume.chevron,
+                            imageVector = AppMd3Icons.Navigation.Forward,
                             contentDescription = MLang.Override.Editor.Edit,
                             
                         )

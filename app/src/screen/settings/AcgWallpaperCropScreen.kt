@@ -58,6 +58,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.core.net.toUri
+import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.panpf.sketch.rememberAsyncImagePainter
@@ -205,14 +206,19 @@ fun AcgWallpaperCropScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 onClick = {
-                    viewModel.onAcgWallpaperUriChange(wallpaperUri)
-                    viewModel.onAcgWallpaperSeedColorChange(wallpaperSeedColorArgb)
-                    viewModel.onAcgWallpaperCropChange(
-                        zoom = 1f,
-                        biasX = viewportLayout.biasX,
-                        biasY = viewportLayout.biasY,
-                    )
-                    navigator.popBackStack()
+                    runCatching {
+                        viewModel.applyAcgWallpaper(wallpaperUri)
+                    }.onSuccess {
+                        viewModel.onAcgWallpaperSeedColorChange(wallpaperSeedColorArgb)
+                        viewModel.onAcgWallpaperCropChange(
+                            zoom = 1f,
+                            biasX = viewportLayout.biasX,
+                            biasY = viewportLayout.biasY,
+                        )
+                        navigator.popBackStack()
+                    }.onFailure { throwable ->
+                        context.toast(throwable.message ?: MLang.Util.Error.UnknownError)
+                    }
                 },
             ) {
                 Text(

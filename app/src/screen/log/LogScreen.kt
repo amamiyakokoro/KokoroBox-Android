@@ -70,12 +70,10 @@ import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Play
-import com.github.yumelira.yumebox.presentation.icon.yume.PowerOff
-import com.github.yumelira.yumebox.presentation.icon.yume.Share
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.AnimationSpecs
+import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -132,6 +130,8 @@ fun LogScreen(navigator: DestinationsNavigator) {
         }
     }
 
+    val destructiveActionColors = yumeDestructiveActionColors()
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -143,7 +143,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
                             onClick = { saveFileLauncher.launch("log_${System.currentTimeMillis()}.txt") }
                         ) {
                             Icon(
-                                imageVector = Yume.Share,
+                                imageVector = AppMd3Icons.Action.Share,
                                 contentDescription = "Save",
                             )
                         }
@@ -155,26 +155,26 @@ fun LogScreen(navigator: DestinationsNavigator) {
                 visible = !fabHidden,
                 enter = scaleIn(
                     animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
+                        durationMillis = AppMotion.Proxy.FabDuration,
+                        easing = AppMotion.EmphasizedDecelerate,
                     ),
-                    initialScale = AnimationSpecs.Proxy.VisibilityInitialScale,
+                    initialScale = AppMotion.Proxy.VisibilityInitialScale,
                 ) + fadeIn(
                     animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabFadeDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
+                        durationMillis = AppMotion.Proxy.FabFadeDuration,
+                        easing = AppMotion.EmphasizedDecelerate,
                     ),
                 ),
                 exit = scaleOut(
                     animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
+                        durationMillis = AppMotion.Proxy.FabDuration,
+                        easing = AppMotion.EmphasizedDecelerate,
                     ),
-                    targetScale = AnimationSpecs.Proxy.VisibilityTargetScale,
+                    targetScale = AppMotion.Proxy.VisibilityTargetScale,
                 ) + fadeOut(
                     animationSpec = tween(
-                        durationMillis = AnimationSpecs.Proxy.FabFadeDuration,
-                        easing = AnimationSpecs.EmphasizedDecelerate,
+                        durationMillis = AppMotion.Proxy.FabFadeDuration,
+                        easing = AppMotion.EmphasizedDecelerate,
                     ),
                 ),
                 label = "log_record_fab_visibility",
@@ -184,6 +184,16 @@ fun LogScreen(navigator: DestinationsNavigator) {
                         end = spacing.space20,
                         bottom = componentSizes.floatingActionButtonBottomInset,
                     ),
+                    containerColor = if (isRecording) {
+                        destructiveActionColors.containerColor
+                    } else {
+                        MaterialTheme.colorScheme.primaryContainer
+                    },
+                    contentColor = if (isRecording) {
+                        destructiveActionColors.contentColor
+                    } else {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    },
                     onClick = {
                         if (isRecording) {
                             viewModel.stopRecording()
@@ -193,7 +203,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
                     },
                 ) {
                     Icon(
-                        imageVector = if (isRecording) Yume.PowerOff else Yume.Play,
+                        imageVector = if (isRecording) AppMd3Icons.Status.RecordingStop else AppMd3Icons.Status.RecordingStart,
                         contentDescription = if (isRecording) "Stop recording" else "Start recording",
                     )
                 }

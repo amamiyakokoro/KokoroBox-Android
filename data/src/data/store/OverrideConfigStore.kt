@@ -32,6 +32,7 @@ import com.github.yumelira.yumebox.data.model.OverrideMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.io.File
@@ -280,6 +281,73 @@ class OverrideConfigStore(
         }
     }
 
+    suspend fun exportUserConfigBackup(): List<OverrideConfigBackupEntry> = withContext(Dispatchers.IO) {
+        if (!configsDir.exists()) return@withContext emptyList()
+        val index = loadMetadataIndex()
+        index.sortedUserMetadata()
+            .filterNot { metadata -> isInternalRuntimeConfig(metadata.id) }
+            .filterNot { metadata -> metadata.id == OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID }
+            .mapNotNull { metadata ->
+                val content = getConfigJsonContent(metadata.id) ?: return@mapNotNull null
+                OverrideConfigBackupEntry(
+                    id = metadata.id,
+                    name = metadata.name,
+                    description = metadata.description,
+                    createdAt = metadata.createdAt,
+                    updatedAt = metadata.updatedAt,
+                    sortOrder = metadata.sortOrder,
+                    content = content,
+                )
+            }
+    }
+
+    suspend fun importUserConfigBackup(entries: List<OverrideConfigBackupEntry>) = withContext(Dispatchers.IO) {
+        if (entries.isEmpty()) return@withContext
+        configsDir.mkdirs()
+        val metadataIndex = loadMetadataIndex()
+        val updatedConfigs = metadataIndex.configs.toMutableMap()
+        val userConfigsById = _configsFlow.value
+            .filterNot(OverrideConfig::isSystem)
+            .associateBy(OverrideConfig::id)
+            .toMutableMap()
+
+        entries.forEach { entry ->
+            if (entry.id.isBlank() || isSystemPreset(entry.id) || isInternalRuntimeConfig(entry.id)) return@forEach
+            if (entry.id == OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID) return@forEach
+            val decodedConfig = runCatching {
+                json.decodeFromString(ConfigurationOverride.serializer(), entry.content)
+            }.getOrNull() ?: return@forEach
+            val configContent = encodeConfigContent(decodedConfig)
+            configsDir.resolve("${entry.id}.json").writeText(configContent)
+            val metadata = OverrideMetadata(
+                id = entry.id,
+                name = entry.name.ifBlank { entry.id },
+                description = entry.description,
+                isSystem = false,
+                createdAt = entry.createdAt,
+                updatedAt = entry.updatedAt,
+                sortOrder = entry.sortOrder,
+            )
+            updatedConfigs[entry.id] = metadata
+            userConfigsById[entry.id] = OverrideConfig(
+                id = entry.id,
+                name = metadata.name,
+                description = metadata.description,
+                config = decodedConfig,
+                isSystem = false,
+                createdAt = metadata.createdAt,
+                updatedAt = metadata.updatedAt,
+            )
+        }
+
+        val updatedIndex = metadataIndex.copy(configs = updatedConfigs).normalizeUserSortOrders()
+        saveMetadataIndex(updatedIndex)
+        updateConfigsFlowSnapshot(
+            metadataIndex = updatedIndex,
+            userConfigsById = userConfigsById,
+        )
+    }
+
     fun getConfigFilePath(id: String): File = configsDir.resolve("$id.json")
     fun getConfigsDirectory(): File = configsDir
 
@@ -409,3 +477,14 @@ class OverrideConfigStore(
         metadataFile.writeText(json.encodeToString(MetadataIndex.serializer(), index))
     }
 }
+
+@Serializable
+data class OverrideConfigBackupEntry(
+    val id: String,
+    val name: String,
+    val description: String? = null,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val sortOrder: Long = 0L,
+    val content: String,
+)

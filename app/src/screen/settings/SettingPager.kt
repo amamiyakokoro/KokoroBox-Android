@@ -23,8 +23,11 @@
 package com.github.yumelira.yumebox.screen.settings
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,12 +51,12 @@ import com.github.yumelira.yumebox.WebViewActivity
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.*
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.viewmodel.SettingEvent
 import com.github.yumelira.yumebox.presentation.viewmodel.SettingViewModel
 import com.ramcosta.composedestinations.generated.destinations.AboutScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AppDataManagementScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.FeatureScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.LogScreenDestination
@@ -116,12 +119,58 @@ private fun CircularIcon(
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable
-fun SettingPager(mainInnerPadding: PaddingValues) {
+fun SettingPager(
+    mainInnerPadding: PaddingValues,
+    lazyListState: LazyListState,
+) {
     val viewModel = koinViewModel<SettingViewModel>()
+    val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val navigator = LocalNavigator.current
     val context = LocalContext.current
 
     val versionInfo = BuildConfig.VERSION_NAME
+    val exportBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        appSettingsViewModel.exportUserSettingsBackup()
+            .onSuccess { backupJson ->
+                runCatching {
+                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(backupJson.toByteArray())
+                        outputStream.flush()
+                    } ?: error(MLang.AppSettings.Backup.ExportFailed)
+                }.onSuccess {
+                    context.toast(MLang.AppSettings.Backup.ExportSuccess)
+                }.onFailure { throwable ->
+                    context.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+                }
+            }
+            .onFailure { throwable ->
+                context.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+            }
+    }
+    val importBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        runCatching {
+            context.contentResolver.openInputStream(uri)
+                ?.bufferedReader()
+                ?.use { reader -> reader.readText() }
+                ?: error(MLang.AppSettings.Backup.ImportReadFailed)
+        }.onSuccess { backupJson ->
+            appSettingsViewModel.importUserSettingsBackup(backupJson)
+                .onSuccess {
+                    context.toast(MLang.AppSettings.Backup.ImportSuccess)
+                }
+                .onFailure { throwable ->
+                    context.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+                }
+        }.onFailure { throwable ->
+            context.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -145,6 +194,7 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
     ) { innerPadding ->
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, mainInnerPadding),
+            lazyListState = lazyListState,
         ) {
 
             item {
@@ -153,30 +203,66 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
                     SettingsEntryItem(
                         title = MLang.Settings.UiSettings.App,
                         summary = MLang.Settings.UiSettings.AppSummary,
-                        imageVector = Yume.`Settings-2`,
+                        imageVector = AppMd3Icons.Settings.App,
                         onClick = { navigator.navigate(AppSettingsScreenDestination) { launchSingleTop = true } },
                     )
+                }
+            }
+            item {
+                Title(MLang.Settings.Section.NetworkSettings)
+                Card {
                     SettingsEntryItem(
-                        title = MLang.Settings.UiSettings.Network,
-                        summary = MLang.Settings.UiSettings.NetworkSummary,
-                        imageVector = Yume.`Wifi-cog`,
+                        title = MLang.Settings.NetworkSettings.Network,
+                        summary = MLang.Settings.NetworkSettings.NetworkSummary,
+                        imageVector = AppMd3Icons.Settings.Network,
                         onClick = { navigator.navigate(NetworkSettingsScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.UiSettings.Override,
-                        summary = MLang.Settings.UiSettings.OverrideSummary,
-                        imageVector = Yume.`Git-merge`,
+                        title = MLang.Settings.NetworkSettings.Override,
+                        summary = MLang.Settings.NetworkSettings.OverrideSummary,
+                        imageVector = AppMd3Icons.Settings.Override,
                         onClick = { navigator.navigate(OverrideScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.UiSettings.MetaFeatures,
-                        summary = MLang.Settings.UiSettings.MetaFeaturesSummary,
-                        imageVector = Yume.Meta,
+                        title = MLang.Settings.NetworkSettings.MetaFeatures,
+                        summary = MLang.Settings.NetworkSettings.MetaFeaturesSummary,
+                        imageVector = AppMd3Icons.Settings.MetaFeatures,
                         onClick = {
                             navigator.navigate(MetaFeatureScreenDestination) {
                                 launchSingleTop = true
                             }
                         },
+                    )
+                    SettingsEntryItem(
+                        title = MLang.Settings.NetworkSettings.Lab,
+                        summary = MLang.Settings.NetworkSettings.LabSummary,
+                        imageVector = AppMd3Icons.Settings.Lab,
+                        onClick = {
+                            navigator.navigate(FeatureScreenDestination) { launchSingleTop = true }
+                        },
+                    )
+                }
+            }
+            item {
+                Title(MLang.Settings.Section.DataSettings)
+                Card {
+                    SettingsEntryItem(
+                        title = MLang.Settings.DataSettings.ExportBackup,
+                        summary = MLang.Settings.DataSettings.ExportBackupSummary,
+                        imageVector = AppMd3Icons.Settings.ExportBackup,
+                        onClick = { exportBackupLauncher.launch("yumebox-settings-backup.json") },
+                    )
+                    SettingsEntryItem(
+                        title = MLang.Settings.DataSettings.ImportBackup,
+                        summary = MLang.Settings.DataSettings.ImportBackupSummary,
+                        imageVector = AppMd3Icons.Settings.ImportBackup,
+                        onClick = { importBackupLauncher.launch("application/json") },
+                    )
+                    SettingsEntryItem(
+                        title = MLang.Settings.DataSettings.AppDataManagement,
+                        summary = MLang.Settings.DataSettings.AppDataManagementSummary,
+                        imageVector = AppMd3Icons.Settings.AppDataManagement,
+                        onClick = { navigator.navigate(AppDataManagementScreenDestination) { launchSingleTop = true } },
                     )
                 }
             }
@@ -185,23 +271,15 @@ fun SettingPager(mainInnerPadding: PaddingValues) {
 
                 Card {
                     SettingsEntryItem(
-                        title = MLang.Settings.More.Lab,
-                        summary = MLang.Settings.More.LabSummary,
-                        imageVector = Yume.FlaskConical,
-                        onClick = {
-                            navigator.navigate(FeatureScreenDestination) { launchSingleTop = true }
-                        },
-                    )
-                    SettingsEntryItem(
                         title = MLang.Settings.More.Logs,
                         summary = MLang.Settings.More.LogsSummary,
-                        imageVector = Yume.`Chart-column`,
+                        imageVector = AppMd3Icons.Settings.Logs,
                         onClick = { navigator.navigate(LogScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.More.About,
                         summary = MLang.Settings.More.AboutSummary,
-                        imageVector = Yume.Github,
+                        imageVector = AppMd3Icons.Settings.About,
                         onClick = { navigator.navigate(AboutScreenDestination) { launchSingleTop = true } },
                         endActions = {
                             VersionBadge(versionInfo)
@@ -241,7 +319,6 @@ private fun VersionBadge(
 ) {
     val spacing = AppTheme.spacing
     val componentSizes = AppTheme.sizes
-    val opacity = AppTheme.opacity
 
     Surface(
         color = MaterialTheme.colorScheme.primaryContainer,

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of YumeBox.
  *
  * YumeBox is free software: you can redistribute it and/or modify
@@ -42,10 +42,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Palette
-import com.github.yumelira.yumebox.presentation.icon.yume.ShieldCheck
-import com.github.yumelira.yumebox.presentation.icon.yume.UserKey
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.colorFromArgb
 import com.github.yumelira.yumebox.presentation.theme.colorToArgbLong
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
@@ -76,7 +73,7 @@ internal class OnboardingActivity : OnboardingBaseActivity() {
                     finishOnboarding()
                 },
                 onGithubClick = {
-                    openUrl(this, "https://github.com/YumeLira/YumeBox")
+                    openUrl(this, "https://github.com/Yizuka17/YumeBox-MaterialDesign")
                 },
                 onCommunityClick = {
                     openUrl(this, "https://t.me/YumeLira")
@@ -166,7 +163,7 @@ private fun OnboardingPagerScreen(
 
             OnboardingStep.Permissions -> {
                 ProvisionDetailShell(
-                    previewIcon = Yume.UserKey,
+                    previewIcon = AppMd3Icons.Onboarding.Permission,
                     title = MLang.Onboarding.Permission.Title,
                     subtitle = MLang.Onboarding.Permission.Subtitle,
                     primaryText = MLang.Onboarding.Navigation.Next,
@@ -184,7 +181,7 @@ private fun OnboardingPagerScreen(
 
             OnboardingStep.Terms -> {
                 ProvisionDetailShell(
-                    previewIcon = Yume.ShieldCheck,
+                    previewIcon = AppMd3Icons.Onboarding.Privacy,
                     title = MLang.Onboarding.Privacy.Title,
                     subtitle = MLang.Onboarding.Privacy.Subtitle,
                     primaryText = MLang.Onboarding.Navigation.Next,
@@ -210,7 +207,7 @@ private fun OnboardingPagerScreen(
 
             OnboardingStep.Personalize -> {
                 ProvisionDetailShell(
-                    previewIcon = Yume.Palette,
+                    previewIcon = AppMd3Icons.Onboarding.Theme,
                     title = MLang.Onboarding.Personalize.Title,
                     subtitle = MLang.Onboarding.Personalize.Subtitle,
                     primaryText = MLang.Onboarding.Navigation.Next,

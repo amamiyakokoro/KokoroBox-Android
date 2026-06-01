@@ -51,6 +51,7 @@ Component = {
         Confirm = "确定"
         Clear = "清除"
         Copy = "复制"
+        Delete = "删除"
     }
 
     Flag = {

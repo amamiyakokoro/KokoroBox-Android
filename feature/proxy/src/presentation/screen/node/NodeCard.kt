@@ -22,7 +22,6 @@
 package com.github.yumelira.yumebox.presentation.screen.node
 
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -32,8 +31,8 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -45,10 +44,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ripple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,7 +55,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -67,11 +64,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Check
-import com.github.yumelira.yumebox.presentation.icon.yume.CircleGauge
-import com.github.yumelira.yumebox.presentation.icon.yume.Cloud
+import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.github.yumelira.yumebox.presentation.theme.AppMotion
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.github.yumelira.yumebox.presentation.theme.appPressSink
 import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.Text
@@ -213,31 +209,30 @@ internal fun rememberProxySelectionPalette(
 }
 
 @Composable
-internal fun RotatingCircleGauge(
+internal fun RotatingRefreshIcon(
     isRotating: Boolean,
     modifier: Modifier = Modifier,
     tint: Color = MiuixTheme.colorScheme.primary,
     contentDescription: String? = MLang.Proxy.Action.Test,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "circle_gauge_rotation")
+    val infiniteTransition = rememberInfiniteTransition(label = "node_delay_test_rotation")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 1000, easing = LinearEasing),
         ),
-        label = "circle_gauge_rotation_value",
+        label = "node_delay_test_rotation_value",
     )
 
     Icon(
-        imageVector = Yume.CircleGauge,
+        imageVector = AppMd3Icons.Action.Refresh,
         contentDescription = contentDescription,
         tint = tint,
         modifier = if (isRotating) modifier.rotate(rotation) else modifier,
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun NodeSelectableCard(
     isSelected: Boolean,
@@ -252,50 +247,43 @@ internal fun NodeSelectableCard(
     val hapticFeedback = LocalHapticFeedback.current
     val shape = RoundedCornerShape(radii.radius18)
     val palette = rememberProxySelectionPalette(selected = isSelected)
-    val motionScheme = MaterialTheme.motionScheme
-    val selectionScale = remember { Animatable(1f) }
+    val fastEffectsSpec = AppMotion.fastEffects<Color>()
     val transition = updateTransition(targetState = palette, label = "node_card_selection")
     val backgroundColor by transition.animateColor(
-        transitionSpec = { motionScheme.fastEffectsSpec() },
+        transitionSpec = { fastEffectsSpec },
         label = "node_card_background_color",
     ) { it.containerColor }
     val borderColor by transition.animateColor(
-        transitionSpec = { motionScheme.fastEffectsSpec() },
+        transitionSpec = { fastEffectsSpec },
         label = "node_card_border_color",
     ) { it.borderColor }
-
-    LaunchedEffect(isSelected) {
-        if (isSelected) {
-            selectionScale.snapTo(1f)
-            selectionScale.animateTo(1.045f, animationSpec = motionScheme.fastSpatialSpec())
-            selectionScale.animateTo(1f, animationSpec = motionScheme.defaultSpatialSpec())
-        } else {
-            selectionScale.animateTo(1f, animationSpec = motionScheme.fastSpatialSpec())
-        }
-    }
+    val cardRipple = ripple(
+        bounded = true,
+        color = MaterialTheme.colorScheme.primary,
+    )
 
     Box(
         modifier = modifier
-            .graphicsLayer {
-                scaleX = selectionScale.value
-                scaleY = selectionScale.value
-            }
+            .appPressSink(
+                interactionSource = interactionSource,
+                enabled = onClick != null,
+            )
             .fillMaxWidth()
             .clip(shape)
             .background(backgroundColor)
             .border(sizes.nodeCardBorderWidth, borderColor, shape)
-            .let {
+            .let { cardModifier ->
                 if (onClick != null) {
-                    it.clickable(
+                    cardModifier.clickable(
                         interactionSource = interactionSource,
-                        indication = null,
+                        indication = cardRipple,
                         onClick = {
                             hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
                             onClick()
                         },
                     )
                 } else {
-                    it
+                    cardModifier
                 }
             }
             .padding(horizontal = sizes.nodeCardPaddingHorizontal, vertical = paddingVertical),
@@ -378,14 +366,14 @@ internal fun NodeCard(
 
                     onNodeTestClick != null && singleNodeTestEnabled -> {
                         if (isThisProxyTesting || isDelayTesting) {
-                            RotatingCircleGauge(
+                            RotatingRefreshIcon(
                                 isRotating = true,
                                 modifier = Modifier.size(spacing.space18),
                                 tint = palette.supportingColor,
                             )
                         } else {
                             Icon(
-                                imageVector = Yume.Cloud,
+                                imageVector = AppMd3Icons.Proxy.CloudTest,
                                 contentDescription = MLang.Proxy.Action.Test,
                                 tint = palette.supportingColor,
                                 modifier = Modifier
@@ -435,7 +423,7 @@ internal fun NodeCard(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            imageVector = Yume.Check,
+                            imageVector = AppMd3Icons.Action.Check,
                             contentDescription = null,
                             tint = palette.trailingBadgeContentColor,
                             modifier = Modifier.size(spacing.space14),

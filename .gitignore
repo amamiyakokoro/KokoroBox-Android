@@ -82,3 +82,5 @@ Thumbs.db
 /.codex/environments/environment.toml
 /docs/code-review/
 /docs/code-review/
+/YumeBox Debug/
+/.continue/

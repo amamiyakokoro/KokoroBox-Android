@@ -23,7 +23,11 @@ package com.github.yumelira.yumebox.substore.util
 import android.app.Application
 import com.github.yumelira.yumebox.common.util.ByteFormatter.formatSpeed
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import okhttp3.Headers
 import okhttp3.OkHttpClient
@@ -104,54 +108,86 @@ class SubStoreDownloadClient(
                 .header("User-Agent", resolveUserAgent())
                 .build()
 
-            client.newCall(request).execute().use { response ->
+            val call = client.newCall(request)
+            val cancellationHandle = currentCoroutineContext().job.invokeOnCompletion { cause ->
+                if (cause is CancellationException) {
+                    call.cancel()
+                }
+            }
+            try {
+                call.execute().use { response ->
                 if (!response.isSuccessful) {
                     return@withContext Pair(false, null)
                 }
 
                 val subscriptionInfo = parseSubscriptionInfo(response.headers)
                 val body = response.body
-                val contentLength = body.contentLength()
+                val contentLength = response.header("Content-Length")?.toLongOrNull()
+                    ?: body.contentLength()
                 val inputStream = body.byteStream()
 
-                var lastUpdateTime = 0L
+                var lastUpdateTime = System.currentTimeMillis()
                 var lastBytesRead = 0L
                 var totalBytesRead = 0L
+                var lastProgress = -1
+                var lastSpeed = 0L
+
+                onProgress?.invoke(
+                    DownloadProgress(
+                        progress = 0,
+                        currentSize = 0L,
+                        totalSize = contentLength,
+                        speed = formatSpeed(0L),
+                    ),
+                )
 
                 tempFile.sink().buffer().use { output ->
                     val buffer = ByteArray(8192)
                     var bytesRead: Int
 
                     while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        currentCoroutineContext().ensureActive()
                         output.write(buffer, 0, bytesRead)
                         totalBytesRead += bytesRead
 
                         val currentTime = System.currentTimeMillis()
-                        if (currentTime - lastUpdateTime >= UPDATE_INTERVAL_MS) {
+                        val progress = if (contentLength > 0) {
+                            ((totalBytesRead * 100) / contentLength).toInt().coerceIn(0, 100)
+                        } else {
+                            0
+                        }
+                        val shouldReport = currentTime - lastUpdateTime >= UPDATE_INTERVAL_MS ||
+                            (contentLength > 0 && progress != lastProgress)
+                        if (shouldReport) {
                             val timeDiff = (currentTime - lastUpdateTime) / 1000.0
                             val bytesDiff = totalBytesRead - lastBytesRead
-                            val speed = if (timeDiff > 0) (bytesDiff / timeDiff).toLong() else 0L
-                            val progress = if (contentLength > 0) {
-                                ((totalBytesRead * 100) / contentLength).toInt()
-                            } else {
-                                0
-                            }
+                            lastSpeed = if (timeDiff > 0) (bytesDiff / timeDiff).toLong() else lastSpeed
 
                             onProgress?.invoke(
                                 DownloadProgress(
                                     progress = progress,
                                     currentSize = totalBytesRead,
                                     totalSize = contentLength,
-                                    speed = formatSpeed(speed),
+                                    speed = formatSpeed(lastSpeed),
                                 ),
                             )
 
                             lastUpdateTime = currentTime
                             lastBytesRead = totalBytesRead
+                            lastProgress = progress
                         }
                     }
                     output.flush()
                 }
+
+                onProgress?.invoke(
+                    DownloadProgress(
+                        progress = 100,
+                        currentSize = totalBytesRead,
+                        totalSize = contentLength,
+                        speed = formatSpeed(lastSpeed),
+                    ),
+                )
 
                 if (totalBytesRead <= 0L) {
                     throw IOException("Downloaded file is empty")
@@ -163,7 +199,13 @@ class SubStoreDownloadClient(
                 replaceDownloadedFile(tempFile, targetFile)
                 tempFile = null
                 Pair(true, subscriptionInfo)
+                }
+            } finally {
+                cancellationHandle.dispose()
             }
+        } catch (e: CancellationException) {
+            tempFile?.delete()
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "Download failed: %s", url)
             tempFile?.delete()
