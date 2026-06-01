@@ -18,8 +18,6 @@
  *
  */
 
-
-
 package com.github.yumelira.yumebox.core
 
 import com.github.yumelira.yumebox.core.bridge.*

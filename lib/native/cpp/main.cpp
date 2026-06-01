@@ -267,14 +267,14 @@ Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeHealthCheckAll(JNIEnv 
 
 JNIEXPORT void JNICALL
 Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeHealthCheckProxy(JNIEnv *env, jobject thiz,
-jobject completable,
-jstring proxy_name) {
-TRACE_METHOD();
+                                                                           jobject completable,
+                                                                           jstring proxy_name) {
+    TRACE_METHOD();
 
-jobject _completable = new_global(completable);
-scoped_string _proxy_name = get_string(proxy_name);
+    jobject _completable = new_global(completable);
+    scoped_string _proxy_name = get_string(proxy_name);
 
-healthCheckProxy(_completable, _proxy_name);
+    healthCheckProxy(_completable, _proxy_name);
 }
 
 JNIEXPORT jboolean JNICALL
