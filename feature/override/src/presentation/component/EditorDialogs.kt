@@ -21,8 +21,6 @@
 
 package com.github.yumelira.yumebox.presentation.component
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -94,7 +92,6 @@ fun JsonTextEditorDialog(
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun StringMapEditorDialog(
     show: Boolean,
