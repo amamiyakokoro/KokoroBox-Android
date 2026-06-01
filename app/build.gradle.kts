@@ -76,7 +76,6 @@ val startupGateExpectedSignerSha256 = providers.gradleProperty("startupGate.expe
         ?.ifEmpty { "" }
     ?: ""
 
-val geoFilesAssetsDir = rootProject.layout.buildDirectory.dir("generated/assets/geo")
 val projectApplicationId = providers.gradleProperty("project.applicationId")
     .orElse(gropify.project.namespace.base)
     .get()
@@ -114,12 +113,7 @@ android {
             res.srcDirs("res")
             assets.directories.apply {
                 clear()
-                addAll(
-                    listOf(
-                        "assets",
-                        geoFilesAssetsDir.get().asFile.invariantSeparatorsPath,
-                    )
-                )
+                add("assets")
             }
             aidl.srcDirs("aidl")
             resources.srcDirs("resources")
