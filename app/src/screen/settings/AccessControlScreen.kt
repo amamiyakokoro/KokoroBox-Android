@@ -67,6 +67,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 @Destination<RootGraph>
 fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNavigator) {
+    val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
     val spacing = spacing
     val componentSizes = AppTheme.sizes
@@ -122,6 +123,29 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
     LaunchedEffect(uiState.searchQuery) {
         if (searchStatus.searchText != uiState.searchQuery) {
             searchStatus = searchStatus.copy(searchText = uiState.searchQuery)
+        }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is AccessControlViewModel.AccessControlUiEffect.RegionalSelectionCompleted -> {
+                    val label = if (effect.selectChina) {
+                        MLang.AccessControl.Settings.ChinaApps
+                    } else {
+                        MLang.AccessControl.Settings.OverseasApps
+                    }
+                    context.toast(
+                        MLang.AccessControl.Settings.RegionSelectResult.format(
+                            label,
+                            effect.selectedCount,
+                        )
+                    )
+                }
+
+                is AccessControlViewModel.AccessControlUiEffect.ShowError -> context.toast(effect.message)
+                is AccessControlViewModel.AccessControlUiEffect.ShowMessage -> context.toast(effect.message)
+            }
         }
     }
 
@@ -339,8 +363,8 @@ private fun AccessControlSettingsSheet(
     onSelectAll: () -> Unit,
     onDeselectAll: () -> Unit,
     onInvertSelection: () -> Unit,
-    onSelectChinaApps: () -> Int,
-    onSelectNonChinaApps: () -> Int,
+    onSelectChinaApps: () -> Unit,
+    onSelectNonChinaApps: () -> Unit,
     onImportPackages: (String) -> Int,
     onExportPackages: () -> String,
 ) {
@@ -398,14 +422,10 @@ private fun AccessControlSettingsSheet(
                         MLang.AccessControl.Settings.OverseasApps,
                     ),
                     onSelectedIndexChange = { index ->
-                        val (label, selectedCount) = when (index) {
-                            0 -> MLang.AccessControl.Settings.ChinaApps to onSelectChinaApps()
-                            1 -> MLang.AccessControl.Settings.OverseasApps to onSelectNonChinaApps()
-                            else -> "" to 0
+                        when (index) {
+                            0 -> onSelectChinaApps()
+                            1 -> onSelectNonChinaApps()
                         }
-                        context.toast(
-                            MLang.AccessControl.Settings.RegionSelectResult.format(label, selectedCount)
-                        )
                     },
                 )
                 DropdownActionPreference(

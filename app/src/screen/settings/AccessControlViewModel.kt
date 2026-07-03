@@ -54,7 +54,6 @@ class AccessControlViewModel(
         val packageName: String,
         val label: String,
         val isSystemApp: Boolean,
-        val isChinaApp: Boolean,
         val installTime: Long = 0L,
         val updateTime: Long = 0L,
     )
@@ -91,6 +90,8 @@ class AccessControlViewModel(
         override fun withMessage(message: String?): UiState = copy(message = message)
     }
 
+    private val chinaAppDetector = ChinaAppDetector(application)
+
     val filteredApps: StateFlow<List<AppInfo>> = uiState.map { state ->
         filterApps(
             apps = state.apps,
@@ -105,6 +106,10 @@ class AccessControlViewModel(
     sealed interface AccessControlUiEffect {
         data class ShowMessage(val message: String) : AccessControlUiEffect
         data class ShowError(val message: String) : AccessControlUiEffect
+        data class RegionalSelectionCompleted(
+            val selectChina: Boolean,
+            val selectedCount: Int,
+        ) : AccessControlUiEffect
     }
 
     init {
@@ -193,7 +198,6 @@ class AccessControlViewModel(
                     packageName = appInfo.packageName,
                     label = appInfo.loadLabel(pm).toString(),
                     isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
-                    isChinaApp = isChinaPackage(appInfo.packageName),
                     installTime = pkgInfo?.firstInstallTime ?: 0L,
                     updateTime = pkgInfo?.lastUpdateTime ?: 0L,
                 )
@@ -301,32 +305,53 @@ class AccessControlViewModel(
         persistSelectionAndApply()
     }
 
-    fun selectChinaAppsInCurrentList(): Int {
-        return applyRegionalSelectionInCurrentList(selectChina = true)
-    }
+    fun selectChinaAppsInCurrentList() = applyRegionalSelectionInCurrentList(selectChina = true)
 
-    fun selectNonChinaAppsInCurrentList(): Int {
-        return applyRegionalSelectionInCurrentList(selectChina = false)
-    }
+    fun selectNonChinaAppsInCurrentList() =
+        applyRegionalSelectionInCurrentList(selectChina = false)
 
-    private fun applyRegionalSelectionInCurrentList(selectChina: Boolean): Int {
+    /**
+     * China-app membership is computed on demand (FlClash-style deep scan behind
+     * [ChinaAppDetector]'s cache): the first run dex-scans undecided APKs and can take a
+     * while, so the list's loading state is raised for the duration.
+     */
+    private fun applyRegionalSelectionInCurrentList(selectChina: Boolean) {
         val currentFiltered = filteredApps.value
-        var selectedCount = 0
-        _uiState.update { state ->
+        if (currentFiltered.isEmpty()) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val chinaPackages =
+                runCatching {
+                        chinaAppDetector.detectChinaPackages(
+                            currentFiltered.map {
+                                ChinaAppDetector.Candidate(it.packageName, it.updateTime)
+                            }
+                        )
+                    }
+                    .getOrElse {
+                        _uiState.update { state -> state.copy(isLoading = false) }
+                        return@launch
+                    }
             val currentPackages = currentFiltered.mapTo(linkedSetOf()) { it.packageName }
-            val targetPackages = currentFiltered
-                .filter { it.isChinaApp == selectChina }
-                .mapTo(linkedSetOf()) { it.packageName }
-            selectedCount = targetPackages.size
-
-            state.copy(
-                selectedPackages = state.selectedPackages
-                    .minus(currentPackages)
-                    .plus(targetPackages),
+            val targetPackages =
+                currentFiltered
+                    .filter { (it.packageName in chinaPackages) == selectChina }
+                    .mapTo(linkedSetOf()) { it.packageName }
+            _uiState.update { state ->
+                state.copy(
+                    isLoading = false,
+                    selectedPackages =
+                        state.selectedPackages.minus(currentPackages).plus(targetPackages),
+                )
+            }
+            persistSelectionAndApply()
+            emitEffect(
+                AccessControlUiEffect.RegionalSelectionCompleted(
+                    selectChina = selectChina,
+                    selectedCount = targetPackages.size,
+                )
             )
         }
-        persistSelectionAndApply()
-        return selectedCount
     }
 
     fun exportPackages(): String {
@@ -350,113 +375,5 @@ class AccessControlViewModel(
 
     private fun persistSelectionAndApply() {
         controller.applyPackages(_uiState.value.selectedPackages)
-    }
-
-    private fun isChinaPackage(packageName: String): Boolean {
-        val normalized = packageName.lowercase()
-        skipPrefixList.forEach {
-            if (normalized == it || normalized.startsWith("$it.")) {
-                return false
-            }
-        }
-        if (normalized.startsWith("cn.") || normalized.contains(".cn.") || normalized.endsWith(".cn")) {
-            return true
-        }
-        return normalized.matches(chinaAppRegex)
-    }
-
-    companion object {
-        private val skipPrefixList = listOf(
-            "com.google",
-            "com.android.chrome",
-            "com.android.vending",
-            "com.microsoft",
-            "com.apple",
-            "com.zhiliaoapp.musically",
-            "com.android.providers.downloads",
-        )
-
-        private val chinaAppPrefixList = listOf(
-            "com.tencent",
-            "com.tencent.mobileqq",
-            "com.tencent.mm",
-            "com.tencent.qqlive",
-            "com.tencent.news",
-            "com.tencent.wework",
-            "com.tencent.weishi",
-            "com.tencent.karaoke",
-            "com.tencent.qqmusic",
-            "com.alibaba",
-            "com.alibaba.android",
-            "com.alibaba.wireless",
-            "com.alibaba.rimet",
-            "com.umeng",
-            "com.qihoo",
-            "com.ali",
-            "com.alipay",
-            "com.amap",
-            "com.sina",
-            "com.weibo",
-            "com.sankuai",
-            "com.sankuai.meituan",
-            "com.sankuai.meituan.takeoutnew",
-            "com.dianping",
-            "com.jingdong",
-            "com.xunmeng",
-            "com.xingin",
-            "com.zhihu",
-            "com.bilibili",
-            "com.coolapk",
-            "tv.danmaku",
-            "com.kuaishou",
-            "com.smile.gifmaker",
-            "com.ss.android",
-            "com.ss.android.ugc",
-            "com.ss.android.article",
-            "com.qiyi",
-            "com.youku",
-            "com.youku.phone",
-            "com.sohu",
-            "com.autonavi",
-            "com.sogou",
-            "com.sogou.inputmethod",
-            "com.iflytek",
-            "com.iflytek.inputmethod",
-            "com.kingsoft",
-            "com.qzone",
-            "com.vivo",
-            "com.xiaomi",
-            "com.huawei",
-            "com.taobao",
-            "com.taobao.idlefish",
-            "com.secneo",
-            "s.h.e.l.l",
-            "com.stub",
-            "com.kiwisec",
-            "com.secshell",
-            "com.wrapper",
-            "cn.securitystack",
-            "com.mogosec",
-            "com.secoen",
-            "com.netease",
-            "com.mx",
-            "com.qq.e",
-            "com.baidu",
-            "com.bytedance",
-            "com.bugly",
-            "com.miui",
-            "com.oppo",
-            "com.coloros",
-            "com.iqoo",
-            "com.meizu",
-            "com.gionee",
-            "com.oplus",
-            "andes.oplus",
-            "com.unionpay",
-        )
-
-        private val chinaAppRegex by lazy {
-            ("(" + chinaAppPrefixList.joinToString("|").replace(".", "\\.") + ").*").toRegex()
-        }
     }
 }

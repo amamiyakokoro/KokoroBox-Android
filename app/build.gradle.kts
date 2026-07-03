@@ -287,6 +287,10 @@ dependencies {
     implementation("io.github.raamcosta.compose-destinations:core:${gropify.dep.version.composeDestinations}")
     ksp("io.github.raamcosta.compose-destinations:ksp:${gropify.dep.version.composeDestinations}")
 
+    implementation("com.android.tools.smali:smali-dexlib2:${gropify.dep.version.smaliDexlib2}") {
+        exclude(group = "com.google.guava", module = "guava")
+    }
+
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
     implementation("org.tukaani:xz:1.12")
 
