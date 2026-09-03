@@ -57,11 +57,7 @@ Onboarding = {
     Project = {
         Github = {
             Title = "GitHub Repo"
-            Summary = "github.com/amamiyakokoro/KokoroBox"
-        }
-        Community = {
-            Title = "Community"
-            Summary = "Jump into the channel or chat"
+            Summary = "github.com/amamiyakokoro/KokoroBox-Android"
         }
     }
 

@@ -164,7 +164,6 @@ object AppMd3Icons {
         val Privacy: ImageVector = Icons.Rounded.Security
         val Complete: ImageVector = Icons.Rounded.CheckCircle
         val Theme: ImageVector = Icons.Rounded.Palette
-        val Community: ImageVector = Icons.AutoMirrored.Rounded.Message
     }
 
     object Status {

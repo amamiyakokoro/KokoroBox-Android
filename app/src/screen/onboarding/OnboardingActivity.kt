@@ -73,10 +73,7 @@ internal class OnboardingActivity : OnboardingBaseActivity() {
                     finishOnboarding()
                 },
                 onGithubClick = {
-                    openUrl(this, "https://github.com/amamiyakokoro/KokoroBox")
-                },
-                onCommunityClick = {
-                    openUrl(this, "https://t.me/YumeLira")
+                    openUrl(this, "https://github.com/amamiyakokoro/KokoroBox-Android")
                 },
             )
         }
@@ -96,7 +93,6 @@ private fun OnboardingPagerScreen(
     activity: OnboardingActivity,
     onFinish: () -> Unit,
     onGithubClick: () -> Unit,
-    onCommunityClick: () -> Unit,
 ) {
     val steps = remember { OnboardingStep.entries }
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { steps.size })
@@ -242,7 +238,6 @@ private fun OnboardingPagerScreen(
                     enabled = true,
                     onPrimaryClick = onFinish,
                     onGithubClick = onGithubClick,
-                    onCommunityClick = onCommunityClick,
                 )
             }
         }

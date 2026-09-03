@@ -10,13 +10,7 @@ About = {
 
     Section = {
         ProjectLinks = "專案連結"
-        More = "更多"
         License = "許可證"
-    }
-
-    Link = {
-        TelegramGroup = "Telegram 群組"
-        TelegramChannel = "Telegram 頻道"
     }
 
     License = {

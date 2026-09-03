@@ -476,7 +476,7 @@ fun AcgQuoteConfigScreen(
 }
 
 private const val DAILY_QUOTE_DOCS_URL =
-    "https://github.com/amamiyakokoro/KokoroBox/blob/Yume/docs/DailyQuote.md"
+    "https://github.com/amamiyakokoro/KokoroBox-Android/blob/Yume/docs/DailyQuote.md"
 
 private fun openDailyQuoteDocs(context: android.content.Context): Boolean = runCatching {
     context.startActivity(

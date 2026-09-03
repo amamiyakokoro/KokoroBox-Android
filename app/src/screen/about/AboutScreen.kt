@@ -149,7 +149,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 Card {
                     AboutLinkItem(
                         title = "KokoroBox",
-                        url = "https://github.com/amamiyakokoro/KokoroBox",
+                        url = "https://github.com/amamiyakokoro/KokoroBox-Android",
                         onOpenUrl = { url -> openUrl(context, url) },
                         showArrow = false,
                     )
@@ -164,22 +164,6 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                         url = "https://github.com/MetaCubeX/mihomo",
                         onOpenUrl = { url -> openUrl(context, url) },
                         showArrow = false,
-                    )
-                }
-
-                Title(MLang.About.Section.More)
-                Card {
-                    AboutLinkItem(
-                        title = MLang.About.Link.TelegramGroup,
-                        url = "https://t.me/OOM_Group",
-                        onOpenUrl = { url -> openUrl(context, url) },
-                        showArrow = true,
-                    )
-                    AboutLinkItem(
-                        title = MLang.About.Link.TelegramChannel,
-                        url = "https://t.me/YumeLira",
-                        onOpenUrl = { url -> openUrl(context, url) },
-                        showArrow = true,
                     )
                 }
 

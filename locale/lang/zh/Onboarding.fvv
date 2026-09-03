@@ -57,11 +57,7 @@ Onboarding = {
     Project = {
         Github = {
             Title = "GitHub 仓库"
-            Summary = "github.com/amamiyakokoro/KokoroBox"
-        }
-        Community = {
-            Title = "社区频道"
-            Summary = "加入频道或群组继续反馈"
+            Summary = "github.com/amamiyakokoro/KokoroBox-Android"
         }
     }
 

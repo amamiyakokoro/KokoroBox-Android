@@ -351,7 +351,6 @@ internal fun FinishHeroShell(
     enabled: Boolean,
     onPrimaryClick: () -> Unit,
     onGithubClick: () -> Unit,
-    onCommunityClick: () -> Unit,
 ) {
     OnboardingPageFrame {
         Spacer(modifier = Modifier.height(UiDp.dp88))
@@ -383,13 +382,6 @@ internal fun FinishHeroShell(
                         title = MLang.Onboarding.Project.Github.Title,
                         summary = MLang.Onboarding.Project.Github.Summary,
                         onClick = onGithubClick,
-                    )
-                    DetailDivider()
-                    ProjectLinkRow(
-                        icon = AppMd3Icons.Onboarding.Community,
-                        title = MLang.Onboarding.Project.Community.Title,
-                        summary = MLang.Onboarding.Project.Community.Summary,
-                        onClick = onCommunityClick,
                     )
                 }
             }
