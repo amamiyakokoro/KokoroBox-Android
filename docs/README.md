@@ -1,61 +1,132 @@
-﻿<div align="center">
+<div align="center">
 
-**English** | [简体中文](README_ZH_HANS.md)
+<img src="../artwork/app-icon/profile-image.png" width="112" alt="KokoroBox icon">
 
-<img src="logo.webp" width="96" alt="YumeBox logo">
+# KokoroBox
 
-# YumeBox MD3
+An Android proxy client powered by Mihomo, designed around a modern Material 3 experience.
 
-[![Latest release](https://img.shields.io/github/v/release/Yizuka17/YumeBox-MaterialDesign?logo=android)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases/latest)
-[![GitHub License](https://img.shields.io/github/license/Yizuka17/YumeBox-MaterialDesign?logo=gnu)](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/Yizuka17/YumeBox-MaterialDesign/total?logo=github)](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
+[![Latest release](https://img.shields.io/github/v/release/amamiyakokoro/YumeBox-MaterialDesign?logo=android)](https://github.com/amamiyakokoro/YumeBox-MaterialDesign/releases/latest)
+[![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com/about/versions/oreo)
+[![License](https://img.shields.io/github/license/amamiyakokoro/YumeBox-MaterialDesign?logo=gnu)](../LICENSE)
 
-YumeBox MD3 is a Material Design 3 / Material You fork based on [YumeBox](https://github.com/YumeRiMoe/YumeBox), an open-source Android client powered by [mihomo](https://github.com/MetaCubeX/mihomo).
+**English** · [简体中文](README_ZH_HANS.md)
 
 </div>
 
-## Use
+> [!IMPORTANT]
+> KokoroBox is currently distributed for **arm64-v8a** devices and requires Android 8.0 (API 26) or newer.
 
-YumeBox MD3 currently only supports **Android 8.0 (API 26) and above systems**.
+## About
 
-- Download the arm64-v8a release APK: [GitHub Releases](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
-- Website and changelog: [YumeBox](https://yumebox.oom-wg.dev/)
-- Override configuration syntax: [override document](https://yumebox.oom-wg.dev/override)
-- Daily Quote API and custom JSON format: [Daily Quote format guide](DailyQuote.md)
+KokoroBox is an open-source Android client built on [Mihomo](https://github.com/MetaCubeX/mihomo). It continues the work of [YumeBox](https://github.com/YumeLira/YumeBox) with a Material 3 interface, profile management, runtime configuration tools, traffic statistics, and first-class integration with the Kokoro subscription service.
 
-If this project is helpful to you, a Star is greatly appreciated.
+The Android application ID is `com.amamiyakokoro.box`. The optional Sub-Store extension uses `com.amamiyakokoro.box.extension`.
 
-## Core features
+## Highlights
 
-YumeBox MD3 keeps the core capabilities of the original project while continuing to improve the UI, configuration workflow, proxy runtime, and stability:
+- **Material 3 interface** — dynamic color, dark theme, responsive navigation, polished motion, and consistent components.
+- **Multiple profile sources** — subscription URLs, local files, QR codes, and authenticated Kokoro accounts.
+- **Mihomo runtime controls** — Rule, Global, Direct, VPN, and optional Root TUN modes.
+- **Subscription management** — configurable protocol, plan, ISP, relay/direct mode, rule source, final route, and update interval.
+- **Overrides and routing** — visual editing, reusable presets, custom routing, configuration preview, and stacked overrides.
+- **Proxy tools** — proxy-group selection, latency testing, sorting, node labels, flags, and persistent selections.
+- **Sub-Store and Geo data** — integrated Sub-Store workflow plus GeoIP, GeoSite, country database, and ASN updates.
+- **Diagnostics** — connection details, traffic statistics, service notifications, and exportable logs.
 
-- **Material Design 3 / Material You**: the main UI is mostly migrated to MD3, with dynamic colors, dark-theme adaptation, navigation bar and Topbar blur effects, smoother motion, and more consistent components.
-- **Override and configuration management**: supports multi-configuration switching, stacked applying, visual editing, preset routing templates, runtime configuration preview, and modifiers such as `start`, `end`, `merge`, and `force`.
-- **Proxy runtime and node management**: supports Root Tun, Rule / Global / Direct modes, single-node and proxy-group delay tests, node sorting, node tags, icon/flag display, and persistent node selection.
-- **Sub-Store, GeoX, and data management**: improves Sub-Store downloads, GeoX data updates, settings backup/restore, app data cleanup, and managed log export.
-- **ACG home and Daily Quote**: supports wallpaper, sidebar controls, launch button, runtime information, quote display, manual/daily refresh, and mixed API/custom JSON sources.
-- **Statistics, notifications, and stability**: provides connection pages, traffic statistics, service notifications, language and privacy settings, plus ongoing fixes for startup, dialogs, runtime state sync, package size, and background resource release.
+## Kokoro account
 
-## Changelog
+KokoroBox can obtain a Mihomo subscription without placing a subscription UUID in the profile URL.
 
-For the full changelog, APK assets, and version tags, see:
+1. Select **Kokoro account** when adding a profile.
+2. Sign in with osu! using the system browser.
+3. Return to the app through `kokoro://oauth/callback`.
+4. Choose the subscription options and create the profile.
 
-- [Website changelog](https://yumebox.oom-wg.dev/update/history)
-- [GitHub Releases](https://github.com/Yizuka17/YumeBox-MaterialDesign/releases)
+Authentication uses the public API at `https://amamiyakoko.ro/api`. Access and refresh tokens are stored as an AES-GCM encrypted credential blob whose key is protected by Android Keystore. OAuth state is verified before exchanging the one-time code, token refresh is single-flight, and credentials are not written to profile URLs or application logs.
 
-## Roadmap
+KokoroBox does not contain an osu! client secret, API secret, or App authentication secret.
 
-Future work will keep polishing the MD3 experience, configuration editing, runtime status display, traffic statistics, Sub-Store / GeoX flows, and overall stability. Remaining legacy UI boundaries will also be reduced gradually.
+## Install
 
-## Feedback and contribution
+Download the newest APK from [GitHub Releases](https://github.com/amamiyakokoro/YumeBox-MaterialDesign/releases/latest), then allow your browser or file manager to install packages when Android prompts you.
 
-- Bugs and suggestions: [Issues](https://github.com/Yizuka17/YumeBox-MaterialDesign/issues)
-- Contribution guide: [CONTRIBUTING](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/CONTRIBUTING.md)
-- Translation contribution: fork this project and create or update the corresponding translation files under `locale/lang`.
-- Discussion and feedback: [@OOM_WG](https://t.me/OOM_Group)
+Changing the application ID made KokoroBox a separate Android application. An older YumeBox MD3 installation will not be upgraded in place, and its profiles, preferences, and login session are not migrated automatically.
 
-## Special
+## Build from source
 
-This project is developed based on [YumeBox](https://github.com/YumeRiMoe/YumeBox); **~~the author knows nothing about the code in this project, and the code is either available or unavailable, with no third case~~**; AI assistance is used during development for part of the code implementation, documentation, and troubleshooting, and thanks go to the original project and related open-source projects.
+### Requirements
 
-And the [third-party](https://github.com/Yizuka17/YumeBox-MaterialDesign/blob/Yume/docs/ThirdParty.md) libraries used in this project.
+- Android Studio with Android SDK 37
+- JDK 25
+- Android NDK `29.0.14206865`
+- Kotlin command-line tools, Go, Rust, and `cargo-ndk` when rebuilding native libraries
+
+Clone the repository:
+
+```bash
+git clone --recurse-submodules https://github.com/amamiyakokoro/YumeBox-MaterialDesign.git
+cd YumeBox-MaterialDesign
+```
+
+The app requires `libclash.so`, `liboverride.so`, and `libbridge.so` under `jniLibs/<abi>/`. To rebuild the native runtime and Geo assets locally:
+
+```bash
+./scripts/sync-kernel.sh alpha
+kotlin scripts/native-build.main.kts --all
+```
+
+Build a debug APK:
+
+```bash
+./gradlew :app:assembleDebug
+```
+
+Build the arm64 release APK or Android App Bundle:
+
+```bash
+./gradlew assembleReleaseArm64V8a
+./gradlew :app:bundleRelease
+```
+
+Expected outputs include:
+
+```text
+app/build/outputs/apk/debug/KokoroBox-arm64-v8a-debug.apk
+app/build/outputs/apk/release/KokoroBox-arm64-v8a-release.apk
+app/build/outputs/bundle/release/KokoroBox-release.aab
+```
+
+Release signing is optional for local development. Keep signing properties and keystores outside version control.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `app` | Android UI, navigation, profiles, and app integration |
+| `core` | Mihomo bridge and shared core models |
+| `data` | Persistent settings and secure Kokoro session storage |
+| `runtime` | Client/service communication and proxy runtime |
+| `feature` | Proxy, override, editor, Meta, and Sub-Store features |
+| `extension` | Optional Sub-Store native extension APK |
+| `locale` | English, Simplified Chinese, and Traditional Chinese strings |
+| `scripts` | Native library, kernel, locale, and release tooling |
+
+## Documentation
+
+- [Daily Quote API and custom JSON](DailyQuote.md)
+- [Third-party projects and libraries](ThirdParty.md)
+- [Privacy policy](../PRIVACY_POLICY.md)
+- [Contribution guide](../CONTRIBUTING.md)
+
+## Contributing
+
+Bug reports and focused pull requests are welcome. Please use [GitHub Issues](https://github.com/amamiyakokoro/YumeBox-MaterialDesign/issues) for reproducible bugs and feature proposals. Translation changes belong under `locale/lang`.
+
+Never commit access tokens, subscription UUIDs, signing keys, OAuth secrets, or generated private configuration files.
+
+## Credits and license
+
+KokoroBox is derived from [YumeBox](https://github.com/YumeLira/YumeBox) and depends on [Mihomo](https://github.com/MetaCubeX/mihomo) and other open-source projects listed in [ThirdParty.md](ThirdParty.md).
+
+The project is distributed under the terms in [LICENSE](../LICENSE) and [LICENSE-F2DLPRL](../LICENSE-F2DLPRL). Individual dependencies remain subject to their respective licenses.
