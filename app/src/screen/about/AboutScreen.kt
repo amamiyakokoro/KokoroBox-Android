@@ -110,7 +110,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     Spacer(modifier = Modifier.height(UiDp.dp24))
 
                     Icon(
-                        painter = painterResource(id = R.drawable.yume),
+                        painter = painterResource(id = R.mipmap.ic_launcher),
                         contentDescription = "App Icon",
                         modifier = Modifier
                             .size(UiDp.dp120)
@@ -121,7 +121,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     Spacer(modifier = Modifier.height(UiDp.dp24))
 
                     Text(
-                        text = "YumeBox MD3",
+                        text = "KokoroBox",
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -139,7 +139,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
 
                 Card {
                     YumeMd3PreferenceItem(
-                        title = "YumeBox MD3",
+                        title = "KokoroBox",
                         summary = "A Material Design 3 / Material You fork of YumeBox, an open-source Android client based on Mihomo",
                         showDivider = false,
                     )

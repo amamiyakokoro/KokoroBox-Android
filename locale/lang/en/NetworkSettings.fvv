@@ -20,7 +20,7 @@ NetworkSettings = {
         BypassPrivateTitle = "Bypass Private Networks"
         BypassPrivateSummary = "Bypass private networks and local addresses"
         DnsHijackTitle = "DNS Hijack"
-        DnsHijackSummary = "Redirect all DNS requests to YumeBox"
+        DnsHijackSummary = "Redirect all DNS requests to KokoroBox"
         AllowBypassTitle = "Allow App Bypass"
         AllowBypassSummary = "Allow apps to bypass VPN"
         EnableIpv6Title = "Enable IPv6"
@@ -62,6 +62,6 @@ NetworkSettings = {
 
     Error = {
         VpnDenied = "VPN permission denied"
-        RootRequired = "RootTun requires YumeBox to have working root access"
+        RootRequired = "RootTun requires KokoroBox to have working root access"
     }
 }

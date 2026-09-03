@@ -31,6 +31,10 @@ plugins {
     id("com.mikepenz.aboutlibraries.plugin.android")
 }
 
+base {
+    archivesName.set(gropify.project.name)
+}
+
 
 val signingPropsFile = rootProject.file("signing.properties")
 val signingFileProps = if (signingPropsFile.exists()) {
@@ -88,7 +92,7 @@ android {
         targetSdk = gropify.android.targetSdk
         versionCode = gropify.project.version.code
         versionName = gropify.project.version.name
-        manifestPlaceholders["appName"] = "${gropify.project.name} MD3"
+        manifestPlaceholders["appName"] = gropify.project.name
         manifestPlaceholders["startupGateEnabled"] = startupGateEnabled
         manifestPlaceholders["startupGateEnforceSigner"] = startupGateEnforceSigner
         manifestPlaceholders["startupGateExpectedSignerSha256"] = startupGateExpectedSignerSha256

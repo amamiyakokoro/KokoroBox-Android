@@ -48,9 +48,9 @@ jobs:
     with:
       channel: stable
       module: app
-      artifact_prefix: yumebox-stable
+      artifact_prefix: kokorobox-stable
       release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      meta_asset_name: yumebox-stable-meta.json
+      meta_asset_name: kokorobox-stable-meta.json
       raw_apk_artifact_name: apk-raw-stable-app
     secrets: inherit
 
@@ -60,9 +60,9 @@ jobs:
     with:
       channel: stable
       module: app
-      artifact_prefix: yumebox-stable
+      artifact_prefix: kokorobox-stable
       release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      meta_asset_name: yumebox-stable-meta.json
+      meta_asset_name: kokorobox-stable-meta.json
       raw_apk_artifact_name: apk-raw-stable-app
       publish_artifact_name: publish-stable-app
     secrets: inherit
@@ -88,6 +88,6 @@ jobs:
       channel: stable
       release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
       publish_artifact_name: publish-stable-app
-      meta_asset_name: yumebox-stable-meta.json
-      telegram_title: YumeBox Stable
+      meta_asset_name: kokorobox-stable-meta.json
+      telegram_title: KokoroBox Stable
     secrets: inherit

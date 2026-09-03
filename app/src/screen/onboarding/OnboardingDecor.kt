@@ -59,7 +59,7 @@ internal const val LinkPolicyTag = "policy"
 internal val DetailPreviewBadgeSize = UiDp.dp108
 internal val DetailPreviewIconSize = UiDp.dp68
 internal val StartupTypewriterPhrases = listOf(
-    "YumeBox",
+    "KokoroBox",
     "Hello Word",
 )
 

@@ -26,6 +26,10 @@ plugins {
     id("com.android.application")
 }
 
+base {
+    archivesName.set("${gropify.project.name}-Extension")
+}
+
 dependencies {
     implementation("com.caoccao.javet:javet-node-android:${gropify.dep.version.javetNodeAndroid}")
 }
@@ -93,4 +97,18 @@ android {
     }
 }
 
+//noinspection WrongGradleMethod
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            val abiName = output.filters.find {
+                it.filterType == com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+            }?.identifier ?: "universal"
+            val buildTypeName = variant.buildType ?: "release"
+            (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
+                "${gropify.project.name}-Extension-${abiName}-${buildTypeName}.apk"
+            )
+        }
+    }
+}
 

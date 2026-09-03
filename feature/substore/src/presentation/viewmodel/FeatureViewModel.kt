@@ -104,7 +104,6 @@ class FeatureViewModel(
     val isJavetLoaded: StateFlow<Boolean> = _isJavetLoaded.asStateFlow()
 
     companion object {
-        private const val EXTENSION_PACKAGE_NAME = "com.github.yumelira.yumebox.extension"
         private const val JAVET_LIB_NAME = "libjavet-node-android"
     }
 
@@ -176,7 +175,7 @@ class FeatureViewModel(
     }
 
     private fun checkExtensionInstalled(): Boolean = runCatching {
-        application.packageManager.getApplicationInfo(EXTENSION_PACKAGE_NAME, 0)
+        application.packageManager.getApplicationInfo("${application.packageName}.extension", 0)
         true
     }.getOrDefault(false)
 

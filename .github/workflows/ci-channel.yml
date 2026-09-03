@@ -72,9 +72,9 @@ jobs:
     with:
       channel: pre
       module: app
-      artifact_prefix: yumebox-pre
+      artifact_prefix: kokorobox-pre
       release_tag: Pre-release
-      meta_asset_name: yumebox-pre-meta.json
+      meta_asset_name: kokorobox-pre-meta.json
       raw_apk_artifact_name: apk-raw-pre-app
     secrets: inherit
 
@@ -84,9 +84,9 @@ jobs:
     with:
       channel: smart
       module: app
-      artifact_prefix: yumebox-smart
+      artifact_prefix: kokorobox-smart
       release_tag: Smart
-      meta_asset_name: yumebox-smart-meta.json
+      meta_asset_name: kokorobox-smart-meta.json
       raw_apk_artifact_name: apk-raw-smart-app
     secrets: inherit
 
@@ -96,9 +96,9 @@ jobs:
     with:
       channel: pre
       module: app
-      artifact_prefix: yumebox-pre
+      artifact_prefix: kokorobox-pre
       release_tag: Pre-release
-      meta_asset_name: yumebox-pre-meta.json
+      meta_asset_name: kokorobox-pre-meta.json
       raw_apk_artifact_name: apk-raw-pre-app
       publish_artifact_name: publish-pre-app
     secrets: inherit
@@ -109,9 +109,9 @@ jobs:
     with:
       channel: smart
       module: app
-      artifact_prefix: yumebox-smart
+      artifact_prefix: kokorobox-smart
       release_tag: Smart
-      meta_asset_name: yumebox-smart-meta.json
+      meta_asset_name: kokorobox-smart-meta.json
       raw_apk_artifact_name: apk-raw-smart-app
       publish_artifact_name: publish-smart-app
     secrets: inherit
@@ -149,8 +149,8 @@ jobs:
       channel: pre
       release_tag: Pre-release
       publish_artifact_name: publish-pre-app
-      meta_asset_name: yumebox-pre-meta.json
-      telegram_title: YumeBox Pre
+      meta_asset_name: kokorobox-pre-meta.json
+      telegram_title: KokoroBox Pre
     secrets: inherit
 
   notify-smart:
@@ -162,6 +162,6 @@ jobs:
       channel: smart
       release_tag: Smart
       publish_artifact_name: publish-smart-app
-      meta_asset_name: yumebox-smart-meta.json
-      telegram_title: YumeBox Smart
+      meta_asset_name: kokorobox-smart-meta.json
+      telegram_title: KokoroBox Smart
     secrets: inherit

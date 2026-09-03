@@ -75,7 +75,7 @@ object NativeLibraryManager {
                 name = "libjavet-node-android",
                 type = LibraryType.JNI_LOAD,
                 source = LibrarySource.EXTENSION_APK,
-                packageName = "com.github.yumelira.yumebox.extension"
+                packageName = "${requireNotNull(context).packageName}.extension"
             )
         )
     }

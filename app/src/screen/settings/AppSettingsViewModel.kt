@@ -286,7 +286,7 @@ private const val LEGACY_DEFAULT_ACG_CUSTOM_QUOTE_LIST_WITH_UNSOURCED_JSON = """
   },
   {
     "text": "在安静的线路上，等一朵云完成漫游",
-    "author": "YumeBox"
+    "author": "KokoroBox"
   },
   {
     "text": "愿你历尽千帆，归来仍是少年。",
@@ -418,7 +418,7 @@ private suspend fun fetchDailyQuoteOnce(apiUrl: String): DailyAcgQuote? = withCo
         val request = Request.Builder()
             .url(url)
             .header("Accept", "application/json")
-            .header("User-Agent", "YumeBox-MaterialDesign")
+            .header("User-Agent", "KokoroBox")
             .build()
         dailyQuoteClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return@withContext null

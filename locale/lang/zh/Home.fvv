@@ -1,6 +1,6 @@
 <Home Page>
 Home = {
-    Title = "YumeBox"
+    Title = "KokoroBox"
 
     Message = {
         ConfigSwitched = "配置已切换"
