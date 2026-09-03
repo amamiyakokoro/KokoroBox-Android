@@ -137,7 +137,7 @@ internal fun ShareOptionsDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(spacing.space12)
             ) {
-                if (profile.type == Profile.Type.Url && !AmamiyaApi.isManagedConfigUrl(profile.source)) {
+                if (profile.type == Profile.Type.Url && !KokoroApi.isManagedConfigUrl(profile.source)) {
                     Button(
                         onClick = { onShareLink(profile) },
                         modifier = Modifier.fillMaxWidth(),
@@ -168,7 +168,7 @@ internal fun ProfileSettingsDialog(
     systemPreset: OverrideConfig?,
     userConfigs: List<OverrideConfig>,
     binding: ProfileBinding?,
-    subscriptionOptions: AmamiyaSubscriptionOptions,
+    subscriptionOptions: KokoroSubscriptionOptions,
     onDismiss: () -> Unit,
     onDismissFinished: () -> Unit,
     onSaveProfileMeta: (String, String, Long, Boolean) -> Unit,
@@ -188,7 +188,7 @@ internal fun ProfileSettingsDialog(
         .filterNot(::isBuiltinPresetOverrideId)
         .filter { it != OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID }
     val appliedOverrideIds = initialOverrideIds
-    val initialSubscriptionSettings = AmamiyaApi.parseConfigSettings(profile.source)
+    val initialSubscriptionSettings = KokoroApi.parseConfigSettings(profile.source)
     var editName by remember { mutableStateOf(profile.name) }
     var editSource by remember { mutableStateOf("") }
     var subscriptionSettings by remember(profile.uuid, profile.source) {
@@ -218,11 +218,11 @@ internal fun ProfileSettingsDialog(
         val trimmedSource = editSource.trim()
         val normalizedSubscriptionSettings = subscriptionSettings?.let(subscriptionOptions::normalize)
         val targetSource = when {
-            normalizedSubscriptionSettings != null -> AmamiyaApi.buildConfigUrl(normalizedSubscriptionSettings)
+            normalizedSubscriptionSettings != null -> KokoroApi.buildConfigUrl(normalizedSubscriptionSettings)
             profile.type == Profile.Type.Url && trimmedSource.isNotEmpty() -> trimmedSource
             else -> profile.source
         }
-        val targetInterval = normalizedSubscriptionSettings?.let(AmamiyaApi::intervalMillis)
+        val targetInterval = normalizedSubscriptionSettings?.let(KokoroApi::intervalMillis)
             ?: profile.interval
         val shouldRefresh = normalizedSubscriptionSettings != null && targetSource != profile.source
         if (trimmedName.isNotEmpty() && targetSource.isNotEmpty() &&

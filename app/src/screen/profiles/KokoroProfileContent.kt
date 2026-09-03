@@ -40,11 +40,11 @@ import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
-internal fun AmamiyaProfileContent(
-    authState: AmamiyaAuthState,
+internal fun KokoroProfileContent(
+    authState: KokoroAuthState,
     name: String,
     settings: MihomoSubscriptionSettings,
-    availableOptions: AmamiyaSubscriptionOptions,
+    availableOptions: KokoroSubscriptionOptions,
     error: String,
     onNameChange: (String) -> Unit,
     onSettingsChange: (MihomoSubscriptionSettings) -> Unit,
@@ -53,10 +53,10 @@ internal fun AmamiyaProfileContent(
     onRetry: () -> Unit,
 ) {
     var showOptions by remember { mutableStateOf(false) }
-    val authenticated = authState as? AmamiyaAuthState.Authenticated
+    val authenticated = authState as? KokoroAuthState.Authenticated
     val subscriptions = authenticated?.account?.subscriptions.orEmpty()
     val effectiveOptions = if (availableOptions.plans.isEmpty()) {
-        AmamiyaSubscriptionOptions.fallback(authenticated?.account)
+        KokoroSubscriptionOptions.fallback(authenticated?.account)
     } else {
         availableOptions
     }
@@ -76,29 +76,29 @@ internal fun AmamiyaProfileContent(
                 verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
                 when (authState) {
-                    AmamiyaAuthState.Checking -> {
+                    KokoroAuthState.Checking -> {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                         ) {
                             Md3EIndeterminateCircularWavyProgressIndicator()
-                            Text(MLang.ProfilesPage.Amamiya.Checking)
+                            Text(MLang.ProfilesPage.Kokoro.Checking)
                         }
                     }
 
-                    AmamiyaAuthState.LoggedOut -> {
+                    KokoroAuthState.LoggedOut -> {
                         StatusText(
-                            title = MLang.ProfilesPage.Amamiya.LoggedOut,
-                            detail = MLang.ProfilesPage.Amamiya.LoginHint,
+                            title = MLang.ProfilesPage.Kokoro.LoggedOut,
+                            detail = MLang.ProfilesPage.Kokoro.LoginHint,
                         )
                         Button(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                            Text(MLang.ProfilesPage.Amamiya.Login)
+                            Text(MLang.ProfilesPage.Kokoro.Login)
                         }
                     }
 
-                    is AmamiyaAuthState.Error -> {
+                    is KokoroAuthState.Error -> {
                         StatusText(
-                            title = MLang.ProfilesPage.Amamiya.CheckFailed,
+                            title = MLang.ProfilesPage.Kokoro.CheckFailed,
                             detail = authState.message,
                             error = true,
                         )
@@ -107,27 +107,27 @@ internal fun AmamiyaProfileContent(
                             verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
                         ) {
                             Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-                                Text(MLang.ProfilesPage.Amamiya.Retry)
+                                Text(MLang.ProfilesPage.Kokoro.Retry)
                             }
                             OutlinedButton(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                                Text(MLang.ProfilesPage.Amamiya.Login)
+                                Text(MLang.ProfilesPage.Kokoro.Login)
                             }
                         }
                     }
 
-                    is AmamiyaAuthState.Authenticated -> {
+                    is KokoroAuthState.Authenticated -> {
                         StatusText(
                             title = authState.account.displayName?.let {
-                                MLang.ProfilesPage.Amamiya.LoggedInAs.format(it)
-                            } ?: MLang.ProfilesPage.Amamiya.LoggedIn,
+                                MLang.ProfilesPage.Kokoro.LoggedInAs.format(it)
+                            } ?: MLang.ProfilesPage.Kokoro.LoggedIn,
                             detail = if (subscriptions.isEmpty()) {
-                                MLang.ProfilesPage.Amamiya.NoSubscription
+                                MLang.ProfilesPage.Kokoro.NoSubscription
                             } else {
-                                MLang.ProfilesPage.Amamiya.SecureTokenSession
+                                MLang.ProfilesPage.Kokoro.SecureTokenSession
                             },
                         )
                         TextButton(onClick = onLogout) {
-                            Text(MLang.ProfilesPage.Amamiya.Logout)
+                            Text(MLang.ProfilesPage.Kokoro.Logout)
                         }
                     }
                 }
@@ -143,17 +143,17 @@ internal fun AmamiyaProfileContent(
                             .padding(UiDp.dp16),
                         verticalArrangement = Arrangement.spacedBy(UiDp.dp6),
                     ) {
-                        SubscriptionLine(MLang.ProfilesPage.Amamiya.Plan, subscription.plan)
+                        SubscriptionLine(MLang.ProfilesPage.Kokoro.Plan, subscription.plan)
                         SubscriptionLine(
-                            MLang.ProfilesPage.Amamiya.Isp,
+                            MLang.ProfilesPage.Kokoro.Isp,
                             subscription.supportedIsps.joinToString(", "),
                         )
                         val traffic = trafficText(subscription.usedBytes, subscription.totalBytes)
                         if (traffic.isNotBlank()) {
-                            SubscriptionLine(MLang.ProfilesPage.Amamiya.Traffic, traffic)
+                            SubscriptionLine(MLang.ProfilesPage.Kokoro.Traffic, traffic)
                         }
                         if (!subscription.expiresAt.isNullOrBlank()) {
-                            SubscriptionLine(MLang.ProfilesPage.Amamiya.Expires, subscription.expiresAt)
+                            SubscriptionLine(MLang.ProfilesPage.Kokoro.Expires, subscription.expiresAt)
                         }
                     }
                 }
@@ -172,9 +172,9 @@ internal fun AmamiyaProfileContent(
             ) {
                 Text(
                     if (showOptions) {
-                        MLang.ProfilesPage.Amamiya.HideOptions
+                        MLang.ProfilesPage.Kokoro.HideOptions
                     } else {
-                        MLang.ProfilesPage.Amamiya.ShowOptions
+                        MLang.ProfilesPage.Kokoro.ShowOptions
                     },
                 )
             }
@@ -201,7 +201,7 @@ internal fun AmamiyaProfileContent(
 @Composable
 internal fun MihomoSubscriptionSettingsContent(
     settings: MihomoSubscriptionSettings,
-    availableOptions: AmamiyaSubscriptionOptions,
+    availableOptions: KokoroSubscriptionOptions,
     onSettingsChange: (MihomoSubscriptionSettings) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -212,8 +212,9 @@ internal fun MihomoSubscriptionSettingsContent(
     val protocol = availableOptions.protocols.firstOrNull { it.value == normalized.protocol }
     val supportsDirect = protocol?.supportsDirect == true
     val plan = availableOptions.plans.firstOrNull { it.name == normalized.plan }
+    val supportedPlanIsps = plan?.supportedIsps.orEmpty().filterNot { it == "all" }
     val selectableIsps = availableOptions.isps.filter {
-        it.value.isBlank() || plan?.supportedIsps.isNullOrEmpty() || it.value in plan.supportedIsps
+        it.value.isBlank() || it.value in supportedPlanIsps
     }.ifEmpty { availableOptions.isps }
     var updateHoursText by remember(normalized.updateIntervalHours) {
         mutableStateOf(normalized.updateIntervalHours.toString())
@@ -228,7 +229,7 @@ internal fun MihomoSubscriptionSettingsContent(
         Card {
             Column {
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Amamiya.Protocol,
+                    title = MLang.ProfilesPage.Kokoro.Protocol,
                     items = availableOptions.protocols.map { it.label },
                     selectedIndex = availableOptions.protocols.indexOfFirst { it.value == normalized.protocol }
                         .coerceAtLeast(0),
@@ -246,7 +247,7 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Amamiya.Plan,
+                    title = MLang.ProfilesPage.Kokoro.Plan,
                     items = availableOptions.plans.map { it.name },
                     selectedIndex = availableOptions.plans.indexOfFirst { it.name == normalized.plan }
                         .coerceAtLeast(0),
@@ -259,7 +260,7 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Amamiya.Isp,
+                    title = MLang.ProfilesPage.Kokoro.Isp,
                     items = selectableIsps.map { localizedIspLabel(it) },
                     selectedIndex = selectableIsps.indexOfFirst { it.value == normalized.isp }.coerceAtLeast(0),
                     onSelectedIndexChange = { index ->
@@ -269,10 +270,10 @@ internal fun MihomoSubscriptionSettingsContent(
                 )
                 AnimatedVisibility(visible = supportsDirect) {
                     YumeMd3DropdownPreference(
-                        title = MLang.ProfilesPage.Amamiya.Mode,
+                        title = MLang.ProfilesPage.Kokoro.Mode,
                         items = listOf(
-                            MLang.ProfilesPage.Amamiya.Relay,
-                            MLang.ProfilesPage.Amamiya.Direct,
+                            MLang.ProfilesPage.Kokoro.Relay,
+                            MLang.ProfilesPage.Kokoro.Direct,
                         ),
                         selectedIndex = if (normalized.mode == "direct") 1 else 0,
                         onSelectedIndexChange = { index ->
@@ -287,10 +288,10 @@ internal fun MihomoSubscriptionSettingsContent(
         Card {
             Column {
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Amamiya.RuleSource,
+                    title = MLang.ProfilesPage.Kokoro.RuleSource,
                     items = availableOptions.ruleSources.map {
-                        if (it == "mirror") MLang.ProfilesPage.Amamiya.Mirror
-                        else MLang.ProfilesPage.Amamiya.Origin
+                        if (it == "mirror") MLang.ProfilesPage.Kokoro.Mirror
+                        else MLang.ProfilesPage.Kokoro.Origin
                     },
                     selectedIndex = availableOptions.ruleSources.indexOf(normalized.ruleSource).coerceAtLeast(0),
                     onSelectedIndexChange = { index ->
@@ -299,10 +300,10 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Amamiya.FinalRoute,
+                    title = MLang.ProfilesPage.Kokoro.FinalRoute,
                     items = availableOptions.finalRoutes.map {
-                        if (it == "direct") MLang.ProfilesPage.Amamiya.Direct
-                        else MLang.ProfilesPage.Amamiya.Proxy
+                        if (it == "direct") MLang.ProfilesPage.Kokoro.Direct
+                        else MLang.ProfilesPage.Kokoro.Proxy
                     },
                     selectedIndex = availableOptions.finalRoutes.indexOf(normalized.finalRoute).coerceAtLeast(0),
                     onSelectedIndexChange = { index ->
@@ -311,8 +312,8 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 PreferenceSwitchItem(
-                    title = MLang.ProfilesPage.Amamiya.RuleProviderAutoUpdate,
-                    summary = MLang.ProfilesPage.Amamiya.RuleProviderAutoUpdateSummary,
+                    title = MLang.ProfilesPage.Kokoro.RuleProviderAutoUpdate,
+                    summary = MLang.ProfilesPage.Kokoro.RuleProviderAutoUpdateSummary,
                     checked = normalized.ruleProviderAutoUpdate,
                     onCheckedChange = {
                         onSettingsChange(normalized.copy(ruleProviderAutoUpdate = it))
@@ -324,8 +325,8 @@ internal fun MihomoSubscriptionSettingsContent(
         Card {
             Column {
                 PreferenceSwitchItem(
-                    title = MLang.ProfilesPage.Amamiya.SubscriptionAutoUpdate,
-                    summary = MLang.ProfilesPage.Amamiya.SubscriptionAutoUpdateSummary,
+                    title = MLang.ProfilesPage.Kokoro.SubscriptionAutoUpdate,
+                    summary = MLang.ProfilesPage.Kokoro.SubscriptionAutoUpdateSummary,
                     checked = normalized.subscriptionAutoUpdate,
                     onCheckedChange = {
                         onSettingsChange(normalized.copy(subscriptionAutoUpdate = it))
@@ -350,7 +351,7 @@ internal fun MihomoSubscriptionSettingsContent(
                                     }
                                 }
                             },
-                            label = MLang.ProfilesPage.Amamiya.UpdateHoursRange.format(
+                            label = MLang.ProfilesPage.Kokoro.UpdateHoursRange.format(
                                 availableOptions.minUpdateHours,
                                 availableOptions.maxUpdateHours,
                             ),
@@ -367,12 +368,12 @@ internal fun MihomoSubscriptionSettingsContent(
 }
 
 @Composable
-private fun localizedIspLabel(option: AmamiyaSubscriptionOptions.IspOption): String = when (option.value) {
-    "" -> MLang.ProfilesPage.Amamiya.IspAuto
-    "ct" -> MLang.ProfilesPage.Amamiya.IspCt
-    "cu" -> MLang.ProfilesPage.Amamiya.IspCu
-    "cm" -> MLang.ProfilesPage.Amamiya.IspCm
-    "other" -> MLang.ProfilesPage.Amamiya.IspOther
+private fun localizedIspLabel(option: KokoroSubscriptionOptions.IspOption): String = when (option.value) {
+    "" -> MLang.ProfilesPage.Kokoro.IspAuto
+    "ct" -> MLang.ProfilesPage.Kokoro.IspCt
+    "cu" -> MLang.ProfilesPage.Kokoro.IspCu
+    "cm" -> MLang.ProfilesPage.Kokoro.IspCm
+    "other" -> MLang.ProfilesPage.Kokoro.IspOther
     else -> option.label
 }
 

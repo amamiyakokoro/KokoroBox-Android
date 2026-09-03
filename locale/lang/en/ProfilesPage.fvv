@@ -22,10 +22,10 @@ ProfilesPage = {
         Subscription = "Subscription URL"
         LocalFile = "Local File"
         QrScan = "Scan QR Code"
-        Amamiya = "Kokoro account"
+        Kokoro = "Kokoro account"
     }
 
-    Amamiya = {
+    Kokoro = {
         Checking = "Checking sign-in status..."
         LoggedOut = "Not signed in"
         LoginHint = "Sign in with osu! to load your proxy subscription."

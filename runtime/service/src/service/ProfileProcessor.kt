@@ -26,6 +26,7 @@ import android.content.Context
 import android.net.Uri
 import com.github.yumelira.yumebox.core.Clash
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
 import com.github.yumelira.yumebox.service.common.log.Log
 import com.github.yumelira.yumebox.service.remote.IFetchObserver
@@ -45,7 +46,10 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
+import java.io.IOException
+import java.net.SocketTimeoutException
 import java.net.URLDecoder
+import java.net.UnknownHostException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.Base64
@@ -88,12 +92,14 @@ object ProfileProcessor {
         val hasCommittedConfig: Boolean
     )
 
+    private class SubscriptionDownloadException(message: String) : IOException(message)
+
     private suspend fun downloadWithSubscriptionInfo(
         context: Context,
         url: String,
         targetFile: File,
         onProgress: ((Int) -> Unit)? = null
-    ): Pair<Boolean, SubscriptionInfo?> = withContext(Dispatchers.IO + NonCancellable) {
+    ): SubscriptionInfo? = withContext(Dispatchers.IO + NonCancellable) {
         try {
             targetFile.parentFile?.mkdirs()
             if (targetFile.exists()) targetFile.delete()
@@ -103,25 +109,50 @@ object ProfileProcessor {
                 .header("User-Agent", resolveUserAgent())
                 .build()
 
-            val response = if (KokoroApi.isAuthenticatedSubscriptionUrl(url)) {
-                KokoroSession(context).executeAuthorized(request)
+            val isKokoroSubscription = KokoroApi.isAuthenticatedSubscriptionUrl(url)
+            val response = if (isKokoroSubscription) {
+                KokoroSession(context).executeSubscriptionConfig(request)
             } else {
                 httpClient.newCall(request).execute()
             }
 
             response.use {
+                if (isKokoroSubscription) {
+                    val mediaType = response.body.contentType()
+                    val responseFormat = mediaType?.let { "${it.type}/${it.subtype}" } ?: "unknown"
+                    Log.i(
+                        "Kokoro subscription response: HTTP ${response.code}, " +
+                            "format=$responseFormat, bytes=${response.body.contentLength()}"
+                    )
+                }
                 if (!response.isSuccessful) {
-                    return@withContext Pair(false, null)
+                    val message = when {
+                        isKokoroSubscription && response.code in listOf(401, 403) ->
+                            "Kokoro session expired. Sign in again."
+                        isKokoroSubscription && response.code in listOf(400, 422) ->
+                            "Kokoro rejected the subscription options (HTTP ${response.code})."
+                        else -> "Subscription server returned HTTP ${response.code}."
+                    }
+                    throw SubscriptionDownloadException(message)
+                }
+                if (isKokoroSubscription && response.body.contentType()?.let {
+                        "${it.type}/${it.subtype}"
+                    } != "text/yaml"
+                ) {
+                    throw SubscriptionDownloadException(
+                        "Kokoro returned an unexpected subscription format."
+                    )
                 }
 
                 val parsedInfo = parseSubscriptionInfo(
                     response.headers["Subscription-Userinfo"] ?: response.headers["subscription-userinfo"],
                     response.headers
                 )
-                val subInfo = if (
-                    KokoroApi.isAuthenticatedSubscriptionUrl(url) &&
-                    Uri.parse(url).getQueryParameter("update") == "off"
-                ) {
+                val subscriptionUri = Uri.parse(url)
+                val profileAutoUpdate = subscriptionUri.getQueryParameter("profile_update")
+                    ?.toBooleanStrictOrNull()
+                    ?: (subscriptionUri.getQueryParameter("update") != "off")
+                val subInfo = if (isKokoroSubscription && !profileAutoUpdate) {
                     parsedInfo.copy(interval = 0)
                 } else {
                     parsedInfo
@@ -153,12 +184,22 @@ object ProfileProcessor {
                     }
                 }
 
-                Pair(true, subInfo)
+                subInfo
             }
         } catch (e: Exception) {
-            Log.w("Failed to download with subscription info: $e", e)
+            val safeError = when (e) {
+                is SubscriptionDownloadException -> e
+                is KokoroAuthenticationRequiredException ->
+                    SubscriptionDownloadException("Kokoro session expired. Sign in again.")
+                is UnknownHostException ->
+                    SubscriptionDownloadException("Unable to resolve the subscription server.")
+                is SocketTimeoutException ->
+                    SubscriptionDownloadException("The subscription server timed out.")
+                else -> SubscriptionDownloadException("Unable to download subscription configuration.")
+            }
+            Log.w("Subscription download failed (${e::class.java.simpleName})")
             if (targetFile.exists()) targetFile.delete()
-            Pair(false, null)
+            throw safeError
         }
     }
 
@@ -327,10 +368,9 @@ object ProfileProcessor {
     ): SubscriptionInfo? {
         onProgress(5)
         val tempFile = stagingDir.resolve("config.download.yaml")
-        val (success, info) = downloadWithSubscriptionInfo(context, source, tempFile) { progress ->
+        val info = downloadWithSubscriptionInfo(context, source, tempFile) { progress ->
             onProgress(5 + (progress * 0.4).toInt())
         }
-        if (!success) throw java.io.IOException("Unable to download subscription configuration")
         tempFile.copyTo(stagingDir.resolve("config.yaml"), overwrite = true)
         tempFile.delete()
         return info

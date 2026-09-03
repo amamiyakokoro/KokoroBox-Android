@@ -53,7 +53,7 @@ class ProfilesViewModel(
     application: Application,
     private val profilesRepository: ProfilesRepository,
     profileLinksStorage: ProfileLinksStore,
-    private val amamiyaAccountClient: AmamiyaAccountClient,
+    private val kokoroAccountClient: KokoroAccountClient,
 ) : AndroidContractStateViewModel<ProfilesUiState, ProfilesViewModel.ProfilesUiEffect>(
     application,
     ProfilesUiState(),
@@ -77,12 +77,12 @@ class ProfilesViewModel(
     private val _updatingProfileIds = MutableStateFlow<Set<UUID>>(emptySet())
     val updatingProfileIds: StateFlow<Set<UUID>> = _updatingProfileIds.asStateFlow()
 
-    private val _amamiyaAuthState = MutableStateFlow<AmamiyaAuthState>(AmamiyaAuthState.Checking)
-    internal val amamiyaAuthState: StateFlow<AmamiyaAuthState> = _amamiyaAuthState.asStateFlow()
+    private val _kokoroAuthState = MutableStateFlow<KokoroAuthState>(KokoroAuthState.Checking)
+    internal val kokoroAuthState: StateFlow<KokoroAuthState> = _kokoroAuthState.asStateFlow()
 
-    private val _amamiyaSubscriptionOptions = MutableStateFlow(AmamiyaSubscriptionOptions.fallback())
-    internal val amamiyaSubscriptionOptions: StateFlow<AmamiyaSubscriptionOptions> =
-        _amamiyaSubscriptionOptions.asStateFlow()
+    private val _kokoroSubscriptionOptions = MutableStateFlow(KokoroSubscriptionOptions.fallback())
+    internal val kokoroSubscriptionOptions: StateFlow<KokoroSubscriptionOptions> =
+        _kokoroSubscriptionOptions.asStateFlow()
 
     private val updateJobs = mutableMapOf<UUID, Job>()
     private val profileConfigBackups = mutableMapOf<UUID, ProfileConfigBackup>()
@@ -90,54 +90,58 @@ class ProfilesViewModel(
 
     init {
         refreshProfiles()
-        refreshAmamiyaAccount()
+        refreshKokoroAccount()
     }
 
-    internal fun refreshAmamiyaAccount() {
+    internal fun refreshKokoroAccount() {
         viewModelScope.launch {
-            _amamiyaAuthState.value = AmamiyaAuthState.Checking
-            _amamiyaAuthState.value = try {
-                val account = amamiyaAccountClient.getAccount()
+            _kokoroAuthState.value = KokoroAuthState.Checking
+            _kokoroAuthState.value = try {
+                val account = kokoroAccountClient.getAccount()
                 if (account == null) {
-                    _amamiyaSubscriptionOptions.value = AmamiyaSubscriptionOptions.fallback()
-                    AmamiyaAuthState.LoggedOut
+                    _kokoroSubscriptionOptions.value = KokoroSubscriptionOptions.fallback()
+                    KokoroAuthState.LoggedOut
                 } else {
-                    _amamiyaSubscriptionOptions.value = runCatching {
-                        amamiyaAccountClient.getSubscriptionOptions(account)
+                    _kokoroSubscriptionOptions.value = runCatching {
+                        kokoroAccountClient.getSubscriptionOptions(account)
                     }.getOrElse { error ->
                         Timber.w(
                             "Unable to load Kokoro subscription options (%s); using account fallback",
                             error::class.java.simpleName,
                         )
-                        AmamiyaSubscriptionOptions.fallback(account)
+                        KokoroSubscriptionOptions.fallback(account)
                     }
-                    AmamiyaAuthState.Authenticated(account)
+                    KokoroAuthState.Authenticated(account)
                 }
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.w("Failed to refresh amamiyakoko.ro account (%s)", e::class.java.simpleName)
-                AmamiyaAuthState.Error(MLang.ProfilesPage.Amamiya.CheckFailedDetail)
+                KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.CheckFailedDetail)
             }
         }
     }
 
-    internal fun beginAmamiyaLogin(): String = amamiyaAccountClient.beginLogin()
+    internal fun beginKokoroLogin(): String = kokoroAccountClient.beginLogin()
 
-    internal fun reportAmamiyaLoginFailure() {
-        _amamiyaAuthState.value = AmamiyaAuthState.Error(MLang.ProfilesPage.Amamiya.LoginFailed)
+    internal suspend fun resolveKokoroSubscription(
+        settings: MihomoSubscriptionSettings,
+    ): ResolvedSubscription = kokoroAccountClient.resolveSubscription(settings)
+
+    internal fun reportKokoroLoginFailure() {
+        _kokoroAuthState.value = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.LoginFailed)
     }
 
-    internal fun logoutAmamiyaAccount() {
+    internal fun logoutKokoroAccount() {
         viewModelScope.launch {
-            _amamiyaAuthState.value = AmamiyaAuthState.Checking
+            _kokoroAuthState.value = KokoroAuthState.Checking
             try {
-                amamiyaAccountClient.revoke()
+                kokoroAccountClient.revoke()
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.w("Failed to revoke amamiyakoko.ro session (%s)", e::class.java.simpleName)
             } finally {
-                _amamiyaSubscriptionOptions.value = AmamiyaSubscriptionOptions.fallback()
-                _amamiyaAuthState.value = AmamiyaAuthState.LoggedOut
+                _kokoroSubscriptionOptions.value = KokoroSubscriptionOptions.fallback()
+                _kokoroAuthState.value = KokoroAuthState.LoggedOut
             }
         }
     }

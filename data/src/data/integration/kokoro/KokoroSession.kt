@@ -22,6 +22,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -44,7 +48,9 @@ object KokoroApi {
     const val ME_URL = "$API_BASE_URL/app/me"
     const val REVOKE_URL = "$API_BASE_URL/app/auth/revoke"
     const val SUBSCRIPTION_OPTIONS_URL = "$API_BASE_URL/app/subscription/options"
+    const val SUBSCRIPTION_RESOLVE_URL = "$API_BASE_URL/app/subscription/resolve"
     const val SUBSCRIPTION_CONFIG_URL = "$API_BASE_URL/app/subscription/config"
+    const val LEGACY_SUBSCRIPTION_CONFIG_URL = "$API_BASE_URL/config"
 
     fun loginUrl(state: String): String = Uri.parse(LOGIN_URL).buildUpon()
         .appendQueryParameter("redirect_uri", APP_REDIRECT_URI)
@@ -80,6 +86,7 @@ object KokoroApi {
     private val AUTHORIZED_API_PATHS = setOf(
         "/api/app/me",
         "/api/app/subscription/options",
+        "/api/app/subscription/resolve",
         "/api/app/subscription/config",
     )
 }
@@ -149,6 +156,80 @@ class KokoroSession(context: Context) {
         second
     }
 
+    /**
+     * Downloads a Mihomo subscription through the App endpoint. Older server deployments do not
+     * expose that endpoint yet, so a 404 falls back to the public endpoint with a UUID obtained
+     * transiently from /app/me. The UUID is never returned to callers or persisted locally.
+     */
+    suspend fun executeSubscriptionConfig(request: Request): Response = withContext(Dispatchers.IO) {
+        require(KokoroApi.isAuthenticatedSubscriptionUrl(request.url.toString())) {
+            "Refusing to download a Kokoro subscription from an untrusted URL"
+        }
+
+        val primary = executeAuthorized(request)
+        if (primary.code != 404) return@withContext primary
+        primary.close()
+
+        val accountRequest = Request.Builder()
+            .url(KokoroApi.ME_URL)
+            .header("Accept", "application/json")
+            .build()
+        val proxyUuid = executeAuthorized(accountRequest).use { response ->
+            if (!response.isSuccessful) {
+                throw IOException("Unable to retrieve Kokoro subscription credentials (HTTP ${response.code})")
+            }
+            json.parseToJsonElement(response.body.string())
+                .jsonObject["proxy_uuid"]
+                ?.jsonPrimitive
+                ?.contentOrNull
+                ?.takeIf(String::isNotBlank)
+                ?: throw IOException("The Kokoro account has no subscription credential")
+        }
+
+        val fallbackBuilder = KokoroApi.LEGACY_SUBSCRIPTION_CONFIG_URL.toHttpUrl().newBuilder()
+            .addQueryParameter("uuid", proxyUuid)
+            .addQueryParameter("client", "meta")
+        fun copyQueryParameter(name: String) {
+            request.url.queryParameter(name)?.let { fallbackBuilder.addQueryParameter(name, it) }
+        }
+        copyQueryParameter("protocol")
+        copyQueryParameter("plan")
+        copyQueryParameter("isp")
+        copyQueryParameter("mode")
+        fallbackBuilder.addQueryParameter(
+            "rule",
+            request.url.queryParameter("rule_source") ?: "origin",
+        )
+        fallbackBuilder.addQueryParameter(
+            "match",
+            if (request.url.queryParameter("final_route") == "direct") "direct" else "none",
+        )
+        fallbackBuilder.addQueryParameter(
+            "rule_update",
+            if (request.url.queryParameter("rule_provider_auto_update")?.toBooleanStrictOrNull() != false) {
+                "enable"
+            } else {
+                "disable"
+            },
+        )
+        val profileAutoUpdate = request.url.queryParameter("profile_update")
+            ?.toBooleanStrictOrNull()
+            ?: true
+        fallbackBuilder.addQueryParameter(
+            "update",
+            if (profileAutoUpdate) {
+                request.url.queryParameter("profile_update_hours") ?: "1"
+            } else {
+                "off"
+            },
+        )
+        val fallbackRequest = request.newBuilder()
+            .removeHeader("Authorization")
+            .url(fallbackBuilder.build())
+            .build()
+        httpClient.newCall(fallbackRequest).execute()
+    }
+
     suspend fun revoke() = withContext(Dispatchers.IO) {
         val accessToken = tokenStore.load().accessToken
         try {
@@ -191,7 +272,9 @@ class KokoroSession(context: Context) {
             tokenStore.replaceTokens(replacement)
             replacement.accessToken
         } catch (error: Exception) {
-            tokenStore.clearTokens()
+            if (error is KokoroTokenRequestException && error.statusCode in 400..499) {
+                tokenStore.clearTokens()
+            }
             throw error
         }
     }
@@ -204,7 +287,7 @@ class KokoroSession(context: Context) {
             .build()
         httpClient.newCall(request).execute().use { response ->
             if (response.code !in 200..299) {
-                throw IOException("Token exchange failed with HTTP ${response.code}")
+                throw KokoroTokenRequestException(response.code)
             }
             return json.decodeFromString(response.body.string())
         }
@@ -233,6 +316,9 @@ class KokoroSession(context: Context) {
 }
 
 class KokoroAuthenticationRequiredException : IOException("Kokoro sign-in is required")
+
+private class KokoroTokenRequestException(val statusCode: Int) :
+    IOException("Token exchange failed with HTTP $statusCode")
 
 @Serializable
 private data class TokenRequest(

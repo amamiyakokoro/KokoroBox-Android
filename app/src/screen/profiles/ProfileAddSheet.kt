@@ -99,12 +99,12 @@ internal fun AddProfileSheet(
     var fileName by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
     var isDownloading by remember { mutableStateOf(false) }
-    var amamiyaOptions by remember { mutableStateOf(AmamiyaConfigOptions()) }
+    var kokoroOptions by remember { mutableStateOf(KokoroConfigOptions()) }
 
     val downloadProgress by profilesViewModel.downloadProgress.collectAsState()
     val uiState by profilesViewModel.uiState.collectAsState()
-    val amamiyaAuthState by profilesViewModel.amamiyaAuthState.collectAsState()
-    val amamiyaSubscriptionOptions by profilesViewModel.amamiyaSubscriptionOptions.collectAsState()
+    val kokoroAuthState by profilesViewModel.kokoroAuthState.collectAsState()
+    val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsState()
     var hasShownCompleteAnimation by remember { mutableStateOf(false) }
     var stableSheetHeightPx by remember { mutableIntStateOf(0) }
 
@@ -150,7 +150,7 @@ internal fun AddProfileSheet(
         fileName = ""
         error = ""
         isDownloading = false
-        amamiyaOptions = AmamiyaConfigOptions()
+        kokoroOptions = KokoroConfigOptions()
         hasShownCompleteAnimation = false
     }
 
@@ -193,20 +193,20 @@ internal fun AddProfileSheet(
         if (selectedTypeIndex == 2 && !hasCameraPermission) {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         } else if (selectedTypeIndex == 3) {
-            profilesViewModel.refreshAmamiyaAccount()
+            profilesViewModel.refreshKokoroAccount()
         }
     }
 
-    LaunchedEffect(amamiyaAuthState, amamiyaSubscriptionOptions) {
-        val authenticated = amamiyaAuthState as? AmamiyaAuthState.Authenticated
+    LaunchedEffect(kokoroAuthState, kokoroSubscriptionOptions) {
+        val authenticated = kokoroAuthState as? KokoroAuthState.Authenticated
         if (authenticated != null) {
-            val effectiveOptions = if (amamiyaSubscriptionOptions.plans.isEmpty()) {
-                AmamiyaSubscriptionOptions.fallback(authenticated.account)
+            val effectiveOptions = if (kokoroSubscriptionOptions.plans.isEmpty()) {
+                KokoroSubscriptionOptions.fallback(authenticated.account)
             } else {
-                amamiyaSubscriptionOptions
+                kokoroSubscriptionOptions
             }
-            amamiyaOptions = effectiveOptions.normalize(
-                if (amamiyaOptions.plan.isBlank()) effectiveOptions.defaults else amamiyaOptions,
+            kokoroOptions = effectiveOptions.normalize(
+                if (kokoroOptions.plan.isBlank()) effectiveOptions.defaults else kokoroOptions,
             )
         }
     }
@@ -349,15 +349,15 @@ internal fun AddProfileSheet(
             error = MLang.ProfilesPage.Validation.SelectFile
             return
         }
-        val amamiyaAccount = (amamiyaAuthState as? AmamiyaAuthState.Authenticated)?.account
-        val effectiveAmamiyaOptions = if (amamiyaSubscriptionOptions.plans.isEmpty()) {
-            AmamiyaSubscriptionOptions.fallback(amamiyaAccount)
+        val kokoroAccount = (kokoroAuthState as? KokoroAuthState.Authenticated)?.account
+        val effectiveKokoroOptions = if (kokoroSubscriptionOptions.plans.isEmpty()) {
+            KokoroSubscriptionOptions.fallback(kokoroAccount)
         } else {
-            amamiyaSubscriptionOptions
+            kokoroSubscriptionOptions
         }
-        val normalizedAmamiyaSettings = effectiveAmamiyaOptions.normalize(amamiyaOptions)
-        if (selectedTypeIndex == 3 && (amamiyaAccount == null || normalizedAmamiyaSettings.plan.isBlank())) {
-            error = MLang.ProfilesPage.Amamiya.LoginRequired
+        val normalizedKokoroSettings = effectiveKokoroOptions.normalize(kokoroOptions)
+        if (selectedTypeIndex == 3 && (kokoroAccount == null || normalizedKokoroSettings.plan.isBlank())) {
+            error = MLang.ProfilesPage.Kokoro.LoginRequired
             return
         }
 
@@ -383,22 +383,30 @@ internal fun AddProfileSheet(
                     null
                 )
             }
-        } else if (selectedTypeIndex == 3 && amamiyaAccount != null) {
-            val source = AmamiyaApi.buildConfigUrl(normalizedAmamiyaSettings)
-            val defaultName = buildString {
-                append(MLang.ProfilesPage.Amamiya.DefaultProfileName)
-                normalizedAmamiyaSettings.plan.takeIf(String::isNotBlank)?.let {
+        } else if (selectedTypeIndex == 3 && kokoroAccount != null) {
+            val fallbackName = buildString {
+                append(MLang.ProfilesPage.Kokoro.DefaultProfileName)
+                normalizedKokoroSettings.plan.takeIf(String::isNotBlank)?.let {
                     append(" · ")
                     append(it)
                 }
             }
-            onAddProfile(
-                name.ifBlank { defaultName },
-                source,
-                Profile.Type.Url,
-                AmamiyaApi.intervalMillis(normalizedAmamiyaSettings),
-                null,
-            )
+            scope.launch {
+                try {
+                    val resolved = profilesViewModel.resolveKokoroSubscription(normalizedKokoroSettings)
+                    onAddProfile(
+                        name.ifBlank { resolved.profileName.ifBlank { fallbackName } },
+                        resolved.authenticatedConfigUrl,
+                        Profile.Type.Url,
+                        KokoroApi.intervalMillis(normalizedKokoroSettings),
+                        null,
+                    )
+                } catch (e: Exception) {
+                    if (e is kotlinx.coroutines.CancellationException) throw e
+                    isDownloading = false
+                    error = e.message ?: MLang.ProfilesPage.Kokoro.CheckFailedDetail
+                }
+            }
         } else {
             if (profileToEdit != null) {
                 onUpdateProfile(
@@ -507,24 +515,24 @@ internal fun AddProfileSheet(
                             url = scannedUrl
                             selectedTypeIndex = 0
                         },
-                        amamiyaAuthState = amamiyaAuthState,
-                        amamiyaOptions = amamiyaOptions,
-                        amamiyaSubscriptionOptions = amamiyaSubscriptionOptions,
-                        onAmamiyaOptionsChange = { amamiyaOptions = it },
-                        onAmamiyaLogin = {
+                        kokoroAuthState = kokoroAuthState,
+                        kokoroOptions = kokoroOptions,
+                        kokoroSubscriptionOptions = kokoroSubscriptionOptions,
+                        onKokoroOptionsChange = { kokoroOptions = it },
+                        onKokoroLogin = {
                             runCatching {
-                                val loginUrl = profilesViewModel.beginAmamiyaLogin()
+                                val loginUrl = profilesViewModel.beginKokoroLogin()
                                 context.startActivity(
                                     Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
                                         addCategory(Intent.CATEGORY_BROWSABLE)
                                     },
                                 )
                             }.onFailure {
-                                error = MLang.ProfilesPage.Amamiya.LoginFailed
+                                error = MLang.ProfilesPage.Kokoro.LoginFailed
                             }
                         },
-                        onAmamiyaLogout = { profilesViewModel.logoutAmamiyaAccount() },
-                        onAmamiyaRetry = { profilesViewModel.refreshAmamiyaAccount() },
+                        onKokoroLogout = { profilesViewModel.logoutKokoroAccount() },
+                        onKokoroRetry = { profilesViewModel.refreshKokoroAccount() },
                     )
                 }
             }
@@ -615,13 +623,13 @@ private fun ProfileFormContent(
     onPickFile: () -> Unit,
     onSelectQrImage: () -> Unit,
     onQrScanned: (String) -> Unit,
-    amamiyaAuthState: AmamiyaAuthState,
-    amamiyaOptions: AmamiyaConfigOptions,
-    amamiyaSubscriptionOptions: AmamiyaSubscriptionOptions,
-    onAmamiyaOptionsChange: (AmamiyaConfigOptions) -> Unit,
-    onAmamiyaLogin: () -> Unit,
-    onAmamiyaLogout: () -> Unit,
-    onAmamiyaRetry: () -> Unit,
+    kokoroAuthState: KokoroAuthState,
+    kokoroOptions: KokoroConfigOptions,
+    kokoroSubscriptionOptions: KokoroSubscriptionOptions,
+    onKokoroOptionsChange: (KokoroConfigOptions) -> Unit,
+    onKokoroLogin: () -> Unit,
+    onKokoroLogout: () -> Unit,
+    onKokoroRetry: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -648,17 +656,17 @@ private fun ProfileFormContent(
                     onQrScanned = onQrScanned,
                 )
 
-                3 -> AmamiyaProfileContent(
-                    authState = amamiyaAuthState,
+                3 -> KokoroProfileContent(
+                    authState = kokoroAuthState,
                     name = name,
-                    settings = amamiyaOptions,
-                    availableOptions = amamiyaSubscriptionOptions,
+                    settings = kokoroOptions,
+                    availableOptions = kokoroSubscriptionOptions,
                     error = error,
                     onNameChange = onNameChange,
-                    onSettingsChange = onAmamiyaOptionsChange,
-                    onLogin = onAmamiyaLogin,
-                    onLogout = onAmamiyaLogout,
-                    onRetry = onAmamiyaRetry,
+                    onSettingsChange = onKokoroOptionsChange,
+                    onLogin = onKokoroLogin,
+                    onLogout = onKokoroLogout,
+                    onRetry = onKokoroRetry,
                 )
 
                 else -> ManualProfileContent(
@@ -693,7 +701,7 @@ private fun ProfileTypeSelectorCard(
                     MLang.ProfilesPage.Type.Subscription,
                     MLang.ProfilesPage.Type.LocalFile,
                     MLang.ProfilesPage.Type.QrScan,
-                    MLang.ProfilesPage.Type.Amamiya,
+                    MLang.ProfilesPage.Type.Kokoro,
                 ),
                 selectedIndex = selectedTypeIndex,
                 onSelectedIndexChange = onTypeSelected,

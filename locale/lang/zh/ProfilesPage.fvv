@@ -22,10 +22,10 @@ ProfilesPage = {
         Subscription = "订阅链接"
         LocalFile = "本地文件"
         QrScan = "扫码添加"
-        Amamiya = "Kokoro account"
+        Kokoro = "Kokoro account"
     }
 
-    Amamiya = {
+    Kokoro = {
         Checking = "正在检查登录状态…"
         LoggedOut = "尚未登录"
         LoginHint = "使用 osu! 登录以加载 Proxy Subscription。"

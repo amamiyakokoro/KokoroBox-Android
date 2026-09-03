@@ -70,7 +70,7 @@ fun ProfilesPager(
     val homeViewModel = koinViewModel<HomeViewModel>()
     val profiles by profilesViewModel.profiles.collectAsState()
     val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsState()
-    val amamiyaSubscriptionOptions by profilesViewModel.amamiyaSubscriptionOptions.collectAsState()
+    val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsState()
     val isRunning by homeViewModel.isRunning.collectAsState()
 
     val overrideConfigViewModel = koinViewModel<OverrideConfigViewModel>()
@@ -94,7 +94,7 @@ fun ProfilesPager(
 
     var importUrlFromScheme by remember { mutableStateOf<String?>(null) }
     val pendingImportUrl by MainActivity.pendingImportUrl.collectAsState()
-    val amamiyaAuthResult by MainActivity.amamiyaAuthResult.collectAsState()
+    val kokoroAuthResult by MainActivity.kokoroAuthResult.collectAsState()
     val urlProfiles = remember(profiles) {
         profiles.filter { it.type == Profile.Type.Url }
     }
@@ -110,20 +110,20 @@ fun ProfilesPager(
         }
     }
 
-    LaunchedEffect(amamiyaAuthResult) {
-        when (amamiyaAuthResult) {
-            true -> profilesViewModel.refreshAmamiyaAccount()
-            false -> profilesViewModel.reportAmamiyaLoginFailure()
+    LaunchedEffect(kokoroAuthResult) {
+        when (kokoroAuthResult) {
+            true -> profilesViewModel.refreshKokoroAccount()
+            false -> profilesViewModel.reportKokoroLoginFailure()
             null -> Unit
         }
-        if (amamiyaAuthResult != null) MainActivity.clearAmamiyaAuthResult()
+        if (kokoroAuthResult != null) MainActivity.clearKokoroAuthResult()
     }
 
     LaunchedEffect(showSettingsDialog.value) {
         if (showSettingsDialog.value) {
             overrideConfigViewModel.refresh()
-            if (profileToEdit?.source?.let(AmamiyaApi::isManagedConfigUrl) == true) {
-                profilesViewModel.refreshAmamiyaAccount()
+            if (profileToEdit?.source?.let(KokoroApi::isManagedConfigUrl) == true) {
+                profilesViewModel.refreshKokoroAccount()
             }
         }
     }
@@ -289,7 +289,7 @@ fun ProfilesPager(
             systemPreset = systemPresets.firstOrNull(),
             userConfigs = userConfigs,
             binding = profileBinding,
-            subscriptionOptions = amamiyaSubscriptionOptions,
+            subscriptionOptions = kokoroSubscriptionOptions,
             onDismiss = {
                 showSettingsDialog.value = false
             },

@@ -11,50 +11,48 @@ package com.github.yumelira.yumebox.screen.profiles
 
 import android.content.Context
 import android.net.Uri
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi as KokoroBackendApi
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
-internal object AmamiyaApi {
-    const val API_BASE_URL = KokoroApi.API_BASE_URL
-    const val APP_REDIRECT_URI = KokoroApi.APP_REDIRECT_URI
-    const val LOGIN_URL = KokoroApi.LOGIN_URL
-    const val TOKEN_URL = KokoroApi.TOKEN_URL
-    const val ME_URL = KokoroApi.ME_URL
-    const val REVOKE_URL = KokoroApi.REVOKE_URL
-    const val OPTIONS_URL = KokoroApi.SUBSCRIPTION_OPTIONS_URL
-    const val CONFIG_URL = KokoroApi.SUBSCRIPTION_CONFIG_URL
+internal object KokoroApi {
+    const val API_BASE_URL = KokoroBackendApi.API_BASE_URL
+    const val APP_REDIRECT_URI = KokoroBackendApi.APP_REDIRECT_URI
+    const val LOGIN_URL = KokoroBackendApi.LOGIN_URL
+    const val TOKEN_URL = KokoroBackendApi.TOKEN_URL
+    const val ME_URL = KokoroBackendApi.ME_URL
+    const val REVOKE_URL = KokoroBackendApi.REVOKE_URL
+    const val OPTIONS_URL = KokoroBackendApi.SUBSCRIPTION_OPTIONS_URL
+    const val RESOLVE_URL = KokoroBackendApi.SUBSCRIPTION_RESOLVE_URL
+    const val CONFIG_URL = KokoroBackendApi.SUBSCRIPTION_CONFIG_URL
 
-    fun isManagedConfigUrl(source: String): Boolean = KokoroApi.isManagedSubscriptionUrl(source)
+    fun isManagedConfigUrl(source: String): Boolean = KokoroBackendApi.isManagedSubscriptionUrl(source)
 
     fun buildConfigUrl(settings: MihomoSubscriptionSettings): String {
         val normalizedMode = if (settings.protocol == "vmess") "relay" else settings.mode
-        val update = if (settings.subscriptionAutoUpdate) {
-            settings.updateIntervalHours.coerceAtLeast(1).toString()
-        } else {
-            "off"
-        }
         return Uri.parse(CONFIG_URL).buildUpon()
+            .appendQueryParameter("format", "mihomo")
             .appendQueryParameter("protocol", settings.protocol)
             .appendQueryParameter("plan", settings.plan)
             .apply {
                 settings.isp.takeIf(String::isNotBlank)?.let { appendQueryParameter("isp", it) }
             }
-            .appendQueryParameter("rule", settings.ruleSource)
+            .appendQueryParameter("rule_source", settings.ruleSource)
             .appendQueryParameter("mode", normalizedMode)
-            .appendQueryParameter("match", if (settings.finalRoute == "direct") "direct" else "none")
-            .appendQueryParameter(
-                "rule_update",
-                if (settings.ruleProviderAutoUpdate) "enable" else "disable",
-            )
-            .appendQueryParameter("update", update)
+            .appendQueryParameter("final_route", settings.finalRoute)
+            .appendQueryParameter("rule_provider_auto_update", settings.ruleProviderAutoUpdate.toString())
+            .appendQueryParameter("profile_update", settings.subscriptionAutoUpdate.toString())
+            .appendQueryParameter("profile_update_hours", settings.updateIntervalHours.coerceIn(1, 720).toString())
             .build()
             .toString()
     }
@@ -65,7 +63,14 @@ internal object AmamiyaApi {
         val protocol = uri.getQueryParameter("protocol")
             ?.takeIf { it in SUPPORTED_PROTOCOLS }
             ?: "vmess"
-        val rawUpdate = uri.getQueryParameter("update") ?: "1"
+        val legacyUpdate = uri.getQueryParameter("update")
+        val profileAutoUpdate = uri.getQueryParameter("profile_update")
+            ?.toBooleanStrictOrNull()
+            ?: (legacyUpdate != "off")
+        val profileUpdateHours = uri.getQueryParameter("profile_update_hours")
+            ?.toIntOrNull()
+            ?: legacyUpdate?.toIntOrNull()
+            ?: 1
         return MihomoSubscriptionSettings(
             protocol = protocol,
             plan = uri.getQueryParameter("plan").orEmpty(),
@@ -75,11 +80,23 @@ internal object AmamiyaApi {
             } else {
                 "relay"
             },
-            ruleSource = if (uri.getQueryParameter("rule") == "mirror") "mirror" else "origin",
-            finalRoute = if (uri.getQueryParameter("match") == "direct") "direct" else "proxy",
-            ruleProviderAutoUpdate = uri.getQueryParameter("rule_update") != "disable",
-            subscriptionAutoUpdate = rawUpdate != "off",
-            updateIntervalHours = rawUpdate.toIntOrNull()?.takeIf { it > 0 } ?: 1,
+            ruleSource = if (
+                (uri.getQueryParameter("rule_source") ?: uri.getQueryParameter("rule")) == "mirror"
+            ) {
+                "mirror"
+            } else {
+                "origin"
+            },
+            finalRoute = when {
+                uri.getQueryParameter("final_route") == "direct" -> "direct"
+                uri.getQueryParameter("match") == "direct" -> "direct"
+                else -> "proxy"
+            },
+            ruleProviderAutoUpdate = uri.getQueryParameter("rule_provider_auto_update")
+                ?.toBooleanStrictOrNull()
+                ?: (uri.getQueryParameter("rule_update") != "disable"),
+            subscriptionAutoUpdate = profileAutoUpdate,
+            updateIntervalHours = profileUpdateHours.coerceIn(1, 720),
         )
     }
 
@@ -92,6 +109,8 @@ internal object AmamiyaApi {
 
     private val SUPPORTED_PROTOCOLS = setOf("vmess", "anytls", "hysteria2")
     private val SUPPORTED_ISPS = setOf("", "ct", "cu", "cm", "other")
+
+    fun supportsProtocol(value: String): Boolean = value in SUPPORTED_PROTOCOLS
 }
 
 internal data class MihomoSubscriptionSettings(
@@ -106,14 +125,14 @@ internal data class MihomoSubscriptionSettings(
     val updateIntervalHours: Int = 1,
 )
 
-internal typealias AmamiyaConfigOptions = MihomoSubscriptionSettings
+internal typealias KokoroConfigOptions = MihomoSubscriptionSettings
 
-internal data class AmamiyaAccount(
+internal data class KokoroAccount(
     val displayName: String?,
-    val subscriptions: List<AmamiyaSubscription>,
+    val subscriptions: List<KokoroSubscription>,
 )
 
-internal data class AmamiyaSubscription(
+internal data class KokoroSubscription(
     val plan: String,
     val description: String?,
     val supportedIsps: List<String>,
@@ -122,7 +141,7 @@ internal data class AmamiyaSubscription(
     val expiresAt: String?,
 )
 
-internal data class AmamiyaSubscriptionOptions(
+internal data class KokoroSubscriptionOptions(
     val protocols: List<ProtocolOption>,
     val plans: List<PlanOption>,
     val isps: List<IspOption>,
@@ -152,10 +171,13 @@ internal data class AmamiyaSubscriptionOptions(
         val plan = settings.plan.takeIf { candidate -> plans.isEmpty() || plans.any { it.name == candidate } }
             ?: defaults.plan.takeIf(String::isNotBlank)
             ?: plans.firstOrNull()?.name.orEmpty()
-        val supportedPlanIsps = plans.firstOrNull { it.name == plan }?.supportedIsps.orEmpty()
+        val supportedPlanIsps = plans.firstOrNull { it.name == plan }
+            ?.supportedIsps
+            .orEmpty()
+            .filterNot { it == "all" }
         val isp = settings.isp.takeIf { candidate ->
             isps.any { it.value == candidate } &&
-                (candidate.isBlank() || supportedPlanIsps.isEmpty() || candidate in supportedPlanIsps)
+                (candidate.isBlank() || candidate in supportedPlanIsps)
         }.orEmpty()
         val supportsDirect = protocols.firstOrNull { it.value == protocol }?.supportsDirect == true
         return settings.copy(
@@ -170,11 +192,11 @@ internal data class AmamiyaSubscriptionOptions(
     }
 
     companion object {
-        fun fallback(account: AmamiyaAccount? = null): AmamiyaSubscriptionOptions {
+        fun fallback(account: KokoroAccount? = null): KokoroSubscriptionOptions {
             val plans = account?.subscriptions.orEmpty().map {
                 PlanOption(it.plan, it.description, it.supportedIsps)
             }
-            return AmamiyaSubscriptionOptions(
+            return KokoroSubscriptionOptions(
                 protocols = listOf(
                     ProtocolOption("vmess", "VMess", false),
                     ProtocolOption("anytls", "AnyTLS", true),
@@ -198,14 +220,14 @@ internal data class AmamiyaSubscriptionOptions(
     }
 }
 
-internal sealed interface AmamiyaAuthState {
-    data object Checking : AmamiyaAuthState
-    data object LoggedOut : AmamiyaAuthState
-    data class Authenticated(val account: AmamiyaAccount) : AmamiyaAuthState
-    data class Error(val message: String) : AmamiyaAuthState
+internal sealed interface KokoroAuthState {
+    data object Checking : KokoroAuthState
+    data object LoggedOut : KokoroAuthState
+    data class Authenticated(val account: KokoroAccount) : KokoroAuthState
+    data class Error(val message: String) : KokoroAuthState
 }
 
-class AmamiyaAccountClient(context: Context) {
+class KokoroAccountClient(context: Context) {
     private val json = Json { ignoreUnknownKeys = true }
     private val session = KokoroSession(context)
 
@@ -213,9 +235,9 @@ class AmamiyaAccountClient(context: Context) {
 
     internal suspend fun handleOAuthCallback(uri: Uri) = session.handleOAuthCallback(uri)
 
-    internal suspend fun getAccount(): AmamiyaAccount? = withContext(Dispatchers.IO) {
+    internal suspend fun getAccount(): KokoroAccount? = withContext(Dispatchers.IO) {
         val request = Request.Builder()
-            .url(AmamiyaApi.ME_URL)
+            .url(KokoroApi.ME_URL)
             .header("Accept", "application/json")
             .build()
         val response = try {
@@ -237,10 +259,10 @@ class AmamiyaAccountClient(context: Context) {
     }
 
     internal suspend fun getSubscriptionOptions(
-        account: AmamiyaAccount? = null,
-    ): AmamiyaSubscriptionOptions = withContext(Dispatchers.IO) {
+        account: KokoroAccount? = null,
+    ): KokoroSubscriptionOptions = withContext(Dispatchers.IO) {
         val request = Request.Builder()
-            .url(AmamiyaApi.OPTIONS_URL)
+            .url(KokoroApi.OPTIONS_URL)
             .header("Accept", "application/json")
             .build()
         session.executeAuthorized(request).use { response ->
@@ -248,22 +270,54 @@ class AmamiyaAccountClient(context: Context) {
                 throw IOException("Subscription options returned HTTP ${response.code}")
             }
             val payload = json.decodeFromString<OptionsResponse>(response.body.string())
-            require(payload.format.equals("mihomo", ignoreCase = true)) { "Unsupported subscription format" }
+            require(payload.formats.any { it.value == "mihomo" && !it.testing }) {
+                "Mihomo subscriptions are unavailable"
+            }
             payload.toUiOptions(account)
+        }
+    }
+
+    internal suspend fun resolveSubscription(
+        settings: MihomoSubscriptionSettings,
+    ): ResolvedSubscription = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url(KokoroApi.RESOLVE_URL)
+            .header("Accept", "application/json")
+            .post(
+                json.encodeToString(SubscriptionSettingsRequest.from(settings))
+                    .toRequestBody(JSON_MEDIA_TYPE),
+            )
+            .build()
+        session.executeAuthorized(request).use { response ->
+            if (!response.isSuccessful) {
+                throw IOException("Kokoro rejected subscription settings (HTTP ${response.code})")
+            }
+            val payload = json.decodeFromString<ResolvedSubscriptionResponse>(response.body.string())
+            require(payload.format == "mihomo") { "Kokoro returned an unsupported subscription format" }
+            require(payload.contentType.substringBefore(';').trim() == "text/yaml") {
+                "Kokoro returned an unexpected subscription content type"
+            }
+            require(KokoroBackendApi.isAuthenticatedSubscriptionUrl(payload.authenticatedConfigUrl)) {
+                "Kokoro returned an untrusted subscription URL"
+            }
+            ResolvedSubscription(
+                profileName = payload.profileName,
+                authenticatedConfigUrl = payload.authenticatedConfigUrl,
+            )
         }
     }
 
     internal suspend fun revoke() = session.revoke()
 
-    private fun parseAccount(rawJson: String): AmamiyaAccount {
+    private fun parseAccount(rawJson: String): KokoroAccount {
         val response = json.decodeFromString<MeResponse>(rawJson)
         val detailByPlan = response.planDetails.associateBy(PlanDetails::name)
         val plans = response.plans.ifEmpty { response.planDetails.map(PlanDetails::name) }
-        return AmamiyaAccount(
+        return KokoroAccount(
             displayName = response.username,
             subscriptions = plans.distinct().map { plan ->
                 val detail = detailByPlan[plan]
-                AmamiyaSubscription(
+                KokoroSubscription(
                     plan = plan,
                     description = detail?.description,
                     supportedIsps = detail?.supportedIsps.orEmpty(),
@@ -274,7 +328,16 @@ class AmamiyaAccountClient(context: Context) {
             },
         )
     }
+
+    private companion object {
+        val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
+    }
 }
+
+internal data class ResolvedSubscription(
+    val profileName: String,
+    val authenticatedConfigUrl: String,
+)
 
 @Serializable
 private data class MeResponse(
@@ -295,29 +358,32 @@ private data class PlanDetails(
 
 @Serializable
 private data class OptionsResponse(
-    val format: String,
+    val formats: List<FormatOptionResponse> = emptyList(),
     val protocols: List<ProtocolOptionResponse> = emptyList(),
     val plans: List<PlanOptionResponse> = emptyList(),
     val isps: List<IspOptionResponse> = emptyList(),
     @SerialName("rule_sources") val ruleSources: List<String> = emptyList(),
     @SerialName("final_routes") val finalRoutes: List<String> = emptyList(),
-    @SerialName("update_interval") val updateInterval: UpdateIntervalResponse = UpdateIntervalResponse(),
+    @SerialName("profile_update") val profileUpdate: UpdateIntervalResponse = UpdateIntervalResponse(),
     val defaults: DefaultsResponse = DefaultsResponse(),
 ) {
-    fun toUiOptions(account: AmamiyaAccount? = null): AmamiyaSubscriptionOptions {
-        val fallback = AmamiyaSubscriptionOptions.fallback(account)
-        val resolvedProtocols = protocols.map {
-            AmamiyaSubscriptionOptions.ProtocolOption(it.value, it.label, it.supportsDirect)
+    fun toUiOptions(account: KokoroAccount? = null): KokoroSubscriptionOptions {
+        val fallback = KokoroSubscriptionOptions.fallback(account)
+        val resolvedProtocols = protocols.filter { KokoroApi.supportsProtocol(it.value) }.map {
+            KokoroSubscriptionOptions.ProtocolOption(it.value, it.label, it.supportsDirect)
         }.ifEmpty { fallback.protocols }
         val resolvedPlans = plans.map {
-            AmamiyaSubscriptionOptions.PlanOption(it.name, it.description, it.supportedIsps)
+            KokoroSubscriptionOptions.PlanOption(it.name, it.description, it.supportedIsps)
         }.ifEmpty { fallback.plans }
         val resolvedIsps = isps.map {
-            AmamiyaSubscriptionOptions.IspOption(it.value, it.label)
+            KokoroSubscriptionOptions.IspOption(it.value, it.label)
         }.ifEmpty { fallback.isps }
-        val minHours = updateInterval.minHours.coerceAtLeast(1)
-        val maxHours = updateInterval.maxHours.coerceAtLeast(minHours)
-        return AmamiyaSubscriptionOptions(
+        val minHours = profileUpdate.minHours.coerceAtLeast(1)
+        val maxHours = profileUpdate.maxHours.coerceAtLeast(minHours)
+        val defaultPlan = defaults.plan
+            ?.takeIf { candidate -> resolvedPlans.any { it.name == candidate } }
+            ?: resolvedPlans.firstOrNull()?.name.orEmpty()
+        return KokoroSubscriptionOptions(
             protocols = resolvedProtocols,
             plans = resolvedPlans,
             isps = resolvedIsps,
@@ -327,17 +393,26 @@ private data class OptionsResponse(
             maxUpdateHours = maxHours,
             defaults = MihomoSubscriptionSettings(
                 protocol = defaults.protocol,
-                plan = resolvedPlans.firstOrNull()?.name.orEmpty(),
+                plan = defaultPlan,
+                isp = defaults.isp.orEmpty(),
                 mode = defaults.mode,
                 ruleSource = defaults.ruleSource,
                 finalRoute = defaults.finalRoute,
                 ruleProviderAutoUpdate = defaults.ruleProviderAutoUpdate,
-                subscriptionAutoUpdate = defaults.subscriptionAutoUpdate,
-                updateIntervalHours = defaults.updateIntervalHours.coerceIn(minHours, maxHours),
+                subscriptionAutoUpdate = defaults.profileAutoUpdate,
+                updateIntervalHours = defaults.profileUpdateHours.coerceIn(minHours, maxHours),
             ),
         )
     }
 }
+
+@Serializable
+private data class FormatOptionResponse(
+    val value: String,
+    @SerialName("content_type") val contentType: String,
+    val filename: String,
+    val testing: Boolean = false,
+)
 
 @Serializable
 private data class ProtocolOptionResponse(
@@ -365,11 +440,50 @@ private data class UpdateIntervalResponse(
 
 @Serializable
 private data class DefaultsResponse(
+    val format: String = "mihomo",
     val protocol: String = "vmess",
+    val plan: String? = null,
+    val isp: String? = null,
     val mode: String = "relay",
     @SerialName("rule_source") val ruleSource: String = "origin",
     @SerialName("final_route") val finalRoute: String = "proxy",
     @SerialName("rule_provider_auto_update") val ruleProviderAutoUpdate: Boolean = true,
-    @SerialName("subscription_auto_update") val subscriptionAutoUpdate: Boolean = true,
-    @SerialName("update_interval_hours") val updateIntervalHours: Int = 1,
+    @SerialName("profile_auto_update") val profileAutoUpdate: Boolean = true,
+    @SerialName("profile_update_hours") val profileUpdateHours: Int = 1,
+)
+
+@Serializable
+private data class SubscriptionSettingsRequest(
+    val format: String = "mihomo",
+    val protocol: String,
+    val plan: String,
+    val isp: String? = null,
+    val mode: String,
+    @SerialName("rule_source") val ruleSource: String,
+    @SerialName("final_route") val finalRoute: String,
+    @SerialName("rule_provider_auto_update") val ruleProviderAutoUpdate: Boolean,
+    @SerialName("profile_auto_update") val profileAutoUpdate: Boolean,
+    @SerialName("profile_update_hours") val profileUpdateHours: Int,
+) {
+    companion object {
+        fun from(settings: MihomoSubscriptionSettings) = SubscriptionSettingsRequest(
+            protocol = settings.protocol,
+            plan = settings.plan,
+            isp = settings.isp.ifBlank { null },
+            mode = if (settings.protocol == "vmess") "relay" else settings.mode,
+            ruleSource = settings.ruleSource,
+            finalRoute = settings.finalRoute,
+            ruleProviderAutoUpdate = settings.ruleProviderAutoUpdate,
+            profileAutoUpdate = settings.subscriptionAutoUpdate,
+            profileUpdateHours = settings.updateIntervalHours.coerceIn(1, 720),
+        )
+    }
+}
+
+@Serializable
+private data class ResolvedSubscriptionResponse(
+    val format: String,
+    @SerialName("content_type") val contentType: String,
+    @SerialName("profile_name") val profileName: String,
+    @SerialName("authenticated_config_url") val authenticatedConfigUrl: String,
 )
