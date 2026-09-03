@@ -12,6 +12,7 @@ package com.github.yumelira.yumebox.screen.profiles
 import android.content.Context
 import android.net.Uri
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -217,7 +218,12 @@ class AmamiyaAccountClient(context: Context) {
             .url(AmamiyaApi.ME_URL)
             .header("Accept", "application/json")
             .build()
-        session.executeAuthorized(request).use { response ->
+        val response = try {
+            session.executeAuthorized(request)
+        } catch (_: KokoroAuthenticationRequiredException) {
+            return@withContext null
+        }
+        response.use {
             when (response.code) {
                 401, 403 -> {
                     session.clearTokens()
