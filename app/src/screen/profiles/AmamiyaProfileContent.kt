@@ -102,14 +102,14 @@ internal fun AmamiyaProfileContent(
                             detail = authState.message,
                             error = true,
                         )
-                        Row(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
+                            verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
                         ) {
-                            OutlinedButton(onClick = onRetry, modifier = Modifier.weight(1f)) {
+                            Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
                                 Text(MLang.ProfilesPage.Amamiya.Retry)
                             }
-                            Button(onClick = onLogin, modifier = Modifier.weight(1f)) {
+                            OutlinedButton(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
                                 Text(MLang.ProfilesPage.Amamiya.Login)
                             }
                         }

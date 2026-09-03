@@ -35,6 +35,7 @@ ProfilesPage = {
         LoggedInAs = "已登入為 %s"
         SecureTokenSession = "Token 已由 Android Keystore 加密保護。"
         CheckFailed = "無法檢查帳號"
+        CheckFailedDetail = "請檢查網路連線，然後再試一次。"
         Retry = "重試"
         LoginRequired = "請先登入並選擇有效的訂閱"
         LoginFailed = "登入失敗或已取消"

@@ -35,6 +35,7 @@ ProfilesPage = {
         LoggedInAs = "Signed in as %s"
         SecureTokenSession = "Tokens are protected by Android Keystore."
         CheckFailed = "Unable to check account"
+        CheckFailedDetail = "Check your connection, then try again."
         Retry = "Retry"
         LoginRequired = "Sign in and select an active subscription first"
         LoginFailed = "Sign-in failed or was cancelled"

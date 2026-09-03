@@ -116,7 +116,7 @@ class ProfilesViewModel(
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.w("Failed to refresh amamiyakoko.ro account (%s)", e::class.java.simpleName)
-                AmamiyaAuthState.Error(MLang.ProfilesPage.Amamiya.CheckFailed)
+                AmamiyaAuthState.Error(MLang.ProfilesPage.Amamiya.CheckFailedDetail)
             }
         }
     }
