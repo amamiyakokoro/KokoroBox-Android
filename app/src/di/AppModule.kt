@@ -26,6 +26,7 @@ import com.github.yumelira.yumebox.data.gateway.LogRecordGateway
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
 import com.github.yumelira.yumebox.screen.log.LogViewModel
 import com.github.yumelira.yumebox.screen.profiles.ProfilesViewModel
+import com.github.yumelira.yumebox.screen.profiles.AmamiyaAccountClient
 import com.github.yumelira.yumebox.screen.settings.AccessControlViewModel
 import com.github.yumelira.yumebox.screen.settings.AppDataManagementViewModel
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
@@ -38,12 +39,13 @@ import org.koin.dsl.module
 
 val appIntegrationModule = module {
     single<LogRecordGateway> { LogRecordServiceGateway() }
+    single { AmamiyaAccountClient(androidApplication()) }
 }
 
 val appViewModelModule = module {
     viewModel { AppSettingsViewModel(get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get(), get(), get(), get(), get()) }
-    viewModel { ProfilesViewModel(androidApplication(), get(), get()) }
+    viewModel { ProfilesViewModel(androidApplication(), get(), get(), get()) }
     viewModel { NetworkSettingsViewModel(androidApplication(), get(), get(), get()) }
     viewModel { AccessControlViewModel(androidApplication(), get(), get()) }
     viewModel { AppDataManagementViewModel(get(), get()) }

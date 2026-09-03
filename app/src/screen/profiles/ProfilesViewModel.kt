@@ -53,6 +53,7 @@ class ProfilesViewModel(
     application: Application,
     private val profilesRepository: ProfilesRepository,
     profileLinksStorage: ProfileLinksStore,
+    private val amamiyaAccountClient: AmamiyaAccountClient,
 ) : AndroidContractStateViewModel<ProfilesUiState, ProfilesViewModel.ProfilesUiEffect>(
     application,
     ProfilesUiState(),
@@ -76,12 +77,50 @@ class ProfilesViewModel(
     private val _updatingProfileIds = MutableStateFlow<Set<UUID>>(emptySet())
     val updatingProfileIds: StateFlow<Set<UUID>> = _updatingProfileIds.asStateFlow()
 
+    private val _amamiyaAuthState = MutableStateFlow<AmamiyaAuthState>(AmamiyaAuthState.Checking)
+    internal val amamiyaAuthState: StateFlow<AmamiyaAuthState> = _amamiyaAuthState.asStateFlow()
+
     private val updateJobs = mutableMapOf<UUID, Job>()
     private val profileConfigBackups = mutableMapOf<UUID, ProfileConfigBackup>()
     private val canceledProfileUpdateIds = mutableSetOf<UUID>()
 
     init {
         refreshProfiles()
+        refreshAmamiyaAccount()
+    }
+
+    internal fun refreshAmamiyaAccount() {
+        viewModelScope.launch {
+            _amamiyaAuthState.value = AmamiyaAuthState.Checking
+            _amamiyaAuthState.value = try {
+                amamiyaAccountClient.getAccount()?.let(AmamiyaAuthState::Authenticated)
+                    ?: AmamiyaAuthState.LoggedOut
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Timber.w("Failed to refresh amamiyakoko.ro account (%s)", e::class.java.simpleName)
+                AmamiyaAuthState.Error(MLang.ProfilesPage.Amamiya.CheckFailed)
+            }
+        }
+    }
+
+    internal fun beginAmamiyaLogin(): String = amamiyaAccountClient.beginLogin()
+
+    internal fun reportAmamiyaLoginFailure() {
+        _amamiyaAuthState.value = AmamiyaAuthState.Error(MLang.ProfilesPage.Amamiya.LoginFailed)
+    }
+
+    internal fun logoutAmamiyaAccount() {
+        viewModelScope.launch {
+            _amamiyaAuthState.value = AmamiyaAuthState.Checking
+            try {
+                amamiyaAccountClient.revoke()
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Timber.w("Failed to revoke amamiyakoko.ro session (%s)", e::class.java.simpleName)
+            } finally {
+                _amamiyaAuthState.value = AmamiyaAuthState.LoggedOut
+            }
+        }
     }
 
     fun refreshProfiles() {

@@ -63,6 +63,7 @@ import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
 import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
 import com.github.yumelira.yumebox.presentation.theme.YumeTheme
 import com.github.yumelira.yumebox.screen.onboarding.OnboardingLauncher
+import com.github.yumelira.yumebox.screen.profiles.AmamiyaAccountClient
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -84,8 +85,13 @@ class MainActivity : FragmentActivity() {
         private const val EXTRA_EXIT_UI_WHEN_BACKGROUND = "exit_ui_when_background"
         private val _pendingImportUrl = MutableStateFlow<String?>(null)
         val pendingImportUrl: StateFlow<String?> = _pendingImportUrl.asStateFlow()
+        private val _amamiyaAuthResult = MutableStateFlow<Boolean?>(null)
+        val amamiyaAuthResult: StateFlow<Boolean?> = _amamiyaAuthResult.asStateFlow()
         fun clearPendingImportUrl() {
             _pendingImportUrl.value = null
+        }
+        fun clearAmamiyaAuthResult() {
+            _amamiyaAuthResult.value = null
         }
     }
 
@@ -96,6 +102,7 @@ class MainActivity : FragmentActivity() {
     private val proxyFacade: com.github.yumelira.yumebox.runtime.client.ProxyFacade by inject()
     private val serviceCache: MMKV by inject(qualifier = named("service_cache"))
     private val applicationScope: CoroutineScope by inject(qualifier = named(APPLICATION_SCOPE_NAME))
+    private val amamiyaAccountClient: AmamiyaAccountClient by inject()
 
     private lateinit var intentController: IntentController
 
@@ -275,6 +282,17 @@ class MainActivity : FragmentActivity() {
             }
             safeIntent.data?.let { uri ->
                 val scheme = uri.scheme
+                if (scheme == "kokoro" && uri.host == "oauth" && uri.path == "/callback") {
+                    safeIntent.data = null
+                    lifecycleScope.launch {
+                        _amamiyaAuthResult.value = runCatching {
+                            amamiyaAccountClient.handleOAuthCallback(uri)
+                        }.onFailure {
+                            Timber.w("amamiyakoko.ro OAuth callback failed")
+                        }.isSuccess
+                    }
+                    return
+                }
                 if (scheme == "clash" || scheme == "clashmeta") {
                     val host = uri.host
                     if (host == "install-config") {
@@ -316,4 +334,3 @@ class MainActivity : FragmentActivity() {
         }
     }
 }
-

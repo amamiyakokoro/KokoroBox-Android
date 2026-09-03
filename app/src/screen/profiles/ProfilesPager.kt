@@ -93,6 +93,7 @@ fun ProfilesPager(
 
     var importUrlFromScheme by remember { mutableStateOf<String?>(null) }
     val pendingImportUrl by MainActivity.pendingImportUrl.collectAsState()
+    val amamiyaAuthResult by MainActivity.amamiyaAuthResult.collectAsState()
     val urlProfiles = remember(profiles) {
         profiles.filter { it.type == Profile.Type.Url }
     }
@@ -106,6 +107,15 @@ fun ProfilesPager(
             showAddBottomSheet.value = true
             MainActivity.clearPendingImportUrl()
         }
+    }
+
+    LaunchedEffect(amamiyaAuthResult) {
+        when (amamiyaAuthResult) {
+            true -> profilesViewModel.refreshAmamiyaAccount()
+            false -> profilesViewModel.reportAmamiyaLoginFailure()
+            null -> Unit
+        }
+        if (amamiyaAuthResult != null) MainActivity.clearAmamiyaAuthResult()
     }
 
     LaunchedEffect(showSettingsDialog.value) {
