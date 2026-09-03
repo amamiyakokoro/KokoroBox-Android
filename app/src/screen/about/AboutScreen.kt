@@ -20,6 +20,7 @@
 
 package com.github.yumelira.yumebox.screen.about
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,14 +40,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.core.graphics.drawable.toBitmap
 import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.R
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.core.bridge.Bridge
 import com.github.yumelira.yumebox.presentation.component.Card
@@ -68,6 +69,14 @@ import kotlinx.coroutines.CancellationException
 @Destination<RootGraph>
 fun AboutScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
+    val appIcon = remember(context) {
+        runCatching {
+            context.packageManager
+                .getApplicationIcon(context.packageName)
+                .toBitmap(width = 256, height = 256)
+                .asImageBitmap()
+        }.getOrNull()
+    }
     val coreVersion by produceState(initialValue = MLang.About.App.VersionLoading) {
         value = try {
             Bridge.nativeCoreVersion()
@@ -109,14 +118,15 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 ) {
                     Spacer(modifier = Modifier.height(UiDp.dp24))
 
-                    Icon(
-                        painter = painterResource(id = R.mipmap.ic_launcher),
-                        contentDescription = "App Icon",
-                        modifier = Modifier
-                            .size(UiDp.dp120)
-                            .clip(RoundedCornerShape(UiDp.dp24)),
-                        tint = Color.Unspecified,
-                    )
+                    appIcon?.let {
+                        Image(
+                            bitmap = it,
+                            contentDescription = "KokoroBox app icon",
+                            modifier = Modifier
+                                .size(UiDp.dp120)
+                                .clip(RoundedCornerShape(UiDp.dp24)),
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(UiDp.dp24))
 
