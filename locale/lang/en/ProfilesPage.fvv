@@ -22,7 +22,7 @@ ProfilesPage = {
         Subscription = "Subscription URL"
         LocalFile = "Local File"
         QrScan = "Scan QR Code"
-        Amamiya = "amamiyakoko.ro account"
+        Amamiya = "Kokoro account"
     }
 
     Amamiya = {

@@ -22,7 +22,7 @@ ProfilesPage = {
         Subscription = "订阅链接"
         LocalFile = "本地文件"
         QrScan = "扫码添加"
-        Amamiya = "amamiyakoko.ro 账号"
+        Amamiya = "Kokoro account"
     }
 
     Amamiya = {

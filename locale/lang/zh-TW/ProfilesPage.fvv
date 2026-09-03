@@ -22,7 +22,7 @@ ProfilesPage = {
         Subscription = "訂閱連結"
         LocalFile = "本地檔案"
         QrScan = "掃描 QR Code 新增"
-        Amamiya = "amamiyakoko.ro 帳號"
+        Amamiya = "Kokoro account"
     }
 
     Amamiya = {
