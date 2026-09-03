@@ -6,10 +6,6 @@
 
 An Android proxy client powered by Mihomo, designed around a modern Material 3 experience.
 
-[![Latest release](https://img.shields.io/github/v/release/amamiyakokoro/KokoroBox-Android?logo=android)](https://github.com/amamiyakokoro/KokoroBox-Android/releases/latest)
-[![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com/about/versions/oreo)
-[![License](https://img.shields.io/github/license/amamiyakokoro/KokoroBox-Android?logo=gnu)](../LICENSE)
-
 **English**
 
 </div>
