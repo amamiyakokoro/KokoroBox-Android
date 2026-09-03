@@ -436,7 +436,12 @@ object ProfileProcessor {
                         }
                     }
 
-                    Clash.fetchAndValid(stagingDir, snapshot.imported.source, true) {
+                    // URL profiles have already been downloaded above, including the authenticated
+                    // Kokoro endpoint. Do not let the native validator fetch the source again: its
+                    // HTTP client cannot attach the App bearer token and would overwrite config.yaml
+                    // with the 401 response body before validation.
+                    val requiresNativeFetch = snapshot.imported.type != Profile.Type.Url
+                    Clash.fetchAndValid(stagingDir, snapshot.imported.source, requiresNativeFetch) {
                         try {
                             cb?.updateStatus(
                                 it

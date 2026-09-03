@@ -129,6 +129,7 @@ internal typealias KokoroConfigOptions = MihomoSubscriptionSettings
 
 internal data class KokoroAccount(
     val displayName: String?,
+    val avatarUrl: String?,
     val subscriptions: List<KokoroSubscription>,
 )
 
@@ -315,6 +316,7 @@ class KokoroAccountClient(context: Context) {
         val plans = response.plans.ifEmpty { response.planDetails.map(PlanDetails::name) }
         return KokoroAccount(
             displayName = response.username,
+            avatarUrl = response.avatarUrl,
             subscriptions = plans.distinct().map { plan ->
                 val detail = detailByPlan[plan]
                 KokoroSubscription(
@@ -342,6 +344,7 @@ internal data class ResolvedSubscription(
 @Serializable
 private data class MeResponse(
     val username: String? = null,
+    @SerialName("avatar_url") val avatarUrl: String? = null,
     val plans: List<String> = emptyList(),
     @SerialName("plans_details") val planDetails: List<PlanDetails> = emptyList(),
     @SerialName("traffic_usage") val trafficUsage: Long? = null,

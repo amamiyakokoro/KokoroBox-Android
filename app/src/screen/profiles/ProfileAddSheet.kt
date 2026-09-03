@@ -395,7 +395,7 @@ internal fun AddProfileSheet(
                 try {
                     val resolved = profilesViewModel.resolveKokoroSubscription(normalizedKokoroSettings)
                     onAddProfile(
-                        name.ifBlank { resolved.profileName.ifBlank { fallbackName } },
+                        resolved.profileName.ifBlank { fallbackName },
                         resolved.authenticatedConfigUrl,
                         Profile.Type.Url,
                         KokoroApi.intervalMillis(normalizedKokoroSettings),
@@ -429,7 +429,11 @@ internal fun AddProfileSheet(
 
     AppActionBottomSheet(
         show = show.value,
-        title = if (profileToEdit != null) MLang.ProfilesPage.Sheet.EditTitle else MLang.ProfilesPage.Sheet.AddTitle,
+        title = when {
+            profileToEdit != null -> MLang.ProfilesPage.Sheet.EditTitle
+            selectedTypeIndex == 3 -> MLang.ProfilesPage.Type.Kokoro
+            else -> MLang.ProfilesPage.Sheet.AddTitle
+        },
         startAction = {
             if (!isDownloading) {
                 AppBottomSheetCloseAction(
@@ -658,11 +662,9 @@ private fun ProfileFormContent(
 
                 3 -> KokoroProfileContent(
                     authState = kokoroAuthState,
-                    name = name,
                     settings = kokoroOptions,
                     availableOptions = kokoroSubscriptionOptions,
                     error = error,
-                    onNameChange = onNameChange,
                     onSettingsChange = onKokoroOptionsChange,
                     onLogin = onKokoroLogin,
                     onLogout = onKokoroLogout,

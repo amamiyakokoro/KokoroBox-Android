@@ -11,48 +11,56 @@ package com.github.yumelira.yumebox.screen.profiles
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.github.yumelira.yumebox.common.util.ByteFormatter
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
 import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.github.panpf.sketch.rememberAsyncImagePainter
+import com.github.panpf.sketch.request.ImageRequest
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 internal fun KokoroProfileContent(
     authState: KokoroAuthState,
-    name: String,
     settings: MihomoSubscriptionSettings,
     availableOptions: KokoroSubscriptionOptions,
     error: String,
-    onNameChange: (String) -> Unit,
     onSettingsChange: (MihomoSubscriptionSettings) -> Unit,
     onLogin: () -> Unit,
     onLogout: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    var showOptions by remember { mutableStateOf(false) }
     val authenticated = authState as? KokoroAuthState.Authenticated
     val subscriptions = authenticated?.account?.subscriptions.orEmpty()
     val effectiveOptions = if (availableOptions.plans.isEmpty()) {
@@ -68,6 +76,8 @@ internal fun KokoroProfileContent(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
     ) {
+        SectionLabel(MLang.ProfilesPage.Kokoro.Account)
+
         Card {
             Column(
                 modifier = Modifier
@@ -116,18 +126,57 @@ internal fun KokoroProfileContent(
                     }
 
                     is KokoroAuthState.Authenticated -> {
-                        StatusText(
-                            title = authState.account.displayName?.let {
-                                MLang.ProfilesPage.Kokoro.LoggedInAs.format(it)
-                            } ?: MLang.ProfilesPage.Kokoro.LoggedIn,
-                            detail = if (subscriptions.isEmpty()) {
-                                MLang.ProfilesPage.Kokoro.NoSubscription
-                            } else {
-                                MLang.ProfilesPage.Kokoro.SecureTokenSession
-                            },
-                        )
-                        TextButton(onClick = onLogout) {
-                            Text(MLang.ProfilesPage.Kokoro.Logout)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                        ) {
+                            OsuAvatar(
+                                displayName = authState.account.displayName,
+                                avatarUrl = authState.account.avatarUrl,
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = authState.account.displayName
+                                        ?: MLang.ProfilesPage.Kokoro.LoggedIn,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                Text(
+                                    text = if (subscriptions.isEmpty()) {
+                                        MLang.ProfilesPage.Kokoro.NoSubscription
+                                    } else {
+                                        subscriptions.joinToString(", ") { it.plan }
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            TextButton(onClick = onLogout) {
+                                Text(MLang.ProfilesPage.Kokoro.Logout)
+                            }
+                        }
+
+                        selectedSubscription?.let { subscription ->
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                            subscription.usedBytes?.let {
+                                SubscriptionLine(
+                                    MLang.ProfilesPage.Kokoro.TrafficUsed,
+                                    ByteFormatter.format(it),
+                                )
+                            }
+                            subscription.totalBytes?.let {
+                                SubscriptionLine(
+                                    MLang.ProfilesPage.Kokoro.BandwidthLimit,
+                                    if (it > 0) ByteFormatter.format(it) else MLang.ProfilesPage.Kokoro.Unlimited,
+                                )
+                            }
+                            if (!subscription.expiresAt.isNullOrBlank()) {
+                                SubscriptionLine(
+                                    MLang.ProfilesPage.Kokoro.Expires,
+                                    displayExpiry(subscription.expiresAt),
+                                )
+                            }
                         }
                     }
                 }
@@ -135,57 +184,11 @@ internal fun KokoroProfileContent(
         }
 
         if (authenticated != null && subscriptions.isNotEmpty()) {
-            selectedSubscription?.let { subscription ->
-                Card {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(UiDp.dp16),
-                        verticalArrangement = Arrangement.spacedBy(UiDp.dp6),
-                    ) {
-                        SubscriptionLine(MLang.ProfilesPage.Kokoro.Plan, subscription.plan)
-                        SubscriptionLine(
-                            MLang.ProfilesPage.Kokoro.Isp,
-                            subscription.supportedIsps.joinToString(", "),
-                        )
-                        val traffic = trafficText(subscription.usedBytes, subscription.totalBytes)
-                        if (traffic.isNotBlank()) {
-                            SubscriptionLine(MLang.ProfilesPage.Kokoro.Traffic, traffic)
-                        }
-                        if (!subscription.expiresAt.isNullOrBlank()) {
-                            SubscriptionLine(MLang.ProfilesPage.Kokoro.Expires, subscription.expiresAt)
-                        }
-                    }
-                }
-            }
-
-            YumeMd3OutlinedTextField(
-                value = name,
-                onValueChange = onNameChange,
-                label = MLang.ProfilesPage.Input.ProfileName,
-                modifier = Modifier.fillMaxWidth(),
+            MihomoSubscriptionSettingsContent(
+                settings = normalizedSettings,
+                availableOptions = effectiveOptions,
+                onSettingsChange = onSettingsChange,
             )
-
-            TextButton(
-                onClick = { showOptions = !showOptions },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    if (showOptions) {
-                        MLang.ProfilesPage.Kokoro.HideOptions
-                    } else {
-                        MLang.ProfilesPage.Kokoro.ShowOptions
-                    },
-                )
-            }
-
-            AnimatedVisibility(visible = showOptions) {
-                MihomoSubscriptionSettingsContent(
-                    settings = normalizedSettings,
-                    availableOptions = effectiveOptions,
-                    onSettingsChange = onSettingsChange,
-                )
-            }
         }
 
         if (error.isNotBlank()) {
@@ -206,8 +209,6 @@ internal fun MihomoSubscriptionSettingsContent(
     modifier: Modifier = Modifier,
 ) {
     val spacing = AppTheme.spacing
-    val opacity = AppTheme.opacity
-    val sizes = AppTheme.sizes
     val normalized = availableOptions.normalize(settings)
     val protocol = availableOptions.protocols.firstOrNull { it.value == normalized.protocol }
     val supportsDirect = protocol?.supportsDirect == true
@@ -216,9 +217,6 @@ internal fun MihomoSubscriptionSettingsContent(
     val selectableIsps = availableOptions.isps.filter {
         it.value.isBlank() || it.value in supportedPlanIsps
     }.ifEmpty { availableOptions.isps }
-    var updateHoursText by remember(normalized.updateIntervalHours) {
-        mutableStateOf(normalized.updateIntervalHours.toString())
-    }
 
     Column(
         modifier = modifier
@@ -226,6 +224,8 @@ internal fun MihomoSubscriptionSettingsContent(
             .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(spacing.space12),
     ) {
+        SectionLabel(MLang.ProfilesPage.Kokoro.Subscription)
+
         Card {
             Column {
                 YumeMd3DropdownPreference(
@@ -285,6 +285,8 @@ internal fun MihomoSubscriptionSettingsContent(
             }
         }
 
+        SectionLabel(MLang.ProfilesPage.Kokoro.Routing)
+
         Card {
             Column {
                 YumeMd3DropdownPreference(
@@ -309,24 +311,25 @@ internal fun MihomoSubscriptionSettingsContent(
                     onSelectedIndexChange = { index ->
                         onSettingsChange(normalized.copy(finalRoute = availableOptions.finalRoutes[index]))
                     },
-                    showDivider = true,
+                    showDivider = false,
                 )
+            }
+        }
+
+        SectionLabel(MLang.ProfilesPage.Kokoro.Updates)
+
+        Card {
+            Column {
                 PreferenceSwitchItem(
                     title = MLang.ProfilesPage.Kokoro.RuleProviderAutoUpdate,
-                    summary = MLang.ProfilesPage.Kokoro.RuleProviderAutoUpdateSummary,
                     checked = normalized.ruleProviderAutoUpdate,
                     onCheckedChange = {
                         onSettingsChange(normalized.copy(ruleProviderAutoUpdate = it))
                     },
                 )
-            }
-        }
-
-        Card {
-            Column {
+                SettingsDivider()
                 PreferenceSwitchItem(
                     title = MLang.ProfilesPage.Kokoro.SubscriptionAutoUpdate,
-                    summary = MLang.ProfilesPage.Kokoro.SubscriptionAutoUpdateSummary,
                     checked = normalized.subscriptionAutoUpdate,
                     onCheckedChange = {
                         onSettingsChange(normalized.copy(subscriptionAutoUpdate = it))
@@ -334,37 +337,136 @@ internal fun MihomoSubscriptionSettingsContent(
                 )
                 AnimatedVisibility(visible = normalized.subscriptionAutoUpdate) {
                     Column {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = spacing.space16),
-                            thickness = sizes.thinDividerThickness,
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline),
-                        )
-                        YumeMd3OutlinedTextField(
-                            value = updateHoursText,
-                            onValueChange = { value ->
-                                if (value.all(Char::isDigit) && value.length <= 3) {
-                                    updateHoursText = value
-                                    value.toIntOrNull()?.let { hours ->
-                                        if (hours in availableOptions.minUpdateHours..availableOptions.maxUpdateHours) {
-                                            onSettingsChange(normalized.copy(updateIntervalHours = hours))
-                                        }
-                                    }
-                                }
+                        SettingsDivider()
+                        UpdateIntervalPreference(
+                            hours = normalized.updateIntervalHours,
+                            minHours = availableOptions.minUpdateHours,
+                            maxHours = availableOptions.maxUpdateHours,
+                            onHoursChange = { hours ->
+                                onSettingsChange(normalized.copy(updateIntervalHours = hours))
                             },
-                            label = MLang.ProfilesPage.Kokoro.UpdateHoursRange.format(
-                                availableOptions.minUpdateHours,
-                                availableOptions.maxUpdateHours,
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(spacing.space16),
-                            singleLine = true,
                         )
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun SettingsDivider() {
+    val spacing = AppTheme.spacing
+    val opacity = AppTheme.opacity
+    val sizes = AppTheme.sizes
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = spacing.space16),
+        thickness = sizes.thinDividerThickness,
+        color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline),
+    )
+}
+
+@Composable
+private fun UpdateIntervalPreference(
+    hours: Int,
+    minHours: Int,
+    maxHours: Int,
+    onHoursChange: (Int) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = UiDp.dp16, vertical = UiDp.dp8),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
+    ) {
+        Text(
+            text = MLang.ProfilesPage.Kokoro.ProfileUpdate,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = MLang.ProfilesPage.Kokoro.UpdateHoursValue.format(hours),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = { onHoursChange(hours - 1) },
+                    enabled = hours > minHours,
+                    modifier = Modifier.semantics {
+                        contentDescription = MLang.ProfilesPage.Kokoro.DecreaseUpdateHours
+                    },
+                ) {
+                    Text(
+                        text = "−",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+                VerticalDivider(
+                    modifier = Modifier.height(UiDp.dp24),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+                IconButton(
+                    onClick = { onHoursChange(hours + 1) },
+                    enabled = hours < maxHours,
+                    modifier = Modifier.semantics {
+                        contentDescription = MLang.ProfilesPage.Kokoro.IncreaseUpdateHours
+                    },
+                ) {
+                    Text(
+                        text = "+",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OsuAvatar(displayName: String?, avatarUrl: String?) {
+    val context = LocalContext.current
+    Box(
+        modifier = Modifier
+            .size(UiDp.dp48)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (!avatarUrl.isNullOrBlank()) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    request = ImageRequest(context, avatarUrl),
+                    contentScale = ContentScale.Crop,
+                ),
+                contentDescription = MLang.ProfilesPage.Kokoro.AvatarDescription.format(
+                    displayName ?: MLang.ProfilesPage.Kokoro.LoggedIn,
+                ),
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+            )
+        } else {
+            Text(
+                text = displayName?.trim()?.firstOrNull()?.uppercase() ?: "K",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = UiDp.dp8),
+    )
 }
 
 @Composable
@@ -407,9 +509,6 @@ private fun SubscriptionLine(label: String, value: String) {
     }
 }
 
-private fun trafficText(used: Long?, total: Long?): String = when {
-    used != null && total != null && total > 0 -> "${ByteFormatter.format(used)} / ${ByteFormatter.format(total)}"
-    used != null -> ByteFormatter.format(used)
-    total != null && total > 0 -> ByteFormatter.format(total)
-    else -> ""
-}
+private fun displayExpiry(value: String): String = value
+    .removeSuffix("Z")
+    .replace('T', ' ')
