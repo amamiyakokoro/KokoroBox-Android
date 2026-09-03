@@ -42,9 +42,6 @@ object AppConstants {
         val TRAFFIC_FONT_SIZE = 96.sp
         val TRAFFIC_LETTER_SPACING = (-3).sp
         val TRAFFIC_UNIT_FONT_SIZE = 24.sp
-        val QUOTE_FONT_SIZE = 32.sp
-        val QUOTE_LINE_HEIGHT = 48.sp
-        val AUTHOR_FONT_SIZE = 18.sp
         val CARD_CORNER_RADIUS = UiDp.dp12
         val BUTTON_CORNER_RADIUS = UiDp.dp32
         val DEFAULT_HORIZONTAL_PADDING = UiDp.dp24

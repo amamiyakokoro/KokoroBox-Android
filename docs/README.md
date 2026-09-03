@@ -114,7 +114,6 @@ Release signing is optional for local development. Keep signing properties and k
 
 ## Documentation
 
-- [Daily Quote API and custom JSON](DailyQuote.md)
 - [Third-party projects and libraries](ThirdParty.md)
 - [Privacy policy](../PRIVACY_POLICY.md)
 - [Contribution guide](../CONTRIBUTING.md)

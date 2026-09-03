@@ -66,7 +66,6 @@ import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.presentation.component.LocalHandlePageChange
-import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.icon.ShellIcons
@@ -118,20 +117,9 @@ fun AcgHomePage(
     val tunnelMode by homeViewModel.tunnelMode.collectAsState()
     val runtimeSnapshot by homeViewModel.runtimeSnapshot.collectAsState()
     val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
-    val acgDailyQuoteApiEnabled by appSettingsViewModel.acgDailyQuoteEnabled.state.collectAsState()
-    val acgCustomQuoteEnabled by appSettingsViewModel.acgCustomQuoteEnabled.state.collectAsState()
-    val acgDailyQuote by appSettingsViewModel.acgDailyQuote.state.collectAsState()
-    val acgDailyQuoteAuthor by appSettingsViewModel.acgDailyQuoteAuthor.state.collectAsState()
-    val isRefreshingDailyAcgQuote by appSettingsViewModel.isRefreshingDailyAcgQuote.collectAsState()
     val sidebarExpanded by appSettingsViewModel.acgSidebarExpanded.state.collectAsState()
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-
-    LaunchedEffect(acgDailyQuoteApiEnabled, acgCustomQuoteEnabled) {
-        if (acgDailyQuoteApiEnabled || acgCustomQuoteEnabled) {
-            appSettingsViewModel.refreshDailyAcgQuoteIfNeeded()
-        }
-    }
 
     LaunchedEffect(Unit) {
         homeViewModel.refreshProxyMode()
@@ -233,18 +221,6 @@ fun AcgHomePage(
             AcgSidebarIconItem(ShellIcons.OpenProxy) { handlePageChange(1) },
             AcgSidebarIconItem(AppMd3Icons.Shell.OpenProfileConfig) { handlePageChange(2) },
             AcgSidebarIconItem(ShellIcons.OpenSettings) { handlePageChange(3) },
-        )
-    }
-    val dailyQuoteEnabled = acgDailyQuoteApiEnabled || acgCustomQuoteEnabled
-    val quote = if (dailyQuoteEnabled) {
-        AcgQuote(
-            text = acgDailyQuote.ifBlank { MLang.AppSettings.Experimental.AcgQuoteDefault },
-            author = acgDailyQuoteAuthor,
-        )
-    } else {
-        AcgQuote(
-            text = MLang.AppSettings.Experimental.AcgQuoteDefault,
-            author = MLang.AppSettings.Experimental.AcgQuoteAuthorDefault,
         )
     }
     val animatedSidebarToggleProgress by animateFloatAsState(
@@ -461,26 +437,7 @@ fun AcgHomePage(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .fillMaxWidth()
-                    .padding(
-                        start = AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset,
-                        end = AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset,
-                        top = statusBarTop + heroHeight + AcgUi.Hero.belowHeroTopGap,
-                    ),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(AcgUi.Hero.belowHeroContentGap),
-            ) {
-                AcgQuoteText(
-                    quote = quote,
-                    color = YumeMiuixTheme.colorScheme.onBackground,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-
-            Row(
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
@@ -489,56 +446,8 @@ fun AcgHomePage(
                         end = UiDp.dp12,
                         bottom = mainInnerPadding.calculateBottomPadding() + AcgUi.Button.bottomInset,
                     ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier = Modifier.size(42.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    AnimatedContent(
-                        targetState = isRefreshingDailyAcgQuote,
-                        contentAlignment = Alignment.Center,
-                        transitionSpec = {
-                            (fadeIn(animationSpec = tween(180, easing = FastOutSlowInEasing)) +
-                                    scaleIn(
-                                        initialScale = 0.86f,
-                                        animationSpec = tween(220, easing = FastOutSlowInEasing),
-                                    )) togetherWith
-                                    (fadeOut(animationSpec = tween(120, easing = FastOutSlowInEasing)) +
-                                            scaleOut(
-                                                targetScale = 0.86f,
-                                                animationSpec = tween(160, easing = FastOutSlowInEasing),
-                                            )) using
-                                    SizeTransform(
-                                        clip = false,
-                                        sizeAnimationSpec = { _, _ ->
-                                            tween(durationMillis = 220, easing = FastOutSlowInEasing)
-                                        },
-                                    )
-                        },
-                        label = "acg_quote_refresh_button_content",
-                    ) { refreshing ->
-                        if (refreshing) {
-                            Box(
-                                modifier = Modifier.size(42.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Md3ELoading()
-                            }
-                        } else {
-                            AcgInlineIconButton(
-                                icon = AppMd3Icons.Action.Refresh,
-                                contentDescription = MLang.Home.Acg.RefreshQuote,
-                                enabled = dailyQuoteEnabled,
-                                onClick = {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                                    appSettingsViewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-                                },
-                            )
-                        }
-                    }
-                }
                 AcgLaunchButton(
                     controlState = visualControlState,
                     enabled = profilesLoaded && profiles.isNotEmpty() && visualControlState.canInteract,

@@ -126,15 +126,6 @@ internal object AcgUi {
         val PressedScale = 0.94f
     }
 
-    object Quote {
-        val contentGap = acgSpacing.space12
-        val authorTopGap = acgSpacing.space14
-        val textSize = 23.sp
-        val lineHeight = 31.sp
-        val authorSize = 16.sp
-        val authorAlpha = acgOpacity.elevatedSurface
-    }
-
     object Traffic {
         val itemGap = acgSpacing.space6
         val labelBottomPadding = acgSpacing.space3
@@ -327,11 +318,6 @@ internal fun calculateHomeVisibility(
 internal data class AcgSidebarIconItem(
     val icon: ImageVector,
     val onClick: () -> Unit,
-)
-
-internal data class AcgQuote(
-    val text: String,
-    val author: String,
 )
 
 internal fun ProxyMode.toAcgDisplayName(): String = when (this) {

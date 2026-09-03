@@ -51,10 +51,8 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.ThemeMode
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
-import com.github.yumelira.yumebox.presentation.component.HapticSwitch
 import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
@@ -66,13 +64,10 @@ import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.WarningBottomSheet
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
 import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AcgQuoteConfigScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AcgWallpaperCropScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
@@ -327,8 +322,6 @@ private fun AppExperimentalSettingsSection(
     navigator: DestinationsNavigator,
 ) {
     val acgMainUiEnabled by viewModel.acgMainUiEnabled.state.collectAsState()
-    val acgDailyQuoteApiEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
-    val acgCustomQuoteEnabled by viewModel.acgCustomQuoteEnabled.state.collectAsState()
     val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsState()
     val acgWallpaperUri by viewModel.acgWallpaperUri.state.collectAsState()
     val acgWallpaperZoom by viewModel.acgWallpaperZoom.state.collectAsState()
@@ -348,20 +341,6 @@ private fun AppExperimentalSettingsSection(
             summary = MLang.AppSettings.Experimental.AcgSidebarExpandedSummary,
             checked = acgSidebarExpanded,
             onCheckedChange = viewModel::onAcgSidebarExpandedChange,
-        )
-        PreferenceArrowItem(
-            title = MLang.AppSettings.Experimental.DailyQuoteTitle,
-            summary = when {
-                acgDailyQuoteApiEnabled && acgCustomQuoteEnabled -> MLang.AppSettings.Experimental.DailyQuoteSummaryApiAndCustomEnabled
-                acgDailyQuoteApiEnabled -> MLang.AppSettings.Experimental.DailyQuoteSummaryApiEnabled
-                acgCustomQuoteEnabled -> MLang.AppSettings.Experimental.DailyQuoteSummaryCustomEnabled
-                else -> MLang.AppSettings.Experimental.DailyQuoteSummaryConfig
-            },
-            onClick = {
-                navigator.navigate(AcgQuoteConfigScreenDestination) {
-                    launchSingleTop = true
-                }
-            },
         )
         AcgWallpaperPreferenceItem(
             navigator = navigator,
@@ -387,124 +366,6 @@ private fun AppExperimentalSettingsSection(
         )
     }
 }
-
-@Composable
-@Destination<RootGraph>
-fun AcgQuoteConfigScreen(
-    navigator: DestinationsNavigator,
-) {
-    val viewModel = koinViewModel<AppSettingsViewModel>()
-    val acgDailyQuoteApiEnabled by viewModel.acgDailyQuoteEnabled.state.collectAsState()
-    val acgCustomQuoteEnabled by viewModel.acgCustomQuoteEnabled.state.collectAsState()
-    val acgDailyQuoteApiUrl by viewModel.acgDailyQuoteApiUrl.state.collectAsState()
-    val acgCustomQuoteListJson by viewModel.acgCustomQuoteListJson.state.collectAsState()
-    val context = LocalContext.current
-
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            TopBar(title = MLang.AppSettings.Experimental.DailyQuoteConfigTitle)
-        },
-    ) { innerPadding ->
-        val mainLikePadding = rememberStandalonePageMainPadding()
-        ScreenLazyColumn(
-            innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
-        ) {
-            item {
-                Title(MLang.AppSettings.Experimental.DailyQuoteTitle)
-                Card {
-                    AcgQuotePreferenceItem(
-                        title = MLang.AppSettings.Experimental.DailyQuoteApiTitle,
-                        summary = acgDailyQuoteApiUrl,
-                        dialogTitle = MLang.AppSettings.Experimental.DailyQuoteApiEditTitle,
-                        currentValue = acgDailyQuoteApiUrl,
-                        endActions = {
-                            HapticSwitch(
-                                checked = acgDailyQuoteApiEnabled,
-                                onCheckedChange = { enabled ->
-                                    viewModel.onAcgDailyQuoteEnabledChange(enabled)
-                                    if (enabled || acgCustomQuoteEnabled) {
-                                        viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-                                    }
-                                },
-                            )
-                        },
-                        onConfirm = {
-                            viewModel.onAcgDailyQuoteApiUrlChange(it)
-                            if (acgDailyQuoteApiEnabled || acgCustomQuoteEnabled) {
-                                viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-                            }
-                        },
-                    )
-                    AcgTextEditorPreferenceItem(
-                        title = MLang.AppSettings.Experimental.CustomQuoteTitle,
-                        summary = MLang.AppSettings.Experimental.CustomQuoteSummary,
-                        editorTitle = MLang.AppSettings.Experimental.CustomQuoteEditorTitle,
-                        content = acgCustomQuoteListJson.ifBlank { customQuoteListTemplate() },
-                        navigator = navigator,
-                        endActions = {
-                            HapticSwitch(
-                                checked = acgCustomQuoteEnabled,
-                                onCheckedChange = { enabled ->
-                                    viewModel.onAcgCustomQuoteEnabledChange(enabled)
-                                    if (enabled || acgDailyQuoteApiEnabled) {
-                                        viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-                                    }
-                                },
-                            )
-                        },
-                        onSave = {
-                            viewModel.onAcgCustomQuoteListJsonChange(it)
-                            if (acgDailyQuoteApiEnabled || acgCustomQuoteEnabled) {
-                                viewModel.refreshDailyAcgQuoteIfNeeded(force = true)
-                            }
-                        },
-                    )
-                    PreferenceArrowItem(
-                        title = MLang.AppSettings.Experimental.DailyQuoteDocsTitle,
-                        summary = MLang.AppSettings.Experimental.DailyQuoteDocsSummary,
-                        onClick = {
-                            if (!openDailyQuoteDocs(context)) {
-                                context.toast(MLang.Util.Error.UnknownError)
-                            }
-                        },
-                    )
-                }
-            }
-        }
-    }
-}
-
-private const val DAILY_QUOTE_DOCS_URL =
-    "https://github.com/amamiyakokoro/KokoroBox-Android/blob/Yume/docs/DailyQuote.md"
-
-private fun openDailyQuoteDocs(context: android.content.Context): Boolean = runCatching {
-    context.startActivity(
-        Intent(Intent.ACTION_VIEW, DAILY_QUOTE_DOCS_URL.toUri()).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        },
-    )
-}.isSuccess
-
-private fun customQuoteListTemplate() = """// ${MLang.AppSettings.Experimental.CustomQuoteTemplateComment}
-// ${MLang.AppSettings.Experimental.CustomQuoteTemplateStringArray}
-// ["${MLang.AppSettings.Experimental.CustomQuoteTemplateSentenceOne}", "${MLang.AppSettings.Experimental.CustomQuoteTemplateSentenceTwo}"]
-// ${MLang.AppSettings.Experimental.CustomQuoteTemplateObjectArray}
-[
-  {
-    "text": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleTextOne}",
-    "author": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleAuthorOne}"
-  },
-  {
-    "text": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleTextTwo}",
-    "author": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleAuthorTwo}"
-  },
-  {
-    "hitokoto": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleTextThree}",
-    "from": "${MLang.AppSettings.Experimental.CustomQuoteTemplateSampleSource}"
-  }
-]
-"""
 
 @Composable
 private fun BiometricProtectedPreferenceSwitch(
@@ -583,64 +444,6 @@ private fun HideAppIconPreferenceItem(
         onConfirm = {
             onHideAppIconChange(true)
             AppIconHelper.toggleIcon(context, true)
-        },
-    )
-}
-
-@Composable
-private fun AcgQuotePreferenceItem(
-    title: String,
-    summary: String,
-    dialogTitle: String,
-    currentValue: String,
-    enabled: Boolean = true,
-    endActions: @Composable (androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
-    onConfirm: (String) -> Unit,
-) {
-    val showEditDialogState = remember { mutableStateOf(false) }
-    val textFieldState = remember { mutableStateOf(TextFieldValue()) }
-
-    PreferenceValueItem(
-        title = title,
-        summary = summary,
-        enabled = enabled,
-        endActions = endActions,
-        onClick = {
-            textFieldState.value = TextFieldValue(currentValue)
-            showEditDialogState.value = true
-        },
-    )
-
-    TextEditBottomSheet(
-        show = showEditDialogState,
-        title = dialogTitle,
-        textFieldValue = textFieldState,
-        onConfirm = onConfirm,
-    )
-}
-
-@Composable
-private fun AcgTextEditorPreferenceItem(
-    title: String,
-    summary: String,
-    editorTitle: String,
-    content: String,
-    navigator: DestinationsNavigator,
-    endActions: @Composable (androidx.compose.foundation.layout.RowScope.() -> Unit)? = null,
-    onSave: ((String) -> Unit)? = null,
-) {
-    PreferenceValueItem(
-        title = title,
-        summary = summary,
-        endActions = endActions,
-        onClick = {
-            OverrideStructuredEditorStore.setupConfigPreview(
-                title = editorTitle,
-                content = content,
-                language = LanguageScope.Text,
-                callback = onSave,
-            )
-            navigator.navigate(OverrideConfigPreviewRouteDestination)
         },
     )
 }

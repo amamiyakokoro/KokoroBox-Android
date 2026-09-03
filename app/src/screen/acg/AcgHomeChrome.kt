@@ -168,42 +168,6 @@ internal fun AcgSidebarContent(
 }
 
 @Composable
-internal fun AcgQuoteText(
-    quote: AcgQuote,
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(AcgUi.Quote.contentGap),
-    ) {
-        Text(
-            text = quote.text,
-            color = color,
-            style = MiuixTheme.textStyles.title2,
-            fontWeight = FontWeight.Medium,
-            fontSize = AcgUi.Quote.textSize,
-            lineHeight = AcgUi.Quote.lineHeight,
-            softWrap = true,
-            overflow = TextOverflow.Clip,
-        )
-        if (quote.author.isNotBlank()) {
-            Text(
-                text = "— ${quote.author}",
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = AcgUi.Quote.authorTopGap),
-                color = color.copy(alpha = AcgUi.Quote.authorAlpha),
-                style = MiuixTheme.textStyles.footnote1,
-                fontWeight = FontWeight.Medium,
-                fontSize = AcgUi.Quote.authorSize,
-                softWrap = false,
-            )
-        }
-    }
-}
-
-@Composable
 internal fun AcgProfileModeBadge(
     profileName: String?,
     tunnelMode: TunnelState.Mode?,
