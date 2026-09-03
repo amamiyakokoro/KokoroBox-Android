@@ -73,7 +73,7 @@ internal class OnboardingActivity : OnboardingBaseActivity() {
                     finishOnboarding()
                 },
                 onGithubClick = {
-                    openUrl(this, "https://github.com/Yizuka17/YumeBox-MaterialDesign")
+                    openUrl(this, "https://github.com/amamiyakokoro/KokoroBox")
                 },
                 onCommunityClick = {
                     openUrl(this, "https://t.me/YumeLira")

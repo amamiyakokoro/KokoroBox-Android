@@ -148,8 +148,8 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 Title(MLang.About.Section.ProjectLinks)
                 Card {
                     AboutLinkItem(
-                        title = "YumeBox-MaterialDesign",
-                        url = "https://github.com/Yizuka17/YumeBox-MaterialDesign",
+                        title = "KokoroBox",
+                        url = "https://github.com/amamiyakokoro/KokoroBox",
                         onOpenUrl = { url -> openUrl(context, url) },
                         showArrow = false,
                     )

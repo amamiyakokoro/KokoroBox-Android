@@ -2,7 +2,7 @@
 
 **简体中文** | [English](DailyQuote.md)
 
-本文说明 YumeBox MD3 ACG 首页「每日一言」功能中，自定义一言 API 与用户自定义一言 JSON 的数据格式要求，并提供可直接参考的示例。
+本文说明 KokoroBox ACG 首页「每日一言」功能中，自定义一言 API 与用户自定义一言 JSON 的数据格式要求，并提供可直接参考的示例。
 
 ## 1. 每日一言 API
 
@@ -19,7 +19,7 @@ https://v1.hitokoto.cn/?c=a&c=b&c=c
 - 请求方法：`GET`
 - 请求头：
   - `Accept: application/json`
-  - `User-Agent: YumeBox-MaterialDesign`
+  - `User-Agent: KokoroBox`
 - 超时：单次请求约 1 秒，失败时会进行少量重试。
 - URL：必须是可直接访问的完整 URL，例如 `https://example.com/quote`。
 

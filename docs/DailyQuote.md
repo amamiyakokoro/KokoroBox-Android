@@ -2,7 +2,7 @@
 
 **English** | [简体中文](DailyQuote_ZH_HANS.md)
 
-This document describes the format requirements for the YumeBox MD3 ACG home "Daily Quote" feature, including custom quote APIs and user-defined quote JSON lists, with examples you can copy and adapt.
+This document describes the format requirements for the KokoroBox ACG home "Daily Quote" feature, including custom quote APIs and user-defined quote JSON lists, with examples you can copy and adapt.
 
 ## 1. Daily Quote API
 
@@ -19,7 +19,7 @@ https://v1.hitokoto.cn/?c=a&c=b&c=c
 - Method: `GET`
 - Request headers:
   - `Accept: application/json`
-  - `User-Agent: YumeBox-MaterialDesign`
+  - `User-Agent: KokoroBox`
 - Timeout: about 1 second per attempt, with a small number of retries on failure.
 - URL: must be a directly accessible full URL, for example `https://example.com/quote`.
 

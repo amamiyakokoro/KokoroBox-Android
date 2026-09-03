@@ -6,11 +6,11 @@
 
 An Android proxy client powered by Mihomo, designed around a modern Material 3 experience.
 
-[![Latest release](https://img.shields.io/github/v/release/amamiyakokoro/YumeBox-MaterialDesign?logo=android)](https://github.com/amamiyakokoro/YumeBox-MaterialDesign/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/amamiyakokoro/KokoroBox?logo=android)](https://github.com/amamiyakokoro/KokoroBox/releases/latest)
 [![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com/about/versions/oreo)
-[![License](https://img.shields.io/github/license/amamiyakokoro/YumeBox-MaterialDesign?logo=gnu)](../LICENSE)
+[![License](https://img.shields.io/github/license/amamiyakokoro/KokoroBox?logo=gnu)](../LICENSE)
 
-**English** · [简体中文](README_ZH_HANS.md)
+**English**
 
 </div>
 
@@ -49,7 +49,7 @@ KokoroBox does not contain an osu! client secret, API secret, or App authenticat
 
 ## Install
 
-Download the newest APK from [GitHub Releases](https://github.com/amamiyakokoro/YumeBox-MaterialDesign/releases/latest), then allow your browser or file manager to install packages when Android prompts you.
+Download the newest APK from [GitHub Releases](https://github.com/amamiyakokoro/KokoroBox/releases/latest), then allow your browser or file manager to install packages when Android prompts you.
 
 Changing the application ID made KokoroBox a separate Android application. An older YumeBox MD3 installation will not be upgraded in place, and its profiles, preferences, and login session are not migrated automatically.
 
@@ -65,8 +65,8 @@ Changing the application ID made KokoroBox a separate Android application. An ol
 Clone the repository:
 
 ```bash
-git clone --recurse-submodules https://github.com/amamiyakokoro/YumeBox-MaterialDesign.git
-cd YumeBox-MaterialDesign
+git clone --recurse-submodules https://github.com/amamiyakokoro/KokoroBox.git
+cd KokoroBox
 ```
 
 The app requires `libclash.so`, `liboverride.so`, and `libbridge.so` under `jniLibs/<abi>/`. To rebuild the native runtime and Geo assets locally:
@@ -121,7 +121,7 @@ Release signing is optional for local development. Keep signing properties and k
 
 ## Contributing
 
-Bug reports and focused pull requests are welcome. Please use [GitHub Issues](https://github.com/amamiyakokoro/YumeBox-MaterialDesign/issues) for reproducible bugs and feature proposals. Translation changes belong under `locale/lang`.
+Bug reports and focused pull requests are welcome. Please use [GitHub Issues](https://github.com/amamiyakokoro/KokoroBox/issues) for reproducible bugs and feature proposals. Translation changes belong under `locale/lang`.
 
 Never commit access tokens, subscription UUIDs, signing keys, OAuth secrets, or generated private configuration files.
 
