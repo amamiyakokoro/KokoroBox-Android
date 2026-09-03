@@ -34,18 +34,14 @@ The Android application ID is `com.amamiyakokoro.box`.
 - **Geo data management** — built-in GeoIP, GeoSite, country database, and ASN updates.
 - **Diagnostics** — connection details, traffic statistics, service notifications, and exportable logs.
 
-## Kokoro account
+## Kokoro subscription
 
 KokoroBox can obtain a Mihomo subscription without placing a subscription UUID in the profile URL.
 
-1. Select **Kokoro account** when adding a profile.
+1. Select **Kokoro Subscription** when adding a profile.
 2. Sign in with osu! using the system browser.
 3. Return to the app through `kokoro://oauth/callback`.
 4. Choose the subscription options and create the profile.
-
-Authentication uses the public API at `https://amamiyakoko.ro/api`. Access and refresh tokens are stored as an AES-GCM encrypted credential blob whose key is protected by Android Keystore. OAuth state is verified before exchanging the one-time code, token refresh is single-flight, and credentials are not written to profile URLs or application logs.
-
-KokoroBox does not contain an osu! client secret, API secret, or App authentication secret.
 
 ## Install
 
