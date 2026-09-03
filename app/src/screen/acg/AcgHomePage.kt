@@ -212,12 +212,8 @@ fun AcgHomePage(
     }
     val heroBlendColor = contentSurface
     val handlePageChange = LocalHandlePageChange.current
-    val sidebarIcons = remember(handlePageChange, homeViewModel) {
+    val sidebarIcons = remember(handlePageChange) {
         listOf(
-            AcgSidebarIconItem(AppMd3Icons.Action.SpeedTest) {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                homeViewModel.testCurrentNodeDelay()
-            },
             AcgSidebarIconItem(ShellIcons.OpenProxy) { handlePageChange(1) },
             AcgSidebarIconItem(AppMd3Icons.Shell.OpenProfileConfig) { handlePageChange(2) },
             AcgSidebarIconItem(ShellIcons.OpenSettings) { handlePageChange(3) },

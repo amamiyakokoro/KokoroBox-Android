@@ -35,7 +35,6 @@ import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
 import com.github.yumelira.yumebox.data.gateway.NetworkInfoService
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
-import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
 import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
@@ -97,7 +96,6 @@ class HomeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RuntimeStateMapper.isActuallyRunning(runtimeSnapshot.value))
     val currentProfile = proxyFacade.currentProfile
     val trafficNow = proxyFacade.trafficNow
-    val proxyGroups = proxyFacade.proxyGroups
     val tunnelMode: StateFlow<com.github.yumelira.yumebox.core.model.TunnelState.Mode> = proxyFacade.preferredTunnelMode
 
     private val _proxyMode = MutableStateFlow(ProxyMode.Tun)
@@ -124,9 +122,6 @@ class HomeViewModel(
 
     private val _speedHistory = MutableStateFlow<List<Long>>(emptyList())
     val speedHistory: StateFlow<List<Long>> = _speedHistory.asStateFlow()
-
-    private val _testingCurrentNodeDelay = MutableStateFlow(false)
-    val testingCurrentNodeDelay: StateFlow<Boolean> = _testingCurrentNodeDelay.asStateFlow()
 
     private var reconcileJob: Job? = null
 
@@ -395,87 +390,6 @@ class HomeViewModel(
         }
     }
 
-    fun testCurrentNodeDelay() {
-        if (_testingCurrentNodeDelay.value) return
-
-        viewModelScope.launch {
-            _testingCurrentNodeDelay.value = true
-            try {
-                if (!ensureProxyRunningForNodeTest()) {
-                    return@launch
-                }
-
-                runCatching { proxyFacade.refreshProxyGroups() }
-                val target = awaitCurrentNodeTestTarget()
-                if (target == null) {
-                    showError(MLang.Proxy.Testing.Failed.format(MLang.Proxy.Empty.NoNodes))
-                    return@launch
-                }
-                proxyFacade.healthCheckProxy(target.groupName, target.proxyName)
-                PollingTimers.awaitTick(PollingTimerSpecs.ProxySwitchFeedback)
-                proxyFacade.refreshProxyGroup(target.groupName)
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
-                Timber.w(e, "Failed to test current node delay")
-                showError(MLang.Proxy.Testing.Failed.format(e.message.orEmpty()))
-            } finally {
-                _testingCurrentNodeDelay.value = false
-            }
-        }
-    }
-
-    private suspend fun ensureProxyRunningForNodeTest(): Boolean {
-        if (controlState.value == HomeProxyControlState.Running) return true
-
-        if (controlState.value == HomeProxyControlState.Idle) {
-            val targetProfile = currentProfile.value
-                ?: recommendedProfile.value
-                ?: withContext(Dispatchers.IO) { profilesRepository.queryActiveProfile() }
-            if (targetProfile == null) {
-                showError(MLang.ProfilesVM.Error.ProfileNotExist)
-                return false
-            }
-            startProxy(profileId = targetProfile.uuid.toString())
-        }
-
-        return withTimeoutOrNull(45_000L) {
-            controlState.first { state ->
-                state == HomeProxyControlState.Running ||
-                        (state == HomeProxyControlState.Idle && _pendingTransition.value == PendingTransition.None)
-            } == HomeProxyControlState.Running
-        } == true
-    }
-
-    private suspend fun awaitCurrentNodeTestTarget(): CurrentNodeTestTarget? {
-        return withTimeoutOrNull(10_000L) {
-            while (currentCoroutineContext().isActive) {
-                resolveCurrentNodeTestTarget()?.let { target -> return@withTimeoutOrNull target }
-                delay(250L)
-            }
-            null
-        }
-    }
-
-    private fun resolveCurrentNodeTestTarget(): CurrentNodeTestTarget? {
-        val nodeName = selectedServerName.value?.trim().orEmpty()
-        if (nodeName.isBlank()) return null
-        return findContainingProxyGroup(nodeName, proxyGroups.value)?.let { group ->
-            CurrentNodeTestTarget(groupName = group.name, proxyName = nodeName)
-        }
-    }
-
-    private fun findContainingProxyGroup(
-        nodeName: String,
-        groups: List<ProxyGroupInfo>,
-    ): ProxyGroupInfo? {
-        groups.forEach { group ->
-            if (group.proxies.any { proxy -> proxy.name == nodeName }) {
-                return group
-            }
-        }
-        return groups.find { group -> group.now == nodeName }
-    }
-
     private fun startSpeedSampling(sampleLimit: Int = 24) {
         viewModelScope.launch {
             PollingTimers.ticks(PollingTimerSpecs.HomeSpeedSampling).collect {
@@ -578,11 +492,6 @@ class HomeViewModel(
     private data class PendingStartRequest(
         val profileId: String,
         val mode: ProxyMode,
-    )
-
-    private data class CurrentNodeTestTarget(
-        val groupName: String,
-        val proxyName: String,
     )
 
     data class HomeUiState(
