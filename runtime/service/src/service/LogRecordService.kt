@@ -221,7 +221,7 @@ class LogRecordService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("正在记录日志")
             .setContentText(currentLogFileName ?: "日志记录中...")
-            .setSmallIcon(R.drawable.ic_logo_service)
+            .setSmallIcon(R.drawable.ic_notification_furin)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)

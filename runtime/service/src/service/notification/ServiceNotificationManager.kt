@@ -138,7 +138,7 @@ class ServiceNotificationManager(
                     .bigText(presentation.expandedText)
                     .setSummaryText(presentation.subText)
             )
-            .setSmallIcon(R.drawable.ic_logo_service)
+            .setSmallIcon(R.drawable.ic_notification_furin)
             .setColor(service.getColor(R.color.color_clash))
             .setContentIntent(contentIntent)
             .setOngoing(true)
