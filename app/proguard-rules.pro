@@ -79,12 +79,6 @@
     boolean getRECOVER_STACK_TRACES() return false;
 }
 
-# ========================================
-# Javet / Native JS
-# ========================================
--keep class com.caoccao.javet.** { *; }
--keep interface com.caoccao.javet.** { *; }
-
 # JMX classes not available on Android
 -dontwarn java.lang.management.**
 -dontwarn javax.management.**

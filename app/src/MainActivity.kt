@@ -52,7 +52,6 @@ import com.github.yumelira.yumebox.common.util.ProxyAutoStartHelper
 import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
-import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
@@ -96,7 +95,6 @@ class MainActivity : FragmentActivity() {
     }
 
     private val appSettingsStorage: com.github.yumelira.yumebox.data.store.AppSettingsStore by inject()
-    private val featureStore: FeatureStore by inject()
     private val networkSettingsStorage: com.github.yumelira.yumebox.data.store.NetworkSettingsStore by inject()
     private val profilesRepository: com.github.yumelira.yumebox.runtime.client.ProfilesRepository by inject()
     private val proxyFacade: com.github.yumelira.yumebox.runtime.client.ProxyFacade by inject()
@@ -227,7 +225,6 @@ class MainActivity : FragmentActivity() {
                 StartupTaskCoordinator.awaitRuntimeWarmup()
                 ProxyAutoStartHelper.checkAndAutoStart(
                     context = this@MainActivity,
-                    featureStore = featureStore,
                     proxyFacade = proxyFacade,
                     profilesRepository = profilesRepository,
                     appSettingsStorage = appSettingsStorage,
@@ -265,7 +262,7 @@ class MainActivity : FragmentActivity() {
         if (level < TRIM_MEMORY_UI_HIDDEN || isFinishing) {
             return
         }
-        if (!featureStore.exitUiWhenBackground.value) {
+        if (!appSettingsStorage.exitUiWhenBackground.value) {
             return
         }
         if (proxyFacade.runtimeSnapshot.value.running) {

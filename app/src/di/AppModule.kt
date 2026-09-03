@@ -31,6 +31,7 @@ import com.github.yumelira.yumebox.screen.settings.AccessControlViewModel
 import com.github.yumelira.yumebox.screen.settings.AppDataManagementViewModel
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.NetworkSettingsViewModel
+import com.github.yumelira.yumebox.screen.settings.ResourceDownloadClient
 import com.github.yumelira.yumebox.service.LogRecordServiceGateway
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.Module
@@ -40,10 +41,11 @@ import org.koin.dsl.module
 val appIntegrationModule = module {
     single<LogRecordGateway> { LogRecordServiceGateway() }
     single { KokoroAccountClient(androidApplication()) }
+    single { ResourceDownloadClient(androidApplication(), get()) }
 }
 
 val appViewModelModule = module {
-    viewModel { AppSettingsViewModel(get(), get(), get(), get(), get()) }
+    viewModel { AppSettingsViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get(), get(), get(), get(), get()) }
     viewModel { ProfilesViewModel(androidApplication(), get(), get(), get()) }
     viewModel { NetworkSettingsViewModel(androidApplication(), get(), get(), get()) }
@@ -55,4 +57,4 @@ val appViewModelModule = module {
 val appModule: List<Module> = coreDiModules + listOf(
     appIntegrationModule,
     appViewModelModule,
-) + featureSubStoreModules + featureProxyModules + featureOverrideModules + featureMetaModules
+) + featureProxyModules + featureOverrideModules + featureMetaModules

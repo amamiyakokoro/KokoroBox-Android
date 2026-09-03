@@ -38,7 +38,6 @@ import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.store.MMKVProvider
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.runtime.service.R
@@ -65,7 +64,6 @@ class AutoRestartService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val mmkvProvider by lazy { MMKVProvider() }
     private val appSettingsStorage by lazy { AppSettingsStore(mmkvProvider.getMMKV("settings")) }
-    private val featureStore by lazy { FeatureStore(mmkvProvider.getMMKV("substore")) }
     private val networkSettingsStorage by lazy { NetworkSettingsStore(mmkvProvider.getMMKV("network_settings")) }
     private val serviceCache by lazy { mmkvProvider.getMMKV("service_cache") }
     private val profileManager by lazy { ProfileManager(applicationContext) }
@@ -127,7 +125,7 @@ class AutoRestartService : Service() {
             return
         }
         StartupTaskCoordinator.awaitRuntimeWarmup()
-        val skipUpdateOnPostUpdateColdStart = featureStore.consumePostUpdateColdStartPending()
+        val skipUpdateOnPostUpdateColdStart = appSettingsStorage.consumePostUpdateColdStartPending()
 
         val activeProfile = profileManager.queryActive()
         if (activeProfile == null) {

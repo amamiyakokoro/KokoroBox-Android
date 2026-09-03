@@ -27,7 +27,6 @@ import android.net.VpnService
 import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
@@ -45,7 +44,6 @@ object ProxyAutoStartHelper {
 
     suspend fun checkAndAutoStart(
         context: Context,
-        featureStore: FeatureStore,
         proxyFacade: ProxyFacade,
         profilesRepository: ProfilesRepository,
         appSettingsStorage: AppSettingsStore,
@@ -60,7 +58,7 @@ object ProxyAutoStartHelper {
             Timber.tag(TAG).i("Skip auto start: background auto-restart is still executing")
             return
         }
-        if (featureStore.consumePostUpdateColdStartPending()) {
+        if (appSettingsStorage.consumePostUpdateColdStartPending()) {
             Timber.tag(TAG).i("Skip auto start/update: post-update cold-start protection is active")
             return
         }

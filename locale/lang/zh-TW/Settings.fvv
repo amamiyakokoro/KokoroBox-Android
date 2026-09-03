@@ -22,7 +22,7 @@ Settings = {
         MetaFeatures = "Meta 功能"
         MetaFeaturesSummary = "Meta 擴充套件"
         Lab = "實驗室"
-        LabSummary = "Sub-Store · 實驗功能"
+        LabSummary = "面板 · 節點測試"
     }
 
     DataSettings = {

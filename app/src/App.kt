@@ -32,10 +32,8 @@ import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.data.controller.AppTrafficStatisticsCollector
 import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.di.appModule
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
-import com.github.yumelira.yumebox.substore.util.AppUtil
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +41,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.Koin
@@ -82,9 +79,8 @@ class App : Application() {
         geoXDataController = koinApp.koin.get()
         geoXDataController.ensureGeoFiles()
         startGeoFileGuard()
-        val featureStore: FeatureStore = koinApp.koin.get()
-        featureStore.syncAppVersion(BuildConfig.VERSION_CODE)
-        scheduleDeferredStartupTasks(koinApp.koin, featureStore)
+        appSettingsStorage.syncAppVersion(BuildConfig.VERSION_CODE)
+        scheduleDeferredStartupTasks(koinApp.koin)
 
         PlatformIdentifier.getPlatformIdentifier()
     }
@@ -104,7 +100,7 @@ class App : Application() {
         }
     }
 
-    private fun scheduleDeferredStartupTasks(koin: Koin, featureStore: FeatureStore) {
+    private fun scheduleDeferredStartupTasks(koin: Koin) {
         StartupTaskCoordinator.startRuntimeWarmup(startupScope) {
             runCatching { koin.get<AppTrafficStatisticsCollector>() }
                 .onFailure { Timber.w(it, "App traffic collector init skipped") }
@@ -112,16 +108,6 @@ class App : Application() {
             runCatching { koin.get<ProxyFacade>().awaitProxyGroupWarmUp() }
                 .onFailure { Timber.w(it, "Proxy preview warm-up skipped") }
 
-            if (featureStore.isFirstTimeOpen()) {
-                withContext(Dispatchers.IO) {
-                    runCatching {
-                        AppUtil.initFirstOpen()
-                        featureStore.markFirstOpenHandled()
-                    }.onFailure { error ->
-                        Timber.w(error, "First-open asset initialization failed")
-                    }
-                }
-            }
         }
     }
 }

@@ -44,7 +44,6 @@ import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.screen.ProxyPager
-import com.github.yumelira.yumebox.presentation.viewmodel.FeatureViewModel
 import com.github.yumelira.yumebox.presentation.webview.WebViewUtils.getPanelUrl
 import com.github.yumelira.yumebox.screen.acg.AcgHomePage
 import com.github.yumelira.yumebox.screen.acg.calculateHomeVisibility
@@ -74,7 +73,6 @@ fun MainScreen(
     val settingsListState = rememberRetainedLazyListState("main_settings")
 
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
-    val featureViewModel = koinViewModel<FeatureViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
     val isProxyRunning by homeViewModel.isRunning.collectAsState()
     val bottomBarAutoHideEnabled by appSettingsViewModel.bottomBarAutoHide.state.collectAsState()
@@ -84,8 +82,8 @@ fun MainScreen(
     val acgWallpaperZoom by appSettingsViewModel.acgWallpaperZoom.state.collectAsState()
     val acgWallpaperBiasX by appSettingsViewModel.acgWallpaperBiasX.state.collectAsState()
     val acgWallpaperBiasY by appSettingsViewModel.acgWallpaperBiasY.state.collectAsState()
-    val selectedPanelType by featureViewModel.selectedPanelType.state.collectAsState()
-    val panelOpenMode by featureViewModel.panelOpenMode.state.collectAsState()
+    val selectedPanelType by appSettingsViewModel.selectedPanelType.state.collectAsState()
+    val panelOpenMode by appSettingsViewModel.panelOpenMode.state.collectAsState()
     val bottomBarScrollBehavior = rememberBottomBarScrollBehavior(autoHideEnabled = bottomBarAutoHideEnabled)
     val pagerFlingBehavior = rememberMainPagerFlingBehavior(mainPagerState.pagerState)
     var settledMainPage by remember { mutableIntStateOf(initialMainPage) }

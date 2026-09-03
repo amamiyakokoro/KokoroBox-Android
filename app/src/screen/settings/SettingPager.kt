@@ -35,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,18 +46,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.WebViewActivity
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.viewmodel.SettingEvent
-import com.github.yumelira.yumebox.presentation.viewmodel.SettingViewModel
 import com.ramcosta.composedestinations.generated.destinations.AboutScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppDataManagementScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppSettingsScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.FeatureScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.LabScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.LogScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MetaFeatureScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.NetworkSettingsScreenDestination
@@ -123,7 +119,6 @@ fun SettingPager(
     mainInnerPadding: PaddingValues,
     lazyListState: LazyListState,
 ) {
-    val viewModel = koinViewModel<SettingViewModel>()
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val navigator = LocalNavigator.current
     val context = LocalContext.current
@@ -169,20 +164,6 @@ fun SettingPager(
                 }
         }.onFailure { throwable ->
             context.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is SettingEvent.OpenWebView -> {
-                    runCatching {
-                        WebViewActivity.start(context, event.url)
-                    }.getOrElse { throwable ->
-                        context.toast(MLang.Settings.Error.WebviewFailed.format(throwable.message))
-                    }
-                }
-            }
         }
     }
 
@@ -238,7 +219,7 @@ fun SettingPager(
                         summary = MLang.Settings.NetworkSettings.LabSummary,
                         imageVector = AppMd3Icons.Settings.Lab,
                         onClick = {
-                            navigator.navigate(FeatureScreenDestination) { launchSingleTop = true }
+                            navigator.navigate(LabScreenDestination) { launchSingleTop = true }
                         },
                     )
                 }

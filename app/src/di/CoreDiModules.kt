@@ -43,7 +43,6 @@ import com.github.yumelira.yumebox.data.store.ProfileBindingProvider
 import com.github.yumelira.yumebox.data.store.ProfileBindingStore
 import com.github.yumelira.yumebox.data.controller.ProvidersController
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.store.MMKVProvider
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.data.store.ProfileLinksStore
@@ -76,7 +75,6 @@ val appFoundationModule = module {
     single<MMKV>(named("profiles")) { get<MMKVProvider>().getMMKV("profiles") }
     single<MMKV>(named("settings")) { get<MMKVProvider>().getMMKV("settings") }
     single<MMKV>(named("network_settings")) { get<MMKVProvider>().getMMKV("network_settings") }
-    single<MMKV>(named("substore")) { get<MMKVProvider>().getMMKV("substore") }
     single<MMKV>(named("proxy_display")) { get<MMKVProvider>().getMMKV("proxy_display") }
     single<MMKV>(named("traffic_statistics")) { get<MMKVProvider>().getMMKV("traffic_statistics") }
     single<MMKV>(named("profile_links")) { get<MMKVProvider>().getMMKV("profile_links") }
@@ -86,12 +84,11 @@ val appFoundationModule = module {
     single { AppSettingsStore(get<MMKV>(named("settings"))) }
     single { NetworkSettingsStore(get(named("network_settings"))) }
     single { ProfileLinksStore(get(named("profile_links"))) }
-    single { FeatureStore(get(named("substore"))) }
     single { ProxyDisplaySettingsStore(get(named("proxy_display"))) }
     single { TrafficStatisticsStore(get(named("traffic_statistics"))) }
     single { AcgWallpaperStorage(androidContext()) }
     single { OverrideConfigStore(androidContext()) }
-    single { UserSettingsBackupController(get(), get(), get(), get(), get(), get(), get()) }
+    single { UserSettingsBackupController(get(), get(), get(), get(), get(), get()) }
     single { GeoXDataController(androidContext()) }
 }
 

@@ -25,7 +25,6 @@
 - [sora-editor](https://github.com/Rosemoe/sora-editor)
 - [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
 - [sketch](https://github.com/panpf/sketch)
-- [Javet](https://github.com/caoccao/Javet)
 - [Apache Commons Compress](https://commons.apache.org/proper/commons-compress/)
 - [XZ for Java](https://github.com/tukaani-project/xz-java)
 - [Shapes](https://github.com/Kyant0/Shapes)

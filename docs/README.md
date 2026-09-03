@@ -21,7 +21,7 @@ An Android proxy client powered by Mihomo, designed around a modern Material 3 e
 
 KokoroBox is an open-source Android client built on [Mihomo](https://github.com/MetaCubeX/mihomo). It continues the work of [YumeBox](https://github.com/YumeLira/YumeBox) with a Material 3 interface, profile management, runtime configuration tools, traffic statistics, and first-class integration with the Kokoro subscription service.
 
-The Android application ID is `com.amamiyakokoro.box`. The optional Sub-Store extension uses `com.amamiyakokoro.box.extension`.
+The Android application ID is `com.amamiyakokoro.box`.
 
 ## Highlights
 
@@ -31,7 +31,7 @@ The Android application ID is `com.amamiyakokoro.box`. The optional Sub-Store ex
 - **Subscription management** — configurable protocol, plan, ISP, relay/direct mode, rule source, final route, and update interval.
 - **Overrides and routing** — visual editing, reusable presets, custom routing, configuration preview, and stacked overrides.
 - **Proxy tools** — proxy-group selection, latency testing, sorting, node labels, flags, and persistent selections.
-- **Sub-Store and Geo data** — integrated Sub-Store workflow plus GeoIP, GeoSite, country database, and ASN updates.
+- **Geo data management** — built-in GeoIP, GeoSite, country database, and ASN updates.
 - **Diagnostics** — connection details, traffic statistics, service notifications, and exportable logs.
 
 ## Kokoro account
@@ -107,8 +107,7 @@ Release signing is optional for local development. Keep signing properties and k
 | `core` | Mihomo bridge and shared core models |
 | `data` | Persistent settings and secure Kokoro session storage |
 | `runtime` | Client/service communication and proxy runtime |
-| `feature` | Proxy, override, editor, Meta, and Sub-Store features |
-| `extension` | Optional Sub-Store native extension APK |
+| `feature` | Proxy, override, editor, and Meta features |
 | `locale` | English, Simplified Chinese, and Traditional Chinese strings |
 | `scripts` | Native library, kernel, locale, and release tooling |
 

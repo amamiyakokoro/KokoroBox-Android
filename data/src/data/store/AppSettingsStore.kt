@@ -31,6 +31,11 @@ import com.tencent.mmkv.MMKV
 
 class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = externalMmkv) {
 
+    private companion object {
+        const val KEY_LAST_APP_VERSION_CODE = "last_app_version_code"
+        const val KEY_POST_UPDATE_COLD_START_PENDING = "post_update_cold_start_pending"
+    }
+
     val initialSetupCompleted by boolFlow(false)
     val privacyPolicyAccepted by boolFlow(false)
 
@@ -61,8 +66,29 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val healthCheckConcurrency by intFlow(DEFAULT_HEALTH_CHECK_CONCURRENCY)
     val screenshotProtectionEnabled by boolFlow(false)
     val biometricUnlockEnabled by boolFlow(false)
+    val exitUiWhenBackground by boolFlow(false)
+    val selectedPanelType by intFlow(0)
+    val panelOpenMode by enumFlow(LinkOpenMode.IN_APP)
 
     val customUserAgent by strFlow("")
+
+    fun syncAppVersion(versionCode: Int): Boolean {
+        val previousVersionCode = mmkv.decodeInt(KEY_LAST_APP_VERSION_CODE, Int.MIN_VALUE)
+        val isUpdated = previousVersionCode != Int.MIN_VALUE && previousVersionCode != versionCode
+        if (isUpdated) {
+            mmkv.encode(KEY_POST_UPDATE_COLD_START_PENDING, true)
+        }
+        mmkv.encode(KEY_LAST_APP_VERSION_CODE, versionCode)
+        return isUpdated
+    }
+
+    fun consumePostUpdateColdStartPending(): Boolean {
+        val pending = mmkv.decodeBool(KEY_POST_UPDATE_COLD_START_PENDING, false)
+        if (pending) {
+            mmkv.removeValueForKey(KEY_POST_UPDATE_COLD_START_PENDING)
+        }
+        return pending
+    }
 
 }
 

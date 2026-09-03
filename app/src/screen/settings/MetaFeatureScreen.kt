@@ -45,8 +45,6 @@ import com.github.yumelira.yumebox.core.util.runtimeHomeDir
 import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.data.controller.GeoXUpdateRecord
 import com.github.yumelira.yumebox.presentation.component.*
-import com.github.yumelira.yumebox.substore.util.DownloadProgress
-import com.github.yumelira.yumebox.substore.util.SubStoreDownloadClient
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
@@ -86,7 +84,7 @@ private enum class GeoXDownloadStatus {
 fun MetaFeatureScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val downloadClient: SubStoreDownloadClient = koinInject()
+    val downloadClient: ResourceDownloadClient = koinInject()
     val geoXDataController: GeoXDataController = koinInject()
 
     val showGeoXDownloadSheet = remember { mutableStateOf(false) }
@@ -196,7 +194,7 @@ private fun GeoXDownloadSheet(
     show: MutableState<Boolean>,
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
-    downloadClient: SubStoreDownloadClient,
+    downloadClient: ResourceDownloadClient,
     geoXDataController: GeoXDataController,
     updateRecords: Map<String, GeoXUpdateRecord>,
     onUpdateRecordsChanged: (Map<String, GeoXUpdateRecord>) -> Unit,
@@ -382,7 +380,7 @@ private fun GeoXImportSheet(
 private fun downloadGeoXFiles(
     context: android.content.Context,
     scope: kotlinx.coroutines.CoroutineScope,
-    downloadClient: SubStoreDownloadClient,
+    downloadClient: ResourceDownloadClient,
     geoXDataController: GeoXDataController,
     items: List<GeoXItem>,
     onProgress: (GeoFileType, GeoXDownloadProgressState) -> Unit,
@@ -459,7 +457,7 @@ private fun formatGeoXUpdateTime(timestamp: Long): String {
     return SimpleDateFormat("yy/MM/dd HH:mm:ss", Locale.getDefault()).format(Date(timestamp))
 }
 
-private fun DownloadProgress.toGeoXProgressState(
+private fun ResourceDownloadProgress.toGeoXProgressState(
     itemTitle: String,
     status: GeoXDownloadStatus,
 ): GeoXDownloadProgressState {

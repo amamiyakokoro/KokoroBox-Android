@@ -36,7 +36,6 @@ import com.github.yumelira.yumebox.data.model.ProxySortMode
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.data.model.TunStack
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.FeatureStore
 import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.data.store.ProfileLink
@@ -73,7 +72,6 @@ private data class UserSettingsBackup(
 
 class UserSettingsBackupController(
     private val appSettingsStore: AppSettingsStore,
-    private val featureStore: FeatureStore,
     private val networkSettingsStore: NetworkSettingsStore,
     private val profileLinksStore: ProfileLinksStore,
     private val proxyDisplaySettingsStore: ProxyDisplaySettingsStore,
@@ -213,23 +211,15 @@ class UserSettingsBackupController(
     }
 
     private fun exportFeatureSettings(): JsonObject = buildJsonObject {
-        put("allowLanAccess", featureStore.allowLanAccess.value)
-        put("backendPort", featureStore.backendPort.value)
-        put("frontendPort", featureStore.frontendPort.value)
-        put("selectedPanelType", featureStore.selectedPanelType.value)
-        put("panelOpenMode", featureStore.panelOpenMode.value.name)
-        put("showWebControlInProxy", featureStore.showWebControlInProxy.value)
-        put("exitUiWhenBackground", featureStore.exitUiWhenBackground.value)
+        put("selectedPanelType", appSettingsStore.selectedPanelType.value)
+        put("panelOpenMode", appSettingsStore.panelOpenMode.value.name)
+        put("exitUiWhenBackground", appSettingsStore.exitUiWhenBackground.value)
     }
 
     private fun importFeatureSettings(obj: JsonObject) {
-        obj.bool("allowLanAccess")?.let(featureStore.allowLanAccess::set)
-        obj.int("backendPort")?.let(featureStore.backendPort::set)
-        obj.int("frontendPort")?.let(featureStore.frontendPort::set)
-        obj.int("selectedPanelType")?.let(featureStore.selectedPanelType::set)
-        obj.enumValue<LinkOpenMode>("panelOpenMode")?.let(featureStore.panelOpenMode::set)
-        obj.bool("showWebControlInProxy")?.let(featureStore.showWebControlInProxy::set)
-        obj.bool("exitUiWhenBackground")?.let(featureStore.exitUiWhenBackground::set)
+        obj.int("selectedPanelType")?.let(appSettingsStore.selectedPanelType::set)
+        obj.enumValue<LinkOpenMode>("panelOpenMode")?.let(appSettingsStore.panelOpenMode::set)
+        obj.bool("exitUiWhenBackground")?.let(appSettingsStore.exitUiWhenBackground::set)
     }
 
     private fun exportNetworkSettings(): JsonObject = buildJsonObject {
