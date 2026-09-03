@@ -11,74 +11,101 @@ package com.github.yumelira.yumebox.screen.profiles
 
 import android.content.Context
 import android.net.Uri
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
-import android.util.Base64
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
-import java.security.KeyStore
-import java.security.MessageDigest
-import java.security.SecureRandom
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.GCMParameterSpec
 
 internal object AmamiyaApi {
-    const val API_BASE_URL = "https://amamiyakoko.ro/api"
-    const val APP_REDIRECT_URI = "kokoro://oauth/callback"
-    const val LOGIN_URL = "$API_BASE_URL/app/auth/login"
-    const val TOKEN_URL = "$API_BASE_URL/app/auth/token"
-    const val ME_URL = "$API_BASE_URL/app/me"
-    const val REVOKE_URL = "$API_BASE_URL/app/auth/revoke"
-    const val CONFIG_URL = "$API_BASE_URL/config"
+    const val API_BASE_URL = KokoroApi.API_BASE_URL
+    const val APP_REDIRECT_URI = KokoroApi.APP_REDIRECT_URI
+    const val LOGIN_URL = KokoroApi.LOGIN_URL
+    const val TOKEN_URL = KokoroApi.TOKEN_URL
+    const val ME_URL = KokoroApi.ME_URL
+    const val REVOKE_URL = KokoroApi.REVOKE_URL
+    const val OPTIONS_URL = KokoroApi.SUBSCRIPTION_OPTIONS_URL
+    const val CONFIG_URL = KokoroApi.SUBSCRIPTION_CONFIG_URL
 
-    fun loginUrl(state: String): String = Uri.parse(LOGIN_URL).buildUpon()
-        .appendQueryParameter("redirect_uri", APP_REDIRECT_URI)
-        .appendQueryParameter("state", state)
-        .build()
-        .toString()
+    fun isManagedConfigUrl(source: String): Boolean = KokoroApi.isManagedSubscriptionUrl(source)
 
-    fun buildConfigUrl(proxyUuid: String, plan: String?, options: AmamiyaConfigOptions): String {
-        require(proxyUuid.isNotBlank()) { "proxy_uuid is required" }
+    fun buildConfigUrl(settings: MihomoSubscriptionSettings): String {
+        val normalizedMode = if (settings.protocol == "vmess") "relay" else settings.mode
+        val update = if (settings.subscriptionAutoUpdate) {
+            settings.updateIntervalHours.coerceAtLeast(1).toString()
+        } else {
+            "off"
+        }
         return Uri.parse(CONFIG_URL).buildUpon()
-            .appendQueryParameter("uuid", proxyUuid)
+            .appendQueryParameter("protocol", settings.protocol)
+            .appendQueryParameter("plan", settings.plan)
             .apply {
-                plan?.takeIf(String::isNotBlank)?.let { appendQueryParameter("plan", it) }
-                options.isp?.let { appendQueryParameter("isp", it) }
+                settings.isp.takeIf(String::isNotBlank)?.let { appendQueryParameter("isp", it) }
             }
-            .appendQueryParameter("protocol", options.protocol)
-            .appendQueryParameter("client", "meta")
-            .appendQueryParameter("rule", options.rule)
-            .appendQueryParameter("mode", options.mode)
-            .appendQueryParameter("match", options.match)
-            .appendQueryParameter("rule_update", options.ruleUpdate)
-            .appendQueryParameter("update", options.update)
+            .appendQueryParameter("rule", settings.ruleSource)
+            .appendQueryParameter("mode", normalizedMode)
+            .appendQueryParameter("match", if (settings.finalRoute == "direct") "direct" else "none")
+            .appendQueryParameter(
+                "rule_update",
+                if (settings.ruleProviderAutoUpdate) "enable" else "disable",
+            )
+            .appendQueryParameter("update", update)
             .build()
             .toString()
     }
+
+    fun parseConfigSettings(source: String): MihomoSubscriptionSettings? {
+        if (!isManagedConfigUrl(source)) return null
+        val uri = Uri.parse(source)
+        val protocol = uri.getQueryParameter("protocol")
+            ?.takeIf { it in SUPPORTED_PROTOCOLS }
+            ?: "vmess"
+        val rawUpdate = uri.getQueryParameter("update") ?: "1"
+        return MihomoSubscriptionSettings(
+            protocol = protocol,
+            plan = uri.getQueryParameter("plan").orEmpty(),
+            isp = uri.getQueryParameter("isp").orEmpty().takeIf { it in SUPPORTED_ISPS }.orEmpty(),
+            mode = if (protocol != "vmess" && uri.getQueryParameter("mode") == "direct") {
+                "direct"
+            } else {
+                "relay"
+            },
+            ruleSource = if (uri.getQueryParameter("rule") == "mirror") "mirror" else "origin",
+            finalRoute = if (uri.getQueryParameter("match") == "direct") "direct" else "proxy",
+            ruleProviderAutoUpdate = uri.getQueryParameter("rule_update") != "disable",
+            subscriptionAutoUpdate = rawUpdate != "off",
+            updateIntervalHours = rawUpdate.toIntOrNull()?.takeIf { it > 0 } ?: 1,
+        )
+    }
+
+    fun intervalMillis(settings: MihomoSubscriptionSettings): Long =
+        if (settings.subscriptionAutoUpdate) {
+            settings.updateIntervalHours.coerceAtLeast(1) * 60L * 60L * 1_000L
+        } else {
+            0L
+        }
+
+    private val SUPPORTED_PROTOCOLS = setOf("vmess", "anytls", "hysteria2")
+    private val SUPPORTED_ISPS = setOf("", "ct", "cu", "cm", "other")
 }
 
-internal data class AmamiyaConfigOptions(
+internal data class MihomoSubscriptionSettings(
     val protocol: String = "vmess",
-    val isp: String? = null,
+    val plan: String = "",
+    val isp: String = "",
     val mode: String = "relay",
-    val rule: String = "origin",
-    val match: String = "none",
-    val ruleUpdate: String = "enable",
-    val update: String = "on",
+    val ruleSource: String = "origin",
+    val finalRoute: String = "proxy",
+    val ruleProviderAutoUpdate: Boolean = true,
+    val subscriptionAutoUpdate: Boolean = true,
+    val updateIntervalHours: Int = 1,
 )
+
+internal typealias AmamiyaConfigOptions = MihomoSubscriptionSettings
 
 internal data class AmamiyaAccount(
     val displayName: String?,
@@ -86,13 +113,89 @@ internal data class AmamiyaAccount(
 )
 
 internal data class AmamiyaSubscription(
-    val proxyUuid: String,
-    val plan: String?,
+    val plan: String,
+    val description: String?,
     val supportedIsps: List<String>,
     val usedBytes: Long?,
     val totalBytes: Long?,
     val expiresAt: String?,
 )
+
+internal data class AmamiyaSubscriptionOptions(
+    val protocols: List<ProtocolOption>,
+    val plans: List<PlanOption>,
+    val isps: List<IspOption>,
+    val ruleSources: List<String>,
+    val finalRoutes: List<String>,
+    val minUpdateHours: Int,
+    val maxUpdateHours: Int,
+    val defaults: MihomoSubscriptionSettings,
+) {
+    data class ProtocolOption(
+        val value: String,
+        val label: String,
+        val supportsDirect: Boolean,
+    )
+
+    data class PlanOption(
+        val name: String,
+        val description: String?,
+        val supportedIsps: List<String>,
+    )
+
+    data class IspOption(val value: String, val label: String)
+
+    fun normalize(settings: MihomoSubscriptionSettings): MihomoSubscriptionSettings {
+        val protocol = settings.protocol.takeIf { candidate -> protocols.any { it.value == candidate } }
+            ?: defaults.protocol
+        val plan = settings.plan.takeIf { candidate -> plans.isEmpty() || plans.any { it.name == candidate } }
+            ?: defaults.plan.takeIf(String::isNotBlank)
+            ?: plans.firstOrNull()?.name.orEmpty()
+        val supportedPlanIsps = plans.firstOrNull { it.name == plan }?.supportedIsps.orEmpty()
+        val isp = settings.isp.takeIf { candidate ->
+            isps.any { it.value == candidate } &&
+                (candidate.isBlank() || supportedPlanIsps.isEmpty() || candidate in supportedPlanIsps)
+        }.orEmpty()
+        val supportsDirect = protocols.firstOrNull { it.value == protocol }?.supportsDirect == true
+        return settings.copy(
+            protocol = protocol,
+            plan = plan,
+            isp = isp,
+            mode = if (supportsDirect && settings.mode == "direct") "direct" else "relay",
+            ruleSource = settings.ruleSource.takeIf(ruleSources::contains) ?: defaults.ruleSource,
+            finalRoute = settings.finalRoute.takeIf(finalRoutes::contains) ?: defaults.finalRoute,
+            updateIntervalHours = settings.updateIntervalHours.coerceIn(minUpdateHours, maxUpdateHours),
+        )
+    }
+
+    companion object {
+        fun fallback(account: AmamiyaAccount? = null): AmamiyaSubscriptionOptions {
+            val plans = account?.subscriptions.orEmpty().map {
+                PlanOption(it.plan, it.description, it.supportedIsps)
+            }
+            return AmamiyaSubscriptionOptions(
+                protocols = listOf(
+                    ProtocolOption("vmess", "VMess", false),
+                    ProtocolOption("anytls", "AnyTLS", true),
+                    ProtocolOption("hysteria2", "Hysteria 2", true),
+                ),
+                plans = plans,
+                isps = listOf(
+                    IspOption("", "Default"),
+                    IspOption("ct", "China Telecom"),
+                    IspOption("cu", "China Unicom"),
+                    IspOption("cm", "China Mobile"),
+                    IspOption("other", "Other"),
+                ),
+                ruleSources = listOf("origin", "mirror"),
+                finalRoutes = listOf("proxy", "direct"),
+                minUpdateHours = 1,
+                maxUpdateHours = 720,
+                defaults = MihomoSubscriptionSettings(plan = plans.firstOrNull()?.name.orEmpty()),
+            )
+        }
+    }
+}
 
 internal sealed interface AmamiyaAuthState {
     data object Checking : AmamiyaAuthState
@@ -103,197 +206,73 @@ internal sealed interface AmamiyaAuthState {
 
 class AmamiyaAccountClient(context: Context) {
     private val json = Json { ignoreUnknownKeys = true }
-    private val httpClient = OkHttpClient()
-    private val tokenStore = AmamiyaKeystoreTokenStore(context.applicationContext, json)
-    private val refreshMutex = Mutex()
-    private val secureRandom = SecureRandom()
+    private val session = KokoroSession(context)
 
-    internal fun beginLogin(): String {
-        val stateBytes = ByteArray(32).also(secureRandom::nextBytes)
-        val state = Base64.encodeToString(stateBytes, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-        tokenStore.update { it.copy(pendingState = state, pendingStateCreatedAt = System.currentTimeMillis()) }
-        return AmamiyaApi.loginUrl(state)
-    }
+    internal fun beginLogin(): String = session.beginLogin()
 
-    internal suspend fun handleOAuthCallback(uri: Uri) = withContext(Dispatchers.IO) {
-        require(uri.scheme == "kokoro" && uri.host == "oauth" && uri.path == "/callback") {
-            "Invalid OAuth callback"
-        }
-        val stored = tokenStore.load()
-        val expectedState = stored.pendingState ?: throw IOException("Missing OAuth state")
-        val receivedState = uri.getQueryParameter("state") ?: ""
-        val validState = MessageDigest.isEqual(
-            expectedState.toByteArray(Charsets.UTF_8),
-            receivedState.toByteArray(Charsets.UTF_8),
-        )
-        val stateFresh = System.currentTimeMillis() - stored.pendingStateCreatedAt <= OAUTH_STATE_MAX_AGE_MS
-        tokenStore.update { it.copy(pendingState = null, pendingStateCreatedAt = 0L) }
-        if (!validState || !stateFresh) throw IOException("OAuth state validation failed")
-        uri.getQueryParameter("error")?.let { throw IOException("OAuth authorization was cancelled") }
-        val code = uri.getQueryParameter("code")?.takeIf(String::isNotBlank)
-            ?: throw IOException("Missing authorization code")
-
-        val response = requestToken(
-            TokenRequest(
-                grantType = "authorization_code",
-                code = code,
-                redirectUri = AmamiyaApi.APP_REDIRECT_URI,
-            ),
-        )
-        tokenStore.replaceTokens(response.toStoredCredentials())
-    }
+    internal suspend fun handleOAuthCallback(uri: Uri) = session.handleOAuthCallback(uri)
 
     internal suspend fun getAccount(): AmamiyaAccount? = withContext(Dispatchers.IO) {
-        val initialToken = validAccessToken() ?: return@withContext null
-        val first = executeMe(initialToken)
-        val response = if (first.code == 401) {
-            first.close()
-            val refreshed = validAccessToken(rejectedAccessToken = initialToken, forceRefresh = true)
-                ?: return@withContext null
-            executeMe(refreshed)
-        } else {
-            first
-        }
-
-        response.use {
-            when (it.code) {
+        val request = Request.Builder()
+            .url(AmamiyaApi.ME_URL)
+            .header("Accept", "application/json")
+            .build()
+        session.executeAuthorized(request).use { response ->
+            when (response.code) {
                 401, 403 -> {
-                    tokenStore.clearTokens()
+                    session.clearTokens()
                     null
                 }
 
-                in 200..299 -> parseAccount(it.body.string())
-                else -> throw IOException("amamiyakoko.ro returned HTTP ${it.code}")
+                in 200..299 -> parseAccount(response.body.string())
+                else -> throw IOException("amamiyakoko.ro returned HTTP ${response.code}")
             }
         }
     }
 
-    internal suspend fun revoke() = withContext(Dispatchers.IO) {
-        val accessToken = tokenStore.load().accessToken
-        try {
-            if (!accessToken.isNullOrBlank()) {
-                val request = Request.Builder()
-                    .url(AmamiyaApi.REVOKE_URL)
-                    .header("Authorization", "Bearer $accessToken")
-                    .post(ByteArray(0).toRequestBody(null))
-                    .build()
-                runCatching { httpClient.newCall(request).execute().close() }
-            }
-        } finally {
-            tokenStore.clearTokens()
-        }
-    }
-
-    private fun executeMe(accessToken: String) = httpClient.newCall(
-        Request.Builder()
-            .url(AmamiyaApi.ME_URL)
-            .header("Accept", "application/json")
-            .header("Authorization", "Bearer $accessToken")
-            .build(),
-    ).execute()
-
-    private suspend fun validAccessToken(
-        rejectedAccessToken: String? = null,
-        forceRefresh: Boolean = false,
-    ): String? = refreshMutex.withLock {
-        val current = tokenStore.load()
-        if (rejectedAccessToken != null && current.accessToken != rejectedAccessToken) {
-            return@withLock current.accessToken
-        }
-        val stillValid = current.accessToken != null &&
-            current.accessTokenExpiresAt > System.currentTimeMillis() + ACCESS_TOKEN_REFRESH_MARGIN_MS
-        if (!forceRefresh && stillValid) return@withLock current.accessToken
-        val refreshToken = current.refreshToken ?: return@withLock current.accessToken?.takeIf { stillValid }
-        if (current.refreshTokenExpiresAt <= System.currentTimeMillis()) {
-            tokenStore.clearTokens()
-            return@withLock null
-        }
-
-        try {
-            val response = requestToken(TokenRequest(grantType = "refresh_token", refreshToken = refreshToken))
-            val replacement = response.toStoredCredentials()
-            tokenStore.replaceTokens(replacement)
-            replacement.accessToken
-        } catch (e: Exception) {
-            tokenStore.clearTokens()
-            throw e
-        }
-    }
-
-    private fun requestToken(payload: TokenRequest): TokenResponse {
+    internal suspend fun getSubscriptionOptions(
+        account: AmamiyaAccount? = null,
+    ): AmamiyaSubscriptionOptions = withContext(Dispatchers.IO) {
         val request = Request.Builder()
-            .url(AmamiyaApi.TOKEN_URL)
+            .url(AmamiyaApi.OPTIONS_URL)
             .header("Accept", "application/json")
-            .post(json.encodeToString(payload).toRequestBody(JSON_MEDIA_TYPE))
             .build()
-        httpClient.newCall(request).execute().use { response ->
+        session.executeAuthorized(request).use { response ->
             if (response.code !in 200..299) {
-                throw IOException("Token exchange failed with HTTP ${response.code}")
+                throw IOException("Subscription options returned HTTP ${response.code}")
             }
-            return json.decodeFromString(response.body.string())
+            val payload = json.decodeFromString<OptionsResponse>(response.body.string())
+            require(payload.format.equals("mihomo", ignoreCase = true)) { "Unsupported subscription format" }
+            payload.toUiOptions(account)
         }
     }
 
-    private fun TokenResponse.toStoredCredentials(): StoredAuthData {
-        val now = System.currentTimeMillis()
-        return StoredAuthData(
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-            accessTokenExpiresAt = now + expiresIn.coerceAtLeast(1) * 1_000L,
-            refreshTokenExpiresAt = now + refreshExpiresIn.coerceAtLeast(1) * 1_000L,
-        )
-    }
+    internal suspend fun revoke() = session.revoke()
 
     private fun parseAccount(rawJson: String): AmamiyaAccount {
         val response = json.decodeFromString<MeResponse>(rawJson)
-        val uuid = response.proxyUuid?.takeIf(String::isNotBlank)
         val detailByPlan = response.planDetails.associateBy(PlanDetails::name)
-        val plans = response.plans.ifEmpty { listOfNotNull(response.planDetails.firstOrNull()?.name) }
-        val selectablePlans: List<String?> = if (plans.isEmpty()) listOf(null) else plans
-        val subscriptions = if (uuid == null) {
-            emptyList()
-        } else {
-            selectablePlans.map { plan ->
+        val plans = response.plans.ifEmpty { response.planDetails.map(PlanDetails::name) }
+        return AmamiyaAccount(
+            displayName = response.username,
+            subscriptions = plans.distinct().map { plan ->
+                val detail = detailByPlan[plan]
                 AmamiyaSubscription(
-                    proxyUuid = uuid,
                     plan = plan,
-                    supportedIsps = plan?.let { detailByPlan[it]?.supportedIsps }.orEmpty(),
+                    description = detail?.description,
+                    supportedIsps = detail?.supportedIsps.orEmpty(),
                     usedBytes = response.trafficUsage,
                     totalBytes = response.bandwidthLimit,
                     expiresAt = response.subscriptionExpiresAt,
                 )
-            }
-        }
-        return AmamiyaAccount(response.username, subscriptions)
-    }
-
-    private companion object {
-        val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
-        const val ACCESS_TOKEN_REFRESH_MARGIN_MS = 60_000L
-        const val OAUTH_STATE_MAX_AGE_MS = 10 * 60_000L
+            },
+        )
     }
 }
 
 @Serializable
-private data class TokenRequest(
-    @SerialName("grant_type") val grantType: String,
-    val code: String? = null,
-    @SerialName("redirect_uri") val redirectUri: String? = null,
-    @SerialName("refresh_token") val refreshToken: String? = null,
-)
-
-@Serializable
-private data class TokenResponse(
-    @SerialName("access_token") val accessToken: String,
-    @SerialName("expires_in") val expiresIn: Long,
-    @SerialName("refresh_token") val refreshToken: String,
-    @SerialName("refresh_expires_in") val refreshExpiresIn: Long,
-)
-
-@Serializable
 private data class MeResponse(
     val username: String? = null,
-    @SerialName("proxy_uuid") val proxyUuid: String? = null,
     val plans: List<String> = emptyList(),
     @SerialName("plans_details") val planDetails: List<PlanDetails> = emptyList(),
     @SerialName("traffic_usage") val trafficUsage: Long? = null,
@@ -304,86 +283,87 @@ private data class MeResponse(
 @Serializable
 private data class PlanDetails(
     val name: String,
+    val description: String? = null,
     @SerialName("supported_isps") val supportedIsps: List<String> = emptyList(),
 )
 
 @Serializable
-private data class StoredAuthData(
-    val accessToken: String? = null,
-    val refreshToken: String? = null,
-    val accessTokenExpiresAt: Long = 0L,
-    val refreshTokenExpiresAt: Long = 0L,
-    val pendingState: String? = null,
-    val pendingStateCreatedAt: Long = 0L,
-)
-
-private class AmamiyaKeystoreTokenStore(context: Context, private val json: Json) {
-    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
-
-    @Synchronized
-    fun load(): StoredAuthData {
-        val encoded = preferences.getString(ENCRYPTED_DATA_KEY, null) ?: return StoredAuthData()
-        return runCatching {
-            val combined = Base64.decode(encoded, Base64.NO_WRAP)
-            require(combined.size > IV_LENGTH_BYTES)
-            val iv = combined.copyOfRange(0, IV_LENGTH_BYTES)
-            val ciphertext = combined.copyOfRange(IV_LENGTH_BYTES, combined.size)
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.DECRYPT_MODE, getOrCreateKey(), GCMParameterSpec(128, iv))
-            json.decodeFromString<StoredAuthData>(cipher.doFinal(ciphertext).toString(Charsets.UTF_8))
-        }.getOrElse {
-            preferences.edit().remove(ENCRYPTED_DATA_KEY).commit()
-            StoredAuthData()
-        }
-    }
-
-    @Synchronized
-    fun update(transform: (StoredAuthData) -> StoredAuthData) = save(transform(load()))
-
-    @Synchronized
-    fun replaceTokens(replacement: StoredAuthData) {
-        val current = load()
-        save(replacement.copy(pendingState = current.pendingState, pendingStateCreatedAt = current.pendingStateCreatedAt))
-    }
-
-    @Synchronized
-    fun clearTokens() {
-        val current = load()
-        save(StoredAuthData(pendingState = current.pendingState, pendingStateCreatedAt = current.pendingStateCreatedAt))
-    }
-
-    private fun save(value: StoredAuthData) {
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.ENCRYPT_MODE, getOrCreateKey())
-        val ciphertext = cipher.doFinal(json.encodeToString(value).toByteArray(Charsets.UTF_8))
-        val encoded = Base64.encodeToString(cipher.iv + ciphertext, Base64.NO_WRAP)
-        check(preferences.edit().putString(ENCRYPTED_DATA_KEY, encoded).commit()) {
-            "Unable to persist encrypted credentials"
-        }
-    }
-
-    private fun getOrCreateKey(): SecretKey {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        (keyStore.getKey(KEY_ALIAS, null) as? SecretKey)?.let { return it }
-        val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        generator.init(
-            KeyGenParameterSpec.Builder(
-                KEY_ALIAS,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
-            )
-                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setRandomizedEncryptionRequired(true)
-                .build(),
+private data class OptionsResponse(
+    val format: String,
+    val protocols: List<ProtocolOptionResponse> = emptyList(),
+    val plans: List<PlanOptionResponse> = emptyList(),
+    val isps: List<IspOptionResponse> = emptyList(),
+    @SerialName("rule_sources") val ruleSources: List<String> = emptyList(),
+    @SerialName("final_routes") val finalRoutes: List<String> = emptyList(),
+    @SerialName("update_interval") val updateInterval: UpdateIntervalResponse = UpdateIntervalResponse(),
+    val defaults: DefaultsResponse = DefaultsResponse(),
+) {
+    fun toUiOptions(account: AmamiyaAccount? = null): AmamiyaSubscriptionOptions {
+        val fallback = AmamiyaSubscriptionOptions.fallback(account)
+        val resolvedProtocols = protocols.map {
+            AmamiyaSubscriptionOptions.ProtocolOption(it.value, it.label, it.supportsDirect)
+        }.ifEmpty { fallback.protocols }
+        val resolvedPlans = plans.map {
+            AmamiyaSubscriptionOptions.PlanOption(it.name, it.description, it.supportedIsps)
+        }.ifEmpty { fallback.plans }
+        val resolvedIsps = isps.map {
+            AmamiyaSubscriptionOptions.IspOption(it.value, it.label)
+        }.ifEmpty { fallback.isps }
+        val minHours = updateInterval.minHours.coerceAtLeast(1)
+        val maxHours = updateInterval.maxHours.coerceAtLeast(minHours)
+        return AmamiyaSubscriptionOptions(
+            protocols = resolvedProtocols,
+            plans = resolvedPlans,
+            isps = resolvedIsps,
+            ruleSources = ruleSources.ifEmpty { fallback.ruleSources },
+            finalRoutes = finalRoutes.ifEmpty { fallback.finalRoutes },
+            minUpdateHours = minHours,
+            maxUpdateHours = maxHours,
+            defaults = MihomoSubscriptionSettings(
+                protocol = defaults.protocol,
+                plan = resolvedPlans.firstOrNull()?.name.orEmpty(),
+                mode = defaults.mode,
+                ruleSource = defaults.ruleSource,
+                finalRoute = defaults.finalRoute,
+                ruleProviderAutoUpdate = defaults.ruleProviderAutoUpdate,
+                subscriptionAutoUpdate = defaults.subscriptionAutoUpdate,
+                updateIntervalHours = defaults.updateIntervalHours.coerceIn(minHours, maxHours),
+            ),
         )
-        return generator.generateKey()
-    }
-
-    private companion object {
-        const val PREFERENCES_NAME = "amamiya_keystore_credentials"
-        const val ENCRYPTED_DATA_KEY = "encrypted_auth_data"
-        const val KEY_ALIAS = "yumebox_amamiya_oauth_aes"
-        const val TRANSFORMATION = "AES/GCM/NoPadding"
-        const val IV_LENGTH_BYTES = 12
     }
 }
+
+@Serializable
+private data class ProtocolOptionResponse(
+    val value: String,
+    val label: String,
+    @SerialName("supports_direct") val supportsDirect: Boolean = false,
+)
+
+@Serializable
+private data class PlanOptionResponse(
+    val name: String,
+    val description: String? = null,
+    @SerialName("supported_isps") val supportedIsps: List<String> = emptyList(),
+)
+
+@Serializable
+private data class IspOptionResponse(val value: String, val label: String)
+
+@Serializable
+private data class UpdateIntervalResponse(
+    @SerialName("min_hours") val minHours: Int = 1,
+    @SerialName("max_hours") val maxHours: Int = 720,
+    @SerialName("default_hours") val defaultHours: Int = 1,
+)
+
+@Serializable
+private data class DefaultsResponse(
+    val protocol: String = "vmess",
+    val mode: String = "relay",
+    @SerialName("rule_source") val ruleSource: String = "origin",
+    @SerialName("final_route") val finalRoute: String = "proxy",
+    @SerialName("rule_provider_auto_update") val ruleProviderAutoUpdate: Boolean = true,
+    @SerialName("subscription_auto_update") val subscriptionAutoUpdate: Boolean = true,
+    @SerialName("update_interval_hours") val updateIntervalHours: Int = 1,
+)

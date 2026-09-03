@@ -99,14 +99,12 @@ internal fun AddProfileSheet(
     var fileName by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
     var isDownloading by remember { mutableStateOf(false) }
-    var selectedAmamiyaSubscriptionIndex by remember { mutableIntStateOf(0) }
     var amamiyaOptions by remember { mutableStateOf(AmamiyaConfigOptions()) }
-    var amamiyaUpdateModeIndex by remember { mutableIntStateOf(0) }
-    var amamiyaCustomUpdateHours by remember { mutableStateOf("1") }
 
     val downloadProgress by profilesViewModel.downloadProgress.collectAsState()
     val uiState by profilesViewModel.uiState.collectAsState()
     val amamiyaAuthState by profilesViewModel.amamiyaAuthState.collectAsState()
+    val amamiyaSubscriptionOptions by profilesViewModel.amamiyaSubscriptionOptions.collectAsState()
     var hasShownCompleteAnimation by remember { mutableStateOf(false) }
     var stableSheetHeightPx by remember { mutableIntStateOf(0) }
 
@@ -152,10 +150,7 @@ internal fun AddProfileSheet(
         fileName = ""
         error = ""
         isDownloading = false
-        selectedAmamiyaSubscriptionIndex = 0
         amamiyaOptions = AmamiyaConfigOptions()
-        amamiyaUpdateModeIndex = 0
-        amamiyaCustomUpdateHours = "1"
         hasShownCompleteAnimation = false
     }
 
@@ -202,12 +197,16 @@ internal fun AddProfileSheet(
         }
     }
 
-    LaunchedEffect(amamiyaAuthState) {
+    LaunchedEffect(amamiyaAuthState, amamiyaSubscriptionOptions) {
         val authenticated = amamiyaAuthState as? AmamiyaAuthState.Authenticated
         if (authenticated != null) {
-            selectedAmamiyaSubscriptionIndex = selectedAmamiyaSubscriptionIndex.coerceIn(
-                0,
-                (authenticated.account.subscriptions.size - 1).coerceAtLeast(0),
+            val effectiveOptions = if (amamiyaSubscriptionOptions.plans.isEmpty()) {
+                AmamiyaSubscriptionOptions.fallback(authenticated.account)
+            } else {
+                amamiyaSubscriptionOptions
+            }
+            amamiyaOptions = effectiveOptions.normalize(
+                if (amamiyaOptions.plan.isBlank()) effectiveOptions.defaults else amamiyaOptions,
             )
         }
     }
@@ -350,29 +349,16 @@ internal fun AddProfileSheet(
             error = MLang.ProfilesPage.Validation.SelectFile
             return
         }
-        val amamiyaSubscription = (amamiyaAuthState as? AmamiyaAuthState.Authenticated)
-            ?.account
-            ?.subscriptions
-            ?.getOrNull(selectedAmamiyaSubscriptionIndex)
-        if (selectedTypeIndex == 3 && amamiyaSubscription == null) {
+        val amamiyaAccount = (amamiyaAuthState as? AmamiyaAuthState.Authenticated)?.account
+        val effectiveAmamiyaOptions = if (amamiyaSubscriptionOptions.plans.isEmpty()) {
+            AmamiyaSubscriptionOptions.fallback(amamiyaAccount)
+        } else {
+            amamiyaSubscriptionOptions
+        }
+        val normalizedAmamiyaSettings = effectiveAmamiyaOptions.normalize(amamiyaOptions)
+        if (selectedTypeIndex == 3 && (amamiyaAccount == null || normalizedAmamiyaSettings.plan.isBlank())) {
             error = MLang.ProfilesPage.Amamiya.LoginRequired
             return
-        }
-        val amamiyaUpdate = if (selectedTypeIndex == 3) {
-            when (amamiyaUpdateModeIndex) {
-                1 -> "off"
-                2 -> amamiyaCustomUpdateHours.toLongOrNull()
-                    ?.takeIf { it > 0 }
-                    ?.toString()
-                    ?: run {
-                        error = MLang.ProfilesPage.Amamiya.InvalidUpdateHours
-                        return
-                    }
-
-                else -> "on"
-            }
-        } else {
-            "on"
         }
 
         keyboardController?.hide()
@@ -397,15 +383,11 @@ internal fun AddProfileSheet(
                     null
                 )
             }
-        } else if (selectedTypeIndex == 3 && amamiyaSubscription != null) {
-            val source = AmamiyaApi.buildConfigUrl(
-                proxyUuid = amamiyaSubscription.proxyUuid,
-                plan = amamiyaSubscription.plan,
-                options = amamiyaOptions.copy(update = amamiyaUpdate),
-            )
+        } else if (selectedTypeIndex == 3 && amamiyaAccount != null) {
+            val source = AmamiyaApi.buildConfigUrl(normalizedAmamiyaSettings)
             val defaultName = buildString {
                 append(MLang.ProfilesPage.Amamiya.DefaultProfileName)
-                amamiyaSubscription.plan?.takeIf(String::isNotBlank)?.let {
+                normalizedAmamiyaSettings.plan.takeIf(String::isNotBlank)?.let {
                     append(" · ")
                     append(it)
                 }
@@ -414,7 +396,7 @@ internal fun AddProfileSheet(
                 name.ifBlank { defaultName },
                 source,
                 Profile.Type.Url,
-                0L,
+                AmamiyaApi.intervalMillis(normalizedAmamiyaSettings),
                 null,
             )
         } else {
@@ -526,20 +508,9 @@ internal fun AddProfileSheet(
                             selectedTypeIndex = 0
                         },
                         amamiyaAuthState = amamiyaAuthState,
-                        selectedAmamiyaSubscriptionIndex = selectedAmamiyaSubscriptionIndex,
                         amamiyaOptions = amamiyaOptions,
-                        amamiyaUpdateModeIndex = amamiyaUpdateModeIndex,
-                        amamiyaCustomUpdateHours = amamiyaCustomUpdateHours,
-                        onAmamiyaSubscriptionSelected = {
-                            selectedAmamiyaSubscriptionIndex = it
-                            error = ""
-                        },
+                        amamiyaSubscriptionOptions = amamiyaSubscriptionOptions,
                         onAmamiyaOptionsChange = { amamiyaOptions = it },
-                        onAmamiyaUpdateModeChange = { amamiyaUpdateModeIndex = it },
-                        onAmamiyaCustomUpdateHoursChange = {
-                            amamiyaCustomUpdateHours = it
-                            error = ""
-                        },
                         onAmamiyaLogin = {
                             runCatching {
                                 val loginUrl = profilesViewModel.beginAmamiyaLogin()
@@ -645,14 +616,9 @@ private fun ProfileFormContent(
     onSelectQrImage: () -> Unit,
     onQrScanned: (String) -> Unit,
     amamiyaAuthState: AmamiyaAuthState,
-    selectedAmamiyaSubscriptionIndex: Int,
     amamiyaOptions: AmamiyaConfigOptions,
-    amamiyaUpdateModeIndex: Int,
-    amamiyaCustomUpdateHours: String,
-    onAmamiyaSubscriptionSelected: (Int) -> Unit,
+    amamiyaSubscriptionOptions: AmamiyaSubscriptionOptions,
     onAmamiyaOptionsChange: (AmamiyaConfigOptions) -> Unit,
-    onAmamiyaUpdateModeChange: (Int) -> Unit,
-    onAmamiyaCustomUpdateHoursChange: (String) -> Unit,
     onAmamiyaLogin: () -> Unit,
     onAmamiyaLogout: () -> Unit,
     onAmamiyaRetry: () -> Unit,
@@ -685,16 +651,11 @@ private fun ProfileFormContent(
                 3 -> AmamiyaProfileContent(
                     authState = amamiyaAuthState,
                     name = name,
-                    selectedSubscriptionIndex = selectedAmamiyaSubscriptionIndex,
-                    options = amamiyaOptions,
-                    updateModeIndex = amamiyaUpdateModeIndex,
-                    customUpdateHours = amamiyaCustomUpdateHours,
+                    settings = amamiyaOptions,
+                    availableOptions = amamiyaSubscriptionOptions,
                     error = error,
                     onNameChange = onNameChange,
-                    onSubscriptionSelected = onAmamiyaSubscriptionSelected,
-                    onOptionsChange = onAmamiyaOptionsChange,
-                    onUpdateModeChange = onAmamiyaUpdateModeChange,
-                    onCustomUpdateHoursChange = onAmamiyaCustomUpdateHoursChange,
+                    onSettingsChange = onAmamiyaOptionsChange,
                     onLogin = onAmamiyaLogin,
                     onLogout = onAmamiyaLogout,
                     onRetry = onAmamiyaRetry,

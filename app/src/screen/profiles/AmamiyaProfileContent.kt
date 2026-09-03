@@ -10,12 +10,14 @@
 package com.github.yumelira.yumebox.screen.profiles
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -30,8 +32,10 @@ import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.common.util.ByteFormatter
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
+import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
+import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
@@ -39,16 +43,11 @@ import dev.oom_wg.purejoy.mlang.MLang
 internal fun AmamiyaProfileContent(
     authState: AmamiyaAuthState,
     name: String,
-    selectedSubscriptionIndex: Int,
-    options: AmamiyaConfigOptions,
-    updateModeIndex: Int,
-    customUpdateHours: String,
+    settings: MihomoSubscriptionSettings,
+    availableOptions: AmamiyaSubscriptionOptions,
     error: String,
     onNameChange: (String) -> Unit,
-    onSubscriptionSelected: (Int) -> Unit,
-    onOptionsChange: (AmamiyaConfigOptions) -> Unit,
-    onUpdateModeChange: (Int) -> Unit,
-    onCustomUpdateHoursChange: (String) -> Unit,
+    onSettingsChange: (MihomoSubscriptionSettings) -> Unit,
     onLogin: () -> Unit,
     onLogout: () -> Unit,
     onRetry: () -> Unit,
@@ -56,9 +55,14 @@ internal fun AmamiyaProfileContent(
     var showOptions by remember { mutableStateOf(false) }
     val authenticated = authState as? AmamiyaAuthState.Authenticated
     val subscriptions = authenticated?.account?.subscriptions.orEmpty()
-    val selectedSubscription = subscriptions.getOrNull(
-        selectedSubscriptionIndex.coerceIn(0, (subscriptions.size - 1).coerceAtLeast(0)),
-    )
+    val effectiveOptions = if (availableOptions.plans.isEmpty()) {
+        AmamiyaSubscriptionOptions.fallback(authenticated?.account)
+    } else {
+        availableOptions
+    }
+    val normalizedSettings = effectiveOptions.normalize(settings)
+    val selectedSubscription = subscriptions.firstOrNull { it.plan == normalizedSettings.plan }
+        ?: subscriptions.firstOrNull()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -131,21 +135,6 @@ internal fun AmamiyaProfileContent(
         }
 
         if (authenticated != null && subscriptions.isNotEmpty()) {
-            if (subscriptions.size > 1) {
-                Card {
-                    YumeMd3DropdownPreference(
-                        title = MLang.ProfilesPage.Amamiya.Subscription,
-                        items = subscriptions.mapIndexed { index, subscription ->
-                            subscription.plan?.takeIf(String::isNotBlank)
-                                ?: MLang.ProfilesPage.Amamiya.SubscriptionNumber.format(index + 1)
-                        },
-                        selectedIndex = selectedSubscriptionIndex,
-                        onSelectedIndexChange = onSubscriptionSelected,
-                        showDivider = false,
-                    )
-                }
-            }
-
             selectedSubscription?.let { subscription ->
                 Card {
                     Column(
@@ -154,7 +143,7 @@ internal fun AmamiyaProfileContent(
                             .padding(UiDp.dp16),
                         verticalArrangement = Arrangement.spacedBy(UiDp.dp6),
                     ) {
-                        SubscriptionLine(MLang.ProfilesPage.Amamiya.Plan, subscription.plan.orEmpty())
+                        SubscriptionLine(MLang.ProfilesPage.Amamiya.Plan, subscription.plan)
                         SubscriptionLine(
                             MLang.ProfilesPage.Amamiya.Isp,
                             subscription.supportedIsps.joinToString(", "),
@@ -191,127 +180,11 @@ internal fun AmamiyaProfileContent(
             }
 
             AnimatedVisibility(visible = showOptions) {
-                Column(verticalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
-                    Card {
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.Protocol,
-                            items = listOf("VMess", "AnyTLS", "Hysteria 2"),
-                            selectedIndex = listOf("vmess", "anytls", "hysteria2")
-                                .indexOf(options.protocol).coerceAtLeast(0),
-                            onSelectedIndexChange = { index ->
-                                val protocol = listOf("vmess", "anytls", "hysteria2")[index]
-                                onOptionsChange(
-                                    options.copy(
-                                        protocol = protocol,
-                                        mode = if (protocol == "vmess") "relay" else options.mode,
-                                    ),
-                                )
-                            },
-                            showDivider = true,
-                        )
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.Isp,
-                            items = listOf(
-                                MLang.ProfilesPage.Amamiya.IspAuto,
-                                MLang.ProfilesPage.Amamiya.IspCt,
-                                MLang.ProfilesPage.Amamiya.IspCu,
-                                MLang.ProfilesPage.Amamiya.IspCm,
-                                MLang.ProfilesPage.Amamiya.IspOther,
-                            ),
-                            selectedIndex = listOf(null, "ct", "cu", "cm", "other").indexOf(options.isp)
-                                .coerceAtLeast(0),
-                            onSelectedIndexChange = { index ->
-                                onOptionsChange(options.copy(isp = listOf(null, "ct", "cu", "cm", "other")[index]))
-                            },
-                            showDivider = true,
-                        )
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.Mode,
-                            items = listOf(
-                                MLang.ProfilesPage.Amamiya.Relay,
-                                MLang.ProfilesPage.Amamiya.Direct,
-                            ),
-                            selectedIndex = if (options.mode == "direct") 1 else 0,
-                            onSelectedIndexChange = { index ->
-                                onOptionsChange(options.copy(mode = if (index == 1) "direct" else "relay"))
-                            },
-                            enabled = options.protocol != "vmess",
-                            summary = if (options.protocol == "vmess") {
-                                MLang.ProfilesPage.Amamiya.VmessRelayOnly
-                            } else {
-                                null
-                            },
-                            showDivider = false,
-                        )
-                    }
-
-                    Card {
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.RuleSource,
-                            items = listOf(
-                                MLang.ProfilesPage.Amamiya.Origin,
-                                MLang.ProfilesPage.Amamiya.Mirror,
-                            ),
-                            selectedIndex = if (options.rule == "mirror") 1 else 0,
-                            onSelectedIndexChange = { index ->
-                                onOptionsChange(options.copy(rule = if (index == 1) "mirror" else "origin"))
-                            },
-                            showDivider = true,
-                        )
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.Fallback,
-                            items = listOf(
-                                MLang.ProfilesPage.Amamiya.KeepFallback,
-                                MLang.ProfilesPage.Amamiya.Direct,
-                            ),
-                            selectedIndex = if (options.match == "direct") 1 else 0,
-                            onSelectedIndexChange = { index ->
-                                onOptionsChange(options.copy(match = if (index == 1) "direct" else "none"))
-                            },
-                            showDivider = true,
-                        )
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.RuleUpdate,
-                            items = listOf(
-                                MLang.ProfilesPage.Amamiya.Enabled,
-                                MLang.ProfilesPage.Amamiya.Disabled,
-                            ),
-                            selectedIndex = if (options.ruleUpdate == "disable") 1 else 0,
-                            onSelectedIndexChange = { index ->
-                                onOptionsChange(options.copy(ruleUpdate = if (index == 1) "disable" else "enable"))
-                            },
-                            showDivider = false,
-                        )
-                    }
-
-                    Card {
-                        YumeMd3DropdownPreference(
-                            title = MLang.ProfilesPage.Amamiya.ProfileUpdate,
-                            items = listOf(
-                                MLang.ProfilesPage.Amamiya.UpdateOn,
-                                MLang.ProfilesPage.Amamiya.UpdateOff,
-                                MLang.ProfilesPage.Amamiya.UpdateCustom,
-                            ),
-                            selectedIndex = updateModeIndex.coerceIn(0, 2),
-                            onSelectedIndexChange = onUpdateModeChange,
-                            showDivider = updateModeIndex == 2,
-                        )
-                        if (updateModeIndex == 2) {
-                            YumeMd3OutlinedTextField(
-                                value = customUpdateHours,
-                                onValueChange = { value ->
-                                    if (value.all(Char::isDigit) && value.length <= 6) {
-                                        onCustomUpdateHoursChange(value)
-                                    }
-                                },
-                                label = MLang.ProfilesPage.Amamiya.UpdateHours,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(UiDp.dp16),
-                            )
-                        }
-                    }
-                }
+                MihomoSubscriptionSettingsContent(
+                    settings = normalizedSettings,
+                    availableOptions = effectiveOptions,
+                    onSettingsChange = onSettingsChange,
+                )
             }
         }
 
@@ -323,6 +196,184 @@ internal fun AmamiyaProfileContent(
             )
         }
     }
+}
+
+@Composable
+internal fun MihomoSubscriptionSettingsContent(
+    settings: MihomoSubscriptionSettings,
+    availableOptions: AmamiyaSubscriptionOptions,
+    onSettingsChange: (MihomoSubscriptionSettings) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = AppTheme.spacing
+    val opacity = AppTheme.opacity
+    val sizes = AppTheme.sizes
+    val normalized = availableOptions.normalize(settings)
+    val protocol = availableOptions.protocols.firstOrNull { it.value == normalized.protocol }
+    val supportsDirect = protocol?.supportsDirect == true
+    val plan = availableOptions.plans.firstOrNull { it.name == normalized.plan }
+    val selectableIsps = availableOptions.isps.filter {
+        it.value.isBlank() || plan?.supportedIsps.isNullOrEmpty() || it.value in plan.supportedIsps
+    }.ifEmpty { availableOptions.isps }
+    var updateHoursText by remember(normalized.updateIntervalHours) {
+        mutableStateOf(normalized.updateIntervalHours.toString())
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        verticalArrangement = Arrangement.spacedBy(spacing.space12),
+    ) {
+        Card {
+            Column {
+                YumeMd3DropdownPreference(
+                    title = MLang.ProfilesPage.Amamiya.Protocol,
+                    items = availableOptions.protocols.map { it.label },
+                    selectedIndex = availableOptions.protocols.indexOfFirst { it.value == normalized.protocol }
+                        .coerceAtLeast(0),
+                    onSelectedIndexChange = { index ->
+                        val selected = availableOptions.protocols[index]
+                        onSettingsChange(
+                            availableOptions.normalize(
+                                normalized.copy(
+                                    protocol = selected.value,
+                                    mode = if (selected.supportsDirect) normalized.mode else "relay",
+                                ),
+                            ),
+                        )
+                    },
+                    showDivider = true,
+                )
+                YumeMd3DropdownPreference(
+                    title = MLang.ProfilesPage.Amamiya.Plan,
+                    items = availableOptions.plans.map { it.name },
+                    selectedIndex = availableOptions.plans.indexOfFirst { it.name == normalized.plan }
+                        .coerceAtLeast(0),
+                    onSelectedIndexChange = { index ->
+                        onSettingsChange(
+                            availableOptions.normalize(normalized.copy(plan = availableOptions.plans[index].name)),
+                        )
+                    },
+                    enabled = availableOptions.plans.isNotEmpty(),
+                    showDivider = true,
+                )
+                YumeMd3DropdownPreference(
+                    title = MLang.ProfilesPage.Amamiya.Isp,
+                    items = selectableIsps.map { localizedIspLabel(it) },
+                    selectedIndex = selectableIsps.indexOfFirst { it.value == normalized.isp }.coerceAtLeast(0),
+                    onSelectedIndexChange = { index ->
+                        onSettingsChange(normalized.copy(isp = selectableIsps[index].value))
+                    },
+                    showDivider = supportsDirect,
+                )
+                AnimatedVisibility(visible = supportsDirect) {
+                    YumeMd3DropdownPreference(
+                        title = MLang.ProfilesPage.Amamiya.Mode,
+                        items = listOf(
+                            MLang.ProfilesPage.Amamiya.Relay,
+                            MLang.ProfilesPage.Amamiya.Direct,
+                        ),
+                        selectedIndex = if (normalized.mode == "direct") 1 else 0,
+                        onSelectedIndexChange = { index ->
+                            onSettingsChange(normalized.copy(mode = if (index == 1) "direct" else "relay"))
+                        },
+                        showDivider = false,
+                    )
+                }
+            }
+        }
+
+        Card {
+            Column {
+                YumeMd3DropdownPreference(
+                    title = MLang.ProfilesPage.Amamiya.RuleSource,
+                    items = availableOptions.ruleSources.map {
+                        if (it == "mirror") MLang.ProfilesPage.Amamiya.Mirror
+                        else MLang.ProfilesPage.Amamiya.Origin
+                    },
+                    selectedIndex = availableOptions.ruleSources.indexOf(normalized.ruleSource).coerceAtLeast(0),
+                    onSelectedIndexChange = { index ->
+                        onSettingsChange(normalized.copy(ruleSource = availableOptions.ruleSources[index]))
+                    },
+                    showDivider = true,
+                )
+                YumeMd3DropdownPreference(
+                    title = MLang.ProfilesPage.Amamiya.FinalRoute,
+                    items = availableOptions.finalRoutes.map {
+                        if (it == "direct") MLang.ProfilesPage.Amamiya.Direct
+                        else MLang.ProfilesPage.Amamiya.Proxy
+                    },
+                    selectedIndex = availableOptions.finalRoutes.indexOf(normalized.finalRoute).coerceAtLeast(0),
+                    onSelectedIndexChange = { index ->
+                        onSettingsChange(normalized.copy(finalRoute = availableOptions.finalRoutes[index]))
+                    },
+                    showDivider = true,
+                )
+                PreferenceSwitchItem(
+                    title = MLang.ProfilesPage.Amamiya.RuleProviderAutoUpdate,
+                    summary = MLang.ProfilesPage.Amamiya.RuleProviderAutoUpdateSummary,
+                    checked = normalized.ruleProviderAutoUpdate,
+                    onCheckedChange = {
+                        onSettingsChange(normalized.copy(ruleProviderAutoUpdate = it))
+                    },
+                )
+            }
+        }
+
+        Card {
+            Column {
+                PreferenceSwitchItem(
+                    title = MLang.ProfilesPage.Amamiya.SubscriptionAutoUpdate,
+                    summary = MLang.ProfilesPage.Amamiya.SubscriptionAutoUpdateSummary,
+                    checked = normalized.subscriptionAutoUpdate,
+                    onCheckedChange = {
+                        onSettingsChange(normalized.copy(subscriptionAutoUpdate = it))
+                    },
+                )
+                AnimatedVisibility(visible = normalized.subscriptionAutoUpdate) {
+                    Column {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = spacing.space16),
+                            thickness = sizes.thinDividerThickness,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline),
+                        )
+                        YumeMd3OutlinedTextField(
+                            value = updateHoursText,
+                            onValueChange = { value ->
+                                if (value.all(Char::isDigit) && value.length <= 3) {
+                                    updateHoursText = value
+                                    value.toIntOrNull()?.let { hours ->
+                                        if (hours in availableOptions.minUpdateHours..availableOptions.maxUpdateHours) {
+                                            onSettingsChange(normalized.copy(updateIntervalHours = hours))
+                                        }
+                                    }
+                                }
+                            },
+                            label = MLang.ProfilesPage.Amamiya.UpdateHoursRange.format(
+                                availableOptions.minUpdateHours,
+                                availableOptions.maxUpdateHours,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(spacing.space16),
+                            singleLine = true,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun localizedIspLabel(option: AmamiyaSubscriptionOptions.IspOption): String = when (option.value) {
+    "" -> MLang.ProfilesPage.Amamiya.IspAuto
+    "ct" -> MLang.ProfilesPage.Amamiya.IspCt
+    "cu" -> MLang.ProfilesPage.Amamiya.IspCu
+    "cm" -> MLang.ProfilesPage.Amamiya.IspCm
+    "other" -> MLang.ProfilesPage.Amamiya.IspOther
+    else -> option.label
 }
 
 @Composable

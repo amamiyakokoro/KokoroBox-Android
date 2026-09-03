@@ -70,6 +70,7 @@ fun ProfilesPager(
     val homeViewModel = koinViewModel<HomeViewModel>()
     val profiles by profilesViewModel.profiles.collectAsState()
     val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsState()
+    val amamiyaSubscriptionOptions by profilesViewModel.amamiyaSubscriptionOptions.collectAsState()
     val isRunning by homeViewModel.isRunning.collectAsState()
 
     val overrideConfigViewModel = koinViewModel<OverrideConfigViewModel>()
@@ -121,6 +122,9 @@ fun ProfilesPager(
     LaunchedEffect(showSettingsDialog.value) {
         if (showSettingsDialog.value) {
             overrideConfigViewModel.refresh()
+            if (profileToEdit?.source?.let(AmamiyaApi::isManagedConfigUrl) == true) {
+                profilesViewModel.refreshAmamiyaAccount()
+            }
         }
     }
 
@@ -285,6 +289,7 @@ fun ProfilesPager(
             systemPreset = systemPresets.firstOrNull(),
             userConfigs = userConfigs,
             binding = profileBinding,
+            subscriptionOptions = amamiyaSubscriptionOptions,
             onDismiss = {
                 showSettingsDialog.value = false
             },
@@ -292,14 +297,23 @@ fun ProfilesPager(
                 profileToEdit = null
                 profileBinding = null
             },
-            onSaveProfileMeta = { newName, newSource ->
+            onSaveProfileMeta = { newName, newSource, newInterval, refreshConfiguration ->
                 if (newName.isNotBlank() && newSource.isNotBlank()) {
-                    profilesViewModel.patchProfile(
-                        currentProfileToEdit.uuid,
-                        newName,
-                        newSource,
-                        currentProfileToEdit.interval
-                    )
+                    if (refreshConfiguration) {
+                        profilesViewModel.patchAndUpdateProfile(
+                            currentProfileToEdit.uuid,
+                            newName,
+                            newSource,
+                            newInterval,
+                        )
+                    } else {
+                        profilesViewModel.patchProfile(
+                            currentProfileToEdit.uuid,
+                            newName,
+                            newSource,
+                            newInterval,
+                        )
+                    }
                 }
             },
             onSaveOverrideSettings = { systemPresetEnabled, selectedOverrideIds ->

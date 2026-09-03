@@ -23,8 +23,6 @@
 package com.github.yumelira.yumebox.screen.profiles
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
@@ -139,7 +137,7 @@ internal fun ShareOptionsDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(spacing.space12)
             ) {
-                if (profile.type == Profile.Type.Url) {
+                if (profile.type == Profile.Type.Url && !AmamiyaApi.isManagedConfigUrl(profile.source)) {
                     Button(
                         onClick = { onShareLink(profile) },
                         modifier = Modifier.fillMaxWidth(),
@@ -170,9 +168,10 @@ internal fun ProfileSettingsDialog(
     systemPreset: OverrideConfig?,
     userConfigs: List<OverrideConfig>,
     binding: ProfileBinding?,
+    subscriptionOptions: AmamiyaSubscriptionOptions,
     onDismiss: () -> Unit,
     onDismissFinished: () -> Unit,
-    onSaveProfileMeta: (String, String) -> Unit,
+    onSaveProfileMeta: (String, String, Long, Boolean) -> Unit,
     onSaveOverrideSettings: (Boolean, List<String>) -> Unit,
 ) {
     val spacing = AppTheme.spacing
@@ -189,8 +188,12 @@ internal fun ProfileSettingsDialog(
         .filterNot(::isBuiltinPresetOverrideId)
         .filter { it != OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID }
     val appliedOverrideIds = initialOverrideIds
+    val initialSubscriptionSettings = AmamiyaApi.parseConfigSettings(profile.source)
     var editName by remember { mutableStateOf(profile.name) }
     var editSource by remember { mutableStateOf("") }
+    var subscriptionSettings by remember(profile.uuid, profile.source) {
+        mutableStateOf(initialSubscriptionSettings)
+    }
     var systemPresetSelected by remember { mutableStateOf(initialSystemPresetEnabled) }
     var customRoutingSelected by remember { mutableStateOf(initialCustomRoutingEnabled) }
     var pendingSelectedUserOverrideIds by remember { mutableStateOf(emptyList<String>()) }
@@ -199,6 +202,7 @@ internal fun ProfileSettingsDialog(
         if (show) {
             editName = profile.name
             editSource = ""
+            subscriptionSettings = initialSubscriptionSettings
             systemPresetSelected = initialSystemPresetEnabled
             customRoutingSelected = initialCustomRoutingEnabled
             pendingSelectedUserOverrideIds = initialOverrideIds
@@ -212,15 +216,19 @@ internal fun ProfileSettingsDialog(
     val saveSettings = {
         val trimmedName = editName.trim()
         val trimmedSource = editSource.trim()
-        val targetSource = if (profile.type == Profile.Type.Url && trimmedSource.isNotEmpty()) {
-            trimmedSource
-        } else {
-            profile.source
+        val normalizedSubscriptionSettings = subscriptionSettings?.let(subscriptionOptions::normalize)
+        val targetSource = when {
+            normalizedSubscriptionSettings != null -> AmamiyaApi.buildConfigUrl(normalizedSubscriptionSettings)
+            profile.type == Profile.Type.Url && trimmedSource.isNotEmpty() -> trimmedSource
+            else -> profile.source
         }
+        val targetInterval = normalizedSubscriptionSettings?.let(AmamiyaApi::intervalMillis)
+            ?: profile.interval
+        val shouldRefresh = normalizedSubscriptionSettings != null && targetSource != profile.source
         if (trimmedName.isNotEmpty() && targetSource.isNotEmpty() &&
-            (trimmedName != profile.name || targetSource != profile.source)
+            (trimmedName != profile.name || targetSource != profile.source || targetInterval != profile.interval)
         ) {
-            onSaveProfileMeta(trimmedName, targetSource)
+            onSaveProfileMeta(trimmedName, targetSource, targetInterval, shouldRefresh)
         }
 
         val basicFinalIds = buildFinalOverrideIds(pendingSelectedUserOverrideIds)
@@ -275,13 +283,21 @@ internal fun ProfileSettingsDialog(
                 )
 
                 if (profile.type == Profile.Type.Url) {
-                    YumeMd3OutlinedTextField(
-                        value = editSource,
-                        onValueChange = { editSource = it },
-                        label = MLang.ProfilesPage.SettingsDialog.ChangeLink,
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 2,
-                    )
+                    if (subscriptionSettings != null) {
+                        MihomoSubscriptionSettingsContent(
+                            settings = subscriptionOptions.normalize(subscriptionSettings!!),
+                            availableOptions = subscriptionOptions,
+                            onSettingsChange = { subscriptionSettings = it },
+                        )
+                    } else {
+                        YumeMd3OutlinedTextField(
+                            value = editSource,
+                            onValueChange = { editSource = it },
+                            label = MLang.ProfilesPage.SettingsDialog.ChangeLink,
+                            modifier = Modifier.fillMaxWidth(),
+                            maxLines = 2,
+                        )
+                    }
                 }
 
                 Card {
@@ -314,12 +330,8 @@ internal fun ProfileSettingsDialog(
 
                 if (userConfigs.isNotEmpty()) {
                     Card {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = componentSizes.profileSettingsListMaxHeight),
-                        ) {
-                            itemsIndexed(userConfigs, key = { _, config -> config.id }) { index, config ->
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            userConfigs.forEachIndexed { index, config ->
                                 val isSelected = config.id in pendingSelectedUserOverrideIds
                                 PreferenceListItem(
                                     title = config.name,

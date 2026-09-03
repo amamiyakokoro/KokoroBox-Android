@@ -39,6 +39,7 @@ dependencies {
     implementation("io.ktor:ktor-client-android:${gropify.dep.version.ktor}")
     implementation("io.ktor:ktor-client-content-negotiation:${gropify.dep.version.ktor}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${gropify.dep.version.ktor}")
+    implementation("com.squareup.okhttp3:okhttp:${gropify.dep.version.okhttp}")
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
     implementation("org.tukaani:xz:1.12")
     implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")

@@ -80,6 +80,10 @@ class ProfilesViewModel(
     private val _amamiyaAuthState = MutableStateFlow<AmamiyaAuthState>(AmamiyaAuthState.Checking)
     internal val amamiyaAuthState: StateFlow<AmamiyaAuthState> = _amamiyaAuthState.asStateFlow()
 
+    private val _amamiyaSubscriptionOptions = MutableStateFlow(AmamiyaSubscriptionOptions.fallback())
+    internal val amamiyaSubscriptionOptions: StateFlow<AmamiyaSubscriptionOptions> =
+        _amamiyaSubscriptionOptions.asStateFlow()
+
     private val updateJobs = mutableMapOf<UUID, Job>()
     private val profileConfigBackups = mutableMapOf<UUID, ProfileConfigBackup>()
     private val canceledProfileUpdateIds = mutableSetOf<UUID>()
@@ -93,8 +97,22 @@ class ProfilesViewModel(
         viewModelScope.launch {
             _amamiyaAuthState.value = AmamiyaAuthState.Checking
             _amamiyaAuthState.value = try {
-                amamiyaAccountClient.getAccount()?.let(AmamiyaAuthState::Authenticated)
-                    ?: AmamiyaAuthState.LoggedOut
+                val account = amamiyaAccountClient.getAccount()
+                if (account == null) {
+                    _amamiyaSubscriptionOptions.value = AmamiyaSubscriptionOptions.fallback()
+                    AmamiyaAuthState.LoggedOut
+                } else {
+                    _amamiyaSubscriptionOptions.value = runCatching {
+                        amamiyaAccountClient.getSubscriptionOptions(account)
+                    }.getOrElse { error ->
+                        Timber.w(
+                            "Unable to load Kokoro subscription options (%s); using account fallback",
+                            error::class.java.simpleName,
+                        )
+                        AmamiyaSubscriptionOptions.fallback(account)
+                    }
+                    AmamiyaAuthState.Authenticated(account)
+                }
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.w("Failed to refresh amamiyakoko.ro account (%s)", e::class.java.simpleName)
@@ -118,6 +136,7 @@ class ProfilesViewModel(
                 if (e is CancellationException) throw e
                 Timber.w("Failed to revoke amamiyakoko.ro session (%s)", e::class.java.simpleName)
             } finally {
+                _amamiyaSubscriptionOptions.value = AmamiyaSubscriptionOptions.fallback()
                 _amamiyaAuthState.value = AmamiyaAuthState.LoggedOut
             }
         }
@@ -352,6 +371,27 @@ class ProfilesViewModel(
             } finally {
                 applyLoading(false)
             }
+        }
+    }
+
+    fun patchAndUpdateProfile(uuid: UUID, name: String, source: String, interval: Long) {
+        if (uuid in _updatingProfileIds.value) return
+        viewModelScope.launch {
+            var patched = false
+            try {
+                applyLoading(true)
+                profilesRepository.patchProfile(uuid, name, source, interval)
+                refreshProfiles()
+                patched = true
+                Timber.i("Kokoro profile settings patched: $uuid")
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Timber.e(e, "Failed to patch Kokoro profile settings")
+                showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
+            } finally {
+                applyLoading(false)
+            }
+            if (patched) updateProfile(uuid)
         }
     }
 

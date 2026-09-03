@@ -23,7 +23,10 @@
 package com.github.yumelira.yumebox.service
 
 import android.content.Context
+import android.net.Uri
 import com.github.yumelira.yumebox.core.Clash
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
 import com.github.yumelira.yumebox.service.common.log.Log
 import com.github.yumelira.yumebox.service.remote.IFetchObserver
 import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
@@ -86,6 +89,7 @@ object ProfileProcessor {
     )
 
     private suspend fun downloadWithSubscriptionInfo(
+        context: Context,
         url: String,
         targetFile: File,
         onProgress: ((Int) -> Unit)? = null
@@ -99,15 +103,29 @@ object ProfileProcessor {
                 .header("User-Agent", resolveUserAgent())
                 .build()
 
-            httpClient.newCall(request).execute().use { response ->
+            val response = if (KokoroApi.isAuthenticatedSubscriptionUrl(url)) {
+                KokoroSession(context).executeAuthorized(request)
+            } else {
+                httpClient.newCall(request).execute()
+            }
+
+            response.use {
                 if (!response.isSuccessful) {
                     return@withContext Pair(false, null)
                 }
 
-                val subInfo = parseSubscriptionInfo(
+                val parsedInfo = parseSubscriptionInfo(
                     response.headers["Subscription-Userinfo"] ?: response.headers["subscription-userinfo"],
                     response.headers
                 )
+                val subInfo = if (
+                    KokoroApi.isAuthenticatedSubscriptionUrl(url) &&
+                    Uri.parse(url).getQueryParameter("update") == "off"
+                ) {
+                    parsedInfo.copy(interval = 0)
+                } else {
+                    parsedInfo
+                }
 
                 val body = response.body
                 val contentLength = body.contentLength()
@@ -302,26 +320,20 @@ object ProfileProcessor {
     }
 
     private suspend fun fetchUrlSubscription(
+        context: Context,
         stagingDir: File,
         source: String,
         onProgress: (Int) -> Unit
     ): SubscriptionInfo? {
-        return try {
-            onProgress(5)
-            val tempFile = stagingDir.resolve("config.download.yaml")
-            val (success, info) = downloadWithSubscriptionInfo(source, tempFile) { progress ->
-                onProgress(5 + (progress * 0.4).toInt())
-            }
-            val result = if (success) {
-                tempFile.copyTo(stagingDir.resolve("config.yaml"), overwrite = true)
-                info
-            } else null
-            tempFile.delete()
-            result
-        } catch (e: Exception) {
-            Log.w("Failed to download with subscription info: $e", e)
-            null
+        onProgress(5)
+        val tempFile = stagingDir.resolve("config.download.yaml")
+        val (success, info) = downloadWithSubscriptionInfo(context, source, tempFile) { progress ->
+            onProgress(5 + (progress * 0.4).toInt())
         }
+        if (!success) throw java.io.IOException("Unable to download subscription configuration")
+        tempFile.copyTo(stagingDir.resolve("config.yaml"), overwrite = true)
+        tempFile.delete()
+        return info
     }
 
     private fun resolveSubscriptionName(
@@ -368,7 +380,7 @@ object ProfileProcessor {
 
                 try {
                     if (snapshot.imported.type == Profile.Type.Url) {
-                        subInfo = fetchUrlSubscription(stagingDir, snapshot.imported.source) { progress ->
+                        subInfo = fetchUrlSubscription(context, stagingDir, snapshot.imported.source) { progress ->
                             try {
                                 cb?.updateStatus(
                                     com.github.yumelira.yumebox.core.model.FetchStatus(
