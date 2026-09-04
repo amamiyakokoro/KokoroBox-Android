@@ -23,9 +23,13 @@ package com.github.yumelira.yumebox.presentation.component.md3
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.systemGestures
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +51,25 @@ import top.yukonga.miuix.kmp.window.WindowBottomSheet
 
 object YumeMd3BottomSheetDefaults {
     val insideMargin: DpSize = DpSize(UiDp.dp24, UiDp.dp16)
+
+    @Composable
+    fun safeInsideMargin(
+        insideMargin: DpSize = this.insideMargin,
+        applyWindowInsets: Boolean = true,
+    ): DpSize {
+        if (!applyWindowInsets) return insideMargin
+
+        val navigationBarBottom = WindowInsets.navigationBars
+            .asPaddingValues()
+            .calculateBottomPadding()
+        val systemGestureBottom = WindowInsets.systemGestures
+            .asPaddingValues()
+            .calculateBottomPadding()
+        return DpSize(
+            width = insideMargin.width,
+            height = insideMargin.height + maxOf(navigationBarBottom, systemGestureBottom),
+        )
+    }
 
     @Composable
     fun backgroundColor(): Color = MaterialTheme.colorScheme.surface
@@ -156,6 +179,10 @@ fun YumeMd3ActionBottomSheet(
     } else {
         dragHandleColor
     }
+    val safeInsideMargin = YumeMd3BottomSheetDefaults.safeInsideMargin(
+        insideMargin = insideMargin,
+        applyWindowInsets = defaultWindowInsetsPadding,
+    )
 
     val maxSheetHeight = LocalConfiguration.current.screenHeightDp.let { screenHeightDp ->
         (screenHeightDp * 0.75f).dp
@@ -176,7 +203,7 @@ fun YumeMd3ActionBottomSheet(
         },
         onDismissFinished = onDismissFinished,
         outsideMargin = outsideMargin,
-        insideMargin = insideMargin,
+        insideMargin = safeInsideMargin,
         defaultWindowInsetsPadding = defaultWindowInsetsPadding,
         dragHandleColor = resolvedDragHandleColor,
         allowDismiss = allowDismiss,

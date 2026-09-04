@@ -41,6 +41,15 @@ object AppBottomSheetDefaults {
     val insideMargin: DpSize = YumeMd3BottomSheetDefaults.insideMargin
 
     @Composable
+    fun safeInsideMargin(
+        insideMargin: DpSize = this.insideMargin,
+        applyWindowInsets: Boolean = true,
+    ): DpSize = YumeMd3BottomSheetDefaults.safeInsideMargin(
+        insideMargin = insideMargin,
+        applyWindowInsets = applyWindowInsets,
+    )
+
+    @Composable
     fun backgroundColor(): Color = YumeMd3BottomSheetDefaults.backgroundColor()
 
     @Composable

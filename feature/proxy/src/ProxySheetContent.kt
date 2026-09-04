@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetDefaults
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
@@ -186,7 +187,9 @@ fun ProxySheetContent(
             }
         },
         enableWindowDim = true,
-        insideMargin = DpSize(UiDp.dp16, UiDp.dp16),
+        insideMargin = AppBottomSheetDefaults.safeInsideMargin(
+            insideMargin = DpSize(UiDp.dp16, UiDp.dp16),
+        ),
         enableNestedScroll = false
     ) {
         AnimatedContent(
