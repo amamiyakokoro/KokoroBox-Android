@@ -65,7 +65,7 @@
         <service
             android:name="com.github.yumelira.yumebox.service.ProxyTileService"
             android:exported="true"
-            android:icon="@drawable/yume"
+            android:icon="@drawable/ic_notification_furin"
             android:label="@string/tile_proxy_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
