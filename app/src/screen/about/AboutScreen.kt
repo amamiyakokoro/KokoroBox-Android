@@ -164,12 +164,6 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                         showArrow = false,
                     )
                     AboutLinkItem(
-                        title = "YumeBox",
-                        url = "https://github.com/YumeLira/YumeBox",
-                        onOpenUrl = { url -> openUrl(context, url) },
-                        showArrow = false,
-                    )
-                    AboutLinkItem(
                         title = "Mihomo",
                         url = "https://github.com/MetaCubeX/mihomo",
                         onOpenUrl = { url -> openUrl(context, url) },
