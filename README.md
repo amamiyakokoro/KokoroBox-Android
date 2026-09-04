@@ -113,6 +113,6 @@ Never commit access tokens, subscription UUIDs, signing keys, OAuth secrets, or 
 
 ## Upstream and license
 
-KokoroBox is derived from [YumeBox](https://github.com/YumeLira/YumeBox) and depends on [Mihomo](https://github.com/MetaCubeX/mihomo) and other [third-party projects and libraries](docs/ThirdParty.md).
+KokoroBox is based on [YumeBox Material Design](https://github.com/Yizuka17/YumeBox-MaterialDesign), which continues the work of [YumeBox](https://github.com/YumeLira/YumeBox). It depends on [Mihomo](https://github.com/MetaCubeX/mihomo) and other [third-party projects and libraries](docs/ThirdParty.md).
 
 The project is distributed under the terms in [LICENSE](LICENSE) and [LICENSE-F2DLPRL](LICENSE-F2DLPRL). Individual dependencies remain subject to their respective licenses. See the [privacy policy](PRIVACY_POLICY.md) for details about application data.
