@@ -22,6 +22,9 @@ package com.github.yumelira.yumebox
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 
@@ -186,22 +189,24 @@ fun MainScreen(
                         orientation = Orientation.Horizontal,
                     ),
                 ) { page ->
-                    MainRootPageContent(
-                        page = page,
-                        mainInnerPadding = mainInnerPaddingForPage(page),
-                        acgMainUiEnabled = acgMainUiEnabled,
-                        acgWallpaperUri = acgWallpaperUri,
-                        acgWallpaperZoom = acgWallpaperZoom,
-                        acgWallpaperBiasX = acgWallpaperBiasX,
-                        acgWallpaperBiasY = acgWallpaperBiasY,
-                        navigator = navigator,
-                        homePageProgress = homeVisibility,
-                        selectedPage = settledMainPage,
-                        isProxyRunning = isProxyRunning,
-                        onProxyStartRequested = homeViewModel::startCurrentOrRecommendedProxy,
-                        profilesListState = profilesListState,
-                        settingsListState = settingsListState,
-                    )
+                    MainPagerPageLifecycle(isActive = page == settledMainPage) {
+                        MainRootPageContent(
+                            page = page,
+                            mainInnerPadding = mainInnerPaddingForPage(page),
+                            acgMainUiEnabled = acgMainUiEnabled,
+                            acgWallpaperUri = acgWallpaperUri,
+                            acgWallpaperZoom = acgWallpaperZoom,
+                            acgWallpaperBiasX = acgWallpaperBiasX,
+                            acgWallpaperBiasY = acgWallpaperBiasY,
+                            navigator = navigator,
+                            homePageProgress = homeVisibility,
+                            selectedPage = settledMainPage,
+                            isProxyRunning = isProxyRunning,
+                            onProxyStartRequested = homeViewModel::startCurrentOrRecommendedProxy,
+                            profilesListState = profilesListState,
+                            settingsListState = settingsListState,
+                        )
+                    }
                 }
 
                 Column(
@@ -215,6 +220,67 @@ fun MainScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * HorizontalPager keeps all four root pages composed. Without a page-scoped lifecycle,
+ * lifecycle-aware flow collection still treats every hidden page as STARTED because they
+ * all inherit the Activity lifecycle. Cap hidden pages at CREATED so their UI collectors,
+ * animations, and page-only sync jobs stop while service-owned runtime collection continues.
+ */
+@Composable
+private fun MainPagerPageLifecycle(
+    isActive: Boolean,
+    content: @Composable () -> Unit,
+) {
+    val parentOwner = LocalLifecycleOwner.current
+    val pageOwner = remember(parentOwner) { MainPagerPageLifecycleOwner() }
+    val currentIsActive by rememberUpdatedState(isActive)
+
+    DisposableEffect(parentOwner, pageOwner) {
+        val observer = LifecycleEventObserver { _, _ ->
+            pageOwner.update(
+                parentState = parentOwner.lifecycle.currentState,
+                isActive = currentIsActive,
+            )
+        }
+        parentOwner.lifecycle.addObserver(observer)
+        pageOwner.update(parentOwner.lifecycle.currentState, currentIsActive)
+
+        onDispose {
+            parentOwner.lifecycle.removeObserver(observer)
+            pageOwner.destroy()
+        }
+    }
+
+    SideEffect {
+        pageOwner.update(parentOwner.lifecycle.currentState, isActive)
+    }
+
+    CompositionLocalProvider(LocalLifecycleOwner provides pageOwner) {
+        content()
+    }
+}
+
+private class MainPagerPageLifecycleOwner : LifecycleOwner {
+    private val registry = LifecycleRegistry(this)
+
+    override val lifecycle: Lifecycle = registry
+
+    fun update(parentState: Lifecycle.State, isActive: Boolean) {
+        if (registry.currentState == Lifecycle.State.DESTROYED) return
+        registry.currentState = if (isActive) {
+            parentState
+        } else {
+            minOf(parentState, Lifecycle.State.CREATED)
+        }
+    }
+
+    fun destroy() {
+        if (registry.currentState != Lifecycle.State.DESTROYED) {
+            registry.currentState = Lifecycle.State.DESTROYED
         }
     }
 }
