@@ -1,12 +1,10 @@
 <div align="center">
 
-<img src="../artwork/app-icon/profile-image.png" width="112" alt="KokoroBox icon">
+<img src="artwork/app-icon/profile-image.png" width="112" alt="KokoroBox icon">
 
 # KokoroBox
 
 An Android proxy client powered by Mihomo, designed around a modern Material 3 experience.
-
-**English**
 
 </div>
 
@@ -21,23 +19,25 @@ The Android application ID is `com.amamiyakokoro.box`.
 
 ## Highlights
 
-- **Material 3 interface** — dynamic color, dark theme, responsive navigation, polished motion, and consistent components.
-- **Multiple profile sources** — subscription URLs, local files, QR codes, and authenticated Kokoro accounts.
-- **Mihomo runtime controls** — Rule, Global, Direct, VPN, and optional Root TUN modes.
-- **Subscription management** — configurable protocol, plan, ISP, relay/direct mode, rule source, final route, and update interval.
-- **Overrides and routing** — visual editing, reusable presets, custom routing, configuration preview, and stacked overrides.
-- **Proxy tools** — proxy-group selection, latency testing, sorting, node labels, flags, and persistent selections.
-- **Geo data management** — built-in GeoIP, GeoSite, country database, and ASN updates.
-- **Diagnostics** — connection details, traffic statistics, service notifications, and exportable logs.
+- **Material 3 interface** — dynamic color, dark theme, responsive navigation, polished motion, and consistent components
+- **Multiple profile sources** — subscription URLs, local files, QR codes, and authenticated Kokoro accounts
+- **Mihomo runtime controls** — Rule, Global, Direct, VPN, and optional Root TUN modes
+- **Subscription management** — configurable protocol, plan, ISP, relay/direct mode, rule source, final route, and update interval
+- **Overrides and routing** — visual editing, reusable presets, custom routing, configuration preview, and stacked overrides
+- **Proxy tools** — proxy-group selection, latency testing, sorting, node labels, flags, and persistent selections
+- **Geo data management** — built-in GeoIP, GeoSite, country database, and ASN updates
+- **Diagnostics** — connection details, traffic statistics, service notifications, and exportable logs
 
-## Kokoro subscription
+## Kokoro subscriptions
 
-KokoroBox can obtain a Mihomo subscription without placing a subscription UUID in the profile URL.
+KokoroBox can obtain a Mihomo subscription without placing a subscription UUID in the profile URL:
 
 1. Select **Kokoro Subscription** when adding a profile.
-2. Sign in with osu! using the system browser.
+2. Sign in with osu! through the system browser.
 3. Return to the app through `kokoro://oauth/callback`.
 4. Choose the subscription options and create the profile.
+
+Access tokens, subscription credentials, and complete subscription URLs must never be included in logs, screenshots, analytics, or issue reports.
 
 ## Install
 
@@ -50,11 +50,11 @@ Changing the application ID made KokoroBox a separate Android application. An ol
 ### Requirements
 
 - Android Studio with Android SDK 37
-- JDK 25
+- JDK 24
 - Android NDK `29.0.14206865`
 - Kotlin command-line tools, Go, Rust, and `cargo-ndk` when rebuilding native libraries
 
-Clone the repository:
+Clone the repository with its submodules:
 
 ```bash
 git clone --recurse-submodules https://github.com/amamiyakokoro/KokoroBox-Android.git
@@ -93,30 +93,26 @@ Release signing is optional for local development. Keep signing properties and k
 
 ## Project structure
 
-| Path | Purpose |
-| --- | --- |
-| `app` | Android UI, navigation, profiles, and app integration |
-| `core` | Mihomo bridge and shared core models |
-| `data` | Persistent settings and secure Kokoro session storage |
-| `runtime` | Client/service communication and proxy runtime |
-| `feature` | Proxy, override, editor, and Meta features |
-| `locale` | English, Simplified Chinese, and Traditional Chinese strings |
-| `scripts` | Native library, kernel, locale, and release tooling |
-
-## Documentation
-
-- [Third-party projects and libraries](ThirdParty.md)
-- [Privacy policy](../PRIVACY_POLICY.md)
-- [Contribution guide](../CONTRIBUTING.md)
+| Path      | Purpose                                                      |
+| --------- | ------------------------------------------------------------ |
+| `app`     | Android UI, navigation, profiles, and app integration        |
+| `core`    | Mihomo bridge and shared core models                         |
+| `data`    | Persistent settings and secure Kokoro session storage        |
+| `runtime` | Client/service communication and proxy runtime               |
+| `feature` | Proxy, override, editor, and Meta features                   |
+| `locale`  | English, Simplified Chinese, and Traditional Chinese strings |
+| `scripts` | Native library, kernel, locale, and release tooling          |
 
 ## Contributing
 
 Bug reports and focused pull requests are welcome. Please use [GitHub Issues](https://github.com/amamiyakokoro/KokoroBox-Android/issues) for reproducible bugs and feature proposals. Translation changes belong under `locale/lang`.
 
+Before opening a pull request, follow the [contribution guide](CONTRIBUTING.md) and update the documentation when behavior changes.
+
 Never commit access tokens, subscription UUIDs, signing keys, OAuth secrets, or generated private configuration files.
 
-## Credits and license
+## Upstream and license
 
-KokoroBox is derived from [YumeBox](https://github.com/YumeLira/YumeBox) and depends on [Mihomo](https://github.com/MetaCubeX/mihomo) and other open-source projects listed in [ThirdParty.md](ThirdParty.md).
+KokoroBox is derived from [YumeBox](https://github.com/YumeLira/YumeBox) and depends on [Mihomo](https://github.com/MetaCubeX/mihomo) and other [third-party projects and libraries](docs/ThirdParty.md).
 
-The project is distributed under the terms in [LICENSE](../LICENSE) and [LICENSE-F2DLPRL](../LICENSE-F2DLPRL). Individual dependencies remain subject to their respective licenses.
+The project is distributed under the terms in [LICENSE](LICENSE) and [LICENSE-F2DLPRL](LICENSE-F2DLPRL). Individual dependencies remain subject to their respective licenses. See the [privacy policy](PRIVACY_POLICY.md) for details about application data.
