@@ -20,7 +20,6 @@
 
 package com.github.yumelira.yumebox.screen.traffic
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -36,19 +35,15 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.core.graphics.drawable.toBitmap
 import com.github.yumelira.yumebox.common.util.formatBytes
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.model.AppTrafficUsage
@@ -63,13 +58,12 @@ import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.TrafficDonutChart
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
+import com.github.yumelira.yumebox.presentation.component.rememberInstalledAppIcon
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import dev.oom_wg.purejoy.mlang.MLang
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
@@ -239,7 +233,6 @@ fun TrafficStatisticsScreen() {
                         ),
                     ) {
                         AppTrafficRow(
-                            context = context,
                             usage = usage,
                             total = activeSummary.total,
                         )
@@ -307,7 +300,6 @@ private fun TrafficMetricLine(
 
 @Composable
 private fun AppTrafficRow(
-    context: Context,
     usage: AppTrafficUsage,
     total: Long,
 ) {
@@ -326,7 +318,6 @@ private fun AppTrafficRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AppIconBadge(
-                context = context,
                 appKey = usage.appKey,
                 packageName = usage.packageName,
                 appName = usage.appName,
@@ -372,7 +363,6 @@ private fun AppTrafficRow(
 
 @Composable
 private fun AppIconBadge(
-    context: Context,
     appKey: String,
     packageName: String?,
     appName: String,
@@ -400,20 +390,7 @@ private fun AppIconBadge(
         return
     }
 
-    val iconBitmap by produceState<ImageBitmap?>(
-        initialValue = null,
-        key1 = packageName,
-    ) {
-        value = withContext(Dispatchers.IO) {
-            packageName?.takeIf { it.isNotBlank() }?.let { target ->
-                runCatching {
-                    context.packageManager.getApplicationIcon(target)
-                        .toBitmap(width = 84, height = 84)
-                        .asImageBitmap()
-                }.getOrNull()
-            }
-        }
-    }
+    val iconBitmap = rememberInstalledAppIcon(packageName, bitmapSize = 84)
 
     val bitmap = iconBitmap
     if (bitmap != null) {

@@ -42,7 +42,9 @@ class AppIdentityResolver(
     private val packageManager = appContext.packageManager
     private val packageCache = ConcurrentHashMap<String, AppIdentity>()
     private val labelCache = ConcurrentHashMap<String, String>()
-    private val uidCache = ConcurrentHashMap<Int, String?>()
+    private val uidCache = ConcurrentHashMap<Int, String>()
+    private val unresolvedUids = ConcurrentHashMap.newKeySet<Int>()
+    private val installedAppsLock = Any()
 
     @Volatile
     private var installedAppsCache: List<InstalledAppIdentity>? = null
@@ -108,11 +110,16 @@ class AppIdentityResolver(
 
     private fun resolveByUid(uid: Int?): String? {
         if (uid == null || uid <= 0) return null
-        if (uidCache.containsKey(uid)) return uidCache[uid]
+        uidCache[uid]?.let { return it }
+        if (uid in unresolvedUids) return null
 
         val packageName = packageManager.getPackagesForUid(uid)
             ?.firstNotNullOfOrNull(::findInstalledPackage)
-        uidCache[uid] = packageName
+        if (packageName == null) {
+            unresolvedUids += uid
+        } else {
+            uidCache[uid] = packageName
+        }
         return packageName
     }
 
@@ -141,18 +148,20 @@ class AppIdentityResolver(
 
     private fun installedApps(): List<InstalledAppIdentity> {
         installedAppsCache?.let { return it }
-        val apps = runCatching {
-            packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-        }.getOrDefault(emptyList<ApplicationInfo>())
-            .map { app ->
-                InstalledAppIdentity(
-                    packageName = app.packageName,
-                    processName = app.processName?.trim().orEmpty(),
-                    label = runCatching { app.loadLabel(packageManager).toString().trim() }.getOrDefault(""),
-                )
-            }
-        installedAppsCache = apps
-        return apps
+        return synchronized(installedAppsLock) {
+            installedAppsCache ?: runCatching {
+                packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+            }.getOrDefault(emptyList<ApplicationInfo>())
+                .map { app ->
+                    InstalledAppIdentity(
+                        packageName = app.packageName,
+                        processName = app.processName?.trim().orEmpty(),
+                        label = runCatching {
+                            app.loadLabel(packageManager).toString().trim()
+                        }.getOrDefault(""),
+                    )
+                }.also { installedAppsCache = it }
+        }
     }
 
     private fun findInstalledPackage(packageName: String): String? {

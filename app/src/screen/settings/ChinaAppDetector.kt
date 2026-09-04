@@ -28,12 +28,11 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.tencent.mmkv.MMKV
 import java.io.File
 import java.util.zip.ZipFile
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 
 /**
  * Heuristic detector for apps of Chinese origin, used by the access-control
@@ -45,7 +44,7 @@ import kotlinx.coroutines.sync.withPermit
  *    (catches apps embedding Tencent/Umeng/Bugly/... SDK components);
  * 4. APK deep scan: a `firebase-*` zip entry short-circuits to NOT China,
  *    otherwise dex class names are prefix-matched against the China vendor/SDK
- *    package prefixes; oversized (>100 MB) or unparsable dex entries are
+ *    package prefixes; oversized (>32 MB) or unparsable dex entries are
  *    skipped as inconclusive.
  *
  * Tier 3/4 verdicts are cached in a dedicated MMKV keyed by package name and
@@ -59,21 +58,14 @@ class ChinaAppDetector(context: Context) {
 
     private val cache by lazy { MMKV.mmkvWithID(CACHE_ID) }
 
-    /**
-     * Deep scans buffer whole dex entries in memory (up to [MAX_SCANNABLE_DEX_BYTES] each),
-     * so unbounded parallelism could transiently hold hundreds of MB. Fast-path prefix
-     * checks stay fully parallel; only the expensive scan path is throttled.
-     */
-    private val deepScanPermits = Semaphore(MAX_CONCURRENT_DEEP_SCANS)
-
-    suspend fun detectChinaPackages(candidates: List<Candidate>): Set<String> = coroutineScope {
-        candidates
-            .map { candidate ->
-                async(Dispatchers.Default) { candidate.takeIf { isChinaPackage(it) } }
+    suspend fun detectChinaPackages(candidates: List<Candidate>): Set<String> =
+        withContext(Dispatchers.IO) {
+            buildSet {
+                candidates.distinctBy(Candidate::packageName).forEach { candidate ->
+                    currentCoroutineContext().ensureActive()
+                    if (isChinaPackage(candidate)) add(candidate.packageName)
+                }
             }
-            .awaitAll()
-            .filterNotNull()
-            .mapTo(linkedSetOf()) { it.packageName }
     }
 
     private suspend fun isChinaPackage(candidate: Candidate): Boolean {
@@ -93,10 +85,10 @@ class ChinaAppDetector(context: Context) {
         if (normalized.matches(chinaAppRegex)) {
             return true
         }
-        return deepScanPermits.withPermit { cachedDeepScan(candidate) }
+        return cachedDeepScan(candidate)
     }
 
-    private fun cachedDeepScan(candidate: Candidate): Boolean {
+    private suspend fun cachedDeepScan(candidate: Candidate): Boolean {
         cache.decodeString(candidate.packageName)?.let { cached ->
             val (stamp, verdict) = cached.split('|', limit = 2).takeIf { it.size == 2 }
                 ?: return@let
@@ -109,7 +101,7 @@ class ChinaAppDetector(context: Context) {
         return verdict
     }
 
-    private fun deepScan(packageName: String): Boolean {
+    private suspend fun deepScan(packageName: String): Boolean {
         return try {
             val flags =
                 PackageManager.MATCH_UNINSTALLED_PACKAGES or
@@ -138,19 +130,23 @@ class ChinaAppDetector(context: Context) {
             }
             val apkPath = packageInfo.applicationInfo?.publicSourceDir ?: return false
             scanApkDexClasses(File(apkPath))
+        } catch (error: CancellationException) {
+            throw error
         } catch (_: Exception) {
             false
         }
     }
 
-    private fun scanApkDexClasses(apk: File): Boolean {
+    private suspend fun scanApkDexClasses(apk: File): Boolean {
         ZipFile(apk).use { zip ->
             for (entry in zip.entries()) {
+                currentCoroutineContext().ensureActive()
                 if (entry.name.startsWith("firebase-")) {
                     return false
                 }
             }
             for (entry in zip.entries()) {
+                currentCoroutineContext().ensureActive()
                 if (!(entry.name.startsWith("classes") && entry.name.endsWith(".dex"))) {
                     continue
                 }
@@ -164,8 +160,9 @@ class ChinaAppDetector(context: Context) {
                         DexBackedDexFile.fromInputStream(null, zip.getInputStream(entry).buffered())
                     } catch (_: Exception) {
                         continue
-                    }
+                }
                 for (clazz in dexFile.classes) {
+                    currentCoroutineContext().ensureActive()
                     val descriptor = clazz.type
                     if (chinaClassDescriptorPrefixList.any { descriptor.startsWith(it) }) {
                         return true
@@ -181,10 +178,7 @@ class ChinaAppDetector(context: Context) {
         private const val CACHE_ID = "china_app_detector_cache_v2"
 
         // Upper bound for dex entries we are willing to buffer in memory for scanning.
-        private const val MAX_SCANNABLE_DEX_BYTES = 100L * 1024 * 1024
-
-        // Bounds peak scan memory to MAX_CONCURRENT_DEEP_SCANS * MAX_SCANNABLE_DEX_BYTES.
-        private const val MAX_CONCURRENT_DEEP_SCANS = 2
+        private const val MAX_SCANNABLE_DEX_BYTES = 32L * 1024 * 1024
 
         private val skipPrefixList =
             listOf(

@@ -20,7 +20,6 @@
 
 
 package com.github.yumelira.yumebox.feature.meta.presentation.component
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,23 +30,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.takeOrElse
-import androidx.core.graphics.drawable.toBitmap
+import com.github.yumelira.yumebox.presentation.component.rememberInstalledAppIcon
+import com.github.yumelira.yumebox.data.controller.AppIdentity
+import com.github.yumelira.yumebox.data.controller.AppIdentityResolver
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.AppColors
-import com.github.yumelira.yumebox.data.controller.AppIdentityResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
+import org.koin.compose.koinInject
 
 private const val CONNECTION_APP_ICON_BITMAP_SIZE = 80
 
@@ -60,33 +57,24 @@ internal fun ConnectionLeadingIcon(
     bitmapSize: Int = CONNECTION_APP_ICON_BITMAP_SIZE,
 ) {
     val sizes = AppTheme.sizes
-    val context = LocalContext.current
-    val appIdentityResolver = remember(context) { AppIdentityResolver(context) }
-    val identity = remember(metadata, appIdentityResolver) {
-        appIdentityResolver.resolve(metadata)
-    }
-    val resolvedSize = size.takeOrElse { sizes.connectionLeadingIconSize }
-    val iconKey = remember(identity, bitmapSize) {
-        "${identity.appKey}|${identity.packageName.orEmpty()}|$bitmapSize"
-    }
-    val iconBitmap by produceState<ImageBitmap?>(
+    val appIdentityResolver: AppIdentityResolver = koinInject()
+    val identity by produceState<AppIdentity?>(
         initialValue = null,
-        key1 = iconKey,
+        key1 = metadata,
+        key2 = appIdentityResolver,
     ) {
         value = withContext(Dispatchers.IO) {
-            ConnectionAppIconResolver.resolveIcon(
-                context = context,
-                packageName = identity.packageName,
-                bitmapSize = bitmapSize,
-            )
+            appIdentityResolver.resolve(metadata)
         }
     }
+    val resolvedSize = size.takeOrElse { sizes.connectionLeadingIconSize }
+    val iconBitmap = rememberInstalledAppIcon(identity?.packageName, bitmapSize)
 
     val bitmap = iconBitmap
     if (bitmap != null) {
         Image(
             bitmap = bitmap,
-            contentDescription = identity.appName.ifEmpty { network },
+            contentDescription = identity?.appName?.ifEmpty { network } ?: network,
             modifier = modifier
                 .size(resolvedSize)
                 .clip(RoundedCornerShape(sizes.connectionLeadingIconCornerRadius)),
@@ -124,22 +112,6 @@ private fun ProtocolFallbackIcon(
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
             color = protocolColor,
         )
-    }
-}
-
-private object ConnectionAppIconResolver {
-    fun resolveIcon(
-        context: Context,
-        packageName: String?,
-        bitmapSize: Int,
-    ): ImageBitmap? {
-        val resolvedPackageName = packageName?.trim().orEmpty().takeIf { it.isNotEmpty() } ?: return null
-        return runCatching {
-            context.packageManager
-                .getApplicationIcon(resolvedPackageName)
-                .toBitmap(width = bitmapSize, height = bitmapSize)
-                .asImageBitmap()
-        }.getOrNull()
     }
 }
 

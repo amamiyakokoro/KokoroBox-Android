@@ -22,7 +22,9 @@ package com.github.yumelira.yumebox.screen.settings
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.core.presentation.AndroidContractStateViewModel
@@ -33,13 +35,17 @@ import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
 import com.github.yumelira.yumebox.service.root.RootPackageShell
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 class AccessControlViewModel(
     application: Application,
@@ -91,6 +97,7 @@ class AccessControlViewModel(
     }
 
     private val chinaAppDetector = ChinaAppDetector(application)
+    private var regionalSelectionJob: Job? = null
 
     val filteredApps: StateFlow<List<AppInfo>> = uiState.map { state ->
         filterApps(
@@ -181,7 +188,7 @@ class AccessControlViewModel(
         val selfPackageName = getApplication<Application>().packageName
 
         val packages = runCatching {
-            pm.getInstalledApplications(PackageManager.GET_META_DATA)
+            getInstalledPackages(pm)
         }.getOrElse { error ->
             if (error is SecurityException) {
                 loadInstalledAppsFromRoot(pm, selfPackageName)
@@ -192,22 +199,32 @@ class AccessControlViewModel(
 
         return packages
             .filter { it.packageName != selfPackageName }
-            .map { appInfo ->
-                val pkgInfo = runCatching { pm.getPackageInfo(appInfo.packageName, 0) }.getOrNull()
+            .mapNotNull { pkgInfo ->
+                val appInfo = pkgInfo.applicationInfo ?: return@mapNotNull null
                 AppInfo(
                     packageName = appInfo.packageName,
                     label = appInfo.loadLabel(pm).toString(),
                     isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
-                    installTime = pkgInfo?.firstInstallTime ?: 0L,
-                    updateTime = pkgInfo?.lastUpdateTime ?: 0L,
+                    installTime = pkgInfo.firstInstallTime,
+                    updateTime = pkgInfo.lastUpdateTime,
                 )
             }
     }
 
+    private fun getInstalledPackages(pm: PackageManager): List<PackageInfo> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.getInstalledPackages(
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getInstalledPackages(PackageManager.GET_META_DATA)
+        }
+
     private fun loadInstalledAppsFromRoot(
         pm: PackageManager,
         selfPackageName: String,
-    ): List<ApplicationInfo> {
+    ): List<PackageInfo> {
         val packageNames = RootPackageShell.queryInstalledPackageNames()
             ?: throw SecurityException("Unable to query installed packages from root shell")
 
@@ -215,7 +232,17 @@ class AccessControlViewModel(
             .asSequence()
             .filterNot { it == selfPackageName }
             .mapNotNull { packageName ->
-                runCatching { pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA) }.getOrNull()
+                runCatching {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        pm.getPackageInfo(
+                            packageName,
+                            PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        pm.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+                    }
+                }.getOrNull()
             }
             .toList()
     }
@@ -318,39 +345,43 @@ class AccessControlViewModel(
     private fun applyRegionalSelectionInCurrentList(selectChina: Boolean) {
         val currentFiltered = filteredApps.value
         if (currentFiltered.isEmpty()) return
-        viewModelScope.launch {
+        regionalSelectionJob?.cancel()
+        regionalSelectionJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val chinaPackages =
-                runCatching {
-                        chinaAppDetector.detectChinaPackages(
-                            currentFiltered.map {
-                                ChinaAppDetector.Candidate(it.packageName, it.updateTime)
-                            }
-                        )
+            try {
+                val chinaPackages = chinaAppDetector.detectChinaPackages(
+                    currentFiltered.map {
+                        ChinaAppDetector.Candidate(it.packageName, it.updateTime)
                     }
-                    .getOrElse {
-                        _uiState.update { state -> state.copy(isLoading = false) }
-                        return@launch
-                    }
-            val currentPackages = currentFiltered.mapTo(linkedSetOf()) { it.packageName }
-            val targetPackages =
-                currentFiltered
+                )
+                coroutineContext.ensureActive()
+                val currentPackages = currentFiltered.mapTo(linkedSetOf()) { it.packageName }
+                val targetPackages = currentFiltered
                     .filter { (it.packageName in chinaPackages) == selectChina }
                     .mapTo(linkedSetOf()) { it.packageName }
-            _uiState.update { state ->
-                state.copy(
-                    isLoading = false,
-                    selectedPackages =
-                        state.selectedPackages.minus(currentPackages).plus(targetPackages),
+                _uiState.update { state ->
+                    state.copy(
+                        selectedPackages = state.selectedPackages
+                            .minus(currentPackages)
+                            .plus(targetPackages),
+                    )
+                }
+                persistSelectionAndApply()
+                emitEffect(
+                    AccessControlUiEffect.RegionalSelectionCompleted(
+                        selectChina = selectChina,
+                        selectedCount = targetPackages.size,
+                    )
                 )
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                return@launch
+            } finally {
+                if (regionalSelectionJob === coroutineContext[Job]) {
+                    _uiState.update { state -> state.copy(isLoading = false) }
+                }
             }
-            persistSelectionAndApply()
-            emitEffect(
-                AccessControlUiEffect.RegionalSelectionCompleted(
-                    selectChina = selectChina,
-                    selectedCount = targetPackages.size,
-                )
-            )
         }
     }
 
