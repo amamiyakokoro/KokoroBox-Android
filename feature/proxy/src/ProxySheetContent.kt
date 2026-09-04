@@ -30,19 +30,24 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemGestures
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetDefaults
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetNavigationBarEffect
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSheetContent
@@ -60,6 +65,7 @@ import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.window.WindowBottomSheet
 
 private const val NOTIFICATION_PROXY_SHEET_HEIGHT_FRACTION = 0.55f
 
@@ -134,7 +140,8 @@ fun ProxySheetContent(
             onDismiss()
         }
     }
-    AppActionBottomSheet(
+
+    WindowBottomSheet(
         show = showSheet.value,
         title = selectedGroup?.name ?: MLang.Proxy.Title,
         backgroundColor = MiuixTheme.colorScheme.surface,
@@ -189,16 +196,16 @@ fun ProxySheetContent(
             }
         },
         enableWindowDim = true,
-        enableNestedScroll = false,
-        contentScrollEnabled = false,
-        contentHandlesBottomInset = true,
+        insideMargin = DpSize(UiDp.dp16, UiDp.dp16),
+        enableNestedScroll = false
     ) {
-        val bottomInset = maxOf(
-            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
-            WindowInsets.systemGestures.asPaddingValues().calculateBottomPadding(),
-        )
+        AppBottomSheetNavigationBarEffect(MiuixTheme.colorScheme.surface)
         AnimatedContent(
-            modifier = Modifier,
+            modifier = Modifier.windowInsetsPadding(
+                WindowInsets.navigationBars
+                    .union(WindowInsets.systemGestures)
+                    .only(WindowInsetsSides.Bottom),
+            ),
             targetState = selectedGroupName,
             transitionSpec = {
                 if (targetState != null) {
@@ -246,7 +253,6 @@ fun ProxySheetContent(
                     testingGroupNames = testingGroupNames,
                     sheetHeightFraction = NOTIFICATION_PROXY_SHEET_HEIGHT_FRACTION,
                     listState = groupListState,
-                    bottomInset = bottomInset,
                 )
             } else {
                 ProxySheetNodeContent(
@@ -255,7 +261,6 @@ fun ProxySheetContent(
                     onTestDelay = triggerSelectedGroupDelayTest,
                     sheetHeightFraction = NOTIFICATION_PROXY_SHEET_HEIGHT_FRACTION,
                     listState = nodeListState,
-                    bottomInset = bottomInset,
                 )
             }
         }
@@ -269,7 +274,6 @@ private fun ProxySheetNodeContent(
     onTestDelay: () -> Unit,
     sheetHeightFraction: Float,
     listState: LazyListState,
-    bottomInset: androidx.compose.ui.unit.Dp,
 ) {
     val groupProxyNames = remember(group.proxies) {
         group.proxies.mapTo(linkedSetOf()) { it.name }
@@ -314,6 +318,5 @@ private fun ProxySheetNodeContent(
         onTestProxyDelay = onSingleNodeTestClick,
         sheetHeightFraction = sheetHeightFraction,
         listState = listState,
-        bottomInset = bottomInset,
     )
 }
