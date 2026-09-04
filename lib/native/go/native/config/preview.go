@@ -73,13 +73,13 @@ func buildProxyGroupsFromParsed(
 func proxyGroupIcon(group outboundgroup.ProxyGroup) string {
 	switch g := group.(type) {
 	case *outboundgroup.Selector:
-		return g.Icon
+		return g.Icon()
 	case *outboundgroup.URLTest:
-		return g.Icon
+		return g.Icon()
 	case *outboundgroup.LoadBalance:
-		return g.Icon
+		return g.Icon()
 	case *outboundgroup.Fallback:
-		return g.Icon
+		return g.Icon()
 	default:
 		return ""
 	}

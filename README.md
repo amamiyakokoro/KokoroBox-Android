@@ -64,7 +64,7 @@ cd KokoroBox-Android
 The app requires `libclash.so`, `liboverride.so`, and `libbridge.so` under `jniLibs/<abi>/`. To rebuild the native runtime and Geo assets locally:
 
 ```bash
-./scripts/sync-kernel.sh alpha
+./scripts/sync-kernel.sh meta
 kotlin scripts/native-build.main.kts --all
 ```
 

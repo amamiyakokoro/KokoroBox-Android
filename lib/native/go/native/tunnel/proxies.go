@@ -139,13 +139,13 @@ func QueryProxyGroup(name string, sortMode SortMode, uiSubtitlePattern *regexp2.
 func proxyGroupIcon(group outboundgroup.ProxyGroup) string {
 	switch g := group.(type) {
 	case *outboundgroup.Selector:
-		return g.Icon
+		return g.Icon()
 	case *outboundgroup.URLTest:
-		return g.Icon
+		return g.Icon()
 	case *outboundgroup.LoadBalance:
-		return g.Icon
+		return g.Icon()
 	case *outboundgroup.Fallback:
-		return g.Icon
+		return g.Icon()
 	default:
 		return ""
 	}
