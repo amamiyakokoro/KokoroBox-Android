@@ -90,11 +90,26 @@ subprojects {
 
             sourceSets {
                 getByName("main") {
-                    kotlin.srcDirs("src")
-                    res.srcDirs("res")
-                    assets.srcDirs("assets")
-                    aidl.srcDirs("aidl")
-                    resources.srcDirs("resources")
+                    kotlin.directories.apply {
+                        clear()
+                        add("src")
+                    }
+                    res.directories.apply {
+                        clear()
+                        add("res")
+                    }
+                    assets.directories.apply {
+                        clear()
+                        add("assets")
+                    }
+                    aidl.directories.apply {
+                        clear()
+                        add("aidl")
+                    }
+                    resources.directories.apply {
+                        clear()
+                        add("resources")
+                    }
                     if (project.file("AndroidManifest.xml").isFile) {
                         manifest.srcFile("AndroidManifest.xml")
                     }
@@ -133,11 +148,26 @@ subprojects {
 
             sourceSets {
                 getByName("main") {
-                    kotlin.srcDirs("src")
-                    res.srcDirs("res")
-                    assets.srcDirs("assets")
-                    aidl.srcDirs("aidl")
-                    resources.srcDirs("resources")
+                    kotlin.directories.apply {
+                        clear()
+                        add("src")
+                    }
+                    res.directories.apply {
+                        clear()
+                        add("res")
+                    }
+                    assets.directories.apply {
+                        clear()
+                        add("assets")
+                    }
+                    aidl.directories.apply {
+                        clear()
+                        add("aidl")
+                    }
+                    resources.directories.apply {
+                        clear()
+                        add("resources")
+                    }
                     if (project.file("AndroidManifest.xml").isFile) {
                         manifest.srcFile("AndroidManifest.xml")
                     }

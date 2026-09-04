@@ -24,7 +24,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val generateFYTxt by tasks.registering {
+val generateFYTxt = tasks.register("generateFYTxt") {
     val inputDir = layout.projectDirectory.dir("lang")
     val outputFile = layout.buildDirectory.file("generated/fytxt/kotlin/commonMain/kotlin/fytxt.kt")
 
@@ -185,7 +185,11 @@ android {
 
     sourceSets {
         getByName("main") {
-            kotlin.srcDirs("src", "build/generated/fytxt/kotlin/commonMain/kotlin")
+            kotlin.directories.apply {
+                clear()
+                add("src")
+                add("build/generated/fytxt/kotlin/commonMain/kotlin")
+            }
         }
     }
 
