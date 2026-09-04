@@ -28,10 +28,12 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.systemGestures
 import androidx.compose.foundation.layout.union
@@ -44,6 +46,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -103,6 +109,44 @@ private fun View.findDialogWindowProvider(): DialogWindowProvider? {
         current = (current as? View)?.parent
     }
     return null
+}
+
+@Composable
+fun Modifier.yumeMd3BottomSheetNavigationGradient(
+    backgroundColor: Color,
+    enabled: Boolean = true,
+): Modifier {
+    if (!enabled) return this
+
+    val navigationBarBottom = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+    val systemGestureBottom = WindowInsets.systemGestures
+        .asPaddingValues()
+        .calculateBottomPadding()
+    val fadeHeight = maxOf(
+        maxOf(navigationBarBottom, systemGestureBottom) + UiDp.dp32,
+        96.dp,
+    )
+
+    return drawWithContent {
+        drawContent()
+        val fadeHeightPx = fadeHeight.toPx().coerceAtMost(size.height)
+        val fadeTop = size.height - fadeHeightPx
+        drawRect(
+            brush = Brush.verticalGradient(
+                colorStops = arrayOf(
+                    0f to Color.Transparent,
+                    0.55f to backgroundColor.copy(alpha = 0.78f),
+                    1f to backgroundColor,
+                ),
+                startY = fadeTop,
+                endY = size.height,
+            ),
+            topLeft = Offset(0f, fadeTop),
+            size = Size(size.width, fadeHeightPx),
+        )
+    }
 }
 
 data class YumeMd3BottomSheetAction(
@@ -187,6 +231,7 @@ fun YumeMd3ActionBottomSheet(
     enableNestedScroll: Boolean = false,
     renderInRootScaffold: Boolean = true,
     contentScrollEnabled: Boolean = true,
+    contentHandlesBottomInset: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val resolvedBackgroundColor = if (backgroundColor == Color.Unspecified) {
@@ -202,10 +247,51 @@ fun YumeMd3ActionBottomSheet(
     val maxSheetHeight = LocalConfiguration.current.screenHeightDp.let { screenHeightDp ->
         (screenHeightDp * 0.75f).dp
     }
-    val bottomWindowInsets = WindowInsets.navigationBars
-        .union(WindowInsets.systemGestures)
-        .only(WindowInsetsSides.Bottom)
+    val resolvedInsideMargin = if (defaultWindowInsetsPadding) {
+        DpSize(insideMargin.width, UiDp.dp0)
+    } else {
+        insideMargin
+    }
+    val sheetContent: @Composable () -> Unit = {
+        YumeMd3BottomSheetNavigationBarEffect(resolvedBackgroundColor)
+        val bottomWindowInsets = WindowInsets.navigationBars
+            .union(WindowInsets.systemGestures)
+            .only(WindowInsetsSides.Bottom)
+        val contentModifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = maxSheetHeight)
+            .yumeMd3BottomSheetNavigationGradient(
+                backgroundColor = resolvedBackgroundColor,
+                enabled = defaultWindowInsetsPadding,
+            )
+        Box(
+            modifier = if (contentScrollEnabled) {
+                contentModifier.verticalScroll(rememberScrollState())
+            } else {
+                contentModifier
+            },
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (defaultWindowInsetsPadding && !contentHandlesBottomInset) {
+                            Modifier
+                                .padding(bottom = insideMargin.height)
+                                .windowInsetsPadding(bottomWindowInsets)
+                        } else {
+                            Modifier
+                        },
+                    ),
+            ) {
+                content()
+            }
+        }
+    }
 
+    val dismissRequest = {
+        if (allowDismiss) onDismissRequest()
+    }
     WindowBottomSheet(
         show = show,
         modifier = modifier.heightIn(max = maxSheetHeight),
@@ -216,43 +302,14 @@ fun YumeMd3ActionBottomSheet(
         enableWindowDim = enableWindowDim,
         cornerRadius = cornerRadius,
         sheetMaxWidth = sheetMaxWidth,
-        onDismissRequest = {
-            if (allowDismiss) onDismissRequest()
-        },
+        onDismissRequest = dismissRequest,
         onDismissFinished = onDismissFinished,
         outsideMargin = outsideMargin,
-        insideMargin = insideMargin,
+        insideMargin = resolvedInsideMargin,
         defaultWindowInsetsPadding = defaultWindowInsetsPadding,
         dragHandleColor = resolvedDragHandleColor,
         allowDismiss = allowDismiss,
         enableNestedScroll = enableNestedScroll,
-    ) {
-        YumeMd3BottomSheetNavigationBarEffect(resolvedBackgroundColor)
-        Box(
-            modifier = if (contentScrollEnabled) {
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = maxSheetHeight)
-                    .verticalScroll(rememberScrollState())
-            } else {
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = maxSheetHeight)
-            },
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(
-                        if (defaultWindowInsetsPadding) {
-                            Modifier.windowInsetsPadding(bottomWindowInsets)
-                        } else {
-                            Modifier
-                        },
-                    ),
-            ) {
-                content()
-            }
-        }
-    }
+        content = sheetContent,
+    )
 }

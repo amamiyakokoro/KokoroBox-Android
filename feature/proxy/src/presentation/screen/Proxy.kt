@@ -667,7 +667,13 @@ private fun ProxyGroupTabs(
         show = showAllGroups,
         title = MLang.Proxy.Title,
         onDismissRequest = { showAllGroups = false },
+        contentScrollEnabled = false,
+        contentHandlesBottomInset = true,
     ) {
+        val bottomInset = maxOf(
+            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
+            WindowInsets.systemGestures.asPaddingValues().calculateBottomPadding(),
+        )
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
@@ -675,7 +681,7 @@ private fun ProxyGroupTabs(
                 .heightIn(max = 420.dp),
             horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
             verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-            contentPadding = PaddingValues(bottom = UiDp.dp16),
+            contentPadding = PaddingValues(bottom = UiDp.dp16 + bottomInset),
         ) {
             items(items = groups, key = { it.name }) { group ->
                 NodeGroupCard(

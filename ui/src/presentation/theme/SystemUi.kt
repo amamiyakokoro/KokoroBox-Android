@@ -22,6 +22,7 @@
 
 package com.github.yumelira.yumebox.presentation.theme
 
+import android.graphics.Color as AndroidColor
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Build
@@ -32,12 +33,18 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+@Suppress("DEPRECATION")
 private val AndroidSystemUiEffect: @Composable () -> Unit = {
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             WindowCompat.setDecorFitsSystemWindows(window, false)
+            window.navigationBarColor = AndroidColor.TRANSPARENT
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.navigationBarDividerColor = AndroidColor.TRANSPARENT
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 window.isNavigationBarContrastEnforced = false

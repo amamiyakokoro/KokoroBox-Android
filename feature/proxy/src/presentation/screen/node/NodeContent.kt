@@ -65,11 +65,11 @@ import com.github.yumelira.yumebox.presentation.theme.UiDp
 import top.yukonga.miuix.kmp.utils.overScrollHorizontal
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 
-val NodeSheetContentPadding = PaddingValues(
+private fun nodeSheetContentPadding(bottomInset: Dp) = PaddingValues(
     start = UiDp.dp0,
     end = UiDp.dp0,
     top = UiDp.dp8,
-    bottom = UiDp.dp16,
+    bottom = UiDp.dp16 + bottomInset,
 )
 
 private fun LazyListState.isScrolledFromTop(): Boolean {
@@ -186,6 +186,7 @@ internal fun NodeGroupSheetContent(
     sheetHeightFraction: Float,
     onGroupClick: (ProxyGroupInfo) -> Unit,
     listState: LazyListState = rememberLazyListState(),
+    bottomInset: Dp = UiDp.dp0,
 ) {
     val sheetHeight = rememberNodeSheetHeight(sheetHeightFraction)
 
@@ -198,11 +199,11 @@ internal fun NodeGroupSheetContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(sheetHeight)
+            .height(sheetHeight + bottomInset)
             .overScrollVertical(),
         state = listState,
         verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-        contentPadding = NodeSheetContentPadding,
+        contentPadding = nodeSheetContentPadding(bottomInset),
         overscrollEffect = null,
     ) {
         nodeGroupItems(
@@ -225,6 +226,7 @@ fun NodeSheetContent(
     sheetHeightFraction: Float,
     listState: LazyListState = rememberLazyListState(),
     singleNodeTestEnabled: Boolean = true,
+    bottomInset: Dp = UiDp.dp0,
 ) {
     val sheetHeight = rememberNodeSheetHeight(sheetHeightFraction)
 
@@ -237,11 +239,11 @@ fun NodeSheetContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(sheetHeight)
+            .height(sheetHeight + bottomInset)
             .overScrollVertical(),
         state = listState,
         verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-        contentPadding = NodeSheetContentPadding,
+        contentPadding = nodeSheetContentPadding(bottomInset),
         overscrollEffect = null,
     ) {
         item(key = "__refresh_indicator__") {
