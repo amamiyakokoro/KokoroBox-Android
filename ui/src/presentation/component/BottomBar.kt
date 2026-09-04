@@ -70,7 +70,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.shapes.SmoothUnevenRoundedCornerShape
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -140,17 +139,6 @@ val LocalNavigator = compositionLocalOf<DestinationsNavigator> { error("LocalNav
 val LocalBottomBarUseLegacyStyle = compositionLocalOf { false }
 
 object MainBottomBarDefaults {
-    val CornerRadius = UiDp.dp24
-    val Shape = SmoothUnevenRoundedCornerShape(
-        topStart = CornerRadius,
-        topEnd = CornerRadius,
-    )
-    val BorderWidth = UiDp.dp0_26
-    val OutlineHorizontalInset = UiDp.dp0
-    val ItemHeight = UiDp.dp64
-    val IconSize = UiDp.dp24
-    val LabelFontSize = 12.sp
-    val IconLabelSpacing = UiDp.dp4
     val HorizontalPadding = UiDp.dp32
     val TopPadding = UiDp.dp8
     val FloatingBottomPadding = UiDp.dp12
