@@ -29,25 +29,16 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.systemGestures
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.core.model.Proxy
+import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetDefaults
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetNavigationBarEffect
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSheetContent
@@ -65,7 +56,6 @@ import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.window.WindowBottomSheet
 
 private const val NOTIFICATION_PROXY_SHEET_HEIGHT_FRACTION = 0.55f
 
@@ -141,7 +131,7 @@ fun ProxySheetContent(
         }
     }
 
-    WindowBottomSheet(
+    AppActionBottomSheet(
         show = showSheet.value,
         title = selectedGroup?.name ?: MLang.Proxy.Title,
         backgroundColor = MiuixTheme.colorScheme.surface,
@@ -196,16 +186,11 @@ fun ProxySheetContent(
             }
         },
         enableWindowDim = true,
-        insideMargin = DpSize(UiDp.dp16, UiDp.dp16),
-        enableNestedScroll = false
+        enableNestedScroll = false,
+        contentScrollEnabled = false,
     ) {
-        AppBottomSheetNavigationBarEffect(MiuixTheme.colorScheme.surface)
         AnimatedContent(
-            modifier = Modifier.windowInsetsPadding(
-                WindowInsets.navigationBars
-                    .union(WindowInsets.systemGestures)
-                    .only(WindowInsetsSides.Bottom),
-            ),
+            modifier = Modifier,
             targetState = selectedGroupName,
             transitionSpec = {
                 if (targetState != null) {
