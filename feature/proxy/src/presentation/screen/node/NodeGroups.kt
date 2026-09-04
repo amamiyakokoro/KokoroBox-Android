@@ -59,11 +59,7 @@ private data class GroupBadge(
     val label: String,
 )
 
-private const val ZAKO_GROUP_NAME = "zako"
-
 private fun groupBadge(type: Proxy.Type): GroupBadge = GroupBadge(type.name)
-
-private fun ProxyGroupInfo.isZakoGroup(): Boolean = name.equals(ZAKO_GROUP_NAME, ignoreCase = true)
 
 internal fun LazyListScope.nodeGroupItems(
     groups: List<ProxyGroupInfo>,
@@ -111,17 +107,11 @@ internal fun NodeGroupCard(
             title = currentProxy?.title,
         )
     }
-    val isZakoGroup = remember(group.name) { group.isZakoGroup() }
-    val currentNodeName = if (isZakoGroup) {
-        MLang.Proxy.Zako.Others
-    } else {
-        remember(currentNode.displayName, group.now) {
-            currentNode.displayName.ifBlank { group.now.trim() }.ifBlank { MLang.Proxy.Mode.Direct }
-        }
+    val currentNodeName = remember(currentNode.displayName, group.now) {
+        currentNode.displayName.ifBlank { group.now.trim() }.ifBlank { MLang.Proxy.Mode.Direct }
     }
-    val currentDelay = remember(currentProxy, isZakoGroup) { currentProxy?.delay?.takeUnless { isZakoGroup } }
+    val currentDelay = remember(currentProxy) { currentProxy?.delay }
     val badge = remember(group.type) { groupBadge(group.type) }
-    val badgeLabel = if (isZakoGroup) MLang.Proxy.Zako.Badge else badge.label
     val delayLabel = nodeLatencyLabel(currentDelay)
     val onCardClick = remember(group, onClick) { onClick?.let { click -> { click(group) } } }
 
@@ -190,7 +180,7 @@ internal fun NodeGroupCard(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    text = badgeLabel,
+                    text = badge.label,
                     style = MiuixTheme.textStyles.footnote1.copy(fontSize = 11.sp),
                     fontWeight = FontWeight.SemiBold,
                     color = palette.chipContentColor,

@@ -22,12 +22,6 @@ Proxy = {
         Count = "%d 节点"
     }
 
-    Zako = {
-        Description = "仅查看其他策略组状态"
-        Others = "其他策略组"
-        Badge = "Others"
-    }
-
     Type = {
         Direct = "直连"
         Reject = "拒绝"

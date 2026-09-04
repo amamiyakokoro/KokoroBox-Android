@@ -78,7 +78,6 @@ class ProxyFacade(
         const val ROOT_TUN_BOOTSTRAP_ATTEMPTS = 20
         const val ROOT_TUN_BOOTSTRAP_DELAY_MS = 300L
         const val GLOBAL_GROUP_NAME = "GLOBAL"
-        const val ZAKO_GROUP_NAME = "zako"
     }
 
     private val appContext: Context = context.appContextOrSelf
@@ -1363,29 +1362,9 @@ class ProxyFacade(
 
     private fun globalProxyGroups(groups: List<ProxyGroupInfo>): List<ProxyGroupInfo> {
         if (groups.isEmpty()) return groups
-        val globalGroup = groups.firstOrNull { it.name.equals(GLOBAL_GROUP_NAME, ignoreCase = true) }
-            ?.withRememberedGlobalSelection()
-            ?: return emptyList()
-        val otherGroups = groups.filterNot { group ->
-            group.name.equals(GLOBAL_GROUP_NAME, ignoreCase = true) ||
-                group.name.equals(ZAKO_GROUP_NAME, ignoreCase = true)
-        }
-        return buildList(capacity = otherGroups.size + 2) {
-            add(globalGroup)
-            add(zakoProxyGroup())
-            addAll(otherGroups)
-        }
-    }
-
-    private fun zakoProxyGroup(): ProxyGroupInfo {
-        return ProxyGroupInfo(
-            name = ZAKO_GROUP_NAME,
-            type = Proxy.Type.Selector,
-            proxies = emptyList(),
-            now = "",
-            icon = null,
-            hidden = false,
-        )
+        return groups.firstOrNull { it.name.equals(GLOBAL_GROUP_NAME, ignoreCase = true) }
+            ?.let { listOf(it.withRememberedGlobalSelection()) }
+            ?: emptyList()
     }
 
     private fun ProxyGroupInfo.withRememberedGlobalSelection(): ProxyGroupInfo {
@@ -1464,7 +1443,6 @@ class ProxyFacade(
     ): Boolean {
         if (groupName.isEmpty() || selectedProxy.isEmpty()) return false
         if (type != Proxy.Type.Selector) return false
-        if (groupName.equals(ZAKO_GROUP_NAME, ignoreCase = true)) return false
         if (groupName.equals("DIRECT", ignoreCase = true) && proxies.size == 1) return false
         return proxies.any { proxy -> proxy.name == selectedProxy }
     }

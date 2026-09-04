@@ -22,12 +22,6 @@ Proxy = {
         Count = "%d nodes"
     }
 
-    Zako = {
-        Description = "View other policy group status only"
-        Others = "Other policy groups"
-        Badge = "Others"
-    }
-
     Type = {
         Direct = "Direct"
         Reject = "Reject"

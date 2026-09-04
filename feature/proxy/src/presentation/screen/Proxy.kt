@@ -94,9 +94,6 @@ import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
 
-private const val GLOBAL_GROUP_NAME = "GLOBAL"
-private const val ZAKO_GROUP_NAME = "zako"
-
 @Composable
 fun ProxyPager(
     mainInnerPadding: PaddingValues,
@@ -121,15 +118,10 @@ fun ProxyPager(
     var pendingTestGroupName by remember { mutableStateOf<String?>(null) }
     var pendingTestProxyName by remember { mutableStateOf<String?>(null) }
 
-    val globalGroup = remember(proxyGroups) {
-        proxyGroups.firstOrNull(ProxyGroupInfo::isGlobalGroup)
-    }
     val selectedGroup = remember(proxyGroups, selectedGroupName) {
         proxyGroups.firstOrNull { it.name == selectedGroupName } ?: proxyGroups.firstOrNull()
     }
-    val isViewingZako = displayTunnelMode == TunnelState.Mode.Global && selectedGroupName.isZakoGroupName()
-    val delayTargetGroup = if (isViewingZako) globalGroup else selectedGroup
-    val effectiveSelectedGroupName = delayTargetGroup?.name
+    val effectiveSelectedGroupName = selectedGroup?.name
     val onTestDelay = remember(effectiveSelectedGroupName, proxyViewModel) {
         { proxyViewModel.testDelay(effectiveSelectedGroupName) }
     }
@@ -165,16 +157,11 @@ fun ProxyPager(
         displayTunnelMode = tunnelMode
     }
 
-    LaunchedEffect(proxyGroups, selectedGroupName, displayTunnelMode) {
-        val selectableGroups = if (displayTunnelMode == TunnelState.Mode.Global) {
-            proxyGroups.globalModeTabGroups()
-        } else {
-            proxyGroups
-        }
+    LaunchedEffect(proxyGroups, selectedGroupName) {
         when {
-            selectableGroups.isEmpty() -> selectedGroupName = null
-            selectedGroupName == null || selectableGroups.none { it.name == selectedGroupName } -> {
-                selectedGroupName = selectableGroups.first().name
+            proxyGroups.isEmpty() -> selectedGroupName = null
+            selectedGroupName == null || proxyGroups.none { it.name == selectedGroupName } -> {
+                selectedGroupName = proxyGroups.first().name
             }
         }
     }
@@ -218,7 +205,7 @@ fun ProxyPager(
                 scrollBehavior = groupScrollBehavior,
                 onNavigateToProviders = onNavigateToProviders,
                 onOpenPanel = onOpenPanel,
-                onTestDelay = if (effectiveSelectedGroupName != null && !isViewingZako) onTestDelayAction else null,
+                onTestDelay = if (effectiveSelectedGroupName != null) onTestDelayAction else null,
                 showSortPopup = showSortPopup,
                 onShowSortPopupChange = { showSortPopup = it },
                 sortMode = sortMode,
@@ -354,28 +341,7 @@ private fun ProxySurfboardContent(
 ) {
     val spacing = LocalSpacing.current
     val selectedName = selectedGroupName ?: selectedGroup?.name
-    val isZakoPage = tunnelMode == TunnelState.Mode.Global && selectedName.isZakoGroupName()
-    val tabGroups = remember(proxyGroups, tunnelMode) {
-        if (tunnelMode == TunnelState.Mode.Global) proxyGroups.globalModeTabGroups() else proxyGroups
-    }
-    val tabSelectedName = selectedName
-    val zakoStatusGroups = remember(proxyGroups) { proxyGroups.zakoStatusGroups() }
-    val displayProxies = remember(proxyGroups, selectedGroup, tunnelMode, isZakoPage) {
-        if (
-            tunnelMode == TunnelState.Mode.Global &&
-            !isZakoPage &&
-            selectedGroup?.isGlobalGroup() == true
-        ) {
-            selectedGroup.proxies.filterNot { proxy ->
-                proxy.type.group || proxyGroups.any { group ->
-                    !group.isGlobalGroup() && !group.isZakoGroup() && group.name == proxy.name
-                }
-            }
-        } else {
-            selectedGroup?.proxies.orEmpty()
-        }
-    }
-    val isTesting = !isZakoPage && selectedName?.let(testingGroupNames::contains) == true
+    val isTesting = selectedName?.let(testingGroupNames::contains) == true
     val currentPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { modes.size })
     val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
@@ -433,8 +399,8 @@ private fun ProxySurfboardContent(
             ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     ProxyGroupTabSection(
-                        groups = tabGroups,
-                        selectedGroupName = tabSelectedName,
+                        groups = proxyGroups,
+                        selectedGroupName = selectedName,
                         onGroupSelected = onGroupSelected,
                     )
                 }
@@ -462,21 +428,7 @@ private fun ProxySurfboardContent(
                     }
                 }
 
-                if (isZakoPage) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        ZakoDescriptionCard()
-                    }
-                    items(items = zakoStatusGroups, key = { it.name }) { group ->
-                        NodeGroupCard(
-                            group = group,
-                            isDelayTesting = false,
-                            isSelected = false,
-                            showTrailingIndicator = false,
-                            onClick = null,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                } else if (selectedGroup == null) {
+                if (selectedGroup == null) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         CenteredText(
                             firstLine = MLang.Proxy.Empty.NoNodes,
@@ -484,7 +436,7 @@ private fun ProxySurfboardContent(
                         )
                     }
                 } else {
-                    items(items = displayProxies, key = { it.name }) { proxy ->
+                    items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
                         NodeCard(
                             proxy = proxy,
                             isSelected = proxy.name == effectiveNow,
@@ -638,37 +590,6 @@ private fun TunnelState.Mode.displayName(): String = when (this) {
     TunnelState.Mode.Global -> MLang.Proxy.Mode.Global
     TunnelState.Mode.Rule -> MLang.Proxy.Mode.Rule
     TunnelState.Mode.Script -> "Script"
-}
-
-private fun ProxyGroupInfo.isGlobalGroup(): Boolean = name.equals(GLOBAL_GROUP_NAME, ignoreCase = true)
-
-private fun ProxyGroupInfo.isZakoGroup(): Boolean = name.equals(ZAKO_GROUP_NAME, ignoreCase = true)
-
-private fun String?.isZakoGroupName(): Boolean = this?.equals(ZAKO_GROUP_NAME, ignoreCase = true) == true
-
-private fun List<ProxyGroupInfo>.globalModeTabGroups(): List<ProxyGroupInfo> {
-    val globalGroup = firstOrNull(ProxyGroupInfo::isGlobalGroup)
-    val zakoGroup = firstOrNull(ProxyGroupInfo::isZakoGroup)
-    return listOfNotNull(globalGroup, zakoGroup).ifEmpty { this }
-}
-
-private fun List<ProxyGroupInfo>.zakoStatusGroups(): List<ProxyGroupInfo> {
-    return filterNot { group -> group.isGlobalGroup() || group.isZakoGroup() }
-}
-
-@Composable
-private fun ZakoDescriptionCard() {
-    MdText(
-        text = MLang.Proxy.Zako.Description,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f))
-            .padding(horizontal = UiDp.dp16, vertical = UiDp.dp18),
-        style = MaterialTheme.typography.bodyMedium,
-        fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
 }
 
 @Composable
@@ -843,5 +764,4 @@ private fun ProxyGroupTab(
         )
     }
 }
-
 
