@@ -35,6 +35,10 @@ import java.io.File
 import java.net.InetSocketAddress
 
 object Clash {
+    private const val TRAFFIC_NOW_QUERY_CACHE_MILLIS = 500L
+    private const val TRAFFIC_TOTAL_QUERY_CACHE_MILLIS = 1_000L
+    private const val CONNECTION_QUERY_CACHE_MILLIS = 500L
+
     private val RootTunConfigJson = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
@@ -43,6 +47,9 @@ object Clash {
         ignoreUnknownKeys = true
         encodeDefaults = true
     }
+    private val trafficNowCache = TimedQueryCache<Long>()
+    private val trafficTotalCache = TimedQueryCache<Long>()
+    private val connectionsCache = TimedQueryCache<ConnectionSnapshot>()
 
     fun compilePreview(request: CompileRequest): CompileResult {
         val payload = Bridge.nativeCompilePreview(Json.encodeToString(CompileRequest.serializer(), request))
@@ -66,6 +73,7 @@ object Clash {
     }
 
     fun reset() {
+        clearRuntimeQueryCache()
         Bridge.nativeReset()
     }
 
@@ -87,26 +95,41 @@ object Clash {
     }
 
     fun queryTrafficNow(): Traffic {
-        return Bridge.nativeQueryTrafficNow()
+        return trafficNowCache.getOrQuery(TRAFFIC_NOW_QUERY_CACHE_MILLIS) {
+            Bridge.nativeQueryTrafficNow()
+        }
     }
 
     fun queryTrafficTotal(): Traffic {
-        return Bridge.nativeQueryTrafficTotal()
+        return trafficTotalCache.getOrQuery(TRAFFIC_TOTAL_QUERY_CACHE_MILLIS) {
+            Bridge.nativeQueryTrafficTotal()
+        }
     }
 
     fun queryConnections(): ConnectionSnapshot {
-        return ConnectionJson.decodeFromString(
-            ConnectionSnapshot.serializer(),
-            Bridge.nativeQueryConnections(),
-        )
+        return connectionsCache.getOrQuery(CONNECTION_QUERY_CACHE_MILLIS) {
+            ConnectionJson.decodeFromString(
+                ConnectionSnapshot.serializer(),
+                Bridge.nativeQueryConnections(),
+            )
+        }
     }
 
     fun closeConnection(id: String): Boolean {
-        return Bridge.nativeCloseConnection(id)
+        return Bridge.nativeCloseConnection(id).also { closed ->
+            if (closed) connectionsCache.clear()
+        }
     }
 
     fun closeAllConnections() {
         Bridge.nativeCloseAllConnections()
+        connectionsCache.clear()
+    }
+
+    private fun clearRuntimeQueryCache() {
+        trafficNowCache.clear()
+        trafficTotalCache.clear()
+        connectionsCache.clear()
     }
 
     fun notifyDnsChanged(dns: List<String>) {

@@ -77,7 +77,7 @@ class ServiceNotificationManager(
     @SuppressLint("MissingPermission")
     fun startTrafficUpdate(scope: CoroutineScope): Job {
         return scope.launch(Dispatchers.Default) {
-            PollingTimers.ticks(PollingTimerSpecs.ServiceTrafficNotification).collect {
+            PollingTimers.ticks(PollingTimerSpecs.RuntimeTrafficPolling).collect {
                 val notification = buildRunningNotification()
                 val fingerprint = "${notification.extras.getCharSequence(Notification.EXTRA_TITLE)}|" +
                     "${notification.extras.getCharSequence(Notification.EXTRA_TEXT)}|" +

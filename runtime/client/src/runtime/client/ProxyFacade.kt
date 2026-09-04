@@ -63,7 +63,6 @@ import java.util.*
 
 enum class ProxyGroupSyncPriority {
     OFF,
-    SLOW,
     FAST,
 }
 
@@ -1024,8 +1023,7 @@ class ProxyFacade(
         if (snapshot.phase != RuntimePhase.Running) {
             return ProxyGroupSyncPriority.OFF
         }
-        val requested = requests.values.maxByOrNull { it.ordinal } ?: ProxyGroupSyncPriority.OFF
-        return if (requested.ordinal > ProxyGroupSyncPriority.SLOW.ordinal) requested else ProxyGroupSyncPriority.SLOW
+        return requests.values.maxByOrNull { it.ordinal } ?: ProxyGroupSyncPriority.OFF
     }
 
     private fun restartProxyGroupSyncLoop(priority: ProxyGroupSyncPriority) {
@@ -1040,7 +1038,6 @@ class ProxyFacade(
 
         val timerSpec = when (priority) {
             ProxyGroupSyncPriority.FAST -> PollingTimerSpecs.RuntimeProxyGroupSyncFast
-            ProxyGroupSyncPriority.SLOW -> PollingTimerSpecs.RuntimeProxyGroupSyncSlow
             ProxyGroupSyncPriority.OFF -> return
         }
         proxyGroupSyncJob = scope.launch {

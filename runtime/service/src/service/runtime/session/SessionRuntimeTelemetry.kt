@@ -105,7 +105,9 @@ internal class SessionRuntimeTelemetry(
     fun startConnectionTracking() {
         stopConnectionTracking()
         connectionTrackingJob = scope.launch(Dispatchers.IO) {
-            PollingTimers.ticks(PollingTimerSpecs.SessionConnectionTracking).collect {
+            // Share the statistics collector's 5-second clock and the Clash query cache so
+            // connection history and per-app accounting do not fetch the same JNI snapshot twice.
+            PollingTimers.ticks(PollingTimerSpecs.TrafficStatsCollection).collect {
                 runCatching {
                     val snapshot = Clash.queryConnections()
                     ConnectionHistoryManager.updateConnections(snapshot.connections)

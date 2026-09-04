@@ -96,7 +96,7 @@ class RootTunService : BaseService() {
                         var unreachableCount = 0
                         var lastStatus = cachedStatus
 
-                        PollingTimers.ticks(PollingTimerSpecs.RootTunStatusNotification).collect {
+                        PollingTimers.ticks(PollingTimerSpecs.RuntimeTrafficPolling).collect {
                             val snapshotResult = runCatching {
                                 RootTunServiceBridge.queryStatus(appContextOrSelf)
                             }
