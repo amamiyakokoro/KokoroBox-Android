@@ -58,7 +58,6 @@ dependencies {
     implementation("io.github.panpf.sketch4:sketch-animated-webp:${gropify.dep.version.sketch4}")
     implementation("io.github.panpf.sketch4:sketch-compose-resources:${gropify.dep.version.sketch4}")
     implementation("dev.chrisbanes.haze:haze:${gropify.dep.version.haze}")
-    implementation("io.github.kyant0:shapes:1.2.0")
+    implementation("io.github.kyant0:shapes:1.2.1")
 }
-
 
