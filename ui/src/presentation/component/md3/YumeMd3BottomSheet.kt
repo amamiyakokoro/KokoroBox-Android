@@ -20,19 +20,23 @@
 
 package com.github.yumelira.yumebox.presentation.component.md3
 
+import android.graphics.Color as AndroidColor
 import android.os.Build
 import android.view.View
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.systemGestures
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
@@ -59,25 +62,6 @@ import top.yukonga.miuix.kmp.window.WindowBottomSheet
 
 object YumeMd3BottomSheetDefaults {
     val insideMargin: DpSize = DpSize(UiDp.dp24, UiDp.dp16)
-
-    @Composable
-    fun safeInsideMargin(
-        insideMargin: DpSize = this.insideMargin,
-        applyWindowInsets: Boolean = true,
-    ): DpSize {
-        if (!applyWindowInsets) return insideMargin
-
-        val navigationBarBottom = WindowInsets.navigationBars
-            .asPaddingValues()
-            .calculateBottomPadding()
-        val systemGestureBottom = WindowInsets.systemGestures
-            .asPaddingValues()
-            .calculateBottomPadding()
-        return DpSize(
-            width = insideMargin.width,
-            height = insideMargin.height + maxOf(navigationBarBottom, systemGestureBottom),
-        )
-    }
 
     @Composable
     fun backgroundColor(): Color = MaterialTheme.colorScheme.surface
@@ -101,7 +85,10 @@ fun YumeMd3BottomSheetNavigationBarEffect(backgroundColor: Color) {
 
     SideEffect {
         val window = view.findDialogWindowProvider()?.window ?: return@SideEffect
-        window.navigationBarColor = backgroundColor.toArgb()
+        window.navigationBarColor = AndroidColor.TRANSPARENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.navigationBarDividerColor = AndroidColor.TRANSPARENT
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
@@ -212,14 +199,12 @@ fun YumeMd3ActionBottomSheet(
     } else {
         dragHandleColor
     }
-    val safeInsideMargin = YumeMd3BottomSheetDefaults.safeInsideMargin(
-        insideMargin = insideMargin,
-        applyWindowInsets = defaultWindowInsetsPadding,
-    )
-
     val maxSheetHeight = LocalConfiguration.current.screenHeightDp.let { screenHeightDp ->
         (screenHeightDp * 0.75f).dp
     }
+    val bottomWindowInsets = WindowInsets.navigationBars
+        .union(WindowInsets.systemGestures)
+        .only(WindowInsetsSides.Bottom)
 
     WindowBottomSheet(
         show = show,
@@ -236,7 +221,7 @@ fun YumeMd3ActionBottomSheet(
         },
         onDismissFinished = onDismissFinished,
         outsideMargin = outsideMargin,
-        insideMargin = safeInsideMargin,
+        insideMargin = insideMargin,
         defaultWindowInsetsPadding = defaultWindowInsetsPadding,
         dragHandleColor = resolvedDragHandleColor,
         allowDismiss = allowDismiss,
@@ -255,7 +240,17 @@ fun YumeMd3ActionBottomSheet(
                     .heightIn(max = maxSheetHeight)
             },
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (defaultWindowInsetsPadding) {
+                            Modifier.windowInsetsPadding(bottomWindowInsets)
+                        } else {
+                            Modifier
+                        },
+                    ),
+            ) {
                 content()
             }
         }
