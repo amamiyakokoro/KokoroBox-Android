@@ -98,7 +98,6 @@ import top.yukonga.miuix.kmp.basic.ScrollBehavior
 fun ProxyPager(
     mainInnerPadding: PaddingValues,
     onNavigateToProviders: (() -> Unit)?,
-    onOpenPanel: (() -> Unit)?,
     isPageActive: Boolean,
     isProxyRunning: Boolean,
     onProxyStartRequested: (() -> Unit)? = null,
@@ -203,7 +202,6 @@ fun ProxyPager(
                 title = MLang.Proxy.Title,
                 scrollBehavior = groupScrollBehavior,
                 onNavigateToProviders = onNavigateToProviders,
-                onOpenPanel = onOpenPanel,
                 onTestDelay = if (effectiveSelectedGroupName != null) onTestDelayAction else null,
                 showSortPopup = showSortPopup,
                 onShowSortPopupChange = { showSortPopup = it },
@@ -261,7 +259,6 @@ private fun ProxyTopBar(
     title: String,
     scrollBehavior: ScrollBehavior,
     onNavigateToProviders: (() -> Unit)?,
-    onOpenPanel: (() -> Unit)?,
     onTestDelay: (() -> Unit)?,
     showSortPopup: Boolean,
     onShowSortPopupChange: (Boolean) -> Unit,
@@ -279,11 +276,6 @@ private fun ProxyTopBar(
                 if (onNavigateToProviders != null) {
                     IconButton(onClick = onNavigateToProviders) {
                         Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
-                    }
-                }
-                if (onOpenPanel != null) {
-                    IconButton(onClick = onOpenPanel) {
-                        Icon(AppMd3Icons.Proxy.Panel, contentDescription = MLang.Proxy.Action.Panel)
                     }
                 }
             }

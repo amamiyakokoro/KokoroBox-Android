@@ -12,7 +12,6 @@ Proxy = {
     }
 
     Action = {
-        Panel = "面板"
         Test = "測試"
         Sort = "排序"
     }

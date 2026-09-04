@@ -2,12 +2,6 @@
 Feature = {
     Title = "進階功能"
 
-    Panel = {
-        Section = "面板選擇"
-        SelectPanel = "選擇面板"
-        Unknown = "未知面板"
-    }
-
     Node = {
         Section = "節點"
         HealthCheckConcurrencyTitle = "測速並發數"

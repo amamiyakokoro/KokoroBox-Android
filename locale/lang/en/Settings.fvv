@@ -22,7 +22,7 @@ Settings = {
         MetaFeatures = "Meta Features"
         MetaFeaturesSummary = "Meta Extensions"
         Lab = "Lab"
-        LabSummary = "Panel · Node testing"
+        LabSummary = "Node testing"
     }
 
     DataSettings = {

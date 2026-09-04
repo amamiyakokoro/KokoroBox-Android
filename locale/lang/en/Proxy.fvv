@@ -12,7 +12,6 @@ Proxy = {
     }
 
     Action = {
-        Panel = "Panel"
         Test = "Test"
         Sort = "Sort"
     }

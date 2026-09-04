@@ -29,7 +29,6 @@ import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.data.store.Preference
 import com.github.yumelira.yumebox.data.controller.UserSettingsBackupController
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
@@ -71,8 +70,6 @@ class AppSettingsViewModel(
     val screenshotProtectionEnabled: Preference<Boolean> = settings.screenshotProtectionEnabled
     val biometricUnlockEnabled: Preference<Boolean> = settings.biometricUnlockEnabled
     val exitUiWhenBackground: Preference<Boolean> = settings.exitUiWhenBackground
-    val selectedPanelType: Preference<Int> = settings.selectedPanelType
-    val panelOpenMode: Preference<LinkOpenMode> = settings.panelOpenMode
 
     val customUserAgent: Preference<String> = settings.customUserAgent
 
@@ -126,8 +123,6 @@ class AppSettingsViewModel(
     fun onScreenshotProtectionEnabledChange(enabled: Boolean) = screenshotProtectionEnabled.set(enabled)
     fun onBiometricUnlockEnabledChange(enabled: Boolean) = biometricUnlockEnabled.set(enabled)
     fun onExitUiWhenBackgroundChange(enabled: Boolean) = exitUiWhenBackground.set(enabled)
-    fun onSelectedPanelTypeChange(panelType: Int) = selectedPanelType.set(panelType)
-    fun onPanelOpenModeChange(mode: LinkOpenMode) = panelOpenMode.set(mode)
 
     fun applyCustomUserAgent(userAgent: String) = controller.applyCustomUserAgent(userAgent)
 

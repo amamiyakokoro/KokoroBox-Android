@@ -26,7 +26,6 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
@@ -40,11 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.common.util.openUrl
-import com.github.yumelira.yumebox.data.store.LinkOpenMode
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.screen.ProxyPager
-import com.github.yumelira.yumebox.presentation.webview.WebViewUtils.getPanelUrl
 import com.github.yumelira.yumebox.screen.acg.AcgHomePage
 import com.github.yumelira.yumebox.screen.acg.calculateHomeVisibility
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
@@ -65,7 +61,6 @@ fun MainScreen(
     navigator: DestinationsNavigator,
     initialPage: Int = 0,
 ) {
-    val activity = LocalActivity.current
     val initialMainPage = initialPage.coerceIn(0, 3)
     val pagerState = rememberPagerState(initialPage = initialMainPage, pageCount = { 4 })
     val mainPagerState = rememberMainPagerState(pagerState)
@@ -82,8 +77,6 @@ fun MainScreen(
     val acgWallpaperZoom by appSettingsViewModel.acgWallpaperZoom.state.collectAsState()
     val acgWallpaperBiasX by appSettingsViewModel.acgWallpaperBiasX.state.collectAsState()
     val acgWallpaperBiasY by appSettingsViewModel.acgWallpaperBiasY.state.collectAsState()
-    val selectedPanelType by appSettingsViewModel.selectedPanelType.state.collectAsState()
-    val panelOpenMode by appSettingsViewModel.panelOpenMode.state.collectAsState()
     val bottomBarScrollBehavior = rememberBottomBarScrollBehavior(autoHideEnabled = bottomBarAutoHideEnabled)
     val pagerFlingBehavior = rememberMainPagerFlingBehavior(mainPagerState.pagerState)
     var settledMainPage by remember { mutableIntStateOf(initialMainPage) }
@@ -194,9 +187,6 @@ fun MainScreen(
                         acgWallpaperBiasX = acgWallpaperBiasX,
                         acgWallpaperBiasY = acgWallpaperBiasY,
                         navigator = navigator,
-                        activity = activity,
-                        selectedPanelType = selectedPanelType,
-                        panelOpenMode = panelOpenMode,
                         homePageProgress = homeVisibility,
                         selectedPage = settledMainPage,
                         isProxyRunning = isProxyRunning,
@@ -231,9 +221,6 @@ private fun MainRootPageContent(
     acgWallpaperBiasX: Float,
     acgWallpaperBiasY: Float,
     navigator: DestinationsNavigator,
-    activity: Activity?,
-    selectedPanelType: Int,
-    panelOpenMode: LinkOpenMode,
     homePageProgress: Float,
     selectedPage: Int,
     isProxyRunning: Boolean,
@@ -266,15 +253,6 @@ private fun MainRootPageContent(
             onNavigateToProviders = {
                 navigator.navigate(ProvidersScreenDestination) {
                     launchSingleTop = true
-                }
-            },
-            onOpenPanel = onOpenPanel@{
-                val context = activity ?: return@onOpenPanel
-                val panelUrl = getPanelUrl(selectedPanelType)
-                if (panelUrl.isEmpty()) return@onOpenPanel
-                when (panelOpenMode) {
-                    LinkOpenMode.IN_APP -> WebViewActivity.start(context, panelUrl)
-                    LinkOpenMode.EXTERNAL_BROWSER -> openUrl(context, panelUrl)
                 }
             },
             isPageActive = selectedPage == 1,

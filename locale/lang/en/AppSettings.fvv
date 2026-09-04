@@ -112,7 +112,7 @@ AppSettings = {
 
     Backup = {
         ExportTitle = "Export Settings Backup"
-        ExportSummary = "Save app preferences, network options, panel links, and display settings as a JSON file"
+        ExportSummary = "Save app preferences, network options, profile links, and display settings as a JSON file"
         ImportTitle = "Import Settings Backup"
         ImportSummary = "Restore settings from a KokoroBox backup JSON file"
         ExportSuccess = "Settings backup exported"

@@ -67,8 +67,6 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val screenshotProtectionEnabled by boolFlow(false)
     val biometricUnlockEnabled by boolFlow(false)
     val exitUiWhenBackground by boolFlow(false)
-    val selectedPanelType by intFlow(0)
-    val panelOpenMode by enumFlow(LinkOpenMode.IN_APP)
 
     val customUserAgent by strFlow("")
 

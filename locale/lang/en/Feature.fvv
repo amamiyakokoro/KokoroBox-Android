@@ -2,12 +2,6 @@
 Feature = {
     Title = "Advanced Features"
 
-    Panel = {
-        Section = "Panel Selection"
-        SelectPanel = "Select Panel"
-        Unknown = "Unknown Panel"
-    }
-
     Node = {
         Section = "Nodes"
         HealthCheckConcurrencyTitle = "Health Check Concurrency"

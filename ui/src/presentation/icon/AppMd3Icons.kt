@@ -122,7 +122,6 @@ object AppMd3Icons {
     object Proxy {
         val DelayTest: ImageVector = Icons.Rounded.Speed
         val CloudTest: ImageVector = Icons.Rounded.CloudQueue
-        val Panel: ImageVector = Icons.Rounded.Public
         val Profiles: ImageVector = Icons.Rounded.Folder
     }
 

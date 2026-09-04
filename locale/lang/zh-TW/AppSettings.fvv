@@ -112,7 +112,7 @@ AppSettings = {
 
     Backup = {
         ExportTitle = "匯出設定備份"
-        ExportSummary = "將應用程式偏好、網路選項、面板連結和顯示設定儲存為 JSON 檔案"
+        ExportSummary = "將應用程式偏好、網路選項、設定檔連結和顯示設定儲存為 JSON 檔案"
         ImportTitle = "匯入設定備份"
         ImportSummary = "從 KokoroBox 備份 JSON 檔案還原設定"
         ExportSuccess = "已匯出設定備份"

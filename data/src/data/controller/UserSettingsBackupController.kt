@@ -211,14 +211,10 @@ class UserSettingsBackupController(
     }
 
     private fun exportFeatureSettings(): JsonObject = buildJsonObject {
-        put("selectedPanelType", appSettingsStore.selectedPanelType.value)
-        put("panelOpenMode", appSettingsStore.panelOpenMode.value.name)
         put("exitUiWhenBackground", appSettingsStore.exitUiWhenBackground.value)
     }
 
     private fun importFeatureSettings(obj: JsonObject) {
-        obj.int("selectedPanelType")?.let(appSettingsStore.selectedPanelType::set)
-        obj.enumValue<LinkOpenMode>("panelOpenMode")?.let(appSettingsStore.panelOpenMode::set)
         obj.bool("exitUiWhenBackground")?.let(appSettingsStore.exitUiWhenBackground::set)
     }
 
