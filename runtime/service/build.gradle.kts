@@ -41,15 +41,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
 
-    val mmkv64 = gropify.dep.version.mmkv64
-    val mmkv32 = gropify.dep.version.mmkv32
-    val injectedAbi = findProperty("android.injected.build.abi") as? String
-    val mmkvVersion = if (injectedAbi in listOf("arm64-v8a", "x86_64")) mmkv64 else mmkv32
-    implementation("com.tencent:mmkv:$mmkvVersion")
+    implementation("com.tencent:mmkv:${gropify.dep.version.mmkv}")
 
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
     implementation("com.squareup.okhttp3:okhttp:${gropify.dep.version.okhttp}")
     implementation("com.github.topjohnwu.libsu:core:6.0.0")
     implementation("com.github.topjohnwu.libsu:service:6.0.0")
 }
-

@@ -44,9 +44,5 @@ dependencies {
     implementation("org.tukaani:xz:1.12")
     implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")
 
-    val mmkv64 = gropify.dep.version.mmkv64
-    val mmkv32 = gropify.dep.version.mmkv32
-    val injectedAbi = findProperty("android.injected.build.abi") as? String
-    val mmkvVersion = if (injectedAbi in listOf("arm64-v8a", "x86_64")) mmkv64 else mmkv32
-    implementation("com.tencent:mmkv:$mmkvVersion")
+    implementation("com.tencent:mmkv:${gropify.dep.version.mmkv}")
 }

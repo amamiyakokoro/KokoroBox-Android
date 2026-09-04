@@ -261,11 +261,7 @@ dependencies {
     implementation("dev.chrisbanes.haze:haze:${gropify.dep.version.haze}")
     implementation("androidx.navigationevent:navigationevent-compose:${gropify.dep.version.navigationevent}")
 
-    val mmkv64 = gropify.dep.version.mmkv64
-    val mmkv32 = gropify.dep.version.mmkv32
-    val mmkvVersion = if (injectedAbi in listOf("arm64-v8a", "x86_64")) mmkv64 else mmkv32
-    //noinspection NewerVersionAvailable
-    implementation("com.tencent:mmkv:$mmkvVersion")
+    implementation("com.tencent:mmkv:${gropify.dep.version.mmkv}")
 
     implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")
     implementation("io.insert-koin:koin-android:${gropify.dep.version.koin}")
