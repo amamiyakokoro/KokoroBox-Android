@@ -324,7 +324,6 @@ class SessionRuntime(
         ensureNotInterrupted(spec)
         startObservers()
         notifyCurrentTimeZone()
-        startConnectionTracking()
         ensureNotInterrupted(spec)
 
         transport.prepare(spec)
@@ -411,7 +410,6 @@ class SessionRuntime(
             ),
         )
         stopLogStream()
-        stopConnectionTracking()
         stopObservers()
         runCatching { transport.stop() }
         teardownCore()
@@ -623,14 +621,6 @@ class SessionRuntime(
 
     private fun stopLogStream() {
         telemetry.stopLogStream()
-    }
-
-    private fun startConnectionTracking() {
-        telemetry.startConnectionTracking()
-    }
-
-    private fun stopConnectionTracking() {
-        telemetry.stopConnectionTracking()
     }
 
     private fun publishSnapshot(snapshot: RuntimeSnapshot) {

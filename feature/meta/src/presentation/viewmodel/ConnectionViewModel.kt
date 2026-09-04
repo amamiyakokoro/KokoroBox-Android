@@ -145,7 +145,6 @@ class ConnectionViewModel : ViewModel() {
         withContext(Dispatchers.IO) {
             try {
                 val snapshot = ServiceClient.clash().queryConnections()
-                ConnectionHistoryManager.updateConnections(snapshot.connections)
                 _state.update {
                     it.copy(
                         snapshot = snapshot,

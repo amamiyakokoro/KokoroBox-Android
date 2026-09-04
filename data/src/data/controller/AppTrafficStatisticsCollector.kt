@@ -22,6 +22,7 @@ package com.github.yumelira.yumebox.data.controller
 
 import com.github.yumelira.yumebox.core.model.ConnectionInfo
 import com.github.yumelira.yumebox.core.model.ConnectionSnapshot
+import com.github.yumelira.yumebox.core.domain.ConnectionHistoryManager
 import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
 import com.github.yumelira.yumebox.core.util.PollingTimers
 import com.github.yumelira.yumebox.data.model.AppTrafficDeltaRecord
@@ -93,6 +94,7 @@ class AppTrafficStatisticsCollector(
     private suspend fun collectTrafficData() {
         val totalTraffic = queryTrafficTotal()
         val snapshot = queryConnections()
+        ConnectionHistoryManager.updateConnections(snapshot.connections)
         val timestamp = System.currentTimeMillis()
         val currentProfileId = currentProfileId()
             ?: runCatching { queryActiveProfileId() }.getOrNull()
@@ -314,6 +316,7 @@ class AppTrafficStatisticsCollector(
 
     private fun resetBaselines() {
         trafficStatisticsStore.flushNow()
+        ConnectionHistoryManager.updateConnections(emptyList())
         connectionBaselines.clear()
         lastTotalUpload = NO_BASELINE
         lastTotalDownload = NO_BASELINE
@@ -347,6 +350,7 @@ class AppTrafficStatisticsCollector(
 
     fun stop() {
         trafficStatisticsStore.flushNow()
+        ConnectionHistoryManager.updateConnections(emptyList())
         monitoringJob?.cancel()
         monitoringJob = null
         collectionJob?.cancel()
