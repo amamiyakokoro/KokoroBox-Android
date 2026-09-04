@@ -138,7 +138,6 @@ fun ProxyPager(
                 pendingTestGroupName = effectiveSelectedGroupName
                 pendingTestProxyName = null
                 onProxyStartRequested?.invoke()
-                Unit
             }
         }
     }
@@ -249,8 +248,7 @@ fun ProxyPager(
                         effectiveSelectedGroupName?.let { groupName ->
                             proxyViewModel.testProxyDelay(groupName, proxyName)
                         }
-            }
-                    Unit
+                    }
                 },
                 singleNodeTestEnabled = singleNodeTest,
             )
@@ -764,4 +762,3 @@ private fun ProxyGroupTab(
         )
     }
 }
-

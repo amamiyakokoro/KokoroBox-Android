@@ -44,7 +44,7 @@ dependencies {
     implementation(composeBom)
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.material3:material3:1.5.0-alpha04")
+    implementation("androidx.compose.material3:material3:1.5.0-alpha27")
     implementation("androidx.activity:activity-compose:${gropify.dep.version.activityCompose}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${gropify.dep.version.lifecycle}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
@@ -60,4 +60,3 @@ dependencies {
     implementation("top.yukonga.miuix.kmp:miuix-preference:${gropify.dep.version.miuix}")
     implementation("top.yukonga.miuix.kmp:miuix-icons:${gropify.dep.version.miuix}")
 }
-

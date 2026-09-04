@@ -45,7 +45,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.material3:material3:1.5.0-alpha04")
+    implementation("androidx.compose.material3:material3:1.5.0-alpha27")
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.core:core-ktx:${gropify.dep.version.coreKtx}")
@@ -60,4 +60,3 @@ dependencies {
     implementation("dev.chrisbanes.haze:haze:${gropify.dep.version.haze}")
     implementation("io.github.kyant0:shapes:1.2.1")
 }
-
