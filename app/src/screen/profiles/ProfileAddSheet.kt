@@ -75,6 +75,11 @@ import java.io.File
 import java.util.*
 import kotlin.math.max
 
+private const val PROFILE_TYPE_KOKORO = 0
+private const val PROFILE_TYPE_SUBSCRIPTION = 1
+private const val PROFILE_TYPE_LOCAL_FILE = 2
+private const val PROFILE_TYPE_QR_SCAN = 3
+
 @Composable
 internal fun AddProfileSheet(
     show: MutableState<Boolean>,
@@ -92,7 +97,7 @@ internal fun AddProfileSheet(
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
-    var selectedTypeIndex by remember { mutableIntStateOf(0) }
+    var selectedTypeIndex by remember { mutableIntStateOf(PROFILE_TYPE_KOKORO) }
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
     var filePath by remember { mutableStateOf("") }
@@ -157,16 +162,16 @@ internal fun AddProfileSheet(
 
     val clearCurrentTypeState = {
         when (selectedTypeIndex) {
-            0 -> url = ""
-            1 -> {
+            PROFILE_TYPE_SUBSCRIPTION -> url = ""
+            PROFILE_TYPE_LOCAL_FILE -> {
                 filePath = ""
                 fileName = ""
             }
 
-            2 -> {
+            PROFILE_TYPE_QR_SCAN -> {
             }
 
-            3 -> Unit
+            PROFILE_TYPE_KOKORO -> Unit
         }
         error = ""
     }
@@ -185,14 +190,14 @@ internal fun AddProfileSheet(
         hasCameraPermission = isGranted
         if (!isGranted) {
             context.toast(MLang.ProfilesPage.QrScanner.NeedCamera, Toast.LENGTH_LONG)
-            selectedTypeIndex = 0
+            selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
         }
     }
 
     LaunchedEffect(selectedTypeIndex) {
-        if (selectedTypeIndex == 2 && !hasCameraPermission) {
+        if (selectedTypeIndex == PROFILE_TYPE_QR_SCAN && !hasCameraPermission) {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        } else if (selectedTypeIndex == 3) {
+        } else if (selectedTypeIndex == PROFILE_TYPE_KOKORO) {
             profilesViewModel.refreshKokoroAccount()
         }
     }
@@ -213,7 +218,7 @@ internal fun AddProfileSheet(
 
     val showCameraPreview by remember(show.value, selectedTypeIndex, isDownloading, hasCameraPermission) {
         derivedStateOf {
-            show.value && selectedTypeIndex == 2 && !isDownloading && hasCameraPermission
+            show.value && selectedTypeIndex == PROFILE_TYPE_QR_SCAN && !isDownloading && hasCameraPermission
         }
     }
 
@@ -224,18 +229,18 @@ internal fun AddProfileSheet(
             if (profileToEdit != null) {
                 name = profileToEdit.name
                 if (profileToEdit.type == Profile.Type.Url) {
-                    selectedTypeIndex = 0
+                    selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
                     url = profileToEdit.source
                 } else {
-                    selectedTypeIndex = 1
+                    selectedTypeIndex = PROFILE_TYPE_LOCAL_FILE
                     filePath = profileToEdit.source
                     fileName = if (profileToEdit.source.isNotEmpty()) File(profileToEdit.source).name else ""
                 }
             } else if (!importUrl.isNullOrBlank()) {
-                selectedTypeIndex = 0
+                selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
                 url = importUrl
             } else {
-                selectedTypeIndex = 0
+                selectedTypeIndex = PROFILE_TYPE_KOKORO
                 try {
                     val clipboardUrl = readClipboardAndCheckUrl()
                     if (clipboardUrl != null) {
@@ -314,7 +319,7 @@ internal fun AddProfileSheet(
                         val result = readQrFromImage(context, it)
                         if (result != null) {
                             url = result
-                            selectedTypeIndex = 0
+                            selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
                             context.toast(MLang.ProfilesPage.QrScanner.RecognizeSuccess)
                         } else {
                             context.toast(MLang.ProfilesPage.QrScanner.RecognizeFailed)
@@ -338,14 +343,14 @@ internal fun AddProfileSheet(
     }
 
     fun submitProfile() {
-        if (selectedTypeIndex == 2 || isDownloading) {
+        if (selectedTypeIndex == PROFILE_TYPE_QR_SCAN || isDownloading) {
             return
         }
-        if (selectedTypeIndex == 0 && url.isBlank()) {
+        if (selectedTypeIndex == PROFILE_TYPE_SUBSCRIPTION && url.isBlank()) {
             error = MLang.ProfilesPage.Validation.EnterUrl
             return
         }
-        if (selectedTypeIndex == 1 && filePath.isBlank()) {
+        if (selectedTypeIndex == PROFILE_TYPE_LOCAL_FILE && filePath.isBlank()) {
             error = MLang.ProfilesPage.Validation.SelectFile
             return
         }
@@ -356,7 +361,9 @@ internal fun AddProfileSheet(
             kokoroSubscriptionOptions
         }
         val normalizedKokoroSettings = effectiveKokoroOptions.normalize(kokoroOptions)
-        if (selectedTypeIndex == 3 && (kokoroAccount == null || normalizedKokoroSettings.plan.isBlank())) {
+        if (selectedTypeIndex == PROFILE_TYPE_KOKORO &&
+            (kokoroAccount == null || normalizedKokoroSettings.plan.isBlank())
+        ) {
             error = MLang.ProfilesPage.Kokoro.LoginRequired
             return
         }
@@ -366,7 +373,7 @@ internal fun AddProfileSheet(
         hasShownCompleteAnimation = false
         isDownloading = true
 
-        if (selectedTypeIndex == 0) {
+        if (selectedTypeIndex == PROFILE_TYPE_SUBSCRIPTION) {
             if (profileToEdit != null) {
                 onUpdateProfile(
                     profileToEdit.uuid,
@@ -383,7 +390,7 @@ internal fun AddProfileSheet(
                     null
                 )
             }
-        } else if (selectedTypeIndex == 3 && kokoroAccount != null) {
+        } else if (selectedTypeIndex == PROFILE_TYPE_KOKORO && kokoroAccount != null) {
             val fallbackName = buildString {
                 append(MLang.ProfilesPage.Kokoro.DefaultProfileName)
                 normalizedKokoroSettings.plan.takeIf(String::isNotBlank)?.let {
@@ -431,7 +438,7 @@ internal fun AddProfileSheet(
         show = show.value,
         title = when {
             profileToEdit != null -> MLang.ProfilesPage.Sheet.EditTitle
-            selectedTypeIndex == 3 -> MLang.ProfilesPage.Type.Kokoro
+            selectedTypeIndex == PROFILE_TYPE_KOKORO -> MLang.ProfilesPage.Type.Kokoro
             else -> MLang.ProfilesPage.Sheet.AddTitle
         },
         startAction = {
@@ -443,7 +450,7 @@ internal fun AddProfileSheet(
             }
         },
         endAction = {
-            if (!isDownloading && selectedTypeIndex != 2) {
+            if (!isDownloading && selectedTypeIndex != PROFILE_TYPE_QR_SCAN) {
                 AppBottomSheetConfirmAction(
                     contentDescription = "Confirm",
                     onClick = { submitProfile() },
@@ -517,7 +524,7 @@ internal fun AddProfileSheet(
                         onSelectQrImage = { qrImageLauncher.launch("image/*") },
                         onQrScanned = { scannedUrl ->
                             url = scannedUrl
-                            selectedTypeIndex = 0
+                            selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
                         },
                         kokoroAuthState = kokoroAuthState,
                         kokoroOptions = kokoroOptions,
@@ -653,14 +660,14 @@ private fun ProfileFormContent(
             label = "ProfileTypeContent",
         ) { typeIndex ->
             when (typeIndex) {
-                2 -> QrScannerContent(
+                PROFILE_TYPE_QR_SCAN -> QrScannerContent(
                     hasCameraPermission = hasCameraPermission,
                     showCameraPreview = showCameraPreview,
                     onSelectQrImage = onSelectQrImage,
                     onQrScanned = onQrScanned,
                 )
 
-                3 -> KokoroProfileContent(
+                PROFILE_TYPE_KOKORO -> KokoroProfileContent(
                     authState = kokoroAuthState,
                     settings = kokoroOptions,
                     availableOptions = kokoroSubscriptionOptions,
@@ -700,10 +707,10 @@ private fun ProfileTypeSelectorCard(
             YumeMd3DropdownPreference(
                 title = MLang.ProfilesPage.Type.Title,
                 items = listOf(
+                    MLang.ProfilesPage.Type.Kokoro,
                     MLang.ProfilesPage.Type.Subscription,
                     MLang.ProfilesPage.Type.LocalFile,
                     MLang.ProfilesPage.Type.QrScan,
-                    MLang.ProfilesPage.Type.Kokoro,
                 ),
                 selectedIndex = selectedTypeIndex,
                 onSelectedIndexChange = onTypeSelected,
@@ -777,7 +784,7 @@ private fun ManualProfileContent(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        if (typeIndex == 0) {
+        if (typeIndex == PROFILE_TYPE_SUBSCRIPTION) {
             YumeMd3OutlinedTextField(
                 value = url,
                 onValueChange = onUrlChange,
