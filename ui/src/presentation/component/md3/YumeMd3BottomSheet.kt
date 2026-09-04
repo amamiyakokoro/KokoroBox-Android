@@ -20,6 +20,8 @@
 
 package com.github.yumelira.yumebox.presentation.component.md3
 
+import android.os.Build
+import android.view.View
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
@@ -35,14 +37,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowCompat
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.github.yumelira.yumebox.presentation.theme.UiDp
@@ -83,6 +91,31 @@ object YumeMd3BottomSheetDefaults {
     } else {
         MaterialTheme.colorScheme.onSurface.copy(alpha = AppTheme.opacity.disabled)
     }
+}
+
+@Composable
+@Suppress("DEPRECATION")
+fun YumeMd3BottomSheetNavigationBarEffect(backgroundColor: Color) {
+    val view = LocalView.current
+    val useDarkIcons = backgroundColor.luminance() > 0.5f
+
+    SideEffect {
+        val window = view.findDialogWindowProvider()?.window ?: return@SideEffect
+        window.navigationBarColor = backgroundColor.toArgb()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+        WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = useDarkIcons
+    }
+}
+
+private fun View.findDialogWindowProvider(): DialogWindowProvider? {
+    var current: Any? = this
+    while (current != null) {
+        if (current is DialogWindowProvider) return current
+        current = (current as? View)?.parent
+    }
+    return null
 }
 
 data class YumeMd3BottomSheetAction(
@@ -209,6 +242,7 @@ fun YumeMd3ActionBottomSheet(
         allowDismiss = allowDismiss,
         enableNestedScroll = enableNestedScroll,
     ) {
+        YumeMd3BottomSheetNavigationBarEffect(resolvedBackgroundColor)
         Box(
             modifier = if (contentScrollEnabled) {
                 Modifier

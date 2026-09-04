@@ -34,6 +34,7 @@ import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheet
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetDefaults
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetIconAction
+import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3BottomSheetNavigationBarEffect
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
@@ -57,6 +58,11 @@ object AppBottomSheetDefaults {
 
     @Composable
     fun actionIconTint(enabled: Boolean): Color = YumeMd3BottomSheetDefaults.actionIconTint(enabled)
+}
+
+@Composable
+fun AppBottomSheetNavigationBarEffect(backgroundColor: Color) {
+    YumeMd3BottomSheetNavigationBarEffect(backgroundColor)
 }
 
 data class AppBottomSheetAction(

@@ -39,6 +39,7 @@ import com.github.yumelira.yumebox.core.model.Proxy
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetDefaults
 import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetNavigationBarEffect
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
 import com.github.yumelira.yumebox.presentation.screen.node.NodeSheetContent
@@ -192,6 +193,7 @@ fun ProxySheetContent(
         ),
         enableNestedScroll = false
     ) {
+        AppBottomSheetNavigationBarEffect(MiuixTheme.colorScheme.surface)
         AnimatedContent(
             targetState = selectedGroupName,
             transitionSpec = {
