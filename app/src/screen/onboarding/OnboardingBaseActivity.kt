@@ -37,7 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -111,11 +111,11 @@ private fun OnboardingActivityTheme(
     content: @Composable () -> Unit,
 ) {
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
-    val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
-    val colorTheme by appSettingsViewModel.colorTheme.state.collectAsState()
-    val themeSeedColorArgb by appSettingsViewModel.themeSeedColorArgb.state.collectAsState()
-    val invertOnPrimaryColors by appSettingsViewModel.invertOnPrimaryColors.state.collectAsState()
-    val pageScale by appSettingsViewModel.pageScale.state.collectAsState()
+    val themeMode by appSettingsViewModel.themeMode.state.collectAsStateWithLifecycle()
+    val colorTheme by appSettingsViewModel.colorTheme.state.collectAsStateWithLifecycle()
+    val themeSeedColorArgb by appSettingsViewModel.themeSeedColorArgb.state.collectAsStateWithLifecycle()
+    val invertOnPrimaryColors by appSettingsViewModel.invertOnPrimaryColors.state.collectAsStateWithLifecycle()
+    val pageScale by appSettingsViewModel.pageScale.state.collectAsStateWithLifecycle()
 
     ProvideAndroidPlatformTheme {
         val systemDensity = LocalDensity.current

@@ -20,6 +20,8 @@
 
 
 package com.github.yumelira.yumebox.presentation.screen
+
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.net.Uri
 import android.widget.Toast
@@ -84,9 +86,9 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
     val scrollBehavior = MiuixScrollBehavior()
     val context = LocalContext.current
 
-    val providers by viewModel.providers.collectAsState()
-    val isRunning by viewModel.isRunning.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
+    val providers by viewModel.providers.collectAsStateWithLifecycle()
+    val isRunning by viewModel.isRunning.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(isRunning) {
         if (isRunning) {

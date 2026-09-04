@@ -38,7 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -78,7 +78,7 @@ import java.util.Date
 @Destination<RootGraph>
 fun AppDataManagementScreen() {
     val viewModel = koinViewModel<AppDataManagementViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val showGeoHistorySheet = remember { mutableStateOf(false) }
     val showLogFilesSheet = remember { mutableStateOf(false) }

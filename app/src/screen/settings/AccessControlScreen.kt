@@ -22,6 +22,11 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -74,8 +79,9 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
     val mainLikePadding = rememberStandalonePageMainPadding()
     val combinedBottomPadding = mainLikePadding.calculateBottomPadding() + spacing.space12
     val viewModel = koinViewModel<AccessControlViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
-    val filteredApps by viewModel.filteredApps.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val filteredApps by viewModel.filteredApps.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var showSettingsSheet by remember { mutableStateOf(false) }
     var searchStatus by remember {
@@ -126,25 +132,27 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
         }
     }
 
-    LaunchedEffect(viewModel) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is AccessControlViewModel.AccessControlUiEffect.RegionalSelectionCompleted -> {
-                    val label = if (effect.selectChina) {
-                        MLang.AccessControl.Settings.ChinaApps
-                    } else {
-                        MLang.AccessControl.Settings.OverseasApps
-                    }
-                    context.toast(
-                        MLang.AccessControl.Settings.RegionSelectResult.format(
-                            label,
-                            effect.selectedCount,
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect { effect ->
+                when (effect) {
+                    is AccessControlViewModel.AccessControlUiEffect.RegionalSelectionCompleted -> {
+                        val label = if (effect.selectChina) {
+                            MLang.AccessControl.Settings.ChinaApps
+                        } else {
+                            MLang.AccessControl.Settings.OverseasApps
+                        }
+                        context.toast(
+                            MLang.AccessControl.Settings.RegionSelectResult.format(
+                                label,
+                                effect.selectedCount,
+                            )
                         )
-                    )
-                }
+                    }
 
-                is AccessControlViewModel.AccessControlUiEffect.ShowError -> context.toast(effect.message)
-                is AccessControlViewModel.AccessControlUiEffect.ShowMessage -> context.toast(effect.message)
+                    is AccessControlViewModel.AccessControlUiEffect.ShowError -> context.toast(effect.message)
+                    is AccessControlViewModel.AccessControlUiEffect.ShowMessage -> context.toast(effect.message)
+                }
             }
         }
     }

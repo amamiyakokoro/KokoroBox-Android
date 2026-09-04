@@ -28,7 +28,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.yumelira.yumebox.common.util.AppLanguageManager
 import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
 import com.github.yumelira.yumebox.presentation.theme.YumeTheme
@@ -52,10 +52,10 @@ class ProxySheetActivity : ComponentActivity() {
 
         setContent {
             val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
-            val themeMode = appSettingsViewModel.themeMode.state.collectAsState().value
-            val colorTheme = appSettingsViewModel.colorTheme.state.collectAsState().value
-            val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsState().value
-            val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsState().value
+            val themeMode = appSettingsViewModel.themeMode.state.collectAsStateWithLifecycle().value
+            val colorTheme = appSettingsViewModel.colorTheme.state.collectAsStateWithLifecycle().value
+            val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsStateWithLifecycle().value
+            val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsStateWithLifecycle().value
 
             ProvideAndroidPlatformTheme {
                 YumeTheme(

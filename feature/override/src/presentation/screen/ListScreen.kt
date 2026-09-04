@@ -20,6 +20,8 @@
 
 
 package com.github.yumelira.yumebox.presentation.screen
+
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -70,9 +72,9 @@ fun OverrideListScreen(
     onOpenCodeEditor: (configId: String, configName: String) -> Unit = { _, _ -> },
 ) {
     val viewModel: OverrideConfigViewModel = koinViewModel()
-    val userConfigs by viewModel.userConfigs.collectAsState()
-    val usageCountMap by viewModel.usageCountMap.collectAsState()
-    val pendingRevealConfigId by viewModel.pendingRevealConfigId.collectAsState()
+    val userConfigs by viewModel.userConfigs.collectAsStateWithLifecycle()
+    val usageCountMap by viewModel.usageCountMap.collectAsStateWithLifecycle()
+    val pendingRevealConfigId by viewModel.pendingRevealConfigId.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current

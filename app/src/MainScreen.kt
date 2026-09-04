@@ -20,6 +20,11 @@
 
 package com.github.yumelira.yumebox
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.app.Activity
@@ -69,14 +74,15 @@ fun MainScreen(
 
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
-    val isProxyRunning by homeViewModel.isRunning.collectAsState()
-    val bottomBarAutoHideEnabled by appSettingsViewModel.bottomBarAutoHide.state.collectAsState()
-    val bottomBarUseLegacyStyle by appSettingsViewModel.bottomBarUseLegacyStyle.state.collectAsState()
-    val acgMainUiEnabled by appSettingsViewModel.acgMainUiEnabled.state.collectAsState()
-    val acgWallpaperUri by appSettingsViewModel.acgWallpaperUri.state.collectAsState()
-    val acgWallpaperZoom by appSettingsViewModel.acgWallpaperZoom.state.collectAsState()
-    val acgWallpaperBiasX by appSettingsViewModel.acgWallpaperBiasX.state.collectAsState()
-    val acgWallpaperBiasY by appSettingsViewModel.acgWallpaperBiasY.state.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val isProxyRunning by homeViewModel.isRunning.collectAsStateWithLifecycle()
+    val bottomBarAutoHideEnabled by appSettingsViewModel.bottomBarAutoHide.state.collectAsStateWithLifecycle()
+    val bottomBarUseLegacyStyle by appSettingsViewModel.bottomBarUseLegacyStyle.state.collectAsStateWithLifecycle()
+    val acgMainUiEnabled by appSettingsViewModel.acgMainUiEnabled.state.collectAsStateWithLifecycle()
+    val acgWallpaperUri by appSettingsViewModel.acgWallpaperUri.state.collectAsStateWithLifecycle()
+    val acgWallpaperZoom by appSettingsViewModel.acgWallpaperZoom.state.collectAsStateWithLifecycle()
+    val acgWallpaperBiasX by appSettingsViewModel.acgWallpaperBiasX.state.collectAsStateWithLifecycle()
+    val acgWallpaperBiasY by appSettingsViewModel.acgWallpaperBiasY.state.collectAsStateWithLifecycle()
     val bottomBarScrollBehavior = rememberBottomBarScrollBehavior(autoHideEnabled = bottomBarAutoHideEnabled)
     val pagerFlingBehavior = rememberMainPagerFlingBehavior(mainPagerState.pagerState)
     var settledMainPage by remember { mutableIntStateOf(initialMainPage) }
@@ -121,9 +127,11 @@ fun MainScreen(
         homeViewModel.onVpnPermissionResult(result.resultCode == Activity.RESULT_OK)
     }
 
-    LaunchedEffect(homeViewModel) {
-        homeViewModel.vpnPrepareIntent.collect { intent ->
-            vpnPermissionLauncher.launch(intent)
+    LaunchedEffect(homeViewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            homeViewModel.vpnPrepareIntent.collect { intent ->
+                vpnPermissionLauncher.launch(intent)
+            }
         }
     }
 

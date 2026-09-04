@@ -22,6 +22,8 @@
 
 package com.github.yumelira.yumebox.presentation.component
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -48,7 +50,7 @@ fun ToastDialogHost() {
     val radii = AppTheme.radii
     val spacing = AppTheme.spacing
 
-    val event by ToastDialogBridge.event.collectAsState()
+    val event by ToastDialogBridge.event.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var eventSnapshot by remember { mutableStateOf<ToastDialogEvent?>(null) }
     val showDialog = remember { mutableStateOf(false) }

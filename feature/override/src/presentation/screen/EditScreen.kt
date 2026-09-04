@@ -24,7 +24,10 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,8 +69,9 @@ fun OverrideEditScreen(
     onOpenSubRulesEditor: OpenSubRulesEditor,
 ) {
     val viewModel: OverrideConfigViewModel = koinViewModel()
-    val editSession by viewModel.editSession.collectAsState()
-    val saveState by viewModel.saveState.collectAsState()
+    val editSession by viewModel.editSession.collectAsStateWithLifecycle()
+    val saveState by viewModel.saveState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val isNewConfig = configId == "new"
     val showDiscardDialog = remember { mutableStateOf(false) }
@@ -84,12 +88,14 @@ fun OverrideEditScreen(
         viewModel.startEditSession(configId)
     }
 
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is OverrideSaveEvent.Saved -> Unit
-                is OverrideSaveEvent.Failed -> {
-                    Timber.tag("OverrideEditScreen").d("Suppress override save toast: %s", event.message)
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
+                when (event) {
+                    is OverrideSaveEvent.Saved -> Unit
+                    is OverrideSaveEvent.Failed -> {
+                        Timber.tag("OverrideEditScreen").d("Suppress override save toast: %s", event.message)
+                    }
                 }
             }
         }

@@ -12,7 +12,7 @@ package com.github.yumelira.yumebox.screen.settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import com.github.yumelira.yumebox.data.store.SUPPORTED_HEALTH_CHECK_CONCURRENCY
 import com.github.yumelira.yumebox.presentation.component.Card
@@ -31,7 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 @Destination<RootGraph>
 fun LabScreen() {
     val viewModel = koinViewModel<AppSettingsViewModel>()
-    val healthCheckConcurrency by viewModel.healthCheckConcurrency.state.collectAsState()
+    val healthCheckConcurrency by viewModel.healthCheckConcurrency.state.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
@@ -53,7 +54,7 @@ internal class ProxyGroupSorter {
         proxyGroups: StateFlow<List<ProxyGroupInfo>>,
         sortMode: StateFlow<ProxySortMode>,
     ): StateFlow<List<ProxyGroupInfo>> = combine(
-        proxyGroups,
+        proxyGroups.onEach(::track),
         sortMode,
         groupOriginalOrder,
     ) { groups, mode, originalOrderCache ->

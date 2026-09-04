@@ -48,6 +48,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.activity:activity-compose:${gropify.dep.version.activityCompose}")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:${gropify.dep.version.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${gropify.dep.version.lifecycle}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
@@ -58,4 +59,3 @@ dependencies {
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
     implementation("sh.calvin.reorderable:reorderable:${gropify.dep.version.reorderable}")
 }
-

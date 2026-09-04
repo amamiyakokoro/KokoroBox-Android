@@ -47,7 +47,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -91,9 +94,10 @@ fun LogScreen(navigator: DestinationsNavigator) {
     val scope = rememberCoroutineScope()
     val spacing = AppTheme.spacing
     val componentSizes = AppTheme.sizes
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val isRecording by viewModel.isRecording.collectAsState()
-    val logEntries by viewModel.tempLogEntries.collectAsState()
+    val isRecording by viewModel.isRecording.collectAsStateWithLifecycle()
+    val logEntries by viewModel.tempLogEntries.collectAsStateWithLifecycle()
 
     var fabHidden by rememberSaveable { mutableStateOf(false) }
     val listState = rememberLazyListState()
@@ -122,8 +126,9 @@ fun LogScreen(navigator: DestinationsNavigator) {
             }
     }
 
-    LaunchedEffect(isRecording) {
-        if (isRecording) {
+    LaunchedEffect(isRecording, lifecycleOwner) {
+        if (!isRecording) return@LaunchedEffect
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             PollingTimers.ticks(PollingTimerSpecs.LogScreenRefresh).collect {
                 viewModel.refreshTempLogEntries()
             }

@@ -22,6 +22,9 @@
 
 package com.github.yumelira.yumebox.screen.connection
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleStartEffect
+
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -82,8 +85,8 @@ fun ConnectionScreen(
     navigator: DestinationsNavigator,
 ) {
     val viewModel = koinViewModel<ConnectionViewModel>()
-    val state by viewModel.state.collectAsState()
-    val filteredConnections by viewModel.filteredConnections.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val filteredConnections by viewModel.filteredConnections.collectAsStateWithLifecycle()
     val spacing = AppTheme.spacing
 
     var showSearchBar by remember { mutableStateOf(false) }
@@ -134,12 +137,9 @@ fun ConnectionScreen(
             showDetailSheet = false
         }
     }
-    LaunchedEffect(showDetailSheet) {
-        if (showDetailSheet) {
-            viewModel.stopPolling()
-        } else {
-            viewModel.startPolling()
-        }
+    LifecycleStartEffect(viewModel, showDetailSheet) {
+        if (!showDetailSheet) viewModel.startPolling()
+        onStopOrDispose { viewModel.stopPolling() }
     }
 
     Scaffold(

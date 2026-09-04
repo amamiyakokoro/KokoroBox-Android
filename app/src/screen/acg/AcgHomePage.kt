@@ -20,6 +20,8 @@
 
 package com.github.yumelira.yumebox.screen.acg
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.content.Context
@@ -52,9 +54,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
 import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.resize.Precision
@@ -102,28 +106,24 @@ fun AcgHomePage(
     val density = LocalDensity.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val controlState by homeViewModel.controlState.collectAsState()
-    val uiState by homeViewModel.uiState.collectAsState()
-    val profiles by homeViewModel.profiles.collectAsState()
-    val profilesLoaded by homeViewModel.profilesLoaded.collectAsState()
-    val recommendedProfile by homeViewModel.recommendedProfile.collectAsState()
-    val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsState(initial = false)
-    val currentProfile by homeViewModel.currentProfile.collectAsState()
-    val selectedServerName by homeViewModel.selectedServerName.collectAsState()
-    val selectedServerPing by homeViewModel.selectedServerPing.collectAsState()
-    val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsState()
-    val trafficNow by homeViewModel.trafficNow.collectAsState()
-    val proxyMode by homeViewModel.proxyMode.collectAsState()
-    val tunnelMode by homeViewModel.tunnelMode.collectAsState()
-    val runtimeSnapshot by homeViewModel.runtimeSnapshot.collectAsState()
-    val themeMode by appSettingsViewModel.themeMode.state.collectAsState()
-    val sidebarExpanded by appSettingsViewModel.acgSidebarExpanded.state.collectAsState()
+    val controlState by homeViewModel.controlState.collectAsStateWithLifecycle()
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val profiles by homeViewModel.profiles.collectAsStateWithLifecycle()
+    val profilesLoaded by homeViewModel.profilesLoaded.collectAsStateWithLifecycle()
+    val recommendedProfile by homeViewModel.recommendedProfile.collectAsStateWithLifecycle()
+    val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsStateWithLifecycle(initialValue = false)
+    val currentProfile by homeViewModel.currentProfile.collectAsStateWithLifecycle()
+    val selectedServerName by homeViewModel.selectedServerName.collectAsStateWithLifecycle()
+    val selectedServerPing by homeViewModel.selectedServerPing.collectAsStateWithLifecycle()
+    val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsStateWithLifecycle()
+    val trafficNow by homeViewModel.trafficNow.collectAsStateWithLifecycle()
+    val proxyMode by homeViewModel.proxyMode.collectAsStateWithLifecycle()
+    val tunnelMode by homeViewModel.tunnelMode.collectAsStateWithLifecycle()
+    val runtimeSnapshot by homeViewModel.runtimeSnapshot.collectAsStateWithLifecycle()
+    val themeMode by appSettingsViewModel.themeMode.state.collectAsStateWithLifecycle()
+    val sidebarExpanded by appSettingsViewModel.acgSidebarExpanded.state.collectAsStateWithLifecycle()
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-
-    LaunchedEffect(Unit) {
-        homeViewModel.refreshProxyMode()
-    }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -139,31 +139,17 @@ fun AcgHomePage(
         }
     }
 
-    LaunchedEffect(isActive) {
+    LifecycleStartEffect(homeViewModel, isActive) {
         homeViewModel.setHomeScreenActive(isActive)
+        onStopOrDispose { homeViewModel.setHomeScreenActive(false) }
+    }
+
+    LifecycleResumeEffect(homeViewModel, isActive) {
         if (isActive) {
             homeViewModel.reconcileRuntimeState()
             homeViewModel.refreshProxyMode()
         }
-    }
-
-    DisposableEffect(homeViewModel) {
-        onDispose {
-            homeViewModel.setHomeScreenActive(false)
-        }
-    }
-
-    DisposableEffect(lifecycleOwner, homeViewModel) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                homeViewModel.reconcileRuntimeState()
-                homeViewModel.refreshProxyMode()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onPauseOrDispose { }
     }
 
     val visualControlState = controlState
@@ -176,8 +162,10 @@ fun AcgHomePage(
             value = System.currentTimeMillis()
             return@produceState
         }
-        PollingTimers.ticks(PollingTimerSpecs.AcgElapsedClock).collect {
-            value = System.currentTimeMillis()
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            PollingTimers.ticks(PollingTimerSpecs.AcgElapsedClock).collect {
+                value = System.currentTimeMillis()
+            }
         }
     }
     val startedAt = runtimeSnapshot.startedAt

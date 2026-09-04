@@ -46,6 +46,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material3:material3:1.5.0-alpha27")
     implementation("androidx.activity:activity-compose:${gropify.dep.version.activityCompose}")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:${gropify.dep.version.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${gropify.dep.version.lifecycle}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
     implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")

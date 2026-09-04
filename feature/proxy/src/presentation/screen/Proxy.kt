@@ -20,6 +20,9 @@
 
 package com.github.yumelira.yumebox.presentation.screen
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleStartEffect
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
@@ -103,13 +106,13 @@ fun ProxyPager(
     onProxyStartRequested: (() -> Unit)? = null,
 ) {
     val proxyViewModel = koinViewModel<ProxyViewModel>()
-    val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsState()
-    val testingGroupNames by proxyViewModel.testingGroupNames.collectAsState()
-    val testingProxyNames by proxyViewModel.testingProxyNames.collectAsState()
-    val sortMode by proxyViewModel.sortMode.collectAsState()
-    val tunnelMode by proxyViewModel.tunnelMode.collectAsState()
+    val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsStateWithLifecycle()
+    val testingGroupNames by proxyViewModel.testingGroupNames.collectAsStateWithLifecycle()
+    val testingProxyNames by proxyViewModel.testingProxyNames.collectAsStateWithLifecycle()
+    val sortMode by proxyViewModel.sortMode.collectAsStateWithLifecycle()
+    val tunnelMode by proxyViewModel.tunnelMode.collectAsStateWithLifecycle()
     var displayTunnelMode by remember { mutableStateOf(tunnelMode) }
-    val singleNodeTest by proxyViewModel.singleNodeTest.collectAsState()
+    val singleNodeTest by proxyViewModel.singleNodeTest.collectAsStateWithLifecycle()
     val groupScrollBehavior = MiuixScrollBehavior(snapAnimationSpec = null)
 
     var showSortPopup by remember { mutableStateOf(false) }
@@ -186,12 +189,9 @@ fun ProxyPager(
         }
     }
 
-    LaunchedEffect(isPageActive) {
+    LifecycleStartEffect(proxyViewModel, isPageActive) {
         proxyViewModel.ensureCoreLoaded(isPageActive, source = "proxy_page")
-    }
-
-    DisposableEffect(proxyViewModel) {
-        onDispose {
+        onStopOrDispose {
             proxyViewModel.ensureCoreLoaded(false, source = "proxy_page")
         }
     }

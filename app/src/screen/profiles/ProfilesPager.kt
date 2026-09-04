@@ -20,6 +20,8 @@
 
 
 package com.github.yumelira.yumebox.screen.profiles
+
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.github.yumelira.yumebox.presentation.theme.appPressSink
 import android.annotation.SuppressLint
@@ -68,16 +70,16 @@ fun ProfilesPager(
     val navigator = LocalNavigator.current
     val profilesViewModel = koinViewModel<ProfilesViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
-    val profiles by profilesViewModel.profiles.collectAsState()
-    val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsState()
-    val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsState()
-    val isRunning by homeViewModel.isRunning.collectAsState()
+    val profiles by profilesViewModel.profiles.collectAsStateWithLifecycle()
+    val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsStateWithLifecycle()
+    val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsStateWithLifecycle()
+    val isRunning by homeViewModel.isRunning.collectAsStateWithLifecycle()
 
     val overrideConfigViewModel = koinViewModel<OverrideConfigViewModel>()
     val bindingProvider: ProfileBindingProvider = koinInject()
     val overrideService: OverrideService = koinInject()
-    val systemPresets by overrideConfigViewModel.systemPresets.collectAsState()
-    val userConfigs by overrideConfigViewModel.userConfigs.collectAsState()
+    val systemPresets by overrideConfigViewModel.systemPresets.collectAsStateWithLifecycle()
+    val userConfigs by overrideConfigViewModel.userConfigs.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val showAddBottomSheet = remember { mutableStateOf(false) }
@@ -93,8 +95,8 @@ fun ProfilesPager(
     var profileBinding by remember { mutableStateOf<ProfileBinding?>(null) }
 
     var importUrlFromScheme by remember { mutableStateOf<String?>(null) }
-    val pendingImportUrl by MainActivity.pendingImportUrl.collectAsState()
-    val kokoroAuthResult by MainActivity.kokoroAuthResult.collectAsState()
+    val pendingImportUrl by MainActivity.pendingImportUrl.collectAsStateWithLifecycle()
+    val kokoroAuthResult by MainActivity.kokoroAuthResult.collectAsStateWithLifecycle()
     val urlProfiles = remember(profiles) {
         profiles.filter { it.type == Profile.Type.Url }
     }

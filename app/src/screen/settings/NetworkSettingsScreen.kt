@@ -20,6 +20,11 @@
 
 
 package com.github.yumelira.yumebox.screen.settings
+
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -64,15 +69,18 @@ fun NetworkSettingsScreen(
     navigator: DestinationsNavigator,
 ) {
     val viewModel = koinViewModel<NetworkSettingsViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
-    val tunServiceOptionsUiState by viewModel.tunServiceOptionsUiState.collectAsState()
-    val rootTunServiceOptionsUiState by viewModel.rootTunServiceOptionsUiState.collectAsState()
-    val accessControlMode by viewModel.accessControlMode.state.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val tunServiceOptionsUiState by viewModel.tunServiceOptionsUiState.collectAsStateWithLifecycle()
+    val rootTunServiceOptionsUiState by viewModel.rootTunServiceOptionsUiState.collectAsStateWithLifecycle()
+    val accessControlMode by viewModel.accessControlMode.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        viewModel.errors.collect { message ->
-            context.toast(message)
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.errors.collect { message ->
+                context.toast(message)
+            }
         }
     }
 

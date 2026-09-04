@@ -36,7 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -139,11 +139,11 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
-            val themeMode = appSettingsViewModel.themeMode.state.collectAsState().value
-            val colorTheme = appSettingsViewModel.colorTheme.state.collectAsState().value
-            val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsState().value
-            val acgWallpaperSeedColorArgb = appSettingsViewModel.acgWallpaperSeedColorArgb.state.collectAsState().value
-            val acgWallpaperUri = appSettingsViewModel.acgWallpaperUri.state.collectAsState().value
+            val themeMode = appSettingsViewModel.themeMode.state.collectAsStateWithLifecycle().value
+            val colorTheme = appSettingsViewModel.colorTheme.state.collectAsStateWithLifecycle().value
+            val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsStateWithLifecycle().value
+            val acgWallpaperSeedColorArgb = appSettingsViewModel.acgWallpaperSeedColorArgb.state.collectAsStateWithLifecycle().value
+            val acgWallpaperUri = appSettingsViewModel.acgWallpaperUri.state.collectAsStateWithLifecycle().value
             val effectiveThemeSeedColorArgb = if (colorTheme == AppColorTheme.AcgWallpaper) {
                 if (acgWallpaperUri.isBlank() && acgWallpaperSeedColorArgb == DEFAULT_CUSTOM_THEME_SEED_ARGB) {
                     DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
@@ -153,11 +153,11 @@ class MainActivity : FragmentActivity() {
             } else {
                 themeSeedColorArgb
             }
-            val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsState().value
-            val excludeFromRecents = appSettingsViewModel.excludeFromRecents.state.collectAsState().value
-            val pageScale = appSettingsViewModel.pageScale.state.collectAsState().value
-            val screenshotProtectionEnabled = appSettingsViewModel.screenshotProtectionEnabled.state.collectAsState().value
-            val biometricUnlockEnabled by appSettingsViewModel.biometricUnlockEnabled.state.collectAsState()
+            val invertOnPrimaryColors = appSettingsViewModel.invertOnPrimaryColors.state.collectAsStateWithLifecycle().value
+            val excludeFromRecents = appSettingsViewModel.excludeFromRecents.state.collectAsStateWithLifecycle().value
+            val pageScale = appSettingsViewModel.pageScale.state.collectAsStateWithLifecycle().value
+            val screenshotProtectionEnabled = appSettingsViewModel.screenshotProtectionEnabled.state.collectAsStateWithLifecycle().value
+            val biometricUnlockEnabled by appSettingsViewModel.biometricUnlockEnabled.state.collectAsStateWithLifecycle()
 
             val biometricGateState = rememberStartupBiometricGateState(
                 activity = this@MainActivity,

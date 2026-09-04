@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +61,7 @@ fun ConfigEditorScreen(
     language: LanguageScope = LanguageScope.Yaml,
 ) {
     val viewModel: ConfigEditorViewModel = koinViewModel()
-    val session by viewModel.session.collectAsState()
+    val session by viewModel.session.collectAsStateWithLifecycle()
     val showDiscardDialog = remember { mutableStateOf(false) }
     val scrollBehavior = MiuixScrollBehavior()
     var content by remember(configId, configType, initialContent, language) { mutableStateOf(initialContent) }

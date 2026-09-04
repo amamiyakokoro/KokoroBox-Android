@@ -20,6 +20,8 @@
 
 
 package com.github.yumelira.yumebox.screen.profiles
+
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.Manifest
 import android.content.ClipboardManager
@@ -106,10 +108,10 @@ internal fun AddProfileSheet(
     var isDownloading by remember { mutableStateOf(false) }
     var kokoroOptions by remember { mutableStateOf(KokoroConfigOptions()) }
 
-    val downloadProgress by profilesViewModel.downloadProgress.collectAsState()
-    val uiState by profilesViewModel.uiState.collectAsState()
-    val kokoroAuthState by profilesViewModel.kokoroAuthState.collectAsState()
-    val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsState()
+    val downloadProgress by profilesViewModel.downloadProgress.collectAsStateWithLifecycle()
+    val uiState by profilesViewModel.uiState.collectAsStateWithLifecycle()
+    val kokoroAuthState by profilesViewModel.kokoroAuthState.collectAsStateWithLifecycle()
+    val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsStateWithLifecycle()
     var hasShownCompleteAnimation by remember { mutableStateOf(false) }
     var stableSheetHeightPx by remember { mutableIntStateOf(0) }
 

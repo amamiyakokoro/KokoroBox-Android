@@ -124,6 +124,7 @@ class HomeViewModel(
     val speedHistory: StateFlow<List<Long>> = _speedHistory.asStateFlow()
 
     private var reconcileJob: Job? = null
+    private var speedSamplingJob: Job? = null
 
     private val mainProxyNode: StateFlow<com.github.yumelira.yumebox.core.model.Proxy?> =
         proxyFacade.resolvedPrimaryNode
@@ -156,7 +157,6 @@ class HomeViewModel(
         observeRuntimeState()
         observeRuntimeFailures()
         syncProxyModeState()
-        startSpeedSampling()
         observeProfileChanges()
     }
 
@@ -285,6 +285,11 @@ class HomeViewModel(
             priority = if (isActive) ProxyGroupSyncPriority.FAST else ProxyGroupSyncPriority.OFF,
             source = "home",
         )
+        if (isActive) {
+            startSpeedSampling()
+        } else {
+            stopSpeedSampling()
+        }
     }
 
     fun reconcileRuntimeState() {
@@ -391,7 +396,8 @@ class HomeViewModel(
     }
 
     private fun startSpeedSampling(sampleLimit: Int = 24) {
-        viewModelScope.launch {
+        if (speedSamplingJob?.isActive == true) return
+        speedSamplingJob = viewModelScope.launch {
             PollingTimers.ticks(PollingTimerSpecs.HomeSpeedSampling).collect {
                 val snapshot = runtimeSnapshot.value
                 val sample = when {
@@ -413,6 +419,11 @@ class HomeViewModel(
                 }
             }
         }
+    }
+
+    private fun stopSpeedSampling() {
+        speedSamplingJob?.cancel()
+        speedSamplingJob = null
     }
 
     private fun applyLoading(loading: Boolean) = super.setLoading(loading)

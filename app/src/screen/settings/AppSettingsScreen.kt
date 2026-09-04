@@ -34,7 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -108,8 +108,8 @@ fun AppSettingsScreen(
 
 @Composable
 private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
-    val automaticRestart by viewModel.automaticRestart.state.collectAsState()
-    val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsState()
+    val automaticRestart by viewModel.automaticRestart.state.collectAsStateWithLifecycle()
+    val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Behavior)
     Card {
@@ -130,14 +130,14 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
 
 @Composable
 private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
-    val themeMode by viewModel.themeMode.state.collectAsState()
-    val colorTheme by viewModel.colorTheme.state.collectAsState()
-    val appLanguage by viewModel.appLanguage.state.collectAsState()
-    val themeSeedColorArgb by viewModel.themeSeedColorArgb.state.collectAsState()
-    val invertOnPrimaryColors by viewModel.invertOnPrimaryColors.state.collectAsState()
-    val bottomBarAutoHide by viewModel.bottomBarAutoHide.state.collectAsState()
-    val bottomBarUseLegacyStyle by viewModel.bottomBarUseLegacyStyle.state.collectAsState()
-    val pageScale by viewModel.pageScale.state.collectAsState()
+    val themeMode by viewModel.themeMode.state.collectAsStateWithLifecycle()
+    val colorTheme by viewModel.colorTheme.state.collectAsStateWithLifecycle()
+    val appLanguage by viewModel.appLanguage.state.collectAsStateWithLifecycle()
+    val themeSeedColorArgb by viewModel.themeSeedColorArgb.state.collectAsStateWithLifecycle()
+    val invertOnPrimaryColors by viewModel.invertOnPrimaryColors.state.collectAsStateWithLifecycle()
+    val bottomBarAutoHide by viewModel.bottomBarAutoHide.state.collectAsStateWithLifecycle()
+    val bottomBarUseLegacyStyle by viewModel.bottomBarUseLegacyStyle.state.collectAsStateWithLifecycle()
+    val pageScale by viewModel.pageScale.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Interface.ColorThemeTitle)
     Card {
@@ -231,7 +231,7 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
 @Composable
 private fun AppPrivacySettingsSection(viewModel: AppSettingsViewModel) {
     val context = LocalContext.current
-    val excludeFromRecents by viewModel.excludeFromRecents.state.collectAsState()
+    val excludeFromRecents by viewModel.excludeFromRecents.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Privacy)
     Card {
@@ -268,9 +268,9 @@ private fun AppPrivacySettingsSection(viewModel: AppSettingsViewModel) {
 @Composable
 private fun AppServiceSettingsSection(viewModel: AppSettingsViewModel) {
     val context = LocalContext.current
-    val showTrafficNotification by viewModel.showTrafficNotification.state.collectAsState()
-    val singleNodeTest by viewModel.singleNodeTest.state.collectAsState()
-    val exitUiWhenBackground by viewModel.exitUiWhenBackground.state.collectAsState()
+    val showTrafficNotification by viewModel.showTrafficNotification.state.collectAsStateWithLifecycle()
+    val singleNodeTest by viewModel.singleNodeTest.state.collectAsStateWithLifecycle()
+    val exitUiWhenBackground by viewModel.exitUiWhenBackground.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Service)
     Card {
@@ -305,7 +305,7 @@ private fun AppServiceSettingsSection(viewModel: AppSettingsViewModel) {
 
 @Composable
 private fun AppNetworkSettingsSection(viewModel: AppSettingsViewModel) {
-    val customUserAgent by viewModel.customUserAgent.state.collectAsState()
+    val customUserAgent by viewModel.customUserAgent.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Network)
     Card {
@@ -321,12 +321,12 @@ private fun AppExperimentalSettingsSection(
     viewModel: AppSettingsViewModel,
     navigator: DestinationsNavigator,
 ) {
-    val acgMainUiEnabled by viewModel.acgMainUiEnabled.state.collectAsState()
-    val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsState()
-    val acgWallpaperUri by viewModel.acgWallpaperUri.state.collectAsState()
-    val acgWallpaperZoom by viewModel.acgWallpaperZoom.state.collectAsState()
-    val acgWallpaperBiasX by viewModel.acgWallpaperBiasX.state.collectAsState()
-    val acgWallpaperBiasY by viewModel.acgWallpaperBiasY.state.collectAsState()
+    val acgMainUiEnabled by viewModel.acgMainUiEnabled.state.collectAsStateWithLifecycle()
+    val acgSidebarExpanded by viewModel.acgSidebarExpanded.state.collectAsStateWithLifecycle()
+    val acgWallpaperUri by viewModel.acgWallpaperUri.state.collectAsStateWithLifecycle()
+    val acgWallpaperZoom by viewModel.acgWallpaperZoom.state.collectAsStateWithLifecycle()
+    val acgWallpaperBiasX by viewModel.acgWallpaperBiasX.state.collectAsStateWithLifecycle()
+    val acgWallpaperBiasY by viewModel.acgWallpaperBiasY.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     Title(MLang.AppSettings.Section.Experimental)
     Card {
@@ -377,7 +377,7 @@ private fun BiometricProtectedPreferenceSwitch(
     onConfirmedChange: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
-    val checked by checkedFlow.collectAsState()
+    val checked by checkedFlow.collectAsStateWithLifecycle()
     val showUnavailableDialogState = remember { mutableStateOf(false) }
     var unavailableMessage by remember { mutableStateOf("") }
 
@@ -417,7 +417,7 @@ private fun HideAppIconPreferenceItem(
     onHideAppIconChange: (Boolean) -> Unit,
     context: android.content.Context,
 ) {
-    val hideAppIcon by hideAppIconFlow.collectAsState()
+    val hideAppIcon by hideAppIconFlow.collectAsStateWithLifecycle()
     val showHideIconDialogState = remember { mutableStateOf(false) }
 
     PreferenceSwitchItem(

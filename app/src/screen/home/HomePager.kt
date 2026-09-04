@@ -20,6 +20,8 @@
 
 
 package com.github.yumelira.yumebox.screen.home
+
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -32,9 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LifecycleStartEffect
 import com.github.yumelira.yumebox.common.AppConstants
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.domain.model.TrafficData
@@ -55,51 +56,35 @@ fun HomePager(
     val homeViewModel = koinViewModel<HomeViewModel>()
     val navigator = LocalNavigator.current
 
-    val controlState by homeViewModel.controlState.collectAsState()
-    val uiState by homeViewModel.uiState.collectAsState()
-    val trafficNow by homeViewModel.trafficNow.collectAsState()
-    val profiles by homeViewModel.profiles.collectAsState()
-    val profilesLoaded by homeViewModel.profilesLoaded.collectAsState()
-    val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsState()
-    val recommendedProfile by homeViewModel.recommendedProfile.collectAsState()
-    val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsState(initial = false)
-    val currentProfile by homeViewModel.currentProfile.collectAsState()
-    val selectedServerName by homeViewModel.selectedServerName.collectAsState()
-    val selectedServerPing by homeViewModel.selectedServerPing.collectAsState()
-    val speedHistory by homeViewModel.speedHistory.collectAsState()
-    val proxyMode by homeViewModel.proxyMode.collectAsState()
-    val tunnelMode by homeViewModel.tunnelMode.collectAsState()
+    val controlState by homeViewModel.controlState.collectAsStateWithLifecycle()
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val trafficNow by homeViewModel.trafficNow.collectAsStateWithLifecycle()
+    val profiles by homeViewModel.profiles.collectAsStateWithLifecycle()
+    val profilesLoaded by homeViewModel.profilesLoaded.collectAsStateWithLifecycle()
+    val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsStateWithLifecycle()
+    val recommendedProfile by homeViewModel.recommendedProfile.collectAsStateWithLifecycle()
+    val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsStateWithLifecycle(initialValue = false)
+    val currentProfile by homeViewModel.currentProfile.collectAsStateWithLifecycle()
+    val selectedServerName by homeViewModel.selectedServerName.collectAsStateWithLifecycle()
+    val selectedServerPing by homeViewModel.selectedServerPing.collectAsStateWithLifecycle()
+    val speedHistory by homeViewModel.speedHistory.collectAsStateWithLifecycle()
+    val proxyMode by homeViewModel.proxyMode.collectAsStateWithLifecycle()
+    val tunnelMode by homeViewModel.tunnelMode.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        homeViewModel.refreshProxyMode()
-    }
-
-    LaunchedEffect(isActive) {
+    LifecycleStartEffect(homeViewModel, isActive) {
         homeViewModel.setHomeScreenActive(isActive)
+        onStopOrDispose { homeViewModel.setHomeScreenActive(false) }
     }
 
-    DisposableEffect(homeViewModel) {
-        onDispose {
-            homeViewModel.setHomeScreenActive(false)
+    LifecycleResumeEffect(homeViewModel, isActive) {
+        if (isActive) {
+            homeViewModel.reconcileRuntimeState()
+            homeViewModel.refreshProxyMode()
         }
-    }
-
-    DisposableEffect(lifecycleOwner, homeViewModel) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                homeViewModel.reconcileRuntimeState()
-                homeViewModel.refreshProxyMode()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onPauseOrDispose { }
     }
 
     LaunchedEffect(uiState.error) {

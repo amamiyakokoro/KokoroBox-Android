@@ -85,17 +85,6 @@ class ProxyViewModel(
     private val activeSyncSources = mutableSetOf<String>()
     private var groupTestJob: Job? = null
 
-    init {
-        proxyFacade.warmUpProxyGroups()
-        viewModelScope.launch {
-            proxyGroups
-                .distinctUntilChangedBy { groups -> groups.map(ProxyGroupInfo::name) }
-                .collect { groups ->
-                    groupSorter.track(groups)
-                }
-        }
-    }
-
     val sortedProxyGroups: StateFlow<List<ProxyGroupInfo>> = groupSorter.bind(
         scope = viewModelScope,
         proxyGroups = proxyGroups,

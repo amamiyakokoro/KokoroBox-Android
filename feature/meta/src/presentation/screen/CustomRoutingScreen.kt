@@ -20,6 +20,8 @@
 
 package com.github.yumelira.yumebox.feature.meta.presentation.screen
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 
 import com.github.yumelira.yumebox.presentation.theme.UiDp
 import androidx.activity.compose.BackHandler
@@ -53,7 +55,7 @@ fun CustomRoutingScreen(
     onNavigateBack: () -> Unit,
 ) {
     val viewModel: CustomRoutingViewModel = koinViewModel()
-    val config by viewModel.config.collectAsState()
+    val config by viewModel.config.collectAsStateWithLifecycle()
 
     val selectedUrlTestRegions = remember { mutableStateListOf<OverridePresetRegion>() }
     val selectedFallbackRegions = remember { mutableStateListOf<OverridePresetRegion>() }

@@ -21,6 +21,9 @@
 
 package com.github.yumelira.yumebox
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleStartEffect
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -68,8 +71,8 @@ fun ProxySheetContent(
     onDismiss: () -> Unit,
     proxyViewModel: ProxyViewModel = koinViewModel(),
 ) {
-    val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsState()
-    val sortMode by proxyViewModel.sortMode.collectAsState()
+    val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsStateWithLifecycle()
+    val sortMode by proxyViewModel.sortMode.collectAsStateWithLifecycle()
 
     val showSheet = remember { mutableStateOf(true) }
     val showSortPopup = remember { mutableStateOf(false) }
@@ -86,9 +89,9 @@ fun ProxySheetContent(
         LazyListState()
     }
 
-    DisposableEffect(Unit) {
+    LifecycleStartEffect(proxyViewModel) {
         proxyViewModel.ensureCoreLoaded(true, source = "proxy_sheet")
-        onDispose {
+        onStopOrDispose {
             proxyViewModel.ensureCoreLoaded(false, source = "proxy_sheet")
         }
     }
@@ -231,7 +234,7 @@ fun ProxySheetContent(
                 proxyGroups.firstOrNull { group -> group.name == name }
             }
             if (targetGroup == null) {
-                val testingGroupNames by proxyViewModel.testingGroupNames.collectAsState()
+                val testingGroupNames by proxyViewModel.testingGroupNames.collectAsStateWithLifecycle()
                 NodeGroupSheetContent(
                     groups = proxyGroups,
                     onGroupClick = groupSelection.selectGroup,
@@ -267,7 +270,7 @@ private fun ProxySheetNodeContent(
         proxyViewModel.testingGroupNames
             .map { testingGroupNames -> testingGroupNames.contains(group.name) }
             .distinctUntilChanged()
-    }.collectAsState(initial = false)
+    }.collectAsStateWithLifecycle(initialValue = false)
     val testingProxyNames by remember(group.name, groupProxyNames, proxyViewModel) {
         if (groupProxyNames.isEmpty()) {
             flowOf(emptySet<String>())
@@ -278,7 +281,7 @@ private fun ProxySheetNodeContent(
                 }
                 .distinctUntilChanged()
         }
-    }.collectAsState(initial = emptySet())
+    }.collectAsStateWithLifecycle(initialValue = emptySet())
     val onSelectProxy = remember(group.name, group.type, proxyViewModel, onTestDelay) {
         { proxyName: String ->
             if (group.type == Proxy.Type.Selector) {
