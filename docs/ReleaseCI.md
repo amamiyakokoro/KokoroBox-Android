@@ -67,7 +67,7 @@ Re-running an old failed workflow run uses that run's old definition. Use a **ne
 manual run** from the updated branch to pick up this signing workflow. GitHub must
 have the workflow on the default branch for manual dispatch to be available.
 
-## Build future releases automatically
+## Build and publish future releases automatically
 
 Update `project.version.name` and `project.version.code` in `gradle.properties`,
 commit them together with the intended changes, then push the branch and tag:
@@ -78,9 +78,16 @@ git tag -a v0.5.6 -m "KokoroBox v0.5.6"
 git push origin v0.5.6
 ```
 
-Tag pushes automatically build and upload **Actions artifacts**. Publishing a
-GitHub Release is deliberately opt-in via the manual-run checkbox; it is not a
-Google Play upload and requires no Google Play service-account credentials.
+Pushing a new `vMAJOR.MINOR.PATCH` tag containing this workflow automatically builds
+and signs the APK, verifies its signature and version, uploads **Actions artifacts**,
+then creates a **GitHub Release** with generated release notes and the verified
+files. Publishing only runs after the build job succeeds. Ordinary branch pushes
+do not publish a release. This does not upload to Google Play or require Google
+Play service-account credentials.
+
+Existing tags are not triggered retroactively by updating `dev`. To publish an
+existing tag such as `v0.5.5`, start a new manual run on `dev` and enable
+**publish_release**. Leave it off when you only want to test the build/signing flow.
 
 After success, download the artifact named `KokoroBox-v0.5.5-arm64-release` from the
 run summary. It contains:
@@ -91,7 +98,8 @@ SHA256SUMS
 SIGNING-CERT-SHA256.txt
 ```
 
-Artifacts are retained for 14 days. Optional GitHub Release publishing uses the
+Artifacts are retained for 14 days; published Release assets remain available
+independently of Actions artifact retention. GitHub Release publishing uses the
 built-in `GITHUB_TOKEN`, does not move tags, and does not overwrite existing assets.
 If the release already contains the same filenames, upload fails instead of
 silently replacing a distributed binary. Release publishing has a separate job

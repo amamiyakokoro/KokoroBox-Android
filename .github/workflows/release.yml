@@ -166,7 +166,8 @@ jobs:
           retention-days: 14
 
   publish:
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+    # needs: build also prevents publishing when signing or verification fails.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10

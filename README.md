@@ -92,8 +92,9 @@ app/build/outputs/bundle/release/KokoroBox-release.aab
 Release signing is optional for local development. Keep signing properties and keystores outside version control.
 
 For signed APKs built by GitHub Actions, follow the [Release CI setup guide](docs/ReleaseCI.md).
-The **Release APK** workflow uses Actions Secrets, builds version tags, and uploads
-verified APKs as artifacts, with optional GitHub Release publishing.
+The **Release APK** workflow uses Actions Secrets and automatically builds, signs,
+and publishes verified APKs to GitHub Releases when a version tag is pushed.
+Manual runs can also build an existing tag, with optional Release publishing.
 
 ## Project structure
 
