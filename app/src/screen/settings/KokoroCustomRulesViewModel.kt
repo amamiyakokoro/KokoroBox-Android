@@ -139,37 +139,6 @@ internal class KokoroCustomRulesViewModel(
         }
     }
 
-    suspend fun beginLogin(): String = accountClient.beginLogin()
-
-    suspend fun cancelLogin(loginUrl: String) = accountClient.cancelLogin(loginUrl)
-
-    fun reportLoginFailure() {
-        _state.update {
-            it.copy(
-                loading = false,
-                authState = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.LoginFailed),
-                status = KokoroRulesStatus.AUTH_REQUIRED,
-            )
-        }
-    }
-
-    fun logout() {
-        viewModelScope.launch {
-            _state.update { it.copy(authState = KokoroAuthState.Checking, saving = true) }
-            try {
-                accountClient.revoke()
-            } catch (error: Exception) {
-                if (error is CancellationException) throw error
-            } finally {
-                _state.value = KokoroCustomRulesUiState(
-                    loading = false,
-                    authState = KokoroAuthState.LoggedOut,
-                    status = KokoroRulesStatus.AUTH_REQUIRED,
-                )
-            }
-        }
-    }
-
     fun addRule(rule: KokoroCustomRuleInput) {
         _state.update { it.copy(draftRules = it.draftRules + rule, dirty = true, status = KokoroRulesStatus.IDLE) }
     }

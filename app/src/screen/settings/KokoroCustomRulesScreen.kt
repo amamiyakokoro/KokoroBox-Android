@@ -9,9 +9,7 @@
 
 package com.github.yumelira.yumebox.screen.settings
 
-import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.core.net.toUri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,17 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.github.yumelira.yumebox.MainActivity
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccountCard
 import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
 import com.github.yumelira.yumebox.presentation.component.AppDialog
 import com.github.yumelira.yumebox.presentation.component.Card
@@ -62,14 +57,11 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 private sealed interface PendingRulesAction {
     data object Reload : PendingRulesAction
     data object Exit : PendingRulesAction
-    data object Logout : PendingRulesAction
 }
 
 @Composable
@@ -78,21 +70,11 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     val viewModel = koinViewModel<KokoroCustomRulesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val authResult by MainActivity.kokoroAuthResult.collectAsStateWithLifecycle()
     var pendingAction by remember { mutableStateOf<PendingRulesAction?>(null) }
     var editingRuleIndex by remember { mutableIntStateOf(-1) }
     var showRuleDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.load() }
-    LaunchedEffect(authResult) {
-        when (authResult) {
-            true -> viewModel.load()
-            false -> viewModel.reportLoginFailure()
-            null -> Unit
-        }
-        if (authResult != null) MainActivity.clearKokoroAuthResult()
-    }
     LaunchedEffect(state.status) {
         val message = when (state.status) {
             KokoroRulesStatus.SAVED -> MLang.MetaFeature.CustomRules.Saved
@@ -118,30 +100,11 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
         when (action) {
             PendingRulesAction.Reload -> viewModel.load()
             PendingRulesAction.Exit -> navigator.navigateUp()
-            PendingRulesAction.Logout -> viewModel.logout()
         }
     }
 
     fun requestAction(action: PendingRulesAction) {
         if (state.dirty) pendingAction = action else performPendingAction(action)
-    }
-
-    fun beginLogin() {
-        scope.launch {
-            var loginUrl: String? = null
-            try {
-                loginUrl = viewModel.beginLogin()
-                context.startActivity(
-                    Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
-                        addCategory(Intent.CATEGORY_BROWSABLE)
-                    },
-                )
-            } catch (error: Exception) {
-                loginUrl?.let { viewModel.cancelLogin(it) }
-                if (error is CancellationException) throw error
-                viewModel.reportLoginFailure()
-            }
-        }
     }
 
     Scaffold(
@@ -168,16 +131,6 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding()),
         ) {
-            item("account-title") { Title(MLang.ProfilesPage.Kokoro.Account) }
-            item("account") {
-                KokoroAccountCard(
-                    authState = state.authState,
-                    onLogin = ::beginLogin,
-                    onLogout = { requestAction(PendingRulesAction.Logout) },
-                    onRetry = viewModel::load,
-                )
-            }
-
             if (state.authState is KokoroAuthState.Authenticated) {
                 item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }
                 when {
@@ -246,6 +199,20 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             ) { Text(MLang.MetaFeature.CustomRules.AddRule) }
                         }
                         item("bottom-space") { Spacer(Modifier.height(UiDp.dp32)) }
+                    }
+                }
+            } else if (!state.loading) {
+                item("authentication-required") {
+                    Card {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
+                            verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                        ) {
+                            Text(MLang.ProfilesPage.Kokoro.LoginRequired)
+                            Button(onClick = navigator::navigateUp, modifier = Modifier.fillMaxWidth()) {
+                                Text(MLang.MetaFeature.CustomRules.BackToKokoroSettings)
+                            }
+                        }
                     }
                 }
             }

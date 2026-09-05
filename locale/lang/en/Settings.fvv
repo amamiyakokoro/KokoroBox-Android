@@ -18,6 +18,8 @@ Settings = {
     Kokoro = {
         Title = "Kokoro Settings"
         Summary = "Custom Rules · Cloud synchronization"
+        CustomRules = "Custom Rules"
+        CustomRulesSummary = "Manage the default cloud rule list"
     }
 
     NetworkSettings = {

@@ -8,7 +8,8 @@ MetaFeature = {
     }
 
     CustomRules = {
-        Title = "Kokoro 设置"
+        Title = "自定义规则"
+        BackToKokoroSettings = "返回 Kokoro 设置"
         Loading = "正在加载自定义规则…"
         Retry = "重试"
         Refresh = "从服务器重新加载"

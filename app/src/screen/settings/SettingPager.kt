@@ -57,7 +57,7 @@ import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.generated.destinations.AboutScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppDataManagementScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppSettingsScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.KokoroCustomRulesScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.KokoroSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.LabScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.LogScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MetaFeatureScreenDestination
@@ -185,7 +185,7 @@ fun SettingPager(
                         summary = MLang.Settings.Kokoro.Summary,
                         imageVector = AppMd3Icons.Settings.Kokoro,
                         onClick = {
-                            navigator.navigate(KokoroCustomRulesScreenDestination) {
+                            navigator.navigate(KokoroSettingsScreenDestination) {
                                 launchSingleTop = true
                             }
                         },

@@ -34,6 +34,7 @@ import com.github.yumelira.yumebox.screen.settings.AccessControlViewModel
 import com.github.yumelira.yumebox.screen.settings.AppDataManagementViewModel
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.KokoroCustomRulesViewModel
+import com.github.yumelira.yumebox.screen.settings.KokoroSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.NetworkSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.ResourceDownloadClient
 import com.github.yumelira.yumebox.service.LogRecordServiceGateway
@@ -60,6 +61,7 @@ val appViewModelModule = module {
     viewModel { AppDataManagementViewModel(get(), get()) }
     viewModel { LogViewModel(get()) }
     viewModel { KokoroCustomRulesViewModel(get(), get()) }
+    viewModel { KokoroSettingsViewModel(get()) }
 }
 
 val appModule: List<Module> = coreDiModules + listOf(

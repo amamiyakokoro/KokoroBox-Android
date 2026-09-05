@@ -8,7 +8,8 @@ MetaFeature = {
     }
 
     CustomRules = {
-        Title = "Kokoro Settings"
+        Title = "Custom Rules"
+        BackToKokoroSettings = "Back to Kokoro Settings"
         Loading = "Loading custom rules…"
         Retry = "Retry"
         Refresh = "Reload from server"
