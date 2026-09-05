@@ -392,33 +392,26 @@ fun AcgHomePage(
                             downloadSpeed = trafficData.download,
                             uploadSpeed = trafficData.upload,
                         )
-                        AcgHomeInfoPanel(
-                            serverName = selectedServerName.takeIf { isRunning },
-                            serverPing = selectedServerPing.takeIf { isRunning },
-                            ipMonitoringState = ipMonitoringState,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        // Keep the badge in the IP's layout flow, including with larger fonts.
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(AcgUi.Hero.profileBadgeGap),
+                        ) {
+                            AcgHomeInfoPanel(
+                                serverName = selectedServerName.takeIf { isRunning },
+                                serverPing = selectedServerPing.takeIf { isRunning },
+                                ipMonitoringState = ipMonitoringState,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            if (isRunning) {
+                                AcgProfileModeBadge(
+                                    profileName = currentProfile?.name,
+                                    tunnelMode = tunnelMode,
+                                    modifier = Modifier.widthIn(max = profileModeBadgeMaxWidth),
+                                )
+                            }
+                        }
                     }
                 }
-            }
-
-            AnimatedVisibility(
-                visible = isRunning,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(
-                        start = AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset,
-                        end = AcgUi.Hero.containerHorizontalInset + AcgUi.Hero.contentHorizontalInset,
-                        top = statusBarTop + heroHeight - 31.dp,
-                    ),
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 3 }),
-                exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 3 }),
-            ) {
-                AcgProfileModeBadge(
-                    profileName = currentProfile?.name,
-                    tunnelMode = tunnelMode,
-                    modifier = Modifier.widthIn(max = profileModeBadgeMaxWidth),
-                )
             }
 
             Box(

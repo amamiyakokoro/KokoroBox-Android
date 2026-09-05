@@ -110,6 +110,7 @@ internal object AcgUi {
         val trafficRowGap = acgSpacing.space28
         val trafficBottomInset = acgSpacing.space12
         val runtimeInfoTopGap = acgSpacing.space16
+        val profileBadgeGap = acgSpacing.space12
         val delayWidth = UiDp.dp72
         val belowHeroTopGap = acgSpacing.space8
         val belowHeroContentGap = acgSpacing.space12
