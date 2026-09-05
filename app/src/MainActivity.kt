@@ -275,13 +275,16 @@ class MainActivity : FragmentActivity() {
             }
             safeIntent.data?.let { uri ->
                 val scheme = uri.scheme
-                if (scheme == "kokoro" && uri.host == "oauth" && uri.path == "/callback") {
+                if (scheme.equals("kokoro", ignoreCase = true)) {
                     safeIntent.data = null
-                    lifecycleScope.launch {
+                    // Exchange survives Activity recreation. The session strictly validates and
+                    // atomically consumes the persisted pending login before sending any code.
+                    applicationScope.launch {
                         _kokoroAuthResult.value = runCatching {
                             kokoroAccountClient.handleOAuthCallback(uri)
                         }.onFailure {
-                            Timber.w("amamiyakoko.ro OAuth callback failed")
+                            if (it is kotlinx.coroutines.CancellationException) throw it
+                            Timber.w("Kokoro OAuth callback failed; sign in again")
                         }.isSuccess
                     }
                     return

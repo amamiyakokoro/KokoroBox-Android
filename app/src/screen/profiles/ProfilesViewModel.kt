@@ -121,7 +121,9 @@ class ProfilesViewModel(
         }
     }
 
-    internal fun beginKokoroLogin(): String = kokoroAccountClient.beginLogin()
+    internal suspend fun beginKokoroLogin(): String = kokoroAccountClient.beginLogin()
+
+    internal suspend fun cancelKokoroLogin(loginUrl: String) = kokoroAccountClient.cancelLogin(loginUrl)
 
     internal suspend fun resolveKokoroSubscription(
         settings: MihomoSubscriptionSettings,

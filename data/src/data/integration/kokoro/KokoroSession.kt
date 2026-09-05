@@ -15,6 +15,9 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -26,6 +29,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -33,7 +37,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 import java.security.KeyStore
-import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -52,32 +55,32 @@ object KokoroApi {
     const val SUBSCRIPTION_CONFIG_URL = "$API_BASE_URL/app/subscription/config"
     const val LEGACY_SUBSCRIPTION_CONFIG_URL = "$API_BASE_URL/config"
 
-    fun loginUrl(state: String): String = Uri.parse(LOGIN_URL).buildUpon()
-        .appendQueryParameter("redirect_uri", APP_REDIRECT_URI)
-        .appendQueryParameter("state", state)
+    fun loginUrl(state: String, codeChallenge: String): String = LOGIN_URL.toHttpUrl().newBuilder()
+        .addQueryParameter("redirect_uri", APP_REDIRECT_URI)
+        .addQueryParameter("state", state)
+        .addQueryParameter("code_challenge", codeChallenge)
+        .addQueryParameter("code_challenge_method", "S256")
         .build()
         .toString()
 
     fun isAuthenticatedSubscriptionUrl(url: String): Boolean {
-        val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return false
-        return uri.scheme.equals("https", ignoreCase = true) &&
-            uri.host.equals("amamiyakoko.ro", ignoreCase = true) &&
-            uri.path == "/api/app/subscription/config"
+        val uri = trustedApiUrl(url) ?: return false
+        return uri.encodedPath == "/api/app/subscription/config"
     }
 
     fun isAuthorizedApiUrl(url: String): Boolean {
-        val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return false
-        return uri.scheme.equals("https", ignoreCase = true) &&
-            uri.host.equals("amamiyakoko.ro", ignoreCase = true) &&
-            uri.path in AUTHORIZED_API_PATHS
+        val uri = trustedApiUrl(url) ?: return false
+        return uri.encodedPath in AUTHORIZED_API_PATHS
     }
 
     fun isLegacySubscriptionUrl(url: String): Boolean {
-        val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return false
-        return uri.scheme.equals("https", ignoreCase = true) &&
-            uri.host.equals("amamiyakoko.ro", ignoreCase = true) &&
-            uri.path == "/api/config" &&
-            !uri.getQueryParameter("uuid").isNullOrBlank()
+        val uri = trustedApiUrl(url) ?: return false
+        return uri.encodedPath == "/api/config" && !uri.queryParameter("uuid").isNullOrBlank()
+    }
+
+    private fun trustedApiUrl(url: String) = url.toHttpUrlOrNull()?.takeIf {
+        it.scheme == "https" && it.host == "amamiyakoko.ro" && it.port == 443 &&
+            it.username.isEmpty() && it.password.isEmpty() && it.fragment == null
     }
 
     fun isManagedSubscriptionUrl(url: String): Boolean =
@@ -95,47 +98,95 @@ object KokoroApi {
  * Owns the OAuth session shared by the Compose UI and the profile download service.
  * Tokens are never exposed through profile URLs or logs.
  */
-class KokoroSession(context: Context) {
-    private val appContext = context.applicationContext
-    private val json = Json { ignoreUnknownKeys = true }
-    private val httpClient = OkHttpClient()
-    private val tokenStore = KokoroKeystoreTokenStore(appContext, json)
-    private val secureRandom = SecureRandom()
+class KokoroSession internal constructor(
+    private val tokenStore: KokoroAuthStore,
+    private val httpClient: OkHttpClient = OkHttpClient(),
+    private val now: () -> Long = System::currentTimeMillis,
+    private val secureRandom: SecureRandom = SecureRandom(),
+) {
+    constructor(context: Context) : this(
+        KokoroKeystoreTokenStore(context.applicationContext, Json { ignoreUnknownKeys = true }),
+    )
 
-    fun beginLogin(): String {
-        val stateBytes = ByteArray(32).also(secureRandom::nextBytes)
-        val state = Base64.encodeToString(stateBytes, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-        tokenStore.update { it.copy(pendingState = state, pendingStateCreatedAt = System.currentTimeMillis()) }
-        return KokoroApi.loginUrl(state)
+    private val json = Json { ignoreUnknownKeys = true }
+    // Single-use codes and rotating refresh tokens must never be automatically replayed
+    // or forwarded to a redirect target. No HTTP/body logger is installed on this client.
+    private val tokenClient = httpClient.newBuilder()
+        .followRedirects(false)
+        .followSslRedirects(false)
+        .retryOnConnectionFailure(false)
+        .build()
+
+    suspend fun beginLogin(): String {
+        var createdState: String? = null
+        return try {
+            withContext(Dispatchers.IO) {
+                refreshMutex.withLock {
+                    val pending = KokoroOAuth.newLogin(secureRandom, now())
+                    createdState = pending.state
+                    tokenStore.update { it.copy(pendingLogin = pending) }
+                    KokoroApi.loginUrl(pending.state, KokoroOAuth.challenge(requireNotNull(pending.codeVerifier)))
+                }
+            }
+        } catch (error: Exception) {
+            withContext(NonCancellable + Dispatchers.IO) { clearPendingLogin(createdState) }
+            throw error
+        }
     }
 
-    suspend fun handleOAuthCallback(uri: Uri) = withContext(Dispatchers.IO) {
-        require(uri.scheme == "kokoro" && uri.host == "oauth" && uri.path == "/callback") {
-            "Invalid OAuth callback"
-        }
-        val stored = tokenStore.load()
-        val expectedState = stored.pendingState ?: throw IOException("Missing OAuth state")
-        val receivedState = uri.getQueryParameter("state") ?: ""
-        val validState = MessageDigest.isEqual(
-            expectedState.toByteArray(Charsets.UTF_8),
-            receivedState.toByteArray(Charsets.UTF_8),
-        )
-        val stateAge = System.currentTimeMillis() - stored.pendingStateCreatedAt
-        val stateFresh = stateAge in 0..OAUTH_STATE_MAX_AGE_MS
-        tokenStore.update { it.copy(pendingState = null, pendingStateCreatedAt = 0L) }
-        if (!validState || !stateFresh) throw IOException("OAuth state validation failed")
-        uri.getQueryParameter("error")?.let { throw IOException("OAuth authorization was cancelled") }
-        val code = uri.getQueryParameter("code")?.takeIf(String::isNotBlank)
-            ?: throw IOException("Missing authorization code")
+    /** Called if the system browser could not be opened; never clears a newer attempt. */
+    suspend fun cancelLogin(loginUrl: String) = withContext(NonCancellable + Dispatchers.IO) {
+        clearPendingLogin(loginUrl.toHttpUrlOrNull()?.queryParameter("state"))
+    }
 
-        val response = requestToken(
-            TokenRequest(
-                grantType = "authorization_code",
-                code = code,
-                redirectUri = KokoroApi.APP_REDIRECT_URI,
-            ),
-        )
-        tokenStore.replaceTokens(response.toStoredCredentials())
+    private fun clearPendingLogin(state: String?) {
+        if (state == null) return
+        tokenStore.update { current ->
+            if (current.pendingLogin?.state == state) current.copy(pendingLogin = null) else current
+        }
+    }
+
+    suspend fun handleOAuthCallback(uri: Uri) = handleOAuthCallback(uri.toString())
+
+    internal suspend fun handleOAuthCallback(rawUri: String) = withContext(Dispatchers.IO) {
+        refreshMutex.withLock {
+            discardExpiredLogin()
+            val callback = KokoroOAuth.parseCallback(rawUri)
+            var claimed: PendingKokoroLogin? = null
+            tokenStore.update { current ->
+                val pending = current.pendingLogin
+                when {
+                    pending == null -> current
+                    !pending.isFresh(now()) || !KokoroOAuth.isValidVerifier(pending.codeVerifier) ||
+                        pending.redirectUri != KokoroApi.APP_REDIRECT_URI -> current.copy(pendingLogin = null)
+                    !KokoroOAuth.sameState(pending.state, callback.state) -> current
+                    else -> {
+                        claimed = pending
+                        current.copy(pendingLogin = null)
+                    }
+                }
+            }
+            val pending = claimed ?: throw IOException("No matching pending PKCE login; sign in again")
+            // Consume before the network request, also on cancellation, malformed success or failure.
+            if (callback.error != null) throw IOException("OAuth authorization was cancelled or denied")
+            val code = callback.code?.takeIf(String::isNotBlank)
+                ?: throw IOException("Missing authorization code")
+            val response = requestToken(
+                TokenRequest(
+                    grantType = "authorization_code",
+                    code = code,
+                    redirectUri = pending.redirectUri,
+                    codeVerifier = requireNotNull(pending.codeVerifier),
+                ),
+            )
+            currentCoroutineContext().ensureActive()
+            tokenStore.replaceTokens(response.toStoredCredentials())
+        }
+    }
+
+    private fun discardExpiredLogin() {
+        val pending = tokenStore.load().pendingLogin ?: return
+        if (!pending.isFresh(now())) clearPendingLogin(pending.state)
     }
 
     suspend fun executeAuthorized(request: Request): Response = withContext(Dispatchers.IO) {
@@ -231,18 +282,20 @@ class KokoroSession(context: Context) {
     }
 
     suspend fun revoke() = withContext(Dispatchers.IO) {
-        val accessToken = tokenStore.load().accessToken
-        try {
-            if (!accessToken.isNullOrBlank()) {
-                val request = Request.Builder()
-                    .url(KokoroApi.REVOKE_URL)
-                    .header("Authorization", "Bearer $accessToken")
-                    .post(ByteArray(0).toRequestBody(null))
-                    .build()
-                runCatching { httpClient.newCall(request).execute().close() }
+        refreshMutex.withLock {
+            val accessToken = tokenStore.load().accessToken
+            try {
+                if (!accessToken.isNullOrBlank()) {
+                    val request = Request.Builder()
+                        .url(KokoroApi.REVOKE_URL)
+                        .header("Authorization", "Bearer $accessToken")
+                        .post(ByteArray(0).toRequestBody(null))
+                        .build()
+                    runCatching { httpClient.newCall(request).execute().close() }
+                }
+            } finally {
+                tokenStore.update { StoredAuthData() }
             }
-        } finally {
-            tokenStore.clearTokens()
         }
     }
 
@@ -252,15 +305,16 @@ class KokoroSession(context: Context) {
         rejectedAccessToken: String? = null,
         forceRefresh: Boolean = false,
     ): String? = refreshMutex.withLock {
+        discardExpiredLogin()
         val current = tokenStore.load()
         if (rejectedAccessToken != null && current.accessToken != rejectedAccessToken) {
             return@withLock current.accessToken
         }
         val stillValid = current.accessToken != null &&
-            current.accessTokenExpiresAt > System.currentTimeMillis() + ACCESS_TOKEN_REFRESH_MARGIN_MS
+            current.accessTokenExpiresAt > now() + ACCESS_TOKEN_REFRESH_MARGIN_MS
         if (!forceRefresh && stillValid) return@withLock current.accessToken
         val refreshToken = current.refreshToken ?: return@withLock current.accessToken?.takeIf { stillValid }
-        if (current.refreshTokenExpiresAt <= System.currentTimeMillis()) {
+        if (current.refreshTokenExpiresAt <= now()) {
             tokenStore.clearTokens()
             return@withLock null
         }
@@ -285,11 +339,23 @@ class KokoroSession(context: Context) {
             .header("Accept", "application/json")
             .post(json.encodeToString(payload).toRequestBody(JSON_MEDIA_TYPE))
             .build()
-        httpClient.newCall(request).execute().use { response ->
+        val tokenResponse = try {
+            tokenClient.newCall(request).execute()
+        } catch (_: IOException) {
+            throw IOException("Unable to contact Kokoro token endpoint")
+        }
+        tokenResponse.use { response ->
             if (response.code !in 200..299) {
                 throw KokoroTokenRequestException(response.code)
             }
-            return json.decodeFromString(response.body.string())
+            return try {
+                json.decodeFromString<TokenResponse>(response.body.string()).also {
+                    check(it.accessToken.isNotBlank() && it.refreshToken.isNotBlank())
+                }
+            } catch (_: Exception) {
+                // Serialization errors may echo credentials from the response body.
+                throw IOException("Invalid Kokoro token response")
+            }
         }
     }
 
@@ -298,7 +364,7 @@ class KokoroSession(context: Context) {
         .build()
 
     private fun TokenResponse.toStoredCredentials(): StoredAuthData {
-        val now = System.currentTimeMillis()
+        val now = now()
         return StoredAuthData(
             accessToken = accessToken,
             refreshToken = refreshToken,
@@ -311,7 +377,6 @@ class KokoroSession(context: Context) {
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
         val refreshMutex = Mutex()
         const val ACCESS_TOKEN_REFRESH_MARGIN_MS = 60_000L
-        const val OAUTH_STATE_MAX_AGE_MS = 10 * 60_000L
     }
 }
 
@@ -325,8 +390,11 @@ private data class TokenRequest(
     @SerialName("grant_type") val grantType: String,
     val code: String? = null,
     @SerialName("redirect_uri") val redirectUri: String? = null,
+    @SerialName("code_verifier") val codeVerifier: String? = null,
     @SerialName("refresh_token") val refreshToken: String? = null,
-)
+) {
+    override fun toString(): String = "TokenRequest([redacted])"
+}
 
 @Serializable
 private data class TokenResponse(
@@ -334,22 +402,14 @@ private data class TokenResponse(
     @SerialName("expires_in") val expiresIn: Long,
     @SerialName("refresh_token") val refreshToken: String,
     @SerialName("refresh_expires_in") val refreshExpiresIn: Long,
-)
+) {
+    override fun toString(): String = "TokenResponse([redacted])"
+}
 
-@Serializable
-private data class StoredAuthData(
-    val accessToken: String? = null,
-    val refreshToken: String? = null,
-    val accessTokenExpiresAt: Long = 0L,
-    val refreshTokenExpiresAt: Long = 0L,
-    val pendingState: String? = null,
-    val pendingStateCreatedAt: Long = 0L,
-)
-
-private class KokoroKeystoreTokenStore(context: Context, private val json: Json) {
+private class KokoroKeystoreTokenStore(context: Context, private val json: Json) : KokoroAuthStore {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
-    fun load(): StoredAuthData = synchronized(storeLock) {
+    override fun load(): StoredAuthData = synchronized(storeLock) {
         val encoded = preferences.getString(ENCRYPTED_DATA_KEY, null) ?: return@synchronized StoredAuthData()
         runCatching {
             val combined = Base64.decode(encoded, Base64.NO_WRAP)
@@ -365,28 +425,8 @@ private class KokoroKeystoreTokenStore(context: Context, private val json: Json)
         }
     }
 
-    fun update(transform: (StoredAuthData) -> StoredAuthData) = synchronized(storeLock) {
+    override fun update(transform: (StoredAuthData) -> StoredAuthData) = synchronized(storeLock) {
         saveLocked(transform(load()))
-    }
-
-    fun replaceTokens(replacement: StoredAuthData) = synchronized(storeLock) {
-        val current = load()
-        saveLocked(
-            replacement.copy(
-                pendingState = current.pendingState,
-                pendingStateCreatedAt = current.pendingStateCreatedAt,
-            ),
-        )
-    }
-
-    fun clearTokens() = synchronized(storeLock) {
-        val current = load()
-        saveLocked(
-            StoredAuthData(
-                pendingState = current.pendingState,
-                pendingStateCreatedAt = current.pendingStateCreatedAt,
-            ),
-        )
     }
 
     private fun saveLocked(value: StoredAuthData) {

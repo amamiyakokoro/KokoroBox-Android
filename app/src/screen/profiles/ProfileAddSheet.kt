@@ -533,15 +533,20 @@ internal fun AddProfileSheet(
                         kokoroSubscriptionOptions = kokoroSubscriptionOptions,
                         onKokoroOptionsChange = { kokoroOptions = it },
                         onKokoroLogin = {
-                            runCatching {
-                                val loginUrl = profilesViewModel.beginKokoroLogin()
-                                context.startActivity(
-                                    Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
-                                        addCategory(Intent.CATEGORY_BROWSABLE)
-                                    },
-                                )
-                            }.onFailure {
-                                error = MLang.ProfilesPage.Kokoro.LoginFailed
+                            scope.launch {
+                                var loginUrl: String? = null
+                                try {
+                                    loginUrl = profilesViewModel.beginKokoroLogin()
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
+                                            addCategory(Intent.CATEGORY_BROWSABLE)
+                                        },
+                                    )
+                                } catch (e: Exception) {
+                                    loginUrl?.let { profilesViewModel.cancelKokoroLogin(it) }
+                                    if (e is kotlinx.coroutines.CancellationException) throw e
+                                    error = MLang.ProfilesPage.Kokoro.LoginFailed
+                                }
                             }
                         },
                         onKokoroLogout = { profilesViewModel.logoutKokoroAccount() },

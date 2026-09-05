@@ -232,7 +232,9 @@ class KokoroAccountClient(context: Context) {
     private val json = Json { ignoreUnknownKeys = true }
     private val session = KokoroSession(context)
 
-    internal fun beginLogin(): String = session.beginLogin()
+    internal suspend fun beginLogin(): String = session.beginLogin()
+
+    internal suspend fun cancelLogin(loginUrl: String) = session.cancelLogin(loginUrl)
 
     internal suspend fun handleOAuthCallback(uri: Uri) = session.handleOAuthCallback(uri)
 
