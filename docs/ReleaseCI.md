@@ -108,6 +108,8 @@ with `contents: write`; the signing/build job only has `contents: read`.
 ## Build and security checks
 
 - Installs JDK 25, Kotlin, Go (from `go.mod`), Rust, Android SDK/NDK and CMake.
+- Resolves SDK package names from both `android.compileSdk` and
+  `android.compileSdkMinor` (API 37.0 is `platforms;android-37.0`, not `android-37`).
 - Checks out the Mihomo revision in the tag's `kernel.properties`, without changing
   it to the latest branch or relying on checked-in/prebuilt `.so` files.
 - Builds Go/Rust/JNI libraries, Geo assets and generated locale sources before Gradle.

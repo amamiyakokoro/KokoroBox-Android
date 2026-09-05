@@ -93,6 +93,21 @@ class ReleaseTests(unittest.TestCase):
             ci.metadata("v0.5.5")
         self.assertIn("tag=v0.5.5\n", Path("outputs").read_text())
         self.assertIn("sha=" + "a" * 40, Path("outputs").read_text())
+        self.assertIn("sdk=37.0\n", Path("outputs").read_text())
+
+    def test_metadata_sdk_package_includes_required_minor_version(self):
+        original = Path("gradle.properties").read_text()
+        for major, minor, expected in ((36, 0, "36"), (36, 1, "36.1"),
+                                       (37, 0, "37.0"), (37, 2, "37.2")):
+            with self.subTest(major=major, minor=minor):
+                Path("gradle.properties").write_text(
+                    original.replace("android.compileSdk=37", f"android.compileSdk={major}")
+                    + f"android.compileSdkMinor={minor}\n"
+                )
+                with patch.object(ci.subprocess, "check_output", return_value="a" * 40), \
+                        patch.object(ci, "output") as output:
+                    ci.metadata("v0.5.5")
+                output.assert_any_call("sdk", expected)
 
     def make_apk(self, missing_lib=False, extra_abi=False):
         directory = Path("app/build/outputs/apk/release")

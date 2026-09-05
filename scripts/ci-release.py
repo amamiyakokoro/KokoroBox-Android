@@ -48,9 +48,13 @@ def metadata(tag):
     tagged = subprocess.check_output(["git", "rev-parse", f"refs/tags/{tag}^{{commit}}"], text=True).strip()
     if head != tagged:
         raise ValueError("Checkout does not match the release tag")
+    sdk_major = int(config["android.compileSdk"])
+    sdk_minor = int(config.get("android.compileSdkMinor", "0"))
+    # API 37 uses a dotted package name even for minor version zero.
+    sdk = f"{sdk_major}.{sdk_minor}" if sdk_major >= 37 or sdk_minor else str(sdk_major)
     for name, value in {
         "tag": tag, "sha": head, "version": config["project.version.name"],
-        "ndk": config["android.ndkVersion"], "sdk": config["android.compileSdk"],
+        "ndk": config["android.ndkVersion"], "sdk": sdk,
     }.items():
         output(name, value)
 
