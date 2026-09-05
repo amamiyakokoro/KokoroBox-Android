@@ -17,7 +17,7 @@ A Material 3 Android proxy client powered by [Mihomo](https://github.com/MetaCub
 - Local, remote, QR-code, and authenticated Kokoro subscription profiles
 - Rule, Global, Direct, VPN, and optional Root TUN modes
 - Proxy selection, connection inspection, traffic statistics, logs, and Geo data updates
-- Profile overrides, configuration preview, and automatic updates
+- Server-synced Kokoro Custom Rules, profile overrides, configuration preview, and automatic updates
 - In-app checks for stable releases published by this repository
 
 ## Install
@@ -31,6 +31,8 @@ The application ID is `com.amamiyakokoro.box`. KokoroBox installs separately fro
 When adding a profile, select **Kokoro Subscription** and sign in with osu! through the system browser. Authentication returns through `kokoro://oauth/callback` and uses PKCE S256; no backend secret is embedded in the app.
 
 Keep tokens, subscription URLs, UUIDs, signing keys, and private configurations out of logs and issue reports. See [Kokoro OAuth](docs/KokoroOAuth.md) for the client integration details.
+
+Authenticated users can manage the same ordered Custom Rules used by the Kokoro website from **Settings → Meta Features → Kokoro Custom Rules**. See [Kokoro Custom Rules](docs/KokoroCustomRules.md) for synchronization and conflict behavior.
 
 ## Build
 

@@ -47,6 +47,8 @@ import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.Hub
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.PowerSettingsNew
@@ -93,6 +95,8 @@ object AppMd3Icons {
         val Delete: ImageVector = Icons.Rounded.Delete
         val Edit: ImageVector = Icons.Rounded.Edit
         val List: ImageVector = Icons.AutoMirrored.Rounded.ViewList
+        val MoveDown: ImageVector = Icons.Rounded.KeyboardArrowDown
+        val MoveUp: ImageVector = Icons.Rounded.KeyboardArrowUp
         val Refresh: ImageVector = Icons.Rounded.Refresh
         val Save: ImageVector = Icons.Rounded.Save
         val Search: ImageVector = Icons.Rounded.Search

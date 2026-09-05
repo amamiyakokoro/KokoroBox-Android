@@ -70,7 +70,8 @@ object KokoroApi {
 
     fun isAuthorizedApiUrl(url: String): Boolean {
         val uri = trustedApiUrl(url) ?: return false
-        return uri.encodedPath in AUTHORIZED_API_PATHS
+        val path = uri.encodedPath
+        return path in AUTHORIZED_API_PATHS || CUSTOM_RULE_SET_PATH.matches(path)
     }
 
     fun isLegacySubscriptionUrl(url: String): Boolean {
@@ -91,7 +92,12 @@ object KokoroApi {
         "/api/app/subscription/options",
         "/api/app/subscription/resolve",
         "/api/app/subscription/config",
+        "/api/app/custom-rules",
+        "/api/app/custom-rules/options",
+        "/api/app/custom-rules/sets",
     )
+    private val CUSTOM_RULE_SET_PATH =
+        Regex("^/api/app/custom-rules/sets/[1-9][0-9]*(?:/rules)?$")
 }
 
 /**
