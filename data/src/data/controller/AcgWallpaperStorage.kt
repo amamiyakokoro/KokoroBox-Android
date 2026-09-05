@@ -66,12 +66,12 @@ class AcgWallpaperStorage(
         return Uri.fromFile(targetFile).toString()
     }
 
-    fun readBytes(wallpaperUri: String): ByteArray? = runCatching {
-        if (wallpaperUri.isBlank()) return@runCatching null
-        context.contentResolver.openInputStream(Uri.parse(wallpaperUri))?.use { input ->
-            input.readBytes()
+    fun readBytes(wallpaperUri: String): ByteArray? {
+        if (wallpaperUri.isBlank()) return null
+        return context.contentResolver.openInputStream(Uri.parse(wallpaperUri))?.use { input ->
+            SizeLimitedInputStream(input, MAX_BACKUP_WALLPAPER_BYTES.toLong(), "Wallpaper").readBytes()
         }
-    }.getOrNull()
+    }
 
     fun clear() {
         runCatching { wallpaperDir.deleteRecursively() }
@@ -86,6 +86,7 @@ class AcgWallpaperStorage(
     }
 
     companion object {
+        const val MAX_BACKUP_WALLPAPER_BYTES = 8 * 1024 * 1024
         private const val WALLPAPER_DIR_NAME = "acg_wallpaper"
         private const val WALLPAPER_FILE_PREFIX = "wallpaper_"
     }

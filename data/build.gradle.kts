@@ -23,11 +23,16 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-android {
+extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
     namespace = "com.github.yumelira.yumebox.data"
+    sourceSets.getByName("test").kotlin.directories.apply {
+        clear()
+        add("test")
+    }
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation(project(":core"))
     implementation(project(":locale"))
     implementation(project(":runtime:api"))

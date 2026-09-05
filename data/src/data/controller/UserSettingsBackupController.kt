@@ -23,6 +23,13 @@
 package com.github.yumelira.yumebox.data.controller
 
 import android.util.Base64
+import java.io.InputStream
+import java.io.OutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.encodeToStream
 import com.github.yumelira.yumebox.core.model.RootTunDnsMode
 import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.model.AccessControlMode
@@ -70,6 +77,7 @@ private data class UserSettingsBackup(
     val assets: JsonObject = buildJsonObject { },
 )
 
+@OptIn(ExperimentalSerializationApi::class)
 class UserSettingsBackupController(
     private val appSettingsStore: AppSettingsStore,
     private val networkSettingsStore: NetworkSettingsStore,
@@ -81,6 +89,7 @@ class UserSettingsBackupController(
     companion object {
         const val BACKUP_FORMAT = "YumeBoxUserSettingsBackup"
         const val BACKUP_VERSION = 3
+        private const val MAX_BACKUP_BYTES = 32L * 1024 * 1024
     }
 
     private val json = Json {
@@ -89,7 +98,7 @@ class UserSettingsBackupController(
         encodeDefaults = true
     }
 
-    suspend fun exportToJson(): String {
+    suspend fun exportToStream(output: OutputStream) = withContext(Dispatchers.IO) {
         val backup = UserSettingsBackup(
             stores = buildJsonObject {
                 put("app", exportAppSettings())
@@ -101,13 +110,18 @@ class UserSettingsBackupController(
             },
             assets = exportAssets(),
         )
-        return json.encodeToString(UserSettingsBackup.serializer(), backup)
+        json.encodeToStream(UserSettingsBackup.serializer(), backup, SizeLimitedOutputStream(output, MAX_BACKUP_BYTES))
     }
 
-    suspend fun importFromJson(rawJson: String) {
-        val backup = json.decodeFromString(UserSettingsBackup.serializer(), rawJson)
+    suspend fun importFromStream(input: InputStream): Unit = withContext(Dispatchers.IO) {
+        val backup = json.decodeFromStream(
+            UserSettingsBackup.serializer(),
+            SizeLimitedInputStream(input, MAX_BACKUP_BYTES, "Backup"),
+        )
         require(backup.format == BACKUP_FORMAT) { "Unsupported backup format" }
         require(backup.version <= BACKUP_VERSION) { "Unsupported backup version" }
+        // Check the embedded asset before changing any settings.
+        val wallpaperBytes = decodeWallpaper(backup.assets)
 
         backup.stores["app"]?.jsonObject?.let(::importAppSettings)
         backup.stores["feature"]?.jsonObject?.let(::importFeatureSettings)
@@ -115,7 +129,10 @@ class UserSettingsBackupController(
         backup.stores["profileLinks"]?.jsonObject?.let(::importProfileLinks)
         backup.stores["proxyDisplay"]?.jsonObject?.let(::importProxyDisplaySettings)
         backup.stores["overrideConfigs"]?.jsonObject?.let { obj -> importOverrideConfigs(obj) }
-        importAssets(backup.assets)
+        wallpaperBytes?.let {
+            val restoredUri = acgWallpaperStorage.saveBackupBytes(it)
+            appSettingsStore.acgWallpaperUri.set(restoredUri)
+        }
     }
 
     private fun exportAssets(): JsonObject = buildJsonObject {
@@ -131,14 +148,14 @@ class UserSettingsBackupController(
         }
     }
 
-    private fun importAssets(assets: JsonObject) {
-        val wallpaperObject = assets["acgWallpaper"]?.jsonObject ?: return
-        val encodedData = wallpaperObject.string("data") ?: return
-        val wallpaperBytes = runCatching {
-            Base64.decode(encodedData, Base64.DEFAULT)
-        }.getOrNull() ?: return
-        val restoredUri = acgWallpaperStorage.saveBackupBytes(wallpaperBytes)
-        appSettingsStore.acgWallpaperUri.set(restoredUri)
+    private fun decodeWallpaper(assets: JsonObject): ByteArray? {
+        val wallpaperObject = assets["acgWallpaper"]?.jsonObject ?: return null
+        val encodedData = wallpaperObject.string("data") ?: return null
+        val maxBytes = AcgWallpaperStorage.MAX_BACKUP_WALLPAPER_BYTES
+        require(encodedData.length <= ((maxBytes + 2) / 3) * 4) { "Backup wallpaper exceeds the 8 MiB limit" }
+        return Base64.decode(encodedData, Base64.DEFAULT).also {
+            require(it.size <= maxBytes) { "Backup wallpaper exceeds the 8 MiB limit" }
+        }
     }
 
     private fun exportAppSettings(): JsonObject = buildJsonObject {

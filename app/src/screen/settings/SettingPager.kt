@@ -35,6 +35,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -122,48 +125,32 @@ fun SettingPager(
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val navigator = LocalNavigator.current
     val context = LocalContext.current
+    val appContext = context.applicationContext
+    val backupInProgress by appSettingsViewModel.backupInProgress.collectAsStateWithLifecycle()
 
     val versionInfo = BuildConfig.VERSION_NAME
     val exportBackupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json"),
     ) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        appSettingsViewModel.exportUserSettingsBackup()
-            .onSuccess { backupJson ->
-                runCatching {
-                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                        outputStream.write(backupJson.toByteArray())
-                        outputStream.flush()
-                    } ?: error(MLang.AppSettings.Backup.ExportFailed)
-                }.onSuccess {
-                    context.toast(MLang.AppSettings.Backup.ExportSuccess)
-                }.onFailure { throwable ->
-                    context.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
-                }
+        appSettingsViewModel.exportUserSettingsBackup(appContext.contentResolver, uri) { result ->
+            result.onSuccess {
+                appContext.toast(MLang.AppSettings.Backup.ExportSuccess)
+            }.onFailure { throwable ->
+                appContext.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
             }
-            .onFailure { throwable ->
-                context.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
-            }
+        }
     }
     val importBackupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
     ) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        runCatching {
-            context.contentResolver.openInputStream(uri)
-                ?.bufferedReader()
-                ?.use { reader -> reader.readText() }
-                ?: error(MLang.AppSettings.Backup.ImportReadFailed)
-        }.onSuccess { backupJson ->
-            appSettingsViewModel.importUserSettingsBackup(backupJson)
-                .onSuccess {
-                    context.toast(MLang.AppSettings.Backup.ImportSuccess)
-                }
-                .onFailure { throwable ->
-                    context.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
-                }
-        }.onFailure { throwable ->
-            context.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+        appSettingsViewModel.importUserSettingsBackup(appContext.contentResolver, uri) { result ->
+            result.onSuccess {
+                appContext.toast(MLang.AppSettings.Backup.ImportSuccess)
+            }.onFailure { throwable ->
+                appContext.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+            }
         }
     }
 
@@ -227,16 +214,21 @@ fun SettingPager(
             item {
                 Title(MLang.Settings.Section.DataSettings)
                 Card {
+                    if (backupInProgress) {
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    }
                     SettingsEntryItem(
                         title = MLang.Settings.DataSettings.ExportBackup,
                         summary = MLang.Settings.DataSettings.ExportBackupSummary,
                         imageVector = AppMd3Icons.Settings.ExportBackup,
+                        enabled = !backupInProgress,
                         onClick = { exportBackupLauncher.launch("yumebox-settings-backup.json") },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.DataSettings.ImportBackup,
                         summary = MLang.Settings.DataSettings.ImportBackupSummary,
                         imageVector = AppMd3Icons.Settings.ImportBackup,
+                        enabled = !backupInProgress,
                         onClick = { importBackupLauncher.launch("application/json") },
                     )
                     SettingsEntryItem(
@@ -278,12 +270,14 @@ private fun SettingsEntryItem(
     summary: String,
     imageVector: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     endActions: @Composable (RowScope.() -> Unit)? = null,
 ) {
     PreferenceArrowItem(
         title = title,
         summary = summary,
         onClick = onClick,
+        enabled = enabled,
         startAction = {
             CircularIcon(
                 imageVector = imageVector,

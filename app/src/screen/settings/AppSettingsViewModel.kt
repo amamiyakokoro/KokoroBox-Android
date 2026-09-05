@@ -23,6 +23,9 @@
 package com.github.yumelira.yumebox.screen.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import android.content.ContentResolver
+import android.net.Uri
 import com.github.yumelira.yumebox.data.controller.AcgWallpaperStorage
 import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.model.AppColorTheme
@@ -33,7 +36,12 @@ import com.github.yumelira.yumebox.data.store.Preference
 import com.github.yumelira.yumebox.data.controller.UserSettingsBackupController
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class AppSettingsViewModel(
     private val settings: AppSettingsStore,
@@ -41,6 +49,9 @@ class AppSettingsViewModel(
     private val userSettingsBackupController: UserSettingsBackupController,
     private val acgWallpaperStorage: AcgWallpaperStorage,
 ) : ViewModel() {
+
+    private val _backupInProgress = MutableStateFlow(false)
+    val backupInProgress = _backupInProgress.asStateFlow()
 
     val initialSetupCompleted: Preference<Boolean> = settings.initialSetupCompleted
     val privacyPolicyAccepted: Preference<Boolean> = settings.privacyPolicyAccepted
@@ -126,18 +137,46 @@ class AppSettingsViewModel(
 
     fun applyCustomUserAgent(userAgent: String) = controller.applyCustomUserAgent(userAgent)
 
-    fun exportUserSettingsBackup(): Result<String> = runCatching {
-        runBlocking {
-            userSettingsBackupController.exportToJson()
+    fun exportUserSettingsBackup(resolver: ContentResolver, uri: Uri, onResult: (Result<Unit>) -> Unit) {
+        launchBackup(onResult = onResult) {
+            resolver.openOutputStream(uri, "wt")?.use {
+                userSettingsBackupController.exportToStream(it)
+            } ?: error("Unable to open backup destination")
         }
     }
 
-    fun importUserSettingsBackup(rawJson: String): Result<Unit> = runCatching {
-        runBlocking {
-            userSettingsBackupController.importFromJson(rawJson)
+    fun importUserSettingsBackup(resolver: ContentResolver, uri: Uri, onResult: (Result<Unit>) -> Unit) {
+        launchBackup(importing = true, onResult = onResult) {
+            resolver.openInputStream(uri)?.use {
+                userSettingsBackupController.importFromStream(it)
+            } ?: error("Unable to open backup file")
         }
-        controller.applyAppLanguage(appLanguage.value)
-        controller.applyCustomUserAgent(customUserAgent.value)
+    }
+
+    private fun launchBackup(
+        importing: Boolean = false,
+        onResult: (Result<Unit>) -> Unit,
+        operation: suspend () -> Unit,
+    ) {
+        if (_backupInProgress.value) return
+        _backupInProgress.value = true
+        viewModelScope.launch {
+            val result = try {
+                withContext(Dispatchers.IO) { operation() }
+                if (importing) {
+                    controller.applyAppLanguage(appLanguage.value)
+                    controller.applyCustomUserAgent(customUserAgent.value)
+                }
+                Result.success(Unit)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Result.failure(error)
+            } finally {
+                _backupInProgress.value = false
+            }
+            onResult(result)
+        }
     }
 
     fun setInitialSetupCompleted(completed: Boolean) = initialSetupCompleted.set(completed)
