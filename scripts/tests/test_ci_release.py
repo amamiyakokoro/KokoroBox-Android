@@ -79,6 +79,8 @@ class ReleaseTests(unittest.TestCase):
             ci.build("apksigner")
         gradle_call, signer_call = run.call_args_list
         self.assertIn("--no-configuration-cache", gradle_call.args[0])
+        self.assertIn("assembleReleaseArm64V8a", gradle_call.args[0])
+        self.assertFalse(any("android.injected" in argument for argument in gradle_call.args[0]))
         self.assertNotIn("env", gradle_call.kwargs)
         signer_args = signer_call.args[0]
         signer_env = signer_call.kwargs["env"]
@@ -156,9 +158,15 @@ class ReleaseTests(unittest.TestCase):
     def certificate(self):
         return "Signer #1 certificate DN: CN=CI Release\nSigner #1 certificate SHA-256 digest: " + "ab" * 32 + "\n"
 
-    def badging(self, application_id="com.amamiyakokoro.box", version_code="5500", version_name="0.5.5"):
-        return (f"package: name='{application_id}' versionCode='{version_code}' "
-                f"versionName='{version_name}' compileSdkVersion='37'\n")
+    def badging(self, application_id="com.amamiyakokoro.box", version_code="5500",
+                version_name="0.5.5", test_only=False, debuggable=False):
+        result = (f"package: name='{application_id}' versionCode='{version_code}' "
+                  f"versionName='{version_name}' compileSdkVersion='37'\n")
+        if test_only:
+            result += "testOnly='-1'\n"
+        if debuggable:
+            result += "application-debuggable\n"
+        return result
 
     def tool_results(self, certificate=None):
         return [
@@ -256,6 +264,15 @@ class ReleaseTests(unittest.TestCase):
             with self.subTest(badging=badging), patch.object(ci.subprocess, "run", return_value=
                     subprocess.CompletedProcess([], 0, badging, "")), \
                     self.assertRaisesRegex(ValueError, "does not match"):
+                ci.verify_and_stage("apksigner", "aapt2")
+
+    def test_test_only_or_debuggable_apk_is_rejected(self):
+        self.make_apk()
+        for badging in (self.badging(test_only=True), self.badging(debuggable=True)):
+            with self.subTest(badging=badging), patch.object(
+                    ci.subprocess, "run",
+                    return_value=subprocess.CompletedProcess([], 0, badging, ""),
+            ), self.assertRaisesRegex(ValueError, "Refusing to publish"):
                 ci.verify_and_stage("apksigner", "aapt2")
 
     def test_cleanup_is_idempotent(self):

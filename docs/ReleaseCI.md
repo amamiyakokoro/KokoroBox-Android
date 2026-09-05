@@ -3,8 +3,7 @@
 The **Release APK** workflow (`.github/workflows/release.yml`) builds an arm64
 Release APK from an existing `vMAJOR.MINOR.PATCH` tag. Signing credentials belong
 in **GitHub Actions Secrets**, never in Git, workflow YAML or an issue/comment.
-This workflow replaces the stable release chain; other legacy preview/PR workflows
-are separate and are not the recommended route for signing a public release.
+This is the repository's canonical path for building and signing public releases.
 
 ## One-time setup
 
@@ -113,25 +112,28 @@ with `contents: write`; the signing/build job only has `contents: read`.
 - Checks out the Mihomo revision in the tag's `kernel.properties`, without changing
   it to the latest branch or relying on checked-in/prebuilt `.so` files.
 - Builds Go/Rust/JNI libraries, Geo assets and generated locale sources before Gradle.
+- Uses the repository's `assembleReleaseArm64V8a` task; IDE-injected Gradle
+  properties must not be used because they can mark an APK as test-only.
 - Requires all four signing secrets; there is no unsigned/debug-signing fallback.
 - Restores the keystore under `RUNNER_TEMP` with mode `0600`, immediately before signing.
 - Passes passwords through Gradle environment project properties, not command-line
   arguments or `signing.properties`; disables build/configuration caches for signing.
-- Verifies the APK signature, application ID, version and required arm64 libraries.
+- Verifies the APK signature, application ID, version and required arm64 libraries,
+  and rejects test-only or debuggable APKs before upload.
 - Removes the temporary keystore even after a failed build. Only the APK, file hash
   and public signing fingerprint are eligible for artifact upload.
 
 Keep these values only in the **release-signing environment**, not duplicated as
-repository-wide secrets: legacy scheduled/preview workflows use `secrets: inherit`.
-Environment-scoped secrets are only provided to jobs using that environment.
+repository-wide secrets. Environment-scoped secrets are only provided to jobs
+using that environment.
 Consider required reviewers and deployment rules allowing `dev` (manual runs) and
 `v*` tags. Existing users of repository-wide signing secrets should remove those
 copies after configuring the environment.
 
 Keep branch/tag creation restricted to trusted maintainers. Any workflow or build
 code with access to signing secrets is trusted code; review changes to it carefully.
-This workflow does not run on pull requests or inherit signing secrets into the
-legacy preview/PR chain. Signing does not guarantee Play Protect will suppress warnings.
+This workflow does not run on pull requests. Signing does not guarantee Play Protect
+will suppress warnings.
 
 ## Local validation
 

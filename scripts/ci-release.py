@@ -96,7 +96,7 @@ def signing_environment(env, store):
 def build_unsigned():
     subprocess.run([
         "./gradlew", "--no-daemon", "--no-configuration-cache", "--no-build-cache",
-        "--console=plain", "-Pandroid.injected.build.abi=arm64-v8a", ":app:assembleRelease",
+        "--console=plain", "assembleReleaseArm64V8a",
     ], check=True)
 
 
@@ -176,6 +176,12 @@ def verify_apk_manifest(aapt2, apk, config):
                 config["project.version.name"])
     if package.groups() != expected:
         raise ValueError("APK version or application ID does not match the release source")
+    # android.injected.* Gradle properties can silently mark an otherwise valid
+    # release as test-only, which Package Installer refuses outside `adb install -t`.
+    if re.search(r"^testOnly=", process.stdout, re.MULTILINE):
+        raise ValueError("Refusing to publish a test-only APK")
+    if re.search(r"^application-debuggable", process.stdout, re.MULTILINE):
+        raise ValueError("Refusing to publish a debuggable APK")
 
 
 def verify_and_stage(apksigner, aapt2, expected_fingerprint=""):
