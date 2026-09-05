@@ -69,119 +69,19 @@ internal fun KokoroProfileContent(
         availableOptions
     }
     val normalizedSettings = effectiveOptions.normalize(settings)
-    val selectedSubscription = subscriptions.firstOrNull { it.plan == normalizedSettings.plan }
-        ?: subscriptions.firstOrNull()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
     ) {
         SectionLabel(MLang.ProfilesPage.Kokoro.Account)
-
-        Card {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(UiDp.dp16),
-                verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-            ) {
-                when (authState) {
-                    KokoroAuthState.Checking -> {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-                        ) {
-                            Md3EIndeterminateCircularWavyProgressIndicator()
-                            Text(MLang.ProfilesPage.Kokoro.Checking)
-                        }
-                    }
-
-                    KokoroAuthState.LoggedOut -> {
-                        StatusText(
-                            title = MLang.ProfilesPage.Kokoro.LoggedOut,
-                            detail = MLang.ProfilesPage.Kokoro.LoginHint,
-                        )
-                        Button(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                            Text(MLang.ProfilesPage.Kokoro.Login)
-                        }
-                    }
-
-                    is KokoroAuthState.Error -> {
-                        StatusText(
-                            title = MLang.ProfilesPage.Kokoro.CheckFailed,
-                            detail = authState.message,
-                            error = true,
-                        )
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
-                        ) {
-                            Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-                                Text(MLang.ProfilesPage.Kokoro.Retry)
-                            }
-                            OutlinedButton(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                                Text(MLang.ProfilesPage.Kokoro.Login)
-                            }
-                        }
-                    }
-
-                    is KokoroAuthState.Authenticated -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-                        ) {
-                            OsuAvatar(
-                                displayName = authState.account.displayName,
-                                avatarUrl = authState.account.avatarUrl,
-                            )
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = authState.account.displayName
-                                        ?: MLang.ProfilesPage.Kokoro.LoggedIn,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Text(
-                                    text = if (subscriptions.isEmpty()) {
-                                        MLang.ProfilesPage.Kokoro.NoSubscription
-                                    } else {
-                                        subscriptions.joinToString(", ") { it.plan }
-                                    },
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            TextButton(onClick = onLogout) {
-                                Text(MLang.ProfilesPage.Kokoro.Logout)
-                            }
-                        }
-
-                        selectedSubscription?.let { subscription ->
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                            subscription.usedBytes?.let {
-                                SubscriptionLine(
-                                    MLang.ProfilesPage.Kokoro.TrafficUsed,
-                                    ByteFormatter.format(it),
-                                )
-                            }
-                            subscription.totalBytes?.let {
-                                SubscriptionLine(
-                                    MLang.ProfilesPage.Kokoro.BandwidthLimit,
-                                    if (it > 0) ByteFormatter.format(it) else MLang.ProfilesPage.Kokoro.Unlimited,
-                                )
-                            }
-                            if (!subscription.expiresAt.isNullOrBlank()) {
-                                SubscriptionLine(
-                                    MLang.ProfilesPage.Kokoro.Expires,
-                                    displayExpiry(subscription.expiresAt),
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        KokoroAccountCard(
+            authState = authState,
+            onLogin = onLogin,
+            onLogout = onLogout,
+            onRetry = onRetry,
+            subscriptionPlan = normalizedSettings.plan,
+        )
 
         if (authenticated != null && subscriptions.isNotEmpty()) {
             MihomoSubscriptionSettingsContent(
@@ -197,6 +97,125 @@ internal fun KokoroProfileContent(
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
+        }
+    }
+}
+
+@Composable
+internal fun KokoroAccountCard(
+    authState: KokoroAuthState,
+    onLogin: () -> Unit,
+    onLogout: () -> Unit,
+    onRetry: () -> Unit,
+    subscriptionPlan: String? = null,
+) {
+    val subscriptions = (authState as? KokoroAuthState.Authenticated)
+        ?.account
+        ?.subscriptions
+        .orEmpty()
+    val selectedSubscription = subscriptions.firstOrNull { it.plan == subscriptionPlan }
+        ?: subscriptions.firstOrNull()
+
+    Card {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(UiDp.dp16),
+            verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
+        ) {
+            when (authState) {
+                KokoroAuthState.Checking -> Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                ) {
+                    Md3EIndeterminateCircularWavyProgressIndicator()
+                    Text(MLang.ProfilesPage.Kokoro.Checking)
+                }
+
+                KokoroAuthState.LoggedOut -> {
+                    StatusText(
+                        title = MLang.ProfilesPage.Kokoro.LoggedOut,
+                        detail = MLang.ProfilesPage.Kokoro.LoginHint,
+                    )
+                    Button(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
+                        Text(MLang.ProfilesPage.Kokoro.Login)
+                    }
+                }
+
+                is KokoroAuthState.Error -> {
+                    StatusText(
+                        title = MLang.ProfilesPage.Kokoro.CheckFailed,
+                        detail = authState.message,
+                        error = true,
+                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
+                    ) {
+                        Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
+                            Text(MLang.ProfilesPage.Kokoro.Retry)
+                        }
+                        OutlinedButton(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
+                            Text(MLang.ProfilesPage.Kokoro.Login)
+                        }
+                    }
+                }
+
+                is KokoroAuthState.Authenticated -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                    ) {
+                        OsuAvatar(
+                            displayName = authState.account.displayName,
+                            avatarUrl = authState.account.avatarUrl,
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = authState.account.displayName
+                                    ?: MLang.ProfilesPage.Kokoro.LoggedIn,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = if (subscriptions.isEmpty()) {
+                                    MLang.ProfilesPage.Kokoro.NoSubscription
+                                } else {
+                                    subscriptions.joinToString(", ") { it.plan }
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        TextButton(onClick = onLogout) {
+                            Text(MLang.ProfilesPage.Kokoro.Logout)
+                        }
+                    }
+
+                    selectedSubscription?.let { subscription ->
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        subscription.usedBytes?.let {
+                            SubscriptionLine(
+                                MLang.ProfilesPage.Kokoro.TrafficUsed,
+                                ByteFormatter.format(it),
+                            )
+                        }
+                        subscription.totalBytes?.let {
+                            SubscriptionLine(
+                                MLang.ProfilesPage.Kokoro.BandwidthLimit,
+                                if (it > 0) ByteFormatter.format(it) else MLang.ProfilesPage.Kokoro.Unlimited,
+                            )
+                        }
+                        if (!subscription.expiresAt.isNullOrBlank()) {
+                            SubscriptionLine(
+                                MLang.ProfilesPage.Kokoro.Expires,
+                                displayExpiry(subscription.expiresAt),
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

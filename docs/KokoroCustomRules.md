@@ -6,6 +6,8 @@ secret is accepted from the UI.
 
 ## Client behavior
 
+- Kokoro Settings uses the existing PKCE system-browser login and secure token session. Its account
+  card reads `/app/me`, displays the signed-in user and subscription status, and can revoke the session.
 - The editor loads both `/app/custom-rules/options` and `/app/custom-rules` when opened.
 - Rule types, targets, domain rule providers, and limits come from `options`; they are not hard-coded.
 - Rules remain ordered in memory and are saved with one atomic `PUT /sets/{set_id}/rules` request.

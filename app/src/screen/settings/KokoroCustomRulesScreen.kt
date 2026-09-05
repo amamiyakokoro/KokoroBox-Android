@@ -42,6 +42,8 @@ import com.github.yumelira.yumebox.MainActivity
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
+import com.github.yumelira.yumebox.screen.profiles.KokoroAccountCard
+import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
 import com.github.yumelira.yumebox.presentation.component.AppDialog
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
@@ -66,6 +68,7 @@ import org.koin.androidx.compose.koinViewModel
 private sealed interface PendingRulesAction {
     data object Reload : PendingRulesAction
     data object Exit : PendingRulesAction
+    data object Logout : PendingRulesAction
 }
 
 @Composable
@@ -82,7 +85,12 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
 
     LaunchedEffect(Unit) { viewModel.load() }
     LaunchedEffect(authResult) {
-        if (authResult == true) viewModel.load()
+        when (authResult) {
+            true -> viewModel.load()
+            false -> viewModel.reportLoginFailure()
+            null -> Unit
+        }
+        if (authResult != null) MainActivity.clearKokoroAuthResult()
     }
     LaunchedEffect(state.status) {
         val message = when (state.status) {
@@ -109,11 +117,30 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
         when (action) {
             PendingRulesAction.Reload -> viewModel.load()
             PendingRulesAction.Exit -> navigator.navigateUp()
+            PendingRulesAction.Logout -> viewModel.logout()
         }
     }
 
     fun requestAction(action: PendingRulesAction) {
         if (state.dirty) pendingAction = action else performPendingAction(action)
+    }
+
+    fun beginLogin() {
+        scope.launch {
+            var loginUrl: String? = null
+            try {
+                loginUrl = viewModel.beginLogin()
+                context.startActivity(
+                    Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
+                        addCategory(Intent.CATEGORY_BROWSABLE)
+                    },
+                )
+            } catch (error: Exception) {
+                loginUrl?.let { viewModel.cancelLogin(it) }
+                if (error is CancellationException) throw error
+                viewModel.reportLoginFailure()
+            }
+        }
     }
 
     Scaffold(
@@ -140,104 +167,85 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding()),
         ) {
-            when {
-                state.loading -> item("loading") {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(UiDp.dp24),
-                        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12, Alignment.CenterHorizontally),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Md3EIndeterminateCircularWavyProgressIndicator()
-                        Text(MLang.MetaFeature.CustomRules.Loading)
-                    }
-                }
+            item("account-title") { Title(MLang.ProfilesPage.Kokoro.Account) }
+            item("account") {
+                KokoroAccountCard(
+                    authState = state.authState,
+                    onLogin = ::beginLogin,
+                    onLogout = { requestAction(PendingRulesAction.Logout) },
+                    onRetry = viewModel::load,
+                )
+            }
 
-                state.status == KokoroRulesStatus.AUTH_REQUIRED -> item("auth") {
-                    Card {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
-                            verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
+            if (state.authState is KokoroAuthState.Authenticated) {
+                item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }
+                when {
+                    state.loading -> item("loading") {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(UiDp.dp24),
+                            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12, Alignment.CenterHorizontally),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(MLang.MetaFeature.CustomRules.SignInRequired)
-                            Button(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    scope.launch {
-                                        var loginUrl: String? = null
-                                        try {
-                                            loginUrl = viewModel.beginLogin()
-                                            context.startActivity(
-                                                Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
-                                                    addCategory(Intent.CATEGORY_BROWSABLE)
-                                                },
-                                            )
-                                        } catch (error: Exception) {
-                                            loginUrl?.let { viewModel.cancelLogin(it) }
-                                            if (error is CancellationException) throw error
-                                            context.toast(MLang.MetaFeature.CustomRules.ErrorRequest)
-                                        }
-                                    }
-                                },
-                            ) { Text(MLang.MetaFeature.CustomRules.SignIn) }
+                            Md3EIndeterminateCircularWavyProgressIndicator()
+                            Text(MLang.MetaFeature.CustomRules.Loading)
                         }
                     }
-                }
 
-                state.status == KokoroRulesStatus.LOAD_FAILED -> item("error") {
-                    Card {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
-                            verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-                        ) {
-                            Text(MLang.MetaFeature.CustomRules.ErrorLoad)
-                            Button(onClick = viewModel::load, modifier = Modifier.fillMaxWidth()) {
-                                Text(MLang.MetaFeature.CustomRules.Retry)
+                    state.status == KokoroRulesStatus.LOAD_FAILED -> item("error") {
+                        Card {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
+                                verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
+                            ) {
+                                Text(MLang.MetaFeature.CustomRules.ErrorLoad)
+                                Button(onClick = viewModel::load, modifier = Modifier.fillMaxWidth()) {
+                                    Text(MLang.MetaFeature.CustomRules.Retry)
+                                }
                             }
                         }
                     }
-                }
 
-                else -> {
-                    item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }
-                    if (state.draftRules.isEmpty()) {
-                        item("empty") {
-                            Card {
-                                Text(
-                                    text = MLang.MetaFeature.CustomRules.Empty,
-                                    modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    else -> {
+                        if (state.draftRules.isEmpty()) {
+                            item("empty") {
+                                Card {
+                                    Text(
+                                        text = MLang.MetaFeature.CustomRules.Empty,
+                                        modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        } else {
+                            items(state.draftRules.size, key = { "rule-$it-${state.draftRules[it]}" }) { index ->
+                                val rule = state.draftRules[index]
+                                RuleCard(
+                                    rule = rule,
+                                    canMoveUp = index > 0,
+                                    canMoveDown = index < state.draftRules.lastIndex,
+                                    onEdit = {
+                                        editingRuleIndex = index
+                                        showRuleDialog = true
+                                    },
+                                    onDelete = { viewModel.deleteRule(index) },
+                                    onMoveUp = { viewModel.moveRule(index, -1) },
+                                    onMoveDown = { viewModel.moveRule(index, 1) },
                                 )
                             }
                         }
-                    } else {
-                        items(state.draftRules.size, key = { "rule-$it-${state.draftRules[it]}" }) { index ->
-                            val rule = state.draftRules[index]
-                            RuleCard(
-                                rule = rule,
-                                canMoveUp = index > 0,
-                                canMoveDown = index < state.draftRules.lastIndex,
-                                onEdit = {
-                                    editingRuleIndex = index
+                        item("add-rule") {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = state.defaultRuleSet != null &&
+                                    state.draftRules.size < state.options.maxRulesPerSet && !state.saving,
+                                onClick = {
+                                    editingRuleIndex = -1
                                     showRuleDialog = true
                                 },
-                                onDelete = { viewModel.deleteRule(index) },
-                                onMoveUp = { viewModel.moveRule(index, -1) },
-                                onMoveDown = { viewModel.moveRule(index, 1) },
-                            )
+                            ) { Text(MLang.MetaFeature.CustomRules.AddRule) }
                         }
+                        item("bottom-space") { Spacer(Modifier.height(UiDp.dp32)) }
                     }
-                    item("add-rule") {
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = state.defaultRuleSet != null &&
-                                state.draftRules.size < state.options.maxRulesPerSet && !state.saving,
-                            onClick = {
-                                editingRuleIndex = -1
-                                showRuleDialog = true
-                            },
-                        ) { Text(MLang.MetaFeature.CustomRules.AddRule) }
-                    }
-                    item("bottom-space") { Spacer(Modifier.height(UiDp.dp32)) }
                 }
             }
         }

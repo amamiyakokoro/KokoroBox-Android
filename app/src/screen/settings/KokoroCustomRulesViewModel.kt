@@ -21,6 +21,8 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesSaveOutcom
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationReason
 import com.github.yumelira.yumebox.screen.profiles.KokoroAccountClient
+import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
+import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,6 +49,7 @@ internal enum class KokoroRulesStatus {
 internal data class KokoroCustomRulesUiState(
     val loading: Boolean = true,
     val saving: Boolean = false,
+    val authState: KokoroAuthState = KokoroAuthState.Checking,
     val options: KokoroCustomRulesOptions = KokoroCustomRulesOptions(),
     val defaultRuleSet: KokoroRuleSet? = null,
     val draftRules: List<KokoroCustomRuleInput> = emptyList(),
@@ -68,7 +71,41 @@ internal class KokoroCustomRulesViewModel(
     fun load() {
         if (_state.value.loading && _state.value.defaultRuleSet != null) return
         viewModelScope.launch {
-            _state.update { it.copy(loading = true, status = KokoroRulesStatus.IDLE) }
+            _state.update {
+                it.copy(
+                    loading = true,
+                    authState = KokoroAuthState.Checking,
+                    status = KokoroRulesStatus.IDLE,
+                )
+            }
+            val account = try {
+                accountClient.getAccount()
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        authState = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.CheckFailedDetail),
+                        status = KokoroRulesStatus.LOAD_FAILED,
+                    )
+                }
+                return@launch
+            }
+            if (account == null) {
+                _state.update {
+                    it.copy(
+                        loading = false,
+                        authState = KokoroAuthState.LoggedOut,
+                        defaultRuleSet = null,
+                        draftRules = emptyList(),
+                        dirty = false,
+                        status = KokoroRulesStatus.AUTH_REQUIRED,
+                        conflict = null,
+                    )
+                }
+                return@launch
+            }
+            _state.update { it.copy(authState = KokoroAuthState.Authenticated(account)) }
             try {
                 val editorData = client.getEditorData()
                 val defaultRuleSet = checkNotNull(
@@ -95,6 +132,9 @@ internal class KokoroCustomRulesViewModel(
                         },
                     )
                 }
+                if (error is KokoroAuthenticationRequiredException) {
+                    _state.update { it.copy(authState = KokoroAuthState.LoggedOut) }
+                }
             }
         }
     }
@@ -102,6 +142,33 @@ internal class KokoroCustomRulesViewModel(
     suspend fun beginLogin(): String = accountClient.beginLogin()
 
     suspend fun cancelLogin(loginUrl: String) = accountClient.cancelLogin(loginUrl)
+
+    fun reportLoginFailure() {
+        _state.update {
+            it.copy(
+                loading = false,
+                authState = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.LoginFailed),
+                status = KokoroRulesStatus.AUTH_REQUIRED,
+            )
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            _state.update { it.copy(authState = KokoroAuthState.Checking, saving = true) }
+            try {
+                accountClient.revoke()
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+            } finally {
+                _state.value = KokoroCustomRulesUiState(
+                    loading = false,
+                    authState = KokoroAuthState.LoggedOut,
+                    status = KokoroRulesStatus.AUTH_REQUIRED,
+                )
+            }
+        }
+    }
 
     fun addRule(rule: KokoroCustomRuleInput) {
         _state.update { it.copy(draftRules = it.draftRules + rule, dirty = true, status = KokoroRulesStatus.IDLE) }
