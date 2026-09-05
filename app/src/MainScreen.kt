@@ -72,6 +72,13 @@ fun MainScreen(
     val initialMainPage = initialPage.coerceIn(0, 3)
     val pagerState = rememberPagerState(initialPage = initialMainPage, pageCount = { 4 })
     val mainPagerState = rememberMainPagerState(pagerState)
+    val pendingImportUrl by MainActivity.pendingImportUrl.collectAsStateWithLifecycle()
+    LaunchedEffect(pendingImportUrl) {
+        if (pendingImportUrl != null) {
+            // The profile page may not be composed yet; show it before it consumes the link.
+            pagerState.scrollToPage(2)
+        }
+    }
     val profilesListState = rememberRetainedLazyListState("main_profiles")
     val settingsListState = rememberRetainedLazyListState("main_settings")
 
@@ -180,7 +187,7 @@ fun MainScreen(
                 HorizontalPager(
                     modifier = Modifier.fillMaxSize(),
                     state = mainPagerState.pagerState,
-                    beyondViewportPageCount = 3,
+                    beyondViewportPageCount = 1,
                     flingBehavior = pagerFlingBehavior,
                     userScrollEnabled = true,
                     overscrollEffect = null,
@@ -225,7 +232,7 @@ fun MainScreen(
 }
 
 /**
- * HorizontalPager keeps all four root pages composed. Without a page-scoped lifecycle,
+ * HorizontalPager preloads neighboring pages. Without a page-scoped lifecycle,
  * lifecycle-aware flow collection still treats every hidden page as STARTED because they
  * all inherit the Activity lifecycle. Cap hidden pages at CREATED so their UI collectors,
  * animations, and page-only sync jobs stop while service-owned runtime collection continues.

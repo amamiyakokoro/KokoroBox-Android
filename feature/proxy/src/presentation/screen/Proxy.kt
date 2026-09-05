@@ -54,6 +54,7 @@ import androidx.compose.material3.IconButton as MdIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text as MdText
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -116,7 +117,7 @@ fun ProxyPager(
     val groupScrollBehavior = MiuixScrollBehavior(snapAnimationSpec = null)
 
     var showSortPopup by remember { mutableStateOf(false) }
-    var selectedGroupName by remember { mutableStateOf<String?>(null) }
+    var selectedGroupName by rememberSaveable { mutableStateOf<String?>(null) }
     var pendingTestGroupName by remember { mutableStateOf<String?>(null) }
     var pendingTestProxyName by remember { mutableStateOf<String?>(null) }
 
@@ -167,10 +168,16 @@ fun ProxyPager(
         }
     }
 
+    var previousSortMode by rememberSaveable { mutableStateOf<ProxySortMode?>(null) }
+    var previousSortGroup by rememberSaveable { mutableStateOf<String?>(null) }
     LaunchedEffect(sortMode, effectiveSelectedGroupName) {
-        if (sortMode == ProxySortMode.BY_LATENCY) {
+        if (sortMode == ProxySortMode.BY_LATENCY &&
+            (sortMode != previousSortMode || effectiveSelectedGroupName != previousSortGroup)
+        ) {
             gridState.scrollToItem(0)
         }
+        previousSortMode = sortMode
+        previousSortGroup = effectiveSelectedGroupName
     }
 
     LaunchedEffect(isProxyRunning, pendingTestGroupName, pendingTestProxyName) {
