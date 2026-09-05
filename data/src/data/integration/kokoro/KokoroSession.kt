@@ -94,10 +94,9 @@ object KokoroApi {
         "/api/app/subscription/config",
         "/api/app/custom-rules",
         "/api/app/custom-rules/options",
-        "/api/app/custom-rules/sets",
     )
     private val CUSTOM_RULE_SET_PATH =
-        Regex("^/api/app/custom-rules/sets/[1-9][0-9]*(?:/rules)?$")
+        Regex("^/api/app/custom-rules/sets/[1-9][0-9]*/rules$")
 }
 
 /**

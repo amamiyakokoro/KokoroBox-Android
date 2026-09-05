@@ -62,34 +62,6 @@ class KokoroCustomRulesClient internal constructor(
         )
     }
 
-    suspend fun createSet(name: String): KokoroRuleSet = executeJson(
-        request = jsonRequest(
-            url = CUSTOM_RULE_SETS_URL.toHttpUrl(),
-            method = "POST",
-            body = RuleSetCreate(normalizeSetName(name)),
-        ),
-        expectedCode = 201,
-    )
-
-    suspend fun renameSet(setId: Long, name: String, expectedRevision: Int): KokoroRuleSet = executeJson(
-        request = jsonRequest(
-            url = setUrl(setId),
-            method = "PATCH",
-            body = RuleSetRename(normalizeSetName(name), requireRevision(expectedRevision)),
-        ),
-        expectedCode = 200,
-    )
-
-    suspend fun deleteSet(setId: Long, expectedRevision: Int) {
-        val url = setUrl(setId).newBuilder()
-            .addQueryParameter("expected_revision", requireRevision(expectedRevision).toString())
-            .build()
-        val response = session.executeAuthorized(Request.Builder().url(url).delete().build())
-        response.use {
-            if (it.code != 204) throw it.toRulesApiException(json)
-        }
-    }
-
     suspend fun replaceRules(
         setId: Long,
         expectedRevision: Int,
@@ -146,10 +118,6 @@ class KokoroCustomRulesClient internal constructor(
         return CUSTOM_RULE_SETS_URL.toHttpUrl().newBuilder().addPathSegment(setId.toString()).build()
     }
 
-    private fun normalizeSetName(name: String): String = name.trim().also {
-        require(it.isNotEmpty() && it.length <= 64) { "Rule-set name must contain 1–64 characters" }
-    }
-
     private fun requireRevision(revision: Int): Int = revision.also {
         require(it >= 1) { "Invalid Kokoro rule-set revision" }
     }
@@ -172,7 +140,9 @@ data class KokoroCustomRulesEditorData(
 data class KokoroCustomRulesState(
     @SerialName("schema_version") val schemaVersion: Int = 1,
     val sets: List<KokoroRuleSet> = emptyList(),
-)
+) {
+    val defaultRuleSet: KokoroRuleSet? get() = sets.firstOrNull { it.name == "default" }
+}
 
 @Serializable
 data class KokoroCustomRulesOptions(
@@ -182,9 +152,7 @@ data class KokoroCustomRulesOptions(
     @SerialName("rule_providers") val ruleProviders: List<KokoroRuleProvider> = emptyList(),
     val limits: Map<String, Int> = emptyMap(),
 ) {
-    val maxRuleSets: Int get() = (limits["max_rule_sets"] ?: 5).coerceAtLeast(1)
     val maxRulesPerSet: Int get() = (limits["max_rules_per_set"] ?: 200).coerceAtLeast(0)
-    val maxNameLength: Int get() = (limits["max_name_length"] ?: 64).coerceAtLeast(1)
     val maxPayloadLength: Int get() = (limits["max_payload_length"] ?: 1024).coerceAtLeast(1)
 }
 
@@ -298,15 +266,6 @@ fun validateCustomRules(
 
 private fun String.isSafeRuleToken(maxLength: Int): Boolean =
     isNotEmpty() && length <= maxLength && this == trim() && ',' !in this && none(Char::isISOControl)
-
-@Serializable
-private data class RuleSetCreate(val name: String)
-
-@Serializable
-private data class RuleSetRename(
-    val name: String,
-    @SerialName("expected_revision") val expectedRevision: Int,
-)
 
 @Serializable
 private data class RuleSetReplace(

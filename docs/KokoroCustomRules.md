@@ -9,23 +9,22 @@ secret is accepted from the UI.
 - The editor loads both `/app/custom-rules/options` and `/app/custom-rules` when opened.
 - Rule types, targets, domain rule providers, and limits come from `options`; they are not hard-coded.
 - Rules remain ordered in memory and are saved with one atomic `PUT /sets/{set_id}/rules` request.
-- The client sends the revision read with the selected rule set as `expected_revision`.
-- Create, rename, and delete operations use the same authenticated session and update the local state
-  only after the server confirms success.
-- The `default` set cannot be renamed or deleted.
+- KokoroBox only exposes the server's `default` set because it is the rule set used by generated
+  configurations. Other server-side sets are intentionally ignored.
+- The client sends the revision read with the `default` rule set as `expected_revision`.
 
-The bearer allowlist accepts only the fixed Custom Rules endpoints and positive numeric set IDs on the
-canonical HTTPS host. Access tokens, Authorization headers, callback URLs, rule payloads, and response
-bodies are not logged.
+The bearer allowlist accepts only the fixed read endpoints and the ordered-rules replacement endpoint
+with a positive numeric set ID on the canonical HTTPS host. Access tokens, Authorization headers,
+callback URLs, rule payloads, and response bodies are not logged.
 
 ## Conflict and failure handling
 
-An HTTP `409` is never retried automatically. KokoroBox reloads the selected remote set and asks the
+An HTTP `409` is never retried automatically. KokoroBox reloads the remote `default` set and asks the
 user to either use the remote rules or keep the local draft. Keeping the draft adopts the newly read
 revision, but still requires a separate explicit Save action before anything is overwritten.
 
 Before each save, the client reloads `options` and validates the complete draft. A `422` refreshes
-capabilities and leaves the draft intact. A `404` reloads all sets. A `429` is surfaced without an
+capabilities and leaves the draft intact. A `404` reloads the default set. A `429` is surfaced without an
 automatic write retry.
 
 If a write times out, the client first performs a fresh GET. An identical ordered rule list is treated as

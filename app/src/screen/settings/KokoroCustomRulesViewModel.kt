@@ -40,7 +40,6 @@ internal enum class KokoroRulesStatus {
     VALIDATION_FAILED,
     NOT_FOUND,
     RATE_LIMITED,
-    SET_CONFLICT,
     SAVE_OUTCOME_UNKNOWN,
     REQUEST_FAILED,
 }
@@ -49,8 +48,7 @@ internal data class KokoroCustomRulesUiState(
     val loading: Boolean = true,
     val saving: Boolean = false,
     val options: KokoroCustomRulesOptions = KokoroCustomRulesOptions(),
-    val sets: List<KokoroRuleSet> = emptyList(),
-    val selectedSetId: Long? = null,
+    val defaultRuleSet: KokoroRuleSet? = null,
     val draftRules: List<KokoroCustomRuleInput> = emptyList(),
     val dirty: Boolean = false,
     val status: KokoroRulesStatus = KokoroRulesStatus.IDLE,
@@ -58,9 +56,7 @@ internal data class KokoroCustomRulesUiState(
     val validationRuleIndex: Int? = null,
     val retryAfterSeconds: Long? = null,
     val conflict: KokoroRulesConflict? = null,
-) {
-    val selectedSet: KokoroRuleSet? get() = sets.firstOrNull { it.id == selectedSetId }
-}
+)
 
 internal class KokoroCustomRulesViewModel(
     private val client: KokoroCustomRulesClient,
@@ -70,21 +66,19 @@ internal class KokoroCustomRulesViewModel(
     val state = _state.asStateFlow()
 
     fun load() {
-        if (_state.value.loading && _state.value.sets.isNotEmpty()) return
+        if (_state.value.loading && _state.value.defaultRuleSet != null) return
         viewModelScope.launch {
             _state.update { it.copy(loading = true, status = KokoroRulesStatus.IDLE) }
             try {
                 val editorData = client.getEditorData()
-                val loadedSets = editorData.state.sets
-                val selected = loadedSets.firstOrNull { it.id == _state.value.selectedSetId }
-                    ?: loadedSets.firstOrNull { it.name == "default" }
-                    ?: loadedSets.firstOrNull()
+                val defaultRuleSet = checkNotNull(
+                    editorData.state.defaultRuleSet,
+                ) { "Kokoro default rule set is unavailable" }
                 _state.value = _state.value.copy(
                     loading = false,
                     options = editorData.options,
-                    sets = loadedSets,
-                    selectedSetId = selected?.id,
-                    draftRules = selected?.rules.orEmpty().map { it.asInput() },
+                    defaultRuleSet = defaultRuleSet,
+                    draftRules = defaultRuleSet.rules.map { it.asInput() },
                     dirty = false,
                     status = KokoroRulesStatus.IDLE,
                     conflict = null,
@@ -108,19 +102,6 @@ internal class KokoroCustomRulesViewModel(
     suspend fun beginLogin(): String = accountClient.beginLogin()
 
     suspend fun cancelLogin(loginUrl: String) = accountClient.cancelLogin(loginUrl)
-
-    fun selectSet(setId: Long) {
-        val selected = _state.value.sets.firstOrNull { it.id == setId } ?: return
-        _state.update {
-            it.copy(
-                selectedSetId = selected.id,
-                draftRules = selected.rules.map { rule -> rule.asInput() },
-                dirty = false,
-                status = KokoroRulesStatus.IDLE,
-                conflict = null,
-            )
-        }
-    }
 
     fun addRule(rule: KokoroCustomRuleInput) {
         _state.update { it.copy(draftRules = it.draftRules + rule, dirty = true, status = KokoroRulesStatus.IDLE) }
@@ -161,46 +142,8 @@ internal class KokoroCustomRulesViewModel(
         }
     }
 
-    fun createSet(name: String) = mutateSet {
-        val created = client.createSet(name)
-        _state.update {
-            it.copy(
-                sets = it.sets + created,
-                selectedSetId = created.id,
-                draftRules = emptyList(),
-                dirty = false,
-            )
-        }
-    }
-
-    fun renameSelectedSet(name: String) {
-        val selected = _state.value.selectedSet ?: return
-        mutateSet {
-            val renamed = client.renameSet(selected.id, name, selected.revision)
-            replaceRemoteSet(renamed, preserveDraft = true)
-        }
-    }
-
-    fun deleteSelectedSet() {
-        val selected = _state.value.selectedSet ?: return
-        if (selected.name == "default") return
-        mutateSet {
-            client.deleteSet(selected.id, selected.revision)
-            val remaining = _state.value.sets.filterNot { it.id == selected.id }
-            val replacement = remaining.firstOrNull { it.name == "default" } ?: remaining.firstOrNull()
-            _state.update {
-                it.copy(
-                    sets = remaining,
-                    selectedSetId = replacement?.id,
-                    draftRules = replacement?.rules.orEmpty().map { rule -> rule.asInput() },
-                    dirty = false,
-                )
-            }
-        }
-    }
-
     fun save() {
-        val selected = _state.value.selectedSet ?: return
+        val selected = _state.value.defaultRuleSet ?: return
         val localRules = _state.value.draftRules
         viewModelScope.launch {
             _state.update { it.copy(saving = true, status = KokoroRulesStatus.IDLE) }
@@ -209,7 +152,7 @@ internal class KokoroCustomRulesViewModel(
                 val freshOptions = client.getOptions()
                 _state.update { it.copy(options = freshOptions) }
                 val updated = client.replaceRules(selected.id, selected.revision, localRules, freshOptions)
-                replaceRemoteSet(updated, preserveDraft = false)
+                replaceDefaultRuleSet(updated, preserveDraft = false)
                 _state.update { it.copy(saving = false, dirty = false, status = KokoroRulesStatus.SAVED) }
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
@@ -220,7 +163,7 @@ internal class KokoroCustomRulesViewModel(
 
     fun useRemoteConflict() {
         val conflict = _state.value.conflict ?: return
-        replaceRemoteSet(conflict.remoteSet, preserveDraft = false)
+        replaceDefaultRuleSet(conflict.remoteSet, preserveDraft = false)
         _state.update {
             it.copy(
                 draftRules = conflict.remoteSet.rules.map { rule -> rule.asInput() },
@@ -233,7 +176,7 @@ internal class KokoroCustomRulesViewModel(
 
     fun keepLocalConflict() {
         val conflict = _state.value.conflict ?: return
-        replaceRemoteSet(conflict.remoteSet, preserveDraft = true)
+        replaceDefaultRuleSet(conflict.remoteSet, preserveDraft = true)
         _state.update {
             it.copy(
                 draftRules = conflict.localRules,
@@ -246,31 +189,6 @@ internal class KokoroCustomRulesViewModel(
 
     fun clearStatus() = _state.update {
         it.copy(status = KokoroRulesStatus.IDLE, validationReason = null, validationRuleIndex = null)
-    }
-
-    private fun mutateSet(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            _state.update { it.copy(saving = true, status = KokoroRulesStatus.IDLE) }
-            try {
-                block()
-                _state.update { it.copy(saving = false) }
-            } catch (error: Exception) {
-                if (error is CancellationException) throw error
-                val status = when (error) {
-                    is KokoroAuthenticationRequiredException -> KokoroRulesStatus.AUTH_REQUIRED
-                    is KokoroRulesApiException -> when (error.statusCode) {
-                        404 -> KokoroRulesStatus.NOT_FOUND
-                        429 -> KokoroRulesStatus.RATE_LIMITED
-                        409 -> KokoroRulesStatus.SET_CONFLICT
-                        else -> KokoroRulesStatus.REQUEST_FAILED
-                    }
-                    else -> KokoroRulesStatus.REQUEST_FAILED
-                }
-                _state.update { it.copy(saving = false, status = status) }
-                if (status == KokoroRulesStatus.NOT_FOUND) load()
-                if (status == KokoroRulesStatus.SET_CONFLICT) reloadSetsPreservingDraft()
-            }
-        }
     }
 
     private suspend fun handleSaveFailure(
@@ -317,12 +235,14 @@ internal class KokoroCustomRulesViewModel(
     }
 
     private suspend fun loadConflict(setId: Long, localRules: List<KokoroCustomRuleInput>) {
-        val remote = runCatching { client.getState().sets.firstOrNull { it.id == setId } }.getOrNull()
+        val remote = runCatching {
+            client.getState().defaultRuleSet?.takeIf { it.id == setId }
+        }.getOrNull()
         if (remote == null) {
             _state.update { it.copy(saving = false, status = KokoroRulesStatus.NOT_FOUND) }
             return
         }
-        replaceRemoteSet(remote, preserveDraft = true)
+        replaceDefaultRuleSet(remote, preserveDraft = true)
         _state.update {
             it.copy(
                 saving = false,
@@ -333,28 +253,17 @@ internal class KokoroCustomRulesViewModel(
         }
     }
 
-    private suspend fun reloadSetsPreservingDraft() {
-        val remoteSets = runCatching { client.getState().sets }.getOrNull() ?: return
-        val selectedId = _state.value.selectedSetId
-        val selectedStillExists = remoteSets.any { it.id == selectedId }
-        val replacement = remoteSets.firstOrNull { it.name == "default" } ?: remoteSets.firstOrNull()
-        _state.update {
-            it.copy(
-                sets = remoteSets,
-                selectedSetId = if (selectedStillExists) selectedId else replacement?.id,
-                draftRules = if (selectedStillExists) it.draftRules
-                else replacement?.rules.orEmpty().map { rule -> rule.asInput() },
-                dirty = selectedStillExists && it.dirty,
+    private fun replaceDefaultRuleSet(updated: KokoroRuleSet, preserveDraft: Boolean) {
+        check(updated.name == DEFAULT_RULE_SET_NAME) { "Unexpected Kokoro rule set" }
+        _state.update { current ->
+            current.copy(
+                defaultRuleSet = updated,
+                draftRules = if (preserveDraft) current.draftRules else updated.rules.map { it.asInput() },
             )
         }
     }
 
-    private fun replaceRemoteSet(updated: KokoroRuleSet, preserveDraft: Boolean) {
-        _state.update { current ->
-            current.copy(
-                sets = current.sets.map { if (it.id == updated.id) updated else it },
-                draftRules = if (preserveDraft) current.draftRules else updated.rules.map { it.asInput() },
-            )
-        }
+    private companion object {
+        const val DEFAULT_RULE_SET_NAME = "default"
     }
 }

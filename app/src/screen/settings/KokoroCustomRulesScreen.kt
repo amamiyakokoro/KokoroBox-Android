@@ -24,7 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +43,6 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
 import com.github.yumelira.yumebox.presentation.component.AppDialog
-import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
@@ -68,7 +66,6 @@ import org.koin.androidx.compose.koinViewModel
 private sealed interface PendingRulesAction {
     data object Reload : PendingRulesAction
     data object Exit : PendingRulesAction
-    data class SelectSet(val setId: Long) : PendingRulesAction
 }
 
 @Composable
@@ -80,9 +77,6 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     val scope = rememberCoroutineScope()
     val authResult by MainActivity.kokoroAuthResult.collectAsStateWithLifecycle()
     var pendingAction by remember { mutableStateOf<PendingRulesAction?>(null) }
-    var showCreateDialog by remember { mutableStateOf(false) }
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
     var editingRuleIndex by remember { mutableIntStateOf(-1) }
     var showRuleDialog by remember { mutableStateOf(false) }
 
@@ -98,7 +92,6 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
             } ?: MLang.MetaFeature.CustomRules.ErrorValidationGeneral
             KokoroRulesStatus.NOT_FOUND -> MLang.MetaFeature.CustomRules.ErrorNotFound
             KokoroRulesStatus.RATE_LIMITED -> MLang.MetaFeature.CustomRules.ErrorRateLimited
-            KokoroRulesStatus.SET_CONFLICT -> MLang.MetaFeature.CustomRules.ErrorConflict
             KokoroRulesStatus.SAVE_OUTCOME_UNKNOWN -> MLang.MetaFeature.CustomRules.ErrorUnknown
             KokoroRulesStatus.REQUEST_FAILED -> MLang.MetaFeature.CustomRules.ErrorRequest
             else -> null
@@ -116,7 +109,6 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
         when (action) {
             PendingRulesAction.Reload -> viewModel.load()
             PendingRulesAction.Exit -> navigator.navigateUp()
-            is PendingRulesAction.SelectSet -> viewModel.selectSet(action.setId)
         }
     }
 
@@ -136,7 +128,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                         Icon(AppMd3Icons.Action.Refresh, MLang.MetaFeature.CustomRules.Refresh)
                     }
                     IconButton(
-                        enabled = state.dirty && !state.saving && state.selectedSet != null,
+                        enabled = state.dirty && !state.saving && state.defaultRuleSet != null,
                         onClick = viewModel::save,
                     ) {
                         Icon(AppMd3Icons.Action.Save, MLang.MetaFeature.CustomRules.Save)
@@ -206,44 +198,6 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                 }
 
                 else -> {
-                    item("set-title") { Title(MLang.MetaFeature.CustomRules.Set) }
-                    item("set-selector") {
-                        Card {
-                            YumeMd3DropdownPreference(
-                                title = MLang.MetaFeature.CustomRules.Set,
-                                items = state.sets.map { it.name },
-                                selectedIndex = state.sets.indexOfFirst { it.id == state.selectedSetId }
-                                    .coerceAtLeast(0),
-                                onSelectedIndexChange = { index ->
-                                    state.sets.getOrNull(index)?.let {
-                                        requestAction(PendingRulesAction.SelectSet(it.id))
-                                    }
-                                },
-                                enabled = state.sets.isNotEmpty() && !state.saving,
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
-                                horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
-                            ) {
-                                OutlinedButton(
-                                    modifier = Modifier.weight(1f),
-                                    enabled = state.sets.size < state.options.maxRuleSets &&
-                                        !state.saving && !state.dirty,
-                                    onClick = { showCreateDialog = true },
-                                ) { Text(MLang.MetaFeature.CustomRules.CreateSet) }
-                                OutlinedButton(
-                                    modifier = Modifier.weight(1f),
-                                    enabled = state.selectedSet?.name != "default" && !state.saving,
-                                    onClick = { showRenameDialog = true },
-                                ) { Text(MLang.MetaFeature.CustomRules.RenameSet) }
-                            }
-                            OutlinedButton(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = UiDp.dp12, vertical = UiDp.dp4),
-                                enabled = state.selectedSet?.name != "default" && !state.saving,
-                                onClick = { showDeleteDialog = true },
-                            ) { Text(MLang.MetaFeature.CustomRules.DeleteSet) }
-                        }
-                    }
                     item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }
                     if (state.draftRules.isEmpty()) {
                         item("empty") {
@@ -275,7 +229,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                     item("add-rule") {
                         Button(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = state.selectedSet != null &&
+                            enabled = state.defaultRuleSet != null &&
                                 state.draftRules.size < state.options.maxRulesPerSet && !state.saving,
                             onClick = {
                                 editingRuleIndex = -1
@@ -300,47 +254,6 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
             showRuleDialog = false
         },
     )
-
-    RuleSetNameDialog(
-        show = showCreateDialog,
-        title = MLang.MetaFeature.CustomRules.CreateSet,
-        initialName = "",
-        maxLength = state.options.maxNameLength,
-        onDismiss = { showCreateDialog = false },
-        onConfirm = {
-            viewModel.createSet(it)
-            showCreateDialog = false
-        },
-    )
-    RuleSetNameDialog(
-        show = showRenameDialog,
-        title = MLang.MetaFeature.CustomRules.RenameSet,
-        initialName = state.selectedSet?.name.orEmpty(),
-        maxLength = state.options.maxNameLength,
-        onDismiss = { showRenameDialog = false },
-        onConfirm = {
-            viewModel.renameSelectedSet(it)
-            showRenameDialog = false
-        },
-    )
-
-    AppDialog(
-        show = showDeleteDialog,
-        title = MLang.MetaFeature.CustomRules.DeleteSetTitle,
-        summary = MLang.MetaFeature.CustomRules.DeleteSetMessage.format(state.selectedSet?.name.orEmpty()),
-        onDismissRequest = { showDeleteDialog = false },
-    ) {
-        DialogButtonRow(
-            onCancel = { showDeleteDialog = false },
-            onConfirm = {
-                showDeleteDialog = false
-                viewModel.deleteSelectedSet()
-            },
-            cancelText = MLang.MetaFeature.CustomRules.Cancel,
-            confirmText = MLang.MetaFeature.CustomRules.DeleteSet,
-            confirmDestructive = true,
-        )
-    }
 
     AppDialog(
         show = pendingAction != null,
@@ -413,28 +326,6 @@ private fun RuleCard(
         }
     }
     Spacer(Modifier.height(UiDp.dp8))
-}
-
-@Composable
-private fun RuleSetNameDialog(
-    show: Boolean,
-    title: String,
-    initialName: String,
-    maxLength: Int,
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
-) {
-    var name by remember(show, initialName) { mutableStateOf(initialName) }
-    AppTextFieldDialog(
-        show = show,
-        title = title,
-        value = name,
-        onValueChange = { if (it.length <= maxLength) name = it },
-        onDismissRequest = onDismiss,
-        onConfirm = { name.trim().takeIf { it.isNotEmpty() }?.let(onConfirm) },
-        label = MLang.MetaFeature.CustomRules.SetName,
-        singleLine = true,
-    )
 }
 
 @Composable

@@ -67,14 +67,14 @@ class KokoroCustomRulesClientTest {
         listOf(
             "https://amamiyakoko.ro/api/app/custom-rules",
             "https://amamiyakoko.ro/api/app/custom-rules/options",
-            "https://amamiyakoko.ro/api/app/custom-rules/sets",
-            "https://amamiyakoko.ro/api/app/custom-rules/sets/12",
             "https://amamiyakoko.ro/api/app/custom-rules/sets/12/rules",
         ).forEach { assertTrue(it, KokoroApi.isAuthorizedApiUrl(it)) }
         listOf(
             "https://evil.example/api/app/custom-rules",
             "https://amamiyakoko.ro/api/app/custom-rules/sets/0",
             "https://amamiyakoko.ro/api/app/custom-rules/sets/-1",
+            "https://amamiyakoko.ro/api/app/custom-rules/sets",
+            "https://amamiyakoko.ro/api/app/custom-rules/sets/12",
             "https://amamiyakoko.ro/api/app/custom-rules/sets/12/other",
             "https://amamiyakoko.ro/api/app/custom-rules/sets/12/rules/extra",
         ).forEach { assertFalse(it, KokoroApi.isAuthorizedApiUrl(it)) }
@@ -96,6 +96,14 @@ class KokoroCustomRulesClientTest {
             assertEquals("Bearer access", it.header("Authorization"))
             assertTrue(it.url.queryParameterNames.isEmpty())
         }
+    }
+
+    @Test
+    fun defaultRuleSetIsSelectedRegardlessOfServerOrder() {
+        val state = Json.decodeFromString<KokoroCustomRulesState>(STATE_WITH_OTHER_SET_FIRST)
+
+        assertEquals("default", state.defaultRuleSet?.name)
+        assertEquals(12L, state.defaultRuleSet?.id)
     }
 
     @Test
@@ -214,6 +222,7 @@ class KokoroCustomRulesClientTest {
     private companion object {
         const val OPTIONS = """{"schema_version":1,"rule_types":["DOMAIN-SUFFIX","DOMAIN-KEYWORD","DOMAIN","IP-CIDR","PROCESS-NAME","RULE-SET","MATCH"],"targets":["DIRECT","REJECT"],"rule_providers":[{"name":"geosite-private","behavior":"domain"}],"limits":{"max_rule_sets":5,"max_rules_per_set":200,"max_name_length":64,"max_payload_length":1024}}"""
         const val STATE = """{"schema_version":1,"sets":[{"id":12,"name":"default","revision":4,"created_at":"2026-09-05T10:00:00","updated_at":"2026-09-05T11:30:00","rules":[]}]}"""
+        const val STATE_WITH_OTHER_SET_FIRST = """{"schema_version":1,"sets":[{"id":13,"name":"Games","revision":1,"created_at":"2026-09-05T10:00:00","updated_at":"2026-09-05T10:00:00","rules":[]},{"id":12,"name":"default","revision":4,"created_at":"2026-09-05T10:00:00","updated_at":"2026-09-05T11:30:00","rules":[]}]}"""
         const val MATCHING_STATE = """{"schema_version":1,"sets":[{"id":12,"name":"default","revision":5,"created_at":"2026-09-05T10:00:00","updated_at":"2026-09-05T11:31:00","rules":[{"id":51,"type":"DOMAIN","payload":"example.com","target":"DIRECT","priority":0,"updated_at":"2026-09-05T11:31:00"}]}]}"""
         const val UPDATED_SET = """{"id":12,"name":"default","revision":5,"created_at":"2026-09-05T10:00:00","updated_at":"2026-09-05T11:31:00","rules":[]}"""
         const val CONFLICT = """{"detail":{"message":"Rule set changed; reload before saving","current_revision":5}}"""
