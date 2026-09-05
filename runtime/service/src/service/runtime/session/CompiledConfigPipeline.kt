@@ -25,6 +25,7 @@ package com.github.yumelira.yumebox.service.runtime.session
 import android.content.Context
 import android.util.Log
 import com.github.yumelira.yumebox.core.Clash
+import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.core.model.CompileRequest
 import com.github.yumelira.yumebox.core.model.CompileResult
 import com.github.yumelira.yumebox.core.model.ConfigurationOverride
@@ -159,6 +160,7 @@ class CompiledConfigPipeline(
     }
 
     suspend fun applyOverrideToRuntimeFile(spec: RuntimeSpec): String = withContext(Dispatchers.Default) {
+        StartupTaskCoordinator.awaitGeoInitialization()
         val request = buildRequest(spec)
         val result = Clash.compileToFile(request)
         check(result.success) { result.error ?: "apply override to runtime config failed" }
@@ -179,6 +181,7 @@ class CompiledConfigPipeline(
         profileDir: File,
         overridePaths: List<String> = resolveOverrideBundle(profileUuid).paths,
     ): ConfigurationOverride = withContext(Dispatchers.Default) {
+        StartupTaskCoordinator.awaitGeoInitialization()
         val request = CompileRequest(
             profileUuid = profileUuid,
             profileDir = profileDir.absolutePath,
@@ -193,6 +196,7 @@ class CompiledConfigPipeline(
     }
 
     suspend fun previewOverride(spec: RuntimeSpec): CompileResult = withContext(Dispatchers.Default) {
+        StartupTaskCoordinator.awaitGeoInitialization()
         val result = Clash.compilePreview(buildRequest(spec))
         check(result.success) { result.error ?: "override preview failed" }
         validateCompiledProviderPaths(result.finalYaml, File(spec.profileDir))

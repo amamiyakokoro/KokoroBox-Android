@@ -25,6 +25,7 @@ package com.github.yumelira.yumebox.service
 import android.content.Context
 import android.net.Uri
 import com.github.yumelira.yumebox.core.Clash
+import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
@@ -441,6 +442,7 @@ object ProfileProcessor {
                     // HTTP client cannot attach the App bearer token and would overwrite config.yaml
                     // with the 401 response body before validation.
                     val requiresNativeFetch = snapshot.imported.type != Profile.Type.Url
+                    StartupTaskCoordinator.awaitGeoInitialization()
                     Clash.fetchAndValid(stagingDir, snapshot.imported.source, requiresNativeFetch) {
                         try {
                             cb?.updateStatus(

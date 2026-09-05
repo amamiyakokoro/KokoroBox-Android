@@ -71,6 +71,7 @@ object RootTunController {
     }
 
     suspend fun start(context: Context): RootTunOperationResult {
+        com.github.yumelira.yumebox.core.util.StartupTaskCoordinator.awaitGeoInitialization()
         val appContext = context.appContextOrSelf
         val startupLogStore = RootTunStartupLogStore(appContext)
         val stateStore = RootTunStateStore(appContext)

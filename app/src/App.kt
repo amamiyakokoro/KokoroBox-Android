@@ -38,9 +38,6 @@ import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.Koin
@@ -48,11 +45,8 @@ import timber.log.Timber
 
 class App : Application() {
     private val startupScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private lateinit var geoXDataController: GeoXDataController
 
     companion object {
-        private const val GEO_FILE_GUARD_INTERVAL_MS = 10_000L
-
         lateinit var instance: App
             private set
     }
@@ -76,9 +70,10 @@ class App : Application() {
         val appSettingsStorage: AppSettingsStore = koinApp.koin.get()
         AppLanguageManager.apply(appSettingsStorage.appLanguage.value)
 
-        geoXDataController = koinApp.koin.get()
-        geoXDataController.ensureGeoFiles()
-        startGeoFileGuard()
+        val geoXDataController = koinApp.koin.get<GeoXDataController>()
+        StartupTaskCoordinator.startGeoInitialization(startupScope) {
+            geoXDataController.ensureGeoFiles()
+        }
         appSettingsStorage.syncAppVersion(BuildConfig.VERSION_CODE)
         scheduleDeferredStartupTasks(koinApp.koin)
 
@@ -90,18 +85,9 @@ class App : Application() {
         AppLanguageManager.refreshSystemLanguage()
     }
 
-    private fun startGeoFileGuard() {
-        startupScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                delay(GEO_FILE_GUARD_INTERVAL_MS)
-                runCatching { geoXDataController.ensureGeoFiles() }
-                    .onFailure { Timber.w(it, "Geo file guard failed") }
-            }
-        }
-    }
-
     private fun scheduleDeferredStartupTasks(koin: Koin) {
         StartupTaskCoordinator.startRuntimeWarmup(startupScope) {
+            StartupTaskCoordinator.awaitGeoInitialization()
             runCatching { koin.get<AppTrafficStatisticsCollector>() }
                 .onFailure { Timber.w(it, "App traffic collector init skipped") }
 

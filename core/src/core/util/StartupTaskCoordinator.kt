@@ -24,6 +24,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import timber.log.Timber
 
@@ -35,6 +36,20 @@ object StartupTaskCoordinator {
 
     @Volatile
     private var backgroundWarmup: Deferred<Unit>? = null
+
+    @Volatile
+    private var geoInitialization: Deferred<Unit>? = null
+
+    @Synchronized
+    fun startGeoInitialization(scope: CoroutineScope, block: () -> Unit) {
+        if (geoInitialization != null) return
+        geoInitialization = scope.async(Dispatchers.IO) { block() }
+    }
+
+    // Separate from runtimeWarmup: previews used by warmup must not wait on themselves.
+    suspend fun awaitGeoInitialization() {
+        geoInitialization?.await()
+    }
 
     fun startRuntimeWarmup(
         scope: CoroutineScope,
