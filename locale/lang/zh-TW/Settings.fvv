@@ -17,9 +17,9 @@ Settings = {
 
     Kokoro = {
         Title = "Kokoro 設定"
-        Summary = "自訂規則 · 雲端同步"
+        Summary = "帳戶 · 自訂規則"
         CustomRules = "自訂規則"
-        CustomRulesSummary = "管理 default 雲端規則列表"
+        CustomRulesSummary = "編輯套用於產生設定檔的 default 規則"
     }
 
     NetworkSettings = {

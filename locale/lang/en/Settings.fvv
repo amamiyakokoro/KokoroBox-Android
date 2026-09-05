@@ -17,9 +17,9 @@ Settings = {
 
     Kokoro = {
         Title = "Kokoro Settings"
-        Summary = "Custom Rules · Cloud synchronization"
+        Summary = "Account · Custom Rules"
         CustomRules = "Custom Rules"
-        CustomRulesSummary = "Manage the default cloud rule list"
+        CustomRulesSummary = "Edit the default rules applied to generated profiles"
     }
 
     NetworkSettings = {

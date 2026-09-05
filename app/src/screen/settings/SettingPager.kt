@@ -167,17 +167,6 @@ fun SettingPager(
         ) {
 
             item {
-                Title(MLang.Settings.Section.UiSettings)
-                Card {
-                    SettingsEntryItem(
-                        title = MLang.Settings.UiSettings.App,
-                        summary = MLang.Settings.UiSettings.AppSummary,
-                        imageVector = AppMd3Icons.Settings.App,
-                        onClick = { navigator.navigate(AppSettingsScreenDestination) { launchSingleTop = true } },
-                    )
-                }
-            }
-            item {
                 Title(MLang.Settings.Section.Kokoro)
                 Card {
                     SettingsEntryItem(
@@ -189,6 +178,17 @@ fun SettingPager(
                                 launchSingleTop = true
                             }
                         },
+                    )
+                }
+            }
+            item {
+                Title(MLang.Settings.Section.UiSettings)
+                Card {
+                    SettingsEntryItem(
+                        title = MLang.Settings.UiSettings.App,
+                        summary = MLang.Settings.UiSettings.AppSummary,
+                        imageVector = AppMd3Icons.Settings.App,
+                        onClick = { navigator.navigate(AppSettingsScreenDestination) { launchSingleTop = true } },
                     )
                 }
             }

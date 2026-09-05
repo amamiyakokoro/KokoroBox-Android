@@ -17,9 +17,9 @@ Settings = {
 
     Kokoro = {
         Title = "Kokoro 设置"
-        Summary = "自定义规则 · 云端同步"
+        Summary = "账号 · 自定义规则"
         CustomRules = "自定义规则"
-        CustomRulesSummary = "管理 default 云端规则列表"
+        CustomRulesSummary = "编辑应用于生成配置的 default 规则"
     }
 
     NetworkSettings = {
