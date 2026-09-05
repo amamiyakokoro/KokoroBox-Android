@@ -135,11 +135,24 @@ def verify_and_stage(apksigner, expected_fingerprint=""):
     if Path(name).name != name or not name.endswith(".apk"):
         raise ValueError("Invalid APK output filename")
     apk = directory / name
+    if not apk.is_file() or apk.stat().st_size == 0:
+        raise ValueError("Release APK listed in output metadata is missing or empty")
     # Non-zero exit prevents publishing unsigned or invalid APKs.
-    verification = subprocess.check_output(
-        [apksigner, "verify", "--verbose", "--print-certs", str(apk)], text=True,
+    verification_process = subprocess.run(
+        [apksigner, "verify", "--verbose", "--print-certs", str(apk)],
+        text=True, capture_output=True,
     )
-    fingerprints = re.findall(r"Signer #[0-9]+ certificate SHA-256 digest: ([a-fA-F0-9]+)", verification)
+    verification = verification_process.stdout + verification_process.stderr
+    if verification_process.returncode != 0:
+        # apksigner output contains only public APK/certificate diagnostics. Limit and
+        # normalize it so hosted failures remain actionable without dumping environment data.
+        diagnostic = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "?", verification).strip()
+        diagnostic = diagnostic[-4_000:] if diagnostic else "apksigner returned no diagnostic output"
+        raise ValueError(f"APK signature verification failed: {diagnostic}")
+    fingerprints = re.findall(
+        r"(?:Signer #[0-9]+ certificate|V[0-9.]+ Signer: certificate) SHA-256 digest: ([a-fA-F0-9]+)",
+        verification,
+    )
     if len(fingerprints) != 1:
         raise ValueError("Expected one APK signing certificate")
     if "CN=Android Debug" in verification:

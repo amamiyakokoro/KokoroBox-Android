@@ -129,7 +129,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_verified_versioned_apk_and_hash_are_staged(self):
         name = self.make_apk()
-        with patch.object(ci.subprocess, "check_output", return_value=self.certificate()):
+        with patch.object(ci.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, self.certificate(), "")):
             ci.verify_and_stage("apksigner", ":".join(["AB"] * 32))
         self.assertTrue((Path("publish") / name).is_file())
         self.assertIn(name, Path("publish/SHA256SUMS").read_text())
@@ -137,28 +137,52 @@ class ReleaseTests(unittest.TestCase):
 
     def test_unsigned_apk_fails_before_staging(self):
         self.make_apk()
-        with patch.object(ci.subprocess, "check_output", side_effect=subprocess.CalledProcessError(1, "apksigner")):
-            with self.assertRaises(subprocess.CalledProcessError):
+        failure = subprocess.CompletedProcess([], 1, "DOES NOT VERIFY\n", "ERROR: malformed APK\n")
+        with patch.object(ci.subprocess, "run", return_value=failure):
+            with self.assertRaisesRegex(ValueError, "DOES NOT VERIFY") as error:
                 ci.verify_and_stage("apksigner")
+        self.assertIn("malformed APK", str(error.exception))
         self.assertFalse(Path("publish").exists())
 
     def test_wrong_certificate_and_debug_certificate_are_rejected(self):
         self.make_apk()
         for verification, expected in ((self.certificate(), "00" * 32),
                                        (self.certificate().replace("CI Release", "Android Debug"), "")):
-            with patch.object(ci.subprocess, "check_output", return_value=verification), self.assertRaises(ValueError):
+            result = subprocess.CompletedProcess([], 0, verification, "")
+            with patch.object(ci.subprocess, "run", return_value=result), self.assertRaises(ValueError):
                 ci.verify_and_stage("apksigner", expected)
         self.assertFalse(Path("publish").exists())
 
     def test_missing_native_library_is_rejected(self):
         self.make_apk(missing_lib=True)
-        with patch.object(ci.subprocess, "check_output", return_value=self.certificate()), self.assertRaises(ValueError):
+        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
+        with patch.object(ci.subprocess, "run", return_value=result), self.assertRaises(ValueError):
             ci.verify_and_stage("apksigner")
 
     def test_extra_32bit_library_is_rejected(self):
         self.make_apk(extra_abi=True)
-        with patch.object(ci.subprocess, "check_output", return_value=self.certificate()), self.assertRaises(ValueError):
+        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
+        with patch.object(ci.subprocess, "run", return_value=result), self.assertRaises(ValueError):
             ci.verify_and_stage("apksigner")
+
+    def test_accepts_build_tools_37_certificate_output(self):
+        name = self.make_apk()
+        certificate = (
+            "V2 Signer: certificate DN: CN=CI Release\n"
+            "V2 Signer: certificate SHA-256 digest: " + "ab" * 32 + "\n"
+        )
+        result = subprocess.CompletedProcess([], 0, certificate, "")
+        with patch.object(ci.subprocess, "run", return_value=result):
+            ci.verify_and_stage("apksigner")
+        self.assertTrue((Path("publish") / name).is_file())
+
+    def test_missing_apk_is_reported_before_running_apksigner(self):
+        self.make_apk()
+        Path("app/build/outputs/apk/release/KokoroBox-v0.5.5-arm64-v8a-release.apk").unlink()
+        with patch.object(ci.subprocess, "run") as run, \
+                self.assertRaisesRegex(ValueError, "missing or empty"):
+            ci.verify_and_stage("apksigner")
+        run.assert_not_called()
 
     def test_cleanup_is_idempotent(self):
         with patch.dict(os.environ, self.env), patch.object(ci.sys, "argv", ["ci-release.py", "cleanup"]):
