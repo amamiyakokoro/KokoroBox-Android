@@ -236,7 +236,7 @@ androidComponents {
             val buildTypeName = variant.buildType ?: "release"
             output.versionName.set(gropify.project.version.name)
             (output as com.android.build.api.variant.impl.VariantOutputImpl).outputFileName.set(
-                "${gropify.project.name}-${abiName}-${buildTypeName}.apk"
+                "${gropify.project.name}-v${gropify.project.version.name}-${abiName}-${buildTypeName}.apk"
             )
         }
     }
