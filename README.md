@@ -84,12 +84,16 @@ Build the arm64 release APK or Android App Bundle:
 Expected outputs include:
 
 ```text
-app/build/outputs/apk/debug/KokoroBox-arm64-v8a-debug.apk
-app/build/outputs/apk/release/KokoroBox-arm64-v8a-release.apk
+app/build/outputs/apk/debug/KokoroBox-v0.5.5-arm64-v8a-debug.apk
+app/build/outputs/apk/release/KokoroBox-v0.5.5-arm64-v8a-release.apk
 app/build/outputs/bundle/release/KokoroBox-release.aab
 ```
 
 Release signing is optional for local development. Keep signing properties and keystores outside version control.
+
+For signed APKs built by GitHub Actions, follow the [Release CI setup guide](docs/ReleaseCI.md).
+The **Release APK** workflow uses Actions Secrets, builds version tags, and uploads
+verified APKs as artifacts, with optional GitHub Release publishing.
 
 ## Project structure
 

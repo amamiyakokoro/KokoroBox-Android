@@ -1,4 +1,4 @@
-name: Release Stable
+name: Release APK
 
 on:
   push:
@@ -7,87 +7,195 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Stable release tag, for manual run (example: v0.5.0)"
+        description: "Existing source tag to build (example: v0.5.5)"
         required: true
         type: string
+      publish_release:
+        description: "Also upload APK to GitHub Releases (never overwrite existing assets)"
+        type: boolean
+        default: false
 
 concurrency:
-  group: release-stable-${{ github.ref }}
+  group: release-apk-${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-geo-stable:
-    uses: ./.github/workflows/reusable-build-geo.yml
-    with:
-      channel: stable
-    secrets: inherit
+  build:
+    runs-on: ubuntu-24.04
+    environment: release-signing
+    timeout-minutes: 90
+    outputs:
+      tag: ${{ steps.source.outputs.tag }}
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      # Keep current automation when manually rebuilding an older source tag.
+      - name: Checkout workflow tools
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
-  build-native-abi-stable-arm64-v8a:
-    uses: ./.github/workflows/reusable-build-native-abi.yml
-    with:
-      channel: stable
-      kernel_channel: meta
-      abi: arm64-v8a
-    secrets: inherit
+      - name: Preserve release helper and validate tag
+        id: tag
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
+        run: |
+          install -m 700 scripts/ci-release.py "$RUNNER_TEMP/kokoro-release.py"
+          python3 "$RUNNER_TEMP/kokoro-release.py" select-tag
 
-  bundle-native-stable:
-    needs:
-      - build-geo-stable
-      - build-native-abi-stable-arm64-v8a
-    uses: ./.github/workflows/reusable-bundle-native.yml
-    with:
-      channel: stable
-    secrets: inherit
+      - name: Check signing secrets before building
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: python3 "$RUNNER_TEMP/kokoro-release.py" check-secrets
 
-  build-apk-stable-app:
-    needs: bundle-native-stable
-    uses: ./.github/workflows/reusable-build-apk-only.yml
-    with:
-      channel: stable
-      module: app
-      artifact_prefix: kokorobox-stable
-      release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      meta_asset_name: kokorobox-stable-meta.json
-      raw_apk_artifact_name: apk-raw-stable-app
-    secrets: inherit
+      - name: Checkout exact release source
+        uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ steps.tag.outputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
 
-  prepare-publish-stable-app:
-    needs: build-apk-stable-app
-    uses: ./.github/workflows/reusable-prepare-publish.yml
-    with:
-      channel: stable
-      module: app
-      artifact_prefix: kokorobox-stable
-      release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      meta_asset_name: kokorobox-stable-meta.json
-      raw_apk_artifact_name: apk-raw-stable-app
-      publish_artifact_name: publish-stable-app
-    secrets: inherit
+      - name: Validate source version
+        id: source
+        env:
+          RELEASE_TAG: ${{ steps.tag.outputs.tag }}
+        run: python3 "$RUNNER_TEMP/kokoro-release.py" metadata
 
-  publish-release-stable:
-    needs: prepare-publish-stable-app
-    uses: ./.github/workflows/reusable-publish-release.yml
-    with:
-      channel: stable
-      release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      release_name: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      prerelease: false
-      publish_artifacts: publish-stable-app
-      cleanup_assets: false
-    secrets: inherit
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
 
-  notify-stable:
-    needs:
-      - prepare-publish-stable-app
-      - publish-release-stable
-    uses: ./.github/workflows/reusable-notify-telegram.yml
-    with:
-      channel: stable
-      release_tag: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
-      publish_artifact_name: publish-stable-app
-      meta_asset_name: kokorobox-stable-meta.json
-      telegram_title: KokoroBox Stable
-    secrets: inherit
+      - name: Setup Kotlin
+        uses: fwilhe2/setup-kotlin@74982ab1a6e647402f7ad39aba2ba10f3a694c54 # pinned main
+
+      - name: Setup Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: lib/native/go/go.mod
+          cache: false
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # pinned stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          # Do not upload caches from a job that handles release signing material.
+          cache-disabled: true
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ""
+
+      - name: Install native and Android build tools
+        env:
+          NDK_VERSION: ${{ steps.source.outputs.ndk }}
+          SDK_VERSION: ${{ steps.source.outputs.sdk }}
+        run: |
+          sdkmanager "platforms;android-$SDK_VERSION" "build-tools;37.0.0" "ndk;$NDK_VERSION" "cmake;3.22.1"
+          cargo install cargo-ndk --locked
+
+      - name: Checkout configured Mihomo release
+        run: python3 "$RUNNER_TEMP/kokoro-release.py" sync-kernel
+
+      - name: Build native runtime, Geo assets and locale
+        env:
+          ABI_APP_LIST: arm64-v8a
+          NDK_VERSION: ${{ steps.source.outputs.ndk }}
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/$NDK_VERSION"
+          kotlin scripts/native-build.main.kts --all
+          kotlin scripts/generate-locale.main.kts .
+          test -s jniLibs/arm64-v8a/libclash.so
+          test -s jniLibs/arm64-v8a/liboverride.so
+          test -s jniLibs/arm64-v8a/libbridge.so
+          test -s build/generated/assets/geo/geoip.metadb.xz
+          test -s build/generated/assets/geo/geosite.dat.xz
+          test -s build/generated/assets/geo/ASN.mmdb.xz
+
+      - name: Restore private release keystore
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: python3 "$RUNNER_TEMP/kokoro-release.py" restore
+
+      - name: Build signed Release APK
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          python3 "$RUNNER_TEMP/kokoro-release.py" build
+
+      - name: Verify signature and prepare versioned APK
+        env:
+          SIGNING_CERT_SHA256: ${{ vars.SIGNING_CERT_SHA256 }}
+        run: |
+          export APKSIGNER="$ANDROID_HOME/build-tools/37.0.0/apksigner"
+          python3 "$RUNNER_TEMP/kokoro-release.py" verify
+
+      - name: Remove private keystore
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/kokoro-release.py" ]; then
+            python3 "$RUNNER_TEMP/kokoro-release.py" cleanup
+          fi
+
+      - name: Upload signed APK and checksums
+        uses: actions/upload-artifact@v7
+        with:
+          name: KokoroBox-${{ steps.source.outputs.tag }}-arm64-release
+          path: |
+            publish/*.apk
+            publish/SHA256SUMS
+            publish/SIGNING-CERT-SHA256.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified release artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: KokoroBox-${{ needs.build.outputs.tag }}-arm64-release
+          path: publish
+
+      - name: Publish without replacing an existing release APK
+        working-directory: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.build.outputs.tag }}
+          SOURCE_SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          sha256sum --check SHA256SUMS
+          tag_sha="$(gh api "repos/$GH_REPO/commits/$RELEASE_TAG" --jq .sha)"
+          if [ "$tag_sha" != "$SOURCE_SHA" ]; then
+            echo "Release tag moved after the build; refusing to publish" >&2
+            exit 1
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --generate-notes \
+              --title "KokoroBox $RELEASE_TAG" ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt
+          fi
