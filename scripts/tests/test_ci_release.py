@@ -32,7 +32,8 @@ class ReleaseTests(unittest.TestCase):
             "RUNNER_TEMP": str(self.root),
         }
         Path("gradle.properties").write_text(
-            "project.version.name=0.5.5\nproject.applicationId=com.amamiyakokoro.box\n"
+            "project.name=KokoroBox\nproject.version.name=0.5.5\nproject.version.code=5500\n"
+            "project.applicationId=com.amamiyakokoro.box\n"
             "android.ndkVersion=29.0.14206865\nandroid.compileSdk=37\n"
         )
 
@@ -129,10 +130,20 @@ class ReleaseTests(unittest.TestCase):
     def certificate(self):
         return "Signer #1 certificate DN: CN=CI Release\nSigner #1 certificate SHA-256 digest: " + "ab" * 32 + "\n"
 
+    def badging(self, application_id="com.amamiyakokoro.box", version_code="5500", version_name="0.5.5"):
+        return (f"package: name='{application_id}' versionCode='{version_code}' "
+                f"versionName='{version_name}' compileSdkVersion='37'\n")
+
+    def tool_results(self, certificate=None):
+        return [
+            subprocess.CompletedProcess([], 0, self.badging(), ""),
+            subprocess.CompletedProcess([], 0, certificate or self.certificate(), ""),
+        ]
+
     def test_verified_versioned_apk_and_hash_are_staged(self):
         name = self.make_apk()
-        with patch.object(ci.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, self.certificate(), "")):
-            ci.verify_and_stage("apksigner", ":".join(["AB"] * 32))
+        with patch.object(ci.subprocess, "run", side_effect=self.tool_results()):
+            ci.verify_and_stage("apksigner", "aapt2", ":".join(["AB"] * 32))
         self.assertTrue((Path("publish") / name).is_file())
         self.assertIn(name, Path("publish/SHA256SUMS").read_text())
         self.assertEqual(Path("publish/SIGNING-CERT-SHA256.txt").read_text(), "ab" * 32 + "\n")
@@ -140,9 +151,10 @@ class ReleaseTests(unittest.TestCase):
     def test_unsigned_apk_fails_before_staging(self):
         self.make_apk()
         failure = subprocess.CompletedProcess([], 1, "DOES NOT VERIFY\n", "ERROR: malformed APK\n")
-        with patch.object(ci.subprocess, "run", return_value=failure):
+        with patch.object(ci.subprocess, "run", side_effect=[
+                subprocess.CompletedProcess([], 0, self.badging(), ""), failure]):
             with self.assertRaisesRegex(ValueError, "DOES NOT VERIFY") as error:
-                ci.verify_and_stage("apksigner")
+                ci.verify_and_stage("apksigner", "aapt2")
         self.assertIn("malformed APK", str(error.exception))
         self.assertFalse(Path("publish").exists())
 
@@ -150,22 +162,20 @@ class ReleaseTests(unittest.TestCase):
         self.make_apk()
         for verification, expected in ((self.certificate(), "00" * 32),
                                        (self.certificate().replace("CI Release", "Android Debug"), "")):
-            result = subprocess.CompletedProcess([], 0, verification, "")
-            with patch.object(ci.subprocess, "run", return_value=result), self.assertRaises(ValueError):
-                ci.verify_and_stage("apksigner", expected)
+            with patch.object(ci.subprocess, "run", side_effect=self.tool_results(verification)), \
+                    self.assertRaises(ValueError):
+                ci.verify_and_stage("apksigner", "aapt2", expected)
         self.assertFalse(Path("publish").exists())
 
     def test_missing_native_library_is_rejected(self):
         self.make_apk(missing_lib=True)
-        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
-        with patch.object(ci.subprocess, "run", return_value=result), self.assertRaises(ValueError):
-            ci.verify_and_stage("apksigner")
+        with patch.object(ci.subprocess, "run", side_effect=self.tool_results()), self.assertRaises(ValueError):
+            ci.verify_and_stage("apksigner", "aapt2")
 
     def test_extra_32bit_library_is_rejected(self):
         self.make_apk(extra_abi=True)
-        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
-        with patch.object(ci.subprocess, "run", return_value=result), self.assertRaises(ValueError):
-            ci.verify_and_stage("apksigner")
+        with patch.object(ci.subprocess, "run", side_effect=self.tool_results()), self.assertRaises(ValueError):
+            ci.verify_and_stage("apksigner", "aapt2")
 
     def test_accepts_build_tools_37_certificate_output(self):
         name = self.make_apk()
@@ -173,36 +183,54 @@ class ReleaseTests(unittest.TestCase):
             "V2 Signer: certificate DN: CN=CI Release\n"
             "V2 Signer: certificate SHA-256 digest: " + "ab" * 32 + "\n"
         )
-        result = subprocess.CompletedProcess([], 0, certificate, "")
-        with patch.object(ci.subprocess, "run", return_value=result):
-            ci.verify_and_stage("apksigner")
+        with patch.object(ci.subprocess, "run", side_effect=self.tool_results(certificate)):
+            ci.verify_and_stage("apksigner", "aapt2")
         self.assertTrue((Path("publish") / name).is_file())
 
-    def test_missing_apk_is_reported_before_running_apksigner(self):
+    def test_missing_apk_is_reported_before_running_tools(self):
         self.make_apk()
         Path("app/build/outputs/apk/release/KokoroBox-v0.5.5-arm64-v8a-release.apk").unlink()
         with patch.object(ci.subprocess, "run") as run, \
-                self.assertRaisesRegex(ValueError, "missing or empty"):
-            ci.verify_and_stage("apksigner")
+                self.assertRaisesRegex(ValueError, "found 0"):
+                ci.verify_and_stage("apksigner", "aapt2")
         run.assert_not_called()
 
     def test_finds_agp_single_abi_nested_release_output(self):
         name = self.make_apk(nested=True)
-        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
-        with patch.object(ci.subprocess, "run", return_value=result):
-            ci.verify_and_stage("apksigner")
+        with patch.object(ci.subprocess, "run", side_effect=self.tool_results()):
+            ci.verify_and_stage("apksigner", "aapt2")
         self.assertTrue((Path("publish") / name).is_file())
+
+    def test_finds_release_output_outside_app_build_tree(self):
+        source = self.make_apk()
+        source_path = Path("app/build/outputs/apk/release") / source
+        alternate = Path("build/outputs/release-arm64-v8a")
+        alternate.mkdir(parents=True)
+        shutil.move(source_path, alternate / source)
+        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
+        with patch.object(ci.subprocess, "run", side_effect=self.tool_results()):
+            ci.verify_and_stage("apksigner", "aapt2")
+        self.assertTrue((Path("publish") / source).is_file())
 
     def test_rejects_missing_or_ambiguous_release_metadata(self):
         with self.assertRaisesRegex(ValueError, "found 0"):
-            ci.find_release_output()
+            ci.find_release_apk(ci.properties("gradle.properties"))
         self.make_apk()
         nested = Path("app/build/outputs/apk/other")
         nested.mkdir(parents=True)
-        shutil.copyfile("app/build/outputs/apk/release/output-metadata.json",
-                        nested / "output-metadata.json")
+        shutil.copyfile("app/build/outputs/apk/release/KokoroBox-v0.5.5-arm64-v8a-release.apk",
+                        nested / "KokoroBox-v0.5.5-arm64-v8a-release.apk")
         with self.assertRaisesRegex(ValueError, "found 2"):
-            ci.find_release_output()
+            ci.find_release_apk(ci.properties("gradle.properties"))
+
+    def test_apk_manifest_must_match_release_source(self):
+        self.make_apk()
+        for badging in (self.badging(application_id="evil.app"),
+                        self.badging(version_code="1"), self.badging(version_name="9.9.9")):
+            with self.subTest(badging=badging), patch.object(ci.subprocess, "run", return_value=
+                    subprocess.CompletedProcess([], 0, badging, "")), \
+                    self.assertRaisesRegex(ValueError, "does not match"):
+                ci.verify_and_stage("apksigner", "aapt2")
 
     def test_cleanup_is_idempotent(self):
         with patch.dict(os.environ, self.env), patch.object(ci.sys, "argv", ["ci-release.py", "cleanup"]):

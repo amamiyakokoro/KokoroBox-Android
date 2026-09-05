@@ -120,37 +120,45 @@ def sync_kernel():
     ], check=True)
 
 
-def find_release_output():
-    root = Path("app/build/outputs/apk")
-    candidates = []
-    for metadata in root.rglob("output-metadata.json") if root.is_dir() else ():
-        try:
-            manifest = json.loads(metadata.read_text())
-        except (OSError, json.JSONDecodeError):
-            continue
-        if manifest.get("variantName") == "release":
-            candidates.append((metadata.parent, manifest))
+def find_release_apk(config):
+    root = Path(".")
+    expected_name = (f"{config['project.name']}-v{config['project.version.name']}-"
+                     "arm64-v8a-release.apk")
+    # AGP 9 may place packaged artifacts outside the historical app/build/outputs
+    # tree. The checkout is clean and this job builds exactly one APK; the manifest,
+    # signature and ABI checks below establish that it is the intended artifact.
+    apks = sorted(path for path in root.rglob("*.apk")
+                  if ".gradle" not in path.parts and path.is_file())
+    exact = [apk for apk in apks if apk.name == expected_name]
+    candidates = exact if exact else apks
     if len(candidates) != 1:
-        raise ValueError(f"Expected one Release APK metadata file, found {len(candidates)}")
-    return candidates[0]
-
-
-def verify_and_stage(apksigner, expected_fingerprint=""):
-    config = properties("gradle.properties")
-    directory, manifest = find_release_output()
-    elements = manifest["elements"]
-    if manifest["variantName"] != "release" or len(elements) != 1:
-        raise ValueError("Expected exactly one Release APK")
-    element = elements[0]
-    if (element["versionName"] != config["project.version.name"] or
-            manifest["applicationId"] != config["project.applicationId"]):
-        raise ValueError("APK version or application ID does not match the release source")
-    name = element["outputFile"]
-    if Path(name).name != name or not name.endswith(".apk"):
-        raise ValueError("Invalid APK output filename")
-    apk = directory / name
+        raise ValueError(f"Expected one Release APK, found {len(candidates)}")
+    apk = candidates[0]
     if not apk.is_file() or apk.stat().st_size == 0:
-        raise ValueError("Release APK listed in output metadata is missing or empty")
+        raise ValueError("Release APK is missing or empty")
+    return apk, expected_name
+
+
+def verify_apk_manifest(aapt2, apk, config):
+    process = subprocess.run([aapt2, "dump", "badging", str(apk)], text=True, capture_output=True)
+    if process.returncode != 0:
+        raise ValueError("Unable to read the built APK manifest with aapt2")
+    package = re.search(
+        r"^package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'",
+        process.stdout, re.MULTILINE,
+    )
+    if package is None:
+        raise ValueError("Built APK manifest does not contain package version information")
+    expected = (config["project.applicationId"], config["project.version.code"],
+                config["project.version.name"])
+    if package.groups() != expected:
+        raise ValueError("APK version or application ID does not match the release source")
+
+
+def verify_and_stage(apksigner, aapt2, expected_fingerprint=""):
+    config = properties("gradle.properties")
+    apk, name = find_release_apk(config)
+    verify_apk_manifest(aapt2, apk, config)
     # Non-zero exit prevents publishing unsigned or invalid APKs.
     verification_process = subprocess.run(
         [apksigner, "verify", "--verbose", "--print-certs", str(apk)],
@@ -207,7 +215,8 @@ def main():
     elif command == "sync-kernel":
         sync_kernel()
     elif command == "verify":
-        verify_and_stage(os.environ["APKSIGNER"], os.environ.get("SIGNING_CERT_SHA256", ""))
+        verify_and_stage(os.environ["APKSIGNER"], os.environ["AAPT2"],
+                         os.environ.get("SIGNING_CERT_SHA256", ""))
     elif command == "cleanup":
         keystore_path().unlink(missing_ok=True)
     else:
