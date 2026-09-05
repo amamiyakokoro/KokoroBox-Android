@@ -38,8 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.common.util.openUrl
-import com.github.yumelira.yumebox.core.bridge.Bridge
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
@@ -62,7 +59,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.OpenSourceLicensesScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
-import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,14 +72,6 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 .toBitmap(width = 256, height = 256)
                 .asImageBitmap()
         }.getOrNull()
-    }
-    val coreVersion by produceState(initialValue = MLang.About.App.VersionLoading) {
-        value = try {
-            Bridge.nativeCoreVersion()
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            MLang.About.App.VersionFailed
-        }
     }
 
     Scaffold(
@@ -139,7 +127,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     Spacer(modifier = Modifier.height(UiDp.dp8))
 
                     Text(
-                        text = "v${BuildConfig.VERSION_NAME} ($coreVersion)",
+                        text = "v${BuildConfig.VERSION_NAME} (Mihomo ${BuildConfig.MIHOMO_VERSION})",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

@@ -84,6 +84,17 @@ val projectApplicationId = providers.gradleProperty("project.applicationId")
     .orElse(gropify.project.namespace.base)
     .get()
 
+// The JNI bridge reports this project's Git revision, not the upstream Mihomo release.
+// Keep the About screen aligned with the core revision selected by the build configuration.
+val mihomoVersion = providers.fileContents(rootProject.layout.projectDirectory.file("kernel.properties"))
+    .asText.map { contents ->
+        val properties = Properties().apply { load(contents.reader()) }
+        val revision = requireNotNull(properties.getProperty("external.mihomo.branch")) {
+            "Missing Mihomo revision in kernel.properties"
+        }.trim().also { require(it.isNotEmpty()) { "Empty Mihomo revision" } }
+        revision + properties.getProperty("external.mihomo.suffix", "").trim()
+    }
+
 android {
     namespace = gropify.project.namespace.base
 
@@ -92,6 +103,11 @@ android {
         targetSdk = gropify.android.targetSdk
         versionCode = gropify.project.version.code
         versionName = gropify.project.version.name
+        buildConfigField(
+            "String",
+            "MIHOMO_VERSION",
+            "\"${mihomoVersion.get().replace("\\", "\\\\").replace("\"", "\\\"")}\"",
+        )
         manifestPlaceholders["appName"] = gropify.project.name
         manifestPlaceholders["startupGateEnabled"] = startupGateEnabled
         manifestPlaceholders["startupGateEnforceSigner"] = startupGateEnforceSigner
