@@ -212,6 +212,13 @@ class KokoroSession internal constructor(
         second
     }
 
+    fun hasActiveSession(): Boolean {
+        val stored = tokenStore.load()
+        val currentTime = now()
+        return (stored.accessToken?.isNotBlank() == true && stored.accessTokenExpiresAt > currentTime) ||
+            (stored.refreshToken?.isNotBlank() == true && stored.refreshTokenExpiresAt > currentTime)
+    }
+
     /**
      * Downloads a Mihomo subscription through the App endpoint. Older server deployments do not
      * expose that endpoint yet, so a 404 falls back to the public endpoint with a UUID obtained

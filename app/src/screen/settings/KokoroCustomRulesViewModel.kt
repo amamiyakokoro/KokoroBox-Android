@@ -13,14 +13,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesClient
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRuleSet
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesApiException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesSaveOutcomeUnknownException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationReason
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccountClient
 import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
@@ -62,13 +61,16 @@ internal data class KokoroCustomRulesUiState(
 )
 
 internal class KokoroCustomRulesViewModel(
-    private val client: KokoroCustomRulesClient,
-    private val accountClient: KokoroAccountClient,
+    private val repository: KokoroRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(KokoroCustomRulesUiState())
     val state = _state.asStateFlow()
 
-    fun load() {
+    fun load() = load(forceRefresh = false)
+
+    fun refresh() = load(forceRefresh = true)
+
+    private fun load(forceRefresh: Boolean) {
         if (_state.value.loading && _state.value.defaultRuleSet != null) return
         viewModelScope.launch {
             _state.update {
@@ -79,7 +81,7 @@ internal class KokoroCustomRulesViewModel(
                 )
             }
             val account = try {
-                accountClient.getAccount()
+                repository.getAccount(forceRefresh)
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
                 _state.update {
@@ -107,7 +109,7 @@ internal class KokoroCustomRulesViewModel(
             }
             _state.update { it.copy(authState = KokoroAuthState.Authenticated(account)) }
             try {
-                val editorData = client.getEditorData()
+                val editorData = repository.getRulesEditorData(forceRefresh)
                 val defaultRuleSet = checkNotNull(
                     editorData.state.defaultRuleSet,
                 ) { "Kokoro default rule set is unavailable" }
@@ -185,9 +187,9 @@ internal class KokoroCustomRulesViewModel(
             _state.update { it.copy(saving = true, status = KokoroRulesStatus.IDLE) }
             try {
                 // Capabilities can change independently of the installed client.
-                val freshOptions = client.getOptions()
+                val freshOptions = repository.getFreshRulesOptions()
                 _state.update { it.copy(options = freshOptions) }
-                val updated = client.replaceRules(selected.id, selected.revision, localRules, freshOptions)
+                val updated = repository.replaceRules(selected.id, selected.revision, localRules, freshOptions)
                 replaceDefaultRuleSet(updated, preserveDraft = false)
                 _state.update { it.copy(saving = false, dirty = false, status = KokoroRulesStatus.SAVED) }
             } catch (error: Exception) {
@@ -244,10 +246,10 @@ internal class KokoroCustomRulesViewModel(
             error is KokoroRulesApiException && error.statusCode == 409 -> loadConflict(setId, localRules)
             error is KokoroRulesApiException && error.statusCode == 404 -> {
                 _state.update { it.copy(saving = false, status = KokoroRulesStatus.NOT_FOUND) }
-                load()
+                refresh()
             }
             error is KokoroRulesApiException && error.statusCode == 422 -> {
-                runCatching { client.getOptions() }.getOrNull()?.let { fresh ->
+                runCatching { repository.getFreshRulesOptions() }.getOrNull()?.let { fresh ->
                     _state.update { it.copy(options = fresh) }
                 }
                 _state.update { it.copy(saving = false, status = KokoroRulesStatus.VALIDATION_FAILED) }
@@ -272,7 +274,7 @@ internal class KokoroCustomRulesViewModel(
 
     private suspend fun loadConflict(setId: Long, localRules: List<KokoroCustomRuleInput>) {
         val remote = runCatching {
-            client.getState().defaultRuleSet?.takeIf { it.id == setId }
+            repository.getFreshRulesState().defaultRuleSet?.takeIf { it.id == setId }
         }.getOrNull()
         if (remote == null) {
             _state.update { it.copy(saving = false, status = KokoroRulesStatus.NOT_FOUND) }

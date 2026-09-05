@@ -238,6 +238,8 @@ class KokoroAccountClient(context: Context) {
 
     internal suspend fun handleOAuthCallback(uri: Uri) = session.handleOAuthCallback(uri)
 
+    internal fun hasSession(): Boolean = session.hasActiveSession()
+
     internal suspend fun getAccount(): KokoroAccount? = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url(KokoroApi.ME_URL)

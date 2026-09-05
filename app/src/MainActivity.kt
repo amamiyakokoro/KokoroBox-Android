@@ -52,6 +52,8 @@ import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
 import com.github.yumelira.yumebox.data.model.AppColorTheme
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
 import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
@@ -62,7 +64,6 @@ import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
 import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
 import com.github.yumelira.yumebox.presentation.theme.YumeTheme
 import com.github.yumelira.yumebox.screen.onboarding.OnboardingLauncher
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccountClient
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -100,7 +101,13 @@ class MainActivity : FragmentActivity() {
     private val proxyFacade: com.github.yumelira.yumebox.runtime.client.ProxyFacade by inject()
     private val serviceCache: MMKV by inject(qualifier = named("service_cache"))
     private val applicationScope: CoroutineScope by inject(qualifier = named(APPLICATION_SCOPE_NAME))
-    private val kokoroAccountClient: KokoroAccountClient by inject()
+    private val kokoroRepository: KokoroRepository by inject()
+    private val kokoroPreloadCoordinator: KokoroPreloadCoordinator by inject()
+
+    override fun onStart() {
+        super.onStart()
+        kokoroPreloadCoordinator.preloadIfAuthenticated()
+    }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLanguageManager.wrap(newBase))
@@ -283,12 +290,14 @@ class MainActivity : FragmentActivity() {
                     // Exchange survives Activity recreation. The session strictly validates and
                     // atomically consumes the persisted pending login before sending any code.
                     applicationScope.launch {
-                        _kokoroAuthResult.value = runCatching {
-                            kokoroAccountClient.handleOAuthCallback(uri)
+                        val authenticated = runCatching {
+                            kokoroRepository.handleOAuthCallback(uri)
                         }.onFailure {
                             if (it is kotlinx.coroutines.CancellationException) throw it
                             Timber.w("Kokoro OAuth callback failed; sign in again")
                         }.isSuccess
+                        _kokoroAuthResult.value = authenticated
+                        if (authenticated) kokoroPreloadCoordinator.preloadIfAuthenticated()
                     }
                     return
                 }

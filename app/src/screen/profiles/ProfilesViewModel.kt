@@ -29,6 +29,7 @@ import com.github.yumelira.yumebox.core.model.FetchStatus
 import com.github.yumelira.yumebox.core.presentation.AndroidContractStateViewModel
 import com.github.yumelira.yumebox.core.presentation.LoadableState
 import com.github.yumelira.yumebox.data.store.LinkOpenMode
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.store.Preference
 import com.github.yumelira.yumebox.data.store.ProfileLink
 import com.github.yumelira.yumebox.data.store.ProfileLinksStore
@@ -53,7 +54,7 @@ class ProfilesViewModel(
     application: Application,
     private val profilesRepository: ProfilesRepository,
     profileLinksStorage: ProfileLinksStore,
-    private val kokoroAccountClient: KokoroAccountClient,
+    private val kokoroRepository: KokoroRepository,
 ) : AndroidContractStateViewModel<ProfilesUiState, ProfilesViewModel.ProfilesUiEffect>(
     application,
     ProfilesUiState(),
@@ -93,17 +94,17 @@ class ProfilesViewModel(
         refreshKokoroAccount()
     }
 
-    internal fun refreshKokoroAccount() {
+    internal fun refreshKokoroAccount(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _kokoroAuthState.value = KokoroAuthState.Checking
             _kokoroAuthState.value = try {
-                val account = kokoroAccountClient.getAccount()
+                val account = kokoroRepository.getAccount(forceRefresh)
                 if (account == null) {
                     _kokoroSubscriptionOptions.value = KokoroSubscriptionOptions.fallback()
                     KokoroAuthState.LoggedOut
                 } else {
                     _kokoroSubscriptionOptions.value = runCatching {
-                        kokoroAccountClient.getSubscriptionOptions(account)
+                        kokoroRepository.getSubscriptionOptions(account, forceRefresh)
                     }.getOrElse { error ->
                         Timber.w(
                             "Unable to load Kokoro subscription options (%s); using account fallback",
@@ -121,13 +122,13 @@ class ProfilesViewModel(
         }
     }
 
-    internal suspend fun beginKokoroLogin(): String = kokoroAccountClient.beginLogin()
+    internal suspend fun beginKokoroLogin(): String = kokoroRepository.beginLogin()
 
-    internal suspend fun cancelKokoroLogin(loginUrl: String) = kokoroAccountClient.cancelLogin(loginUrl)
+    internal suspend fun cancelKokoroLogin(loginUrl: String) = kokoroRepository.cancelLogin(loginUrl)
 
     internal suspend fun resolveKokoroSubscription(
         settings: MihomoSubscriptionSettings,
-    ): ResolvedSubscription = kokoroAccountClient.resolveSubscription(settings)
+    ): ResolvedSubscription = kokoroRepository.resolveSubscription(settings)
 
     internal fun reportKokoroLoginFailure() {
         _kokoroAuthState.value = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.LoginFailed)
@@ -137,7 +138,7 @@ class ProfilesViewModel(
         viewModelScope.launch {
             _kokoroAuthState.value = KokoroAuthState.Checking
             try {
-                kokoroAccountClient.revoke()
+                kokoroRepository.revoke()
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.w("Failed to revoke amamiyakoko.ro session (%s)", e::class.java.simpleName)

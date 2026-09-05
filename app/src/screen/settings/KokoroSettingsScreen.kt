@@ -54,7 +54,7 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
     LaunchedEffect(Unit) { viewModel.loadAccount() }
     LaunchedEffect(authResult) {
         when (authResult) {
-            true -> viewModel.loadAccount()
+            true -> viewModel.refreshAccount()
             false -> viewModel.reportLoginFailure()
             null -> Unit
         }
@@ -84,7 +84,7 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
             TopBar(
                 title = MLang.Settings.Kokoro.Title,
                 actions = {
-                    IconButton(onClick = viewModel::loadAccount) {
+                    IconButton(onClick = viewModel::refreshAccount) {
                         Icon(AppMd3Icons.Action.Refresh, MLang.MetaFeature.CustomRules.Refresh)
                     }
                 },
@@ -100,7 +100,7 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
                     authState = authState,
                     onLogin = ::beginLogin,
                     onLogout = viewModel::logout,
-                    onRetry = viewModel::loadAccount,
+                    onRetry = viewModel::refreshAccount,
                 )
             }
             item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }

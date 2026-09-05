@@ -24,6 +24,8 @@ package com.github.yumelira.yumebox.di
 
 import com.github.yumelira.yumebox.data.gateway.LogRecordGateway
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesClient
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
 import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
@@ -39,6 +41,7 @@ import com.github.yumelira.yumebox.screen.settings.NetworkSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.ResourceDownloadClient
 import com.github.yumelira.yumebox.service.LogRecordServiceGateway
 import org.koin.android.ext.koin.androidApplication
+import org.koin.core.qualifier.named
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -48,6 +51,8 @@ val appIntegrationModule = module {
     single<LogRecordGateway> { LogRecordServiceGateway() }
     single { KokoroAccountClient(androidApplication()) }
     single { KokoroCustomRulesClient(androidApplication()) }
+    single { KokoroRepository(get(), get()) }
+    single { KokoroPreloadCoordinator(get(), get(named(APPLICATION_SCOPE_NAME))) }
     single { ResourceDownloadClient(androidApplication(), get()) }
 }
 
@@ -60,7 +65,7 @@ val appViewModelModule = module {
     viewModel { AccessControlViewModel(androidApplication(), get(), get()) }
     viewModel { AppDataManagementViewModel(get(), get()) }
     viewModel { LogViewModel(get()) }
-    viewModel { KokoroCustomRulesViewModel(get(), get()) }
+    viewModel { KokoroCustomRulesViewModel(get()) }
     viewModel { KokoroSettingsViewModel(get()) }
 }
 

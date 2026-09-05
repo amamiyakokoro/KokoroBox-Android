@@ -101,7 +101,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
 
     fun performPendingAction(action: PendingRulesAction) {
         when (action) {
-            PendingRulesAction.Reload -> viewModel.load()
+            PendingRulesAction.Reload -> viewModel.refresh()
             PendingRulesAction.Exit -> navigator.navigateUp()
         }
     }
@@ -167,7 +167,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                                 verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
                             ) {
                                 Text(MLang.MetaFeature.CustomRules.ErrorLoad)
-                                Button(onClick = viewModel::load, modifier = Modifier.fillMaxWidth()) {
+                                Button(onClick = viewModel::refresh, modifier = Modifier.fillMaxWidth()) {
                                     Text(MLang.MetaFeature.CustomRules.Retry)
                                 }
                             }

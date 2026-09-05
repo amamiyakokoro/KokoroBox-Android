@@ -31,6 +31,7 @@ import com.github.yumelira.yumebox.core.Global
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.data.controller.AppTrafficStatisticsCollector
 import com.github.yumelira.yumebox.data.controller.GeoXDataController
+import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.di.appModule
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
@@ -76,6 +77,7 @@ class App : Application() {
         }
         appSettingsStorage.syncAppVersion(BuildConfig.VERSION_CODE)
         scheduleDeferredStartupTasks(koinApp.koin)
+        koinApp.koin.get<KokoroPreloadCoordinator>().preloadIfAuthenticated()
 
         PlatformIdentifier.getPlatformIdentifier()
     }

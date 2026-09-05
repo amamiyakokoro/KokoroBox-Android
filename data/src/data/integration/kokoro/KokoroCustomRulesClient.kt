@@ -97,6 +97,7 @@ class KokoroCustomRulesClient internal constructor(
 
     private suspend inline fun <reified T> executeJson(request: Request, expectedCode: Int): T {
         return session.executeAuthorized(request.newBuilder().header("Accept", "application/json").build()).use {
+            if (it.code == 401 || it.code == 403) throw KokoroAuthenticationRequiredException()
             if (it.code != expectedCode) throw it.toRulesApiException(json)
             try {
                 json.decodeFromString<T>(it.body.string())
