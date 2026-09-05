@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.core.model.OverrideInternalConstants
 import com.github.yumelira.yumebox.data.model.OverrideConfig
 import com.github.yumelira.yumebox.data.model.ProfileBinding
 import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
@@ -165,7 +164,6 @@ internal fun ShareOptionsDialog(
 internal fun ProfileSettingsDialog(
     show: Boolean,
     profile: Profile,
-    systemPreset: OverrideConfig?,
     userConfigs: List<OverrideConfig>,
     binding: ProfileBinding?,
     subscriptionOptions: KokoroSubscriptionOptions,
@@ -179,14 +177,10 @@ internal fun ProfileSettingsDialog(
     val componentSizes = AppTheme.sizes
 
     val initialSystemPresetEnabled = binding?.enabled ?: false
-    val initialCustomRoutingEnabled = binding?.overrideIds
-        ?.contains(OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID) == true
-
     val initialOverrideIds = binding
         ?.overrideIds
         .orEmpty()
         .filterNot(::isBuiltinPresetOverrideId)
-        .filter { it != OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID }
     val appliedOverrideIds = initialOverrideIds
     val initialSubscriptionSettings = KokoroApi.parseConfigSettings(profile.source)
     var editName by remember { mutableStateOf(profile.name) }
@@ -195,7 +189,6 @@ internal fun ProfileSettingsDialog(
         mutableStateOf(initialSubscriptionSettings)
     }
     var systemPresetSelected by remember { mutableStateOf(initialSystemPresetEnabled) }
-    var customRoutingSelected by remember { mutableStateOf(initialCustomRoutingEnabled) }
     var pendingSelectedUserOverrideIds by remember { mutableStateOf(emptyList<String>()) }
 
     LaunchedEffect(show, profile.uuid, profile.name, binding?.overrideIds, binding?.enabled) {
@@ -204,7 +197,6 @@ internal fun ProfileSettingsDialog(
             editSource = ""
             subscriptionSettings = initialSubscriptionSettings
             systemPresetSelected = initialSystemPresetEnabled
-            customRoutingSelected = initialCustomRoutingEnabled
             pendingSelectedUserOverrideIds = initialOverrideIds
         }
     }
@@ -231,12 +223,7 @@ internal fun ProfileSettingsDialog(
             onSaveProfileMeta(trimmedName, targetSource, targetInterval, shouldRefresh)
         }
 
-        val basicFinalIds = buildFinalOverrideIds(pendingSelectedUserOverrideIds)
-        val finalSelectedOverrideIds = if (customRoutingSelected) {
-            basicFinalIds + OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID
-        } else {
-            basicFinalIds - OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID
-        }
+        val finalSelectedOverrideIds = buildFinalOverrideIds(pendingSelectedUserOverrideIds)
         onSaveOverrideSettings(systemPresetSelected, finalSelectedOverrideIds)
         onDismiss()
     }
@@ -301,31 +288,12 @@ internal fun ProfileSettingsDialog(
                 }
 
                 Card {
-                    Column {
-                        PreferenceSwitchItem(
-                            title = MLang.ProfilesPage.SettingsDialog.SystemPreset,
-                            summary = MLang.ProfilesPage.SettingsDialog.SystemPresetSummary,
-                            checked = systemPresetSelected,
-                            onCheckedChange = {
-                                systemPresetSelected = it
-                                if (it) customRoutingSelected = false
-                            },
-                        )
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = spacing.space16),
-                            thickness = componentSizes.thinDividerThickness,
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = opacity.outline),
-                        )
-                        PreferenceSwitchItem(
-                            title = MLang.ProfilesPage.SettingsDialog.CustomRouting,
-                            summary = MLang.ProfilesPage.SettingsDialog.CustomRoutingSummary,
-                            checked = customRoutingSelected,
-                            onCheckedChange = {
-                                customRoutingSelected = it
-                                if (it) systemPresetSelected = false
-                            },
-                        )
-                    }
+                    PreferenceSwitchItem(
+                        title = MLang.ProfilesPage.SettingsDialog.SystemPreset,
+                        summary = MLang.ProfilesPage.SettingsDialog.SystemPresetSummary,
+                        checked = systemPresetSelected,
+                        onCheckedChange = { systemPresetSelected = it },
+                    )
                 }
 
                 if (userConfigs.isNotEmpty()) {

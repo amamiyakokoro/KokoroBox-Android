@@ -17,7 +17,7 @@ A Material 3 Android proxy client powered by [Mihomo](https://github.com/MetaCub
 - Local, remote, QR-code, and authenticated Kokoro subscription profiles
 - Rule, Global, Direct, VPN, and optional Root TUN modes
 - Proxy selection, connection inspection, traffic statistics, logs, and Geo data updates
-- Profile overrides, custom routing, configuration preview, and automatic updates
+- Profile overrides, configuration preview, and automatic updates
 - In-app checks for stable releases published by this repository
 
 ## Install

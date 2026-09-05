@@ -134,20 +134,6 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                 }
             }
             item {
-                Title(MLang.MetaFeature.Section.CustomRouting)
-                Card {
-                    PreferenceArrowItem(
-                        title = MLang.MetaFeature.CustomRouting.Title,
-                        summary = MLang.MetaFeature.CustomRouting.Summary,
-                        onClick = {
-                            navigator.navigate(com.ramcosta.composedestinations.generated.destinations.CustomRoutingRouteDestination) {
-                                launchSingleTop = true
-                            }
-                        },
-                    )
-                }
-            }
-            item {
                 Title(MLang.MetaFeature.Section.GeoXUpdate)
                 Card {
                     PreferenceArrowItem(

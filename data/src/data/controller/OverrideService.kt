@@ -24,7 +24,6 @@ package com.github.yumelira.yumebox.data.controller
 
 import android.content.Context
 import android.content.Intent
-import com.github.yumelira.yumebox.core.model.OverrideInternalConstants
 import com.github.yumelira.yumebox.service.common.constants.Intents
 import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
 import timber.log.Timber
@@ -40,8 +39,7 @@ class OverrideService(
         return try {
             val overrideIds = resolver.resolveIds(profileId)
             val resolvedConfigs = resolver.resolveConfigs(overrideIds)
-            val expectedConfigIds = overrideIds.filterNot(::isVirtualOverrideId)
-            val missingOverrideCount = expectedConfigIds.size - resolvedConfigs.size
+            val missingOverrideCount = overrideIds.size - resolvedConfigs.size
 
             Timber.i(
                 "Apply override chain: profile=%s ids=%s resolved=%d missing=%d",
@@ -67,10 +65,6 @@ class OverrideService(
             Timber.e(e, "Failed to apply override for profile: %s", profileId)
             false
         }
-    }
-
-    private fun isVirtualOverrideId(overrideId: String): Boolean {
-        return overrideId == OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID
     }
 
     private fun notifyRuntimeOverrideChanged() {

@@ -201,7 +201,9 @@ class ProfileBindingStore(
         return index.copy(
             profileChains = index.profileChains.mapValues { (_, binding) ->
                 binding.copy(
-                    overrideIds = binding.overrideIds.filterNot(::isBuiltinPresetOverrideId),
+                    overrideIds = binding.overrideIds
+                        .filterNot(::isBuiltinPresetOverrideId)
+                        .filterNot(::isObsoleteStandaloneRoutingId),
                 )
             },
         )
@@ -211,12 +213,20 @@ class ProfileBindingStore(
         return overrideId.startsWith(OverrideMetadata.SYSTEM_PREFIX)
     }
 
+    private fun isObsoleteStandaloneRoutingId(overrideId: String): Boolean {
+        return overrideId == OBSOLETE_STANDALONE_ROUTING_ID
+    }
+
     private fun isOverrideApplied(binding: ProfileBinding, overrideId: String): Boolean {
         return if (isBuiltinPresetOverrideId(overrideId)) {
             binding.enabled
         } else {
             binding.overrideIds.contains(overrideId)
         }
+    }
+
+    private companion object {
+        const val OBSOLETE_STANDALONE_ROUTING_ID = "__custom_routing__"
     }
 
 }

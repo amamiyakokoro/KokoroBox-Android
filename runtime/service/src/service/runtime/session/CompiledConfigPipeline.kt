@@ -29,7 +29,6 @@ import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.core.model.CompileRequest
 import com.github.yumelira.yumebox.core.model.CompileResult
 import com.github.yumelira.yumebox.core.model.ConfigurationOverride
-import com.github.yumelira.yumebox.core.model.OverrideInternalConstants
 import com.github.yumelira.yumebox.core.model.ProxyGroup
 import com.github.yumelira.yumebox.core.model.buildOfficialMrsConfigurationOverride
 import com.github.yumelira.yumebox.core.model.defaultSystemOfficialMrsPresetSelection
@@ -82,7 +81,6 @@ class CompiledConfigPipeline(
                 profileUuid = profileUuid,
                 userOverridePaths = emptyList(),
                 builtinPresetPath = null,
-                customRoutingOverridePath = null,
                 runtimeInternalOverridePath = null,
                 paths = emptyList(),
             )
@@ -101,14 +99,10 @@ class CompiledConfigPipeline(
         )
 
         val userOverridePaths = mutableListOf<String>()
-        val customRoutingEnabled = binding?.overrideIds
-            .orEmpty()
-            .contains(OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID)
         binding
             ?.overrideIds
             .orEmpty()
             .filterNot(::isReservedOverrideId)
-            .filterNot(::isCustomRoutingId)
             .forEach { overrideId ->
                 val file = resolveUserOverrideFile(overridesDir, overrideId)
                 if (file == null) {
@@ -126,21 +120,12 @@ class CompiledConfigPipeline(
             null
         }
 
-        val customRoutingOverridePath = if (customRoutingEnabled) {
-            resolveCustomRoutingOverrideFile(overridesDir)?.also { file ->
-                logger?.invoke(describeOverrideFile(file, OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID))
-            }?.absolutePath
-        } else {
-            null
-        }
-
         val runtimeInternalOverridePath = resolveRuntimeInternalOverrideFile(overridesDir, profileUuid)
             ?.also { file -> logger?.invoke(describeOverrideFile(file, "__runtime__")) }
             ?.absolutePath
 
         val paths = mutableListOf<String>()
         builtinPresetPath?.let(paths::add)
-        customRoutingOverridePath?.let(paths::add)
         paths += userOverridePaths
         runtimeInternalOverridePath?.let(paths::add)
 
@@ -153,7 +138,6 @@ class CompiledConfigPipeline(
             profileUuid = profileUuid,
             userOverridePaths = userOverridePaths,
             builtinPresetPath = builtinPresetPath,
-            customRoutingOverridePath = customRoutingOverridePath,
             runtimeInternalOverridePath = runtimeInternalOverridePath,
             paths = paths,
         )
@@ -275,7 +259,11 @@ class CompiledConfigPipeline(
     private fun sanitizeMetadataIndex(metadata: MetadataIndexPayload): MetadataIndexPayload {
         return metadata.copy(
             profileChains = metadata.profileChains.mapValues { (_, binding) ->
-                binding.copy(overrideIds = binding.overrideIds.filterNot(::isBuiltinPresetId))
+                binding.copy(
+                    overrideIds = binding.overrideIds
+                        .filterNot(::isBuiltinPresetId)
+                        .filterNot(::isObsoleteStandaloneRoutingId),
+                )
             },
         )
     }
@@ -298,21 +286,6 @@ class CompiledConfigPipeline(
         return file
     }
 
-    private fun resolveCustomRoutingOverrideFile(overridesDir: File): File? {
-        val file = overridesDir.resolve(
-            "${OverrideInternalConstants.INTERNAL_DIR_NAME}/${OverrideInternalConstants.CUSTOM_ROUTING_FILE_NAME}",
-        )
-        if (!file.exists()) return null
-        val content = runCatching { file.readText() }.getOrElse {
-            error("Custom routing override file unreadable path=${file.absolutePath} reason=${it.message}")
-        }
-        if (content.isBlank()) {
-            runCatching { file.delete() }
-            return null
-        }
-        return file
-    }
-
     private fun resolveBuiltinPresetFile(overridesDir: File): File? {
         val content = runCatching {
             encodeConfigurationOverride(
@@ -324,7 +297,7 @@ class CompiledConfigPipeline(
         }
         if (content.isBlank()) return null
 
-        val file = overridesDir.resolve("${OverrideInternalConstants.INTERNAL_DIR_NAME}/$BUILTIN_PRESET_FILE_NAME")
+        val file = overridesDir.resolve("$INTERNAL_OVERRIDE_DIR_NAME/$BUILTIN_PRESET_FILE_NAME")
         file.parentFile?.mkdirs()
         if (!file.exists() || file.readText() != content) {
             file.writeText(content)
@@ -344,8 +317,8 @@ class CompiledConfigPipeline(
         return isInternalRuntimeId(overrideId) || isBuiltinPresetId(overrideId)
     }
 
-    private fun isCustomRoutingId(overrideId: String): Boolean {
-        return overrideId == OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID
+    private fun isObsoleteStandaloneRoutingId(overrideId: String): Boolean {
+        return overrideId == OBSOLETE_STANDALONE_ROUTING_ID
     }
 
     private fun describeOverrideFile(file: File, overrideId: String): String {
@@ -381,7 +354,6 @@ class CompiledConfigPipeline(
         val profileUuid: String,
         val userOverridePaths: List<String>,
         val builtinPresetPath: String?,
-        val customRoutingOverridePath: String?,
         val runtimeInternalOverridePath: String?,
         val paths: List<String>,
     )
@@ -405,5 +377,7 @@ class CompiledConfigPipeline(
         const val BUILTIN_PRESET_PREFIX = "preset-"
         const val BUILTIN_PRESET_FILE_ID = "__builtin__"
         const val BUILTIN_PRESET_FILE_NAME = "builtin-preset.json"
+        const val INTERNAL_OVERRIDE_DIR_NAME = "internal"
+        const val OBSOLETE_STANDALONE_ROUTING_ID = "__custom_routing__"
     }
 }

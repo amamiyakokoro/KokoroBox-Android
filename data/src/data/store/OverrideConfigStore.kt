@@ -48,7 +48,7 @@ class OverrideConfigStore(
 
     private val overridesDir = File(context.filesDir, "overrides")
     private val configsDir = File(overridesDir, "configs")
-    private val internalDir = File(overridesDir, OverrideInternalConstants.INTERNAL_DIR_NAME)
+    private val obsoleteStandaloneRoutingFile = File(overridesDir, "internal/custom-routing.json")
     private val metadataFile = File(overridesDir, "metadata.json")
 
     private val json = Json {
@@ -137,12 +137,11 @@ class OverrideConfigStore(
         }
     }
 
-    override suspend fun getUserConfigs(): List<OverrideConfig> =
-        loadUserConfigs().filter { it.id != OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID }
+    override suspend fun getUserConfigs(): List<OverrideConfig> = loadUserConfigs()
 
     override fun getUserConfigsFlow(): Flow<List<OverrideConfig>> =
         flow {
-            emit(loadUserConfigs().filter { it.id != OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID })
+            emit(loadUserConfigs())
         }.flowOn(Dispatchers.IO)
 
     override suspend fun save(config: OverrideConfig) = withContext(Dispatchers.IO) {
@@ -235,20 +234,6 @@ class OverrideConfigStore(
         return id.startsWith(OverrideMetadata.SYSTEM_PREFIX)
     }
 
-    suspend fun loadCustomRouting(): ConfigurationOverride? = withContext(Dispatchers.IO) {
-        val file = File(internalDir, OverrideInternalConstants.CUSTOM_ROUTING_FILE_NAME)
-        if (!file.exists()) return@withContext null
-        runCatching {
-            json.decodeFromString<ConfigurationOverride>(file.readText())
-        }.getOrNull()
-    }
-
-    suspend fun saveCustomRouting(config: ConfigurationOverride) = withContext(Dispatchers.IO) {
-        val file = File(internalDir, OverrideInternalConstants.CUSTOM_ROUTING_FILE_NAME)
-        file.parentFile?.mkdirs()
-        file.writeText(encodeConfigContent(config))
-    }
-
     suspend fun export(config: OverrideConfig): String = withContext(Dispatchers.IO) {
         encodeConfigContent(config.config)
     }
@@ -285,8 +270,7 @@ class OverrideConfigStore(
         if (!configsDir.exists()) return@withContext emptyList()
         val index = loadMetadataIndex()
         index.sortedUserMetadata()
-            .filterNot { metadata -> isInternalRuntimeConfig(metadata.id) }
-            .filterNot { metadata -> metadata.id == OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID }
+            .filterNot { metadata -> isReservedInternalConfig(metadata.id) }
             .mapNotNull { metadata ->
                 val content = getConfigJsonContent(metadata.id) ?: return@mapNotNull null
                 OverrideConfigBackupEntry(
@@ -312,8 +296,7 @@ class OverrideConfigStore(
             .toMutableMap()
 
         entries.forEach { entry ->
-            if (entry.id.isBlank() || isSystemPreset(entry.id) || isInternalRuntimeConfig(entry.id)) return@forEach
-            if (entry.id == OverrideInternalConstants.CUSTOM_ROUTING_OVERRIDE_ID) return@forEach
+            if (entry.id.isBlank() || isSystemPreset(entry.id) || isReservedInternalConfig(entry.id)) return@forEach
             val decodedConfig = runCatching {
                 json.decodeFromString(ConfigurationOverride.serializer(), entry.content)
             }.getOrNull() ?: return@forEach
@@ -392,11 +375,12 @@ class OverrideConfigStore(
     }
 
     private fun loadUserConfigs(): List<OverrideConfig> {
+        obsoleteStandaloneRoutingFile.delete()
         if (!configsDir.exists()) return emptyList()
         val index = loadMetadataIndex()
         return index.sortedUserMetadata()
             .mapNotNull { metadata ->
-                if (isInternalRuntimeConfig(metadata.id)) {
+                if (isReservedInternalConfig(metadata.id)) {
                     return@mapNotNull null
                 }
                 loadConfigContent(metadata.id)?.let { config ->
@@ -454,6 +438,8 @@ class OverrideConfigStore(
     private fun encodeConfigContent(config: ConfigurationOverride): String {
         return encodeConfigurationOverride(config)
     }
+
+    private fun isReservedInternalConfig(id: String): Boolean = id.startsWith("__")
 
     private fun loadMetadataIndex(): MetadataIndex {
         val metadataIndex = if (!metadataFile.exists()) {

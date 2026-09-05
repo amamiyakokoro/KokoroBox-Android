@@ -78,7 +78,6 @@ fun ProfilesPager(
     val overrideConfigViewModel = koinViewModel<OverrideConfigViewModel>()
     val bindingProvider: ProfileBindingProvider = koinInject()
     val overrideService: OverrideService = koinInject()
-    val systemPresets by overrideConfigViewModel.systemPresets.collectAsStateWithLifecycle()
     val userConfigs by overrideConfigViewModel.userConfigs.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -288,7 +287,6 @@ fun ProfilesPager(
         ProfileSettingsDialog(
             show = showSettingsDialog.value,
             profile = currentProfileToEdit,
-            systemPreset = systemPresets.firstOrNull(),
             userConfigs = userConfigs,
             binding = profileBinding,
             subscriptionOptions = kokoroSubscriptionOptions,

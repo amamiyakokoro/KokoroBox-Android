@@ -4,7 +4,6 @@ MetaFeature = {
 
     Section = {
         ConnectionAndTraffic = "Connections & Traffic"
-        CustomRouting = "Custom Routing"
         GeoXUpdate = "GeoX Update"
     }
 
@@ -14,17 +13,6 @@ MetaFeature = {
         LocalUpdateTitle = "Update GeoX Locally"
         LocalUpdateSummary = "Import and apply database files from local storage"
         RuntimeHomeInfo = "GeoX data downloads into the core directory: %s"
-    }
-
-    CustomRouting = {
-        Title = "Custom Routing"
-        Summary = "Standalone routing rules configuration"
-        Description = "Custom rules are globally shared. Please enable the 'Custom Split Tunneling' switch on the subscription config editing page for them to take effect. Each subscription config needs the switch enabled individually."
-        GroupTypeTitle = "Group Types"
-        GroupTypeUrlTest = "UrlTest"
-        GroupTypeFallback = "Fallback"
-        UrlTestRegionGroupTitle = "UrlTest Region Groups"
-        FallbackRegionGroupTitle = "Fallback Region Groups"
     }
 
     Download = {

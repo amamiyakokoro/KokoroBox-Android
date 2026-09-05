@@ -119,7 +119,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-group-types") {
                 RoutingSwitchCard(
-                    title = MLang.MetaFeature.CustomRouting.GroupTypeTitle,
+                    title = MLang.Override.Draft.GroupTypeTitle,
                     items = listOf("urltest", "fallback"),
                     iconUrl = { type ->
                         officialMrsPresetIconUrl(
@@ -140,9 +140,9 @@ fun OverridePresetTemplateSheet(
                     },
                     itemTitle = {
                         if (it == "urltest") {
-                            MLang.MetaFeature.CustomRouting.GroupTypeUrlTest
+                            MLang.Override.Draft.GroupTypeUrlTest
                         } else {
-                            MLang.MetaFeature.CustomRouting.GroupTypeFallback
+                            MLang.Override.Draft.GroupTypeFallback
                         }
                     },
                     applyHorizontalPadding = false,
@@ -154,7 +154,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-urltest-regions") {
                 RoutingSwitchCard(
-                    title = MLang.MetaFeature.CustomRouting.UrlTestRegionGroupTitle,
+                    title = MLang.Override.Draft.UrlTestRegionGroupTitle,
                     items = orderedPresetRegions(),
                     iconUrl = OverridePresetRegion::icon,
                     isChecked = { region -> region in selectedUrlTestRegions },
@@ -171,7 +171,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-fallback-regions") {
                 RoutingSwitchCard(
-                    title = MLang.MetaFeature.CustomRouting.FallbackRegionGroupTitle,
+                    title = MLang.Override.Draft.FallbackRegionGroupTitle,
                     items = orderedPresetRegions(),
                     iconUrl = OverridePresetRegion::icon,
                     isChecked = { region -> region in selectedFallbackRegions },
