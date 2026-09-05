@@ -32,7 +32,7 @@ When adding a profile, select **Kokoro Subscription** and sign in with osu! thro
 
 Keep tokens, subscription URLs, UUIDs, signing keys, and private configurations out of logs and issue reports. See [Kokoro OAuth](docs/KokoroOAuth.md) for the client integration details.
 
-Authenticated users can manage the same ordered Custom Rules used by the Kokoro website from **Settings → Meta Features → Kokoro Custom Rules**. See [Kokoro Custom Rules](docs/KokoroCustomRules.md) for synchronization and conflict behavior.
+Authenticated users can manage the same ordered Custom Rules used by the Kokoro website from **Settings → Kokoro Settings**. See [Kokoro Custom Rules](docs/KokoroCustomRules.md) for synchronization and conflict behavior.
 
 ## Build
 

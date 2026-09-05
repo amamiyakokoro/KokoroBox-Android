@@ -52,7 +52,6 @@ import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.KokoroCustomRulesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
@@ -128,20 +127,6 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                         summary = MLang.TrafficStatistics.EntrySummary,
                         onClick = {
                             navigator.navigate(TrafficStatisticsScreenDestination) {
-                                launchSingleTop = true
-                            }
-                        },
-                    )
-                }
-            }
-            item {
-                Title(MLang.MetaFeature.Section.KokoroCustomRules)
-                Card {
-                    PreferenceArrowItem(
-                        title = MLang.MetaFeature.CustomRules.Title,
-                        summary = MLang.MetaFeature.CustomRules.Summary,
-                        onClick = {
-                            navigator.navigate(KokoroCustomRulesScreenDestination) {
                                 launchSingleTop = true
                             }
                         },

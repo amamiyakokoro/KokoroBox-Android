@@ -4,6 +4,7 @@ Settings = {
 
     Section = {
         UiSettings = "UI Settings"
+        Kokoro = "Kokoro"
         NetworkSettings = "Network Settings"
         DataSettings = "Data Settings"
         More = "More"
@@ -12,6 +13,11 @@ Settings = {
     UiSettings = {
         App = "App"
         AppSummary = "Appearance · Language · Theme"
+    }
+
+    Kokoro = {
+        Title = "Kokoro Settings"
+        Summary = "Custom Rules · Cloud synchronization"
     }
 
     NetworkSettings = {

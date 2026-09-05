@@ -145,6 +145,7 @@ object AppMd3Icons {
 
     object Settings {
         val App: ImageVector = Icons.Rounded.Settings
+        val Kokoro: ImageVector = Icons.Rounded.CloudSync
         val Network: ImageVector = Icons.Rounded.Dns
         val Override: ImageVector = Icons.Rounded.Tune
         val MetaFeatures: ImageVector = Icons.Rounded.Hub

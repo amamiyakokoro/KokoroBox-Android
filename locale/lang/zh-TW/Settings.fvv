@@ -4,6 +4,7 @@ Settings = {
 
     Section = {
         UiSettings = "介面設定"
+        Kokoro = "Kokoro"
         NetworkSettings = "網路設定"
         DataSettings = "資料設定"
         More = "更多"
@@ -12,6 +13,11 @@ Settings = {
     UiSettings = {
         App = "應用程式"
         AppSummary = "外觀 · 語言 · 主題"
+    }
+
+    Kokoro = {
+        Title = "Kokoro 設定"
+        Summary = "自訂規則 · 雲端同步"
     }
 
     NetworkSettings = {

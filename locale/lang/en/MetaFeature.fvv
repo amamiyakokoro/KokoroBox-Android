@@ -4,12 +4,11 @@ MetaFeature = {
 
     Section = {
         ConnectionAndTraffic = "Connections & Traffic"
-        KokoroCustomRules = "Kokoro"
         GeoXUpdate = "GeoX Update"
     }
 
     CustomRules = {
-        Title = "Kokoro Custom Rules"
+        Title = "Kokoro Settings"
         Summary = "Manage server-synced routing rules"
         SignIn = "Sign in with osu!"
         SignInRequired = "Sign in to Kokoro before managing custom rules."

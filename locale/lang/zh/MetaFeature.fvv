@@ -4,12 +4,11 @@ MetaFeature = {
 
     Section = {
         ConnectionAndTraffic = "连接与流量统计"
-        KokoroCustomRules = "Kokoro"
         GeoXUpdate = "GeoX 更新"
     }
 
     CustomRules = {
-        Title = "Kokoro 自定义规则"
+        Title = "Kokoro 设置"
         Summary = "管理与服务器同步的路由规则"
         SignIn = "使用 osu! 登录"
         SignInRequired = "请先登录 Kokoro，再管理自定义规则。"
