@@ -20,10 +20,11 @@
 
 package com.github.yumelira.yumebox.presentation.component.md3
 
+import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -103,7 +104,7 @@ fun YumeMd3Dialog(
             dismissOnClickOutside = true,
         ),
     ) {
-        Box(
+        AppSnackbarSurface(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable(
@@ -112,10 +113,10 @@ fun YumeMd3Dialog(
                     onClick = onDismissRequest,
                 )
                 .padding(horizontal = outsideMargin.width, vertical = outsideMargin.height),
-            contentAlignment = Alignment.Center,
         ) {
             Surface(
                 modifier = modifier
+                    .align(Alignment.Center)
                     .fillMaxWidth()
                     .widthIn(max = UiDp.dp560)
                     .clickable(

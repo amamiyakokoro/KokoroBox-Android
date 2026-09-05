@@ -46,4 +46,38 @@ class ToastDialogBridgeTest {
         ToastDialogBridge.show("  ")
         assertNull(ToastDialogBridge.event.value)
     }
+
+    @Test fun routineFeedbackUsesSnackbarAndPreservesDuration() {
+        showTransientNotice("Saved")
+        val short = requireNotNull(ToastDialogBridge.event.value)
+        assertEquals(NoticePresentation.Snackbar, short.presentation)
+        assertFalse(short.longDuration)
+        ToastDialogBridge.dismiss(short.id)
+        showTransientNotice("Longer feedback", longDuration = true)
+        assertTrue(requireNotNull(ToastDialogBridge.event.value).longDuration)
+    }
+
+    @Test fun explicitDialogsAndCopyableDiagnosticsRemainModal() {
+        showToastDialog("Please read this")
+        assertEquals(NoticePresentation.Dialog, requireNotNull(ToastDialogBridge.event.value).presentation)
+        clearQueue()
+        showTransientNotice("Failure detail", copyable = true)
+        val error = requireNotNull(ToastDialogBridge.event.value)
+        assertEquals(NoticePresentation.Dialog, error.presentation)
+        assertTrue(error.copyable)
+    }
+
+    @Test fun mixedNotificationQueuePreservesMessagesAndPresentation() {
+        showTransientNotice("Saved")
+        val first = requireNotNull(ToastDialogBridge.event.value)
+        showToastDialog("Failure detail", copyable = true)
+        showTransientNotice("Copied")
+        ToastDialogBridge.dismiss(first.id)
+        val second = requireNotNull(ToastDialogBridge.event.value)
+        assertEquals(NoticePresentation.Dialog, second.presentation)
+        ToastDialogBridge.dismiss(second.id)
+        val third = requireNotNull(ToastDialogBridge.event.value)
+        assertEquals("Copied", third.message)
+        assertEquals(NoticePresentation.Snackbar, third.presentation)
+    }
 }

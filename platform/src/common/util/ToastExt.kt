@@ -32,11 +32,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
+enum class NoticePresentation { Dialog, Snackbar }
+
 data class ToastDialogEvent(
     val id: Long,
     val title: String,
     val message: String,
     val copyable: Boolean = false,
+    val presentation: NoticePresentation = NoticePresentation.Dialog,
+    val longDuration: Boolean = false,
 )
 
 object ToastDialogBridge {
@@ -46,7 +50,13 @@ object ToastDialogBridge {
     private val _event = MutableStateFlow<ToastDialogEvent?>(null)
     val event: StateFlow<ToastDialogEvent?> = _event.asStateFlow()
 
-    fun show(message: String, title: String = "", copyable: Boolean = false) {
+    fun show(
+        message: String,
+        title: String = "",
+        copyable: Boolean = false,
+        presentation: NoticePresentation = NoticePresentation.Dialog,
+        longDuration: Boolean = false,
+    ) {
         if (message.isBlank()) return
 
         val event = ToastDialogEvent(
@@ -54,6 +64,8 @@ object ToastDialogBridge {
             title = title,
             message = message,
             copyable = copyable,
+            presentation = if (copyable) NoticePresentation.Dialog else presentation,
+            longDuration = longDuration,
         )
 
         synchronized(lock) {
@@ -81,14 +93,18 @@ fun showToastDialog(message: String, title: String = "", copyable: Boolean = fal
 }
 
 fun Context.toast(message: String, duration: Int = Toast.LENGTH_SHORT, copyable: Boolean = false) {
-    @Suppress("UNUSED_VARIABLE")
-    val ignored = duration
-    showToastDialog(message, copyable = copyable)
+    showTransientNotice(message, longDuration = duration == Toast.LENGTH_LONG, copyable = copyable)
+}
+
+/** Routine feedback is transient; diagnostics explicitly requesting Copy remain modal. */
+fun showTransientNotice(message: String, longDuration: Boolean = false, copyable: Boolean = false) {
+    ToastDialogBridge.show(message, copyable = copyable,
+        presentation = NoticePresentation.Snackbar, longDuration = longDuration)
 }
 
 @Composable
 fun ShowToast(message: String) {
     LaunchedEffect(message) {
-        showToastDialog(message)
+        showTransientNotice(message)
     }
 }

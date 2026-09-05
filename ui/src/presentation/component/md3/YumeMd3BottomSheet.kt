@@ -20,6 +20,8 @@
 
 package com.github.yumelira.yumebox.presentation.component.md3
 
+import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
+
 import android.graphics.Color as AndroidColor
 import android.os.Build
 import android.view.View
@@ -264,27 +266,29 @@ fun YumeMd3ActionBottomSheet(
                 backgroundColor = resolvedBackgroundColor,
                 enabled = defaultWindowInsetsPadding,
             )
-        Box(
-            modifier = if (contentScrollEnabled) {
-                contentModifier.verticalScroll(rememberScrollState())
-            } else {
-                contentModifier
-            },
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(
-                        if (defaultWindowInsetsPadding && !contentHandlesBottomInset) {
-                            Modifier
-                                .padding(bottom = insideMargin.height)
-                                .windowInsetsPadding(bottomWindowInsets)
-                        } else {
-                            Modifier
-                        },
-                    ),
+        AppSnackbarSurface(enabled = show) {
+            Box(
+                modifier = if (contentScrollEnabled) {
+                    contentModifier.verticalScroll(rememberScrollState())
+                } else {
+                    contentModifier
+                },
             ) {
-                content()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (defaultWindowInsetsPadding && !contentHandlesBottomInset) {
+                                Modifier
+                                    .padding(bottom = insideMargin.height)
+                                    .windowInsetsPadding(bottomWindowInsets)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                ) {
+                    content()
+                }
             }
         }
     }

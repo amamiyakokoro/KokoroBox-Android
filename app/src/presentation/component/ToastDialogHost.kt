@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.github.yumelira.yumebox.common.util.ToastDialogBridge
 import com.github.yumelira.yumebox.common.util.ToastDialogEvent
+import com.github.yumelira.yumebox.common.util.NoticePresentation
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import dev.oom_wg.purejoy.mlang.MLang
 
@@ -58,7 +59,7 @@ fun ToastDialogHost() {
     val showDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(event) {
-        if (event != null) {
+        if (event?.presentation == NoticePresentation.Dialog) {
             eventSnapshot = event
             showDialog.value = true
         }

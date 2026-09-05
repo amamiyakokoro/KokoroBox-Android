@@ -54,6 +54,7 @@ import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
+import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
 import com.github.yumelira.yumebox.presentation.component.rememberStartupBiometricGateState
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
@@ -198,12 +199,14 @@ class MainActivity : FragmentActivity() {
                             Surface(
                                 modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
                             ) {
-                                DestinationsNavHost(
-                                    navGraph = NavGraphs.root,
-                                    navController = navController,
-                                    defaultTransitions = NavigationTransitions.defaultStyle,
-                                )
-                                ToastDialogHost()
+                                AppSnackbarSurface(Modifier.fillMaxSize()) {
+                                    DestinationsNavHost(
+                                        navGraph = NavGraphs.root,
+                                        navController = navController,
+                                        defaultTransitions = NavigationTransitions.defaultStyle,
+                                    )
+                                    ToastDialogHost()
+                                }
                             }
                         }
                     }
