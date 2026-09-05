@@ -187,7 +187,7 @@ fun MainScreen(
                 HorizontalPager(
                     modifier = Modifier.fillMaxSize(),
                     state = mainPagerState.pagerState,
-                    beyondViewportPageCount = 1,
+                    beyondViewportPageCount = 3,
                     flingBehavior = pagerFlingBehavior,
                     userScrollEnabled = true,
                     overscrollEffect = null,
@@ -232,7 +232,7 @@ fun MainScreen(
 }
 
 /**
- * HorizontalPager preloads neighboring pages. Without a page-scoped lifecycle,
+ * HorizontalPager keeps all four root pages composed. Without a page-scoped lifecycle,
  * lifecycle-aware flow collection still treats every hidden page as STARTED because they
  * all inherit the Activity lifecycle. Cap hidden pages at CREATED so their UI collectors,
  * animations, and page-only sync jobs stop while service-owned runtime collection continues.
