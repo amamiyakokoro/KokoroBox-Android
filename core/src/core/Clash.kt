@@ -46,6 +46,9 @@ object Clash {
     private val ConnectionJson = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
+        // Mihomo returns `connections: null` while no connection list is available.
+        // Treat that value as absent so ConnectionSnapshot's empty-list default is used.
+        coerceInputValues = true
     }
     private val trafficNowCache = TimedQueryCache<Long>()
     private val trafficTotalCache = TimedQueryCache<Long>()
@@ -108,12 +111,12 @@ object Clash {
 
     fun queryConnections(): ConnectionSnapshot {
         return connectionsCache.getOrQuery(CONNECTION_QUERY_CACHE_MILLIS) {
-            ConnectionJson.decodeFromString(
-                ConnectionSnapshot.serializer(),
-                Bridge.nativeQueryConnections(),
-            )
+            decodeConnectionSnapshot(Bridge.nativeQueryConnections())
         }
     }
+
+    internal fun decodeConnectionSnapshot(payload: String): ConnectionSnapshot =
+        ConnectionJson.decodeFromString(ConnectionSnapshot.serializer(), payload)
 
     fun closeConnection(id: String): Boolean {
         return Bridge.nativeCloseConnection(id).also { closed ->

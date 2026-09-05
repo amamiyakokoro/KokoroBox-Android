@@ -32,7 +32,15 @@ android {
     }
 }
 
+extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
+    sourceSets.getByName("test").kotlin.directories.apply {
+        clear()
+        add("test")
+    }
+}
+
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel:${gropify.dep.version.lifecycle}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${gropify.dep.version.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
@@ -40,5 +48,3 @@ dependencies {
     implementation("androidx.annotation:annotation-jvm:${gropify.dep.version.annotationJvm}")
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
 }
-
-
