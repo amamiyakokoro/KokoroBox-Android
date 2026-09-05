@@ -137,7 +137,7 @@ fun SettingPager(
             result.onSuccess {
                 appContext.toast(MLang.AppSettings.Backup.ExportSuccess)
             }.onFailure { throwable ->
-                appContext.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+                appContext.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError), copyable = true)
             }
         }
     }
@@ -149,7 +149,7 @@ fun SettingPager(
             result.onSuccess {
                 appContext.toast(MLang.AppSettings.Backup.ImportSuccess)
             }.onFailure { throwable ->
-                appContext.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError))
+                appContext.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError), copyable = true)
             }
         }
     }

@@ -47,6 +47,7 @@ Component = {
     }
 
     Button = {
+        Ok = "確定"
         Cancel = "取消"
         Confirm = "確定"
         Clear = "清除"

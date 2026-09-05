@@ -32,7 +32,15 @@ android {
     }
 }
 
+extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
+    sourceSets.getByName("test").kotlin.directories.apply {
+        clear()
+        add("test")
+    }
+}
+
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     val composeBom = platform("androidx.compose:compose-bom:${gropify.dep.version.composeBom}")
     implementation(composeBom)
     implementation("androidx.compose.runtime:runtime")
@@ -41,5 +49,3 @@ dependencies {
     implementation("com.android.tools.build:apksig:${gropify.dep.version.apksig}")
     implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
 }
-
-

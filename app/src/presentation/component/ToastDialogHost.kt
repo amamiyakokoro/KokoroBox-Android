@@ -30,11 +30,13 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,7 +65,9 @@ fun ToastDialogHost() {
     }
 
     eventSnapshot?.let { snapshot ->
-        val localizedTitle = snapshot.title.ifBlank { MLang.Component.Message.Hint }
+        val localizedTitle = snapshot.title.ifBlank {
+            if (snapshot.copyable) MLang.Component.Message.Error else MLang.Component.Message.Hint
+        }
         AppDialog(
             show = showDialog.value,
             modifier = Modifier,
@@ -80,30 +84,33 @@ fun ToastDialogHost() {
             insideMargin = AppDialogDefaults.insideMargin,
             defaultWindowInsetsPadding = true,
             content = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtleStrong),
-                            shape = RoundedCornerShape(radii.radius16),
-                        )
-                        .clickable {
-                            val clipboardManager =
-                                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val textToCopy = snapshot.message.ifBlank { localizedTitle }
-                            clipboardManager.setPrimaryClip(
-                                ClipData.newPlainText(localizedTitle, textToCopy)
+                Column {
+                    if (snapshot.copyable) {
+                        TextButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboard.setPrimaryClip(ClipData.newPlainText(localizedTitle, snapshot.message))
+                            },
+                        ) { Text(MLang.Component.Button.Copy) }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = opacity.subtleStrong),
+                                shape = RoundedCornerShape(radii.radius16),
                             )
-                            showDialog.value = false
-                        }
-                        .padding(vertical = spacing.space14),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = MLang.Component.Button.Copy,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                            .clickable { showDialog.value = false }
+                            .padding(vertical = spacing.space14),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = MLang.Component.Button.Ok,
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                 }
             })
     }

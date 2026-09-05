@@ -257,7 +257,7 @@ internal fun AddProfileSheet(
     LaunchedEffect(uiState.error) {
         val errorMessage = uiState.error
         if (errorMessage != null) {
-            context.toast(errorMessage, Toast.LENGTH_LONG)
+            context.toast(errorMessage, Toast.LENGTH_LONG, copyable = true)
             if (isDownloading) {
                 isDownloading = false
                 error = errorMessage

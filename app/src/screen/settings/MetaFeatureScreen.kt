@@ -37,6 +37,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.model.GeoFileType
 import com.github.yumelira.yumebox.core.model.GeoXItem
@@ -45,6 +48,7 @@ import com.github.yumelira.yumebox.core.util.runtimeHomeDir
 import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.data.controller.GeoXUpdateRecord
 import com.github.yumelira.yumebox.presentation.component.*
+import com.github.yumelira.yumebox.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
@@ -205,12 +209,14 @@ private fun GeoXDownloadSheet(
     var isDownloading by remember { mutableStateOf(false) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var downloadSession by remember { mutableIntStateOf(0) }
+    var completedCounts by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     fun resetDownloadState() {
         downloadSession++
         downloadJob?.cancel()
         downloadJob = null
         isDownloading = false
+        completedCounts = null
         selectedItems.clear()
         progressItems.clear()
     }
@@ -247,6 +253,7 @@ private fun GeoXDownloadSheet(
                         return@AppBottomSheetConfirmAction
                     }
                     isDownloading = true
+                    completedCounts = null
                     val currentSession = ++downloadSession
                     progressItems.clear()
                     itemsToDownload.forEach { item ->
@@ -268,7 +275,7 @@ private fun GeoXDownloadSheet(
                                 isDownloading = false
                                 downloadJob = null
                                 onUpdateRecordsChanged(geoXDataController.getGeoFileUpdateRecords())
-                                context.toast(MLang.MetaFeature.Download.DownloadComplete.format(successCount, totalCount))
+                                completedCounts = successCount to totalCount
                             }
                         },
                     )
@@ -277,6 +284,16 @@ private fun GeoXDownloadSheet(
         },
         content = {
             Column {
+                completedCounts?.let { (success, total) ->
+                    Text(
+                        text = MLang.MetaFeature.Download.DownloadComplete.format(success, total),
+                        modifier = Modifier
+                            .padding(UiDp.dp16)
+                            .semantics { liveRegion = LiveRegionMode.Polite },
+                        color = if (success == total) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.error,
+                    )
+                }
                 geoXItems.forEach { item ->
                     PreferenceListItem(
                         title = item.title,

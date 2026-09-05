@@ -89,7 +89,7 @@ fun HomePager(
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
-            context.toast(it, Toast.LENGTH_LONG)
+            context.toast(it, Toast.LENGTH_LONG, copyable = true)
             homeViewModel.consumeError()
         }
     }

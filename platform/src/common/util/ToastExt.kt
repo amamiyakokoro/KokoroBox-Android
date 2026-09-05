@@ -36,6 +36,7 @@ data class ToastDialogEvent(
     val id: Long,
     val title: String,
     val message: String,
+    val copyable: Boolean = false,
 )
 
 object ToastDialogBridge {
@@ -45,13 +46,14 @@ object ToastDialogBridge {
     private val _event = MutableStateFlow<ToastDialogEvent?>(null)
     val event: StateFlow<ToastDialogEvent?> = _event.asStateFlow()
 
-    fun show(message: String, title: String = "") {
+    fun show(message: String, title: String = "", copyable: Boolean = false) {
         if (message.isBlank()) return
 
         val event = ToastDialogEvent(
             id = nextId.getAndIncrement(),
             title = title,
             message = message,
+            copyable = copyable,
         )
 
         synchronized(lock) {
@@ -74,14 +76,14 @@ object ToastDialogBridge {
     }
 }
 
-fun showToastDialog(message: String, title: String = "") {
-    ToastDialogBridge.show(message = message, title = title)
+fun showToastDialog(message: String, title: String = "", copyable: Boolean = false) {
+    ToastDialogBridge.show(message = message, title = title, copyable = copyable)
 }
 
-fun Context.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+fun Context.toast(message: String, duration: Int = Toast.LENGTH_SHORT, copyable: Boolean = false) {
     @Suppress("UNUSED_VARIABLE")
     val ignored = duration
-    showToastDialog(message)
+    showToastDialog(message, copyable = copyable)
 }
 
 @Composable

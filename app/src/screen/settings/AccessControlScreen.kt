@@ -145,7 +145,7 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
                         )
                     }
 
-                    is AccessControlViewModel.AccessControlUiEffect.ShowError -> context.toast(effect.message)
+                    is AccessControlViewModel.AccessControlUiEffect.ShowError -> context.toast(effect.message, copyable = true)
                     is AccessControlViewModel.AccessControlUiEffect.ShowMessage -> context.toast(effect.message)
                 }
             }
