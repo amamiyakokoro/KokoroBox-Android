@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -307,29 +308,53 @@ private fun RuleCard(
     onMoveDown: () -> Unit,
 ) {
     Card {
-        Column(modifier = Modifier.fillMaxWidth().padding(UiDp.dp12)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(rule.type, style = MaterialTheme.typography.titleMedium)
-                    rule.payload?.takeIf { it.isNotEmpty() }?.let {
-                        Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
+            verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = rule.type,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                if (canMoveUp) {
+                    IconButton(onClick = onMoveUp) {
+                        Icon(AppMd3Icons.Action.MoveUp, MLang.MetaFeature.CustomRules.MoveUp)
                     }
-                    Text(rule.target, color = MaterialTheme.colorScheme.primary)
                 }
-                IconButton(onClick = onMoveUp, enabled = canMoveUp) {
-                    Icon(AppMd3Icons.Action.MoveUp, MLang.MetaFeature.CustomRules.MoveUp)
+                if (canMoveDown) {
+                    IconButton(onClick = onMoveDown) {
+                        Icon(AppMd3Icons.Action.MoveDown, MLang.MetaFeature.CustomRules.MoveDown)
+                    }
                 }
-                IconButton(onClick = onMoveDown, enabled = canMoveDown) {
-                    Icon(AppMd3Icons.Action.MoveDown, MLang.MetaFeature.CustomRules.MoveDown)
-                }
-            }
-            Row(modifier = Modifier.align(Alignment.End)) {
                 IconButton(onClick = onEdit) {
                     Icon(AppMd3Icons.Action.Edit, MLang.MetaFeature.CustomRules.EditRule)
                 }
                 IconButton(onClick = onDelete) {
                     Icon(AppMd3Icons.Action.Delete, MLang.MetaFeature.CustomRules.DeleteRule)
                 }
+            }
+            rule.payload?.takeIf { it.isNotEmpty() }?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                shape = MaterialTheme.shapes.small,
+            ) {
+                Text(
+                    text = rule.target,
+                    modifier = Modifier.padding(horizontal = UiDp.dp8, vertical = UiDp.dp4),
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         }
     }

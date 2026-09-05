@@ -26,7 +26,6 @@ import com.github.yumelira.yumebox.presentation.theme.UiDp
 import android.Manifest
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.OpenableColumns
 import android.widget.Toast
@@ -532,25 +531,6 @@ internal fun AddProfileSheet(
                         kokoroOptions = kokoroOptions,
                         kokoroSubscriptionOptions = kokoroSubscriptionOptions,
                         onKokoroOptionsChange = { kokoroOptions = it },
-                        onKokoroLogin = {
-                            scope.launch {
-                                var loginUrl: String? = null
-                                try {
-                                    loginUrl = profilesViewModel.beginKokoroLogin()
-                                    context.startActivity(
-                                        Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
-                                            addCategory(Intent.CATEGORY_BROWSABLE)
-                                        },
-                                    )
-                                } catch (e: Exception) {
-                                    loginUrl?.let { profilesViewModel.cancelKokoroLogin(it) }
-                                    if (e is kotlinx.coroutines.CancellationException) throw e
-                                    error = MLang.ProfilesPage.Kokoro.LoginFailed
-                                }
-                            }
-                        },
-                        onKokoroLogout = { profilesViewModel.logoutKokoroAccount() },
-                        onKokoroRetry = { profilesViewModel.refreshKokoroAccount() },
                     )
                 }
             }
@@ -645,9 +625,6 @@ private fun ProfileFormContent(
     kokoroOptions: KokoroConfigOptions,
     kokoroSubscriptionOptions: KokoroSubscriptionOptions,
     onKokoroOptionsChange: (KokoroConfigOptions) -> Unit,
-    onKokoroLogin: () -> Unit,
-    onKokoroLogout: () -> Unit,
-    onKokoroRetry: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -680,9 +657,6 @@ private fun ProfileFormContent(
                     availableOptions = kokoroSubscriptionOptions,
                     error = error,
                     onSettingsChange = onKokoroOptionsChange,
-                    onLogin = onKokoroLogin,
-                    onLogout = onKokoroLogout,
-                    onRetry = onKokoroRetry,
                 )
 
                 else -> ManualProfileContent(

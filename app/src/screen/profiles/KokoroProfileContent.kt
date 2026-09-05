@@ -57,9 +57,6 @@ internal fun KokoroProfileContent(
     availableOptions: KokoroSubscriptionOptions,
     error: String,
     onSettingsChange: (MihomoSubscriptionSettings) -> Unit,
-    onLogin: () -> Unit,
-    onLogout: () -> Unit,
-    onRetry: () -> Unit,
 ) {
     val authenticated = authState as? KokoroAuthState.Authenticated
     val subscriptions = authenticated?.account?.subscriptions.orEmpty()
@@ -74,20 +71,26 @@ internal fun KokoroProfileContent(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
     ) {
-        SectionLabel(MLang.ProfilesPage.Kokoro.Account)
-        KokoroAccountCard(
-            authState = authState,
-            onLogin = onLogin,
-            onLogout = onLogout,
-            onRetry = onRetry,
-            subscriptionPlan = normalizedSettings.plan,
-        )
+        when {
+            authenticated != null && subscriptions.isNotEmpty() -> {
+                MihomoSubscriptionSettingsContent(
+                    settings = normalizedSettings,
+                    availableOptions = effectiveOptions,
+                    onSettingsChange = onSettingsChange,
+                )
+            }
 
-        if (authenticated != null && subscriptions.isNotEmpty()) {
-            MihomoSubscriptionSettingsContent(
-                settings = normalizedSettings,
-                availableOptions = effectiveOptions,
-                onSettingsChange = onSettingsChange,
+            authenticated != null -> KokoroSubscriptionNotice(
+                text = MLang.ProfilesPage.Kokoro.NoSubscription,
+            )
+
+            authState == KokoroAuthState.Checking -> KokoroSubscriptionNotice(
+                text = MLang.ProfilesPage.Kokoro.Checking,
+                loading = true,
+            )
+
+            else -> KokoroSubscriptionNotice(
+                text = MLang.ProfilesPage.Kokoro.SignInFromSettings,
             )
         }
 
@@ -95,6 +98,29 @@ internal fun KokoroProfileContent(
             Text(
                 text = error,
                 color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun KokoroSubscriptionNotice(
+    text: String,
+    loading: Boolean = false,
+) {
+    Card {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
+        ) {
+            if (loading) {
+                Md3EIndeterminateCircularWavyProgressIndicator()
+            }
+            Text(
+                text = text,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }

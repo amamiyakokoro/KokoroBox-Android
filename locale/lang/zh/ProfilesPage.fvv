@@ -40,6 +40,7 @@ ProfilesPage = {
         Retry = "重试"
         LoginRequired = "请先登录并选择有效的订阅"
         LoginFailed = "登录失败或已取消"
+        SignInFromSettings = "请先前往“设置 → Kokoro 设置”登录，再添加 Kokoro Subscription。"
         NoSubscription = "此账号没有有效的 Proxy Subscription。"
         Subscription = "订阅"
         SubscriptionNumber = "订阅 %s"
