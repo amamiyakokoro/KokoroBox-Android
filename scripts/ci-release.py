@@ -120,10 +120,24 @@ def sync_kernel():
     ], check=True)
 
 
+def find_release_output():
+    root = Path("app/build/outputs/apk")
+    candidates = []
+    for metadata in root.rglob("output-metadata.json") if root.is_dir() else ():
+        try:
+            manifest = json.loads(metadata.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if manifest.get("variantName") == "release":
+            candidates.append((metadata.parent, manifest))
+    if len(candidates) != 1:
+        raise ValueError(f"Expected one Release APK metadata file, found {len(candidates)}")
+    return candidates[0]
+
+
 def verify_and_stage(apksigner, expected_fingerprint=""):
     config = properties("gradle.properties")
-    directory = Path("app/build/outputs/apk/release")
-    manifest = json.loads((directory / "output-metadata.json").read_text())
+    directory, manifest = find_release_output()
     elements = manifest["elements"]
     if manifest["variantName"] != "release" or len(elements) != 1:
         raise ValueError("Expected exactly one Release APK")

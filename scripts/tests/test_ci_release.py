@@ -3,6 +3,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
 import stat
 import subprocess
 import tempfile
@@ -109,8 +110,9 @@ class ReleaseTests(unittest.TestCase):
                     ci.metadata("v0.5.5")
                 output.assert_any_call("sdk", expected)
 
-    def make_apk(self, missing_lib=False, extra_abi=False):
-        directory = Path("app/build/outputs/apk/release")
+    def make_apk(self, missing_lib=False, extra_abi=False, nested=False):
+        directory = Path("app/build/outputs/apk/release/arm64-v8a" if nested
+                         else "app/build/outputs/apk/release")
         directory.mkdir(parents=True)
         name = "KokoroBox-v0.5.5-arm64-v8a-release.apk"
         with zipfile.ZipFile(directory / name, "w") as archive:
@@ -183,6 +185,24 @@ class ReleaseTests(unittest.TestCase):
                 self.assertRaisesRegex(ValueError, "missing or empty"):
             ci.verify_and_stage("apksigner")
         run.assert_not_called()
+
+    def test_finds_agp_single_abi_nested_release_output(self):
+        name = self.make_apk(nested=True)
+        result = subprocess.CompletedProcess([], 0, self.certificate(), "")
+        with patch.object(ci.subprocess, "run", return_value=result):
+            ci.verify_and_stage("apksigner")
+        self.assertTrue((Path("publish") / name).is_file())
+
+    def test_rejects_missing_or_ambiguous_release_metadata(self):
+        with self.assertRaisesRegex(ValueError, "found 0"):
+            ci.find_release_output()
+        self.make_apk()
+        nested = Path("app/build/outputs/apk/other")
+        nested.mkdir(parents=True)
+        shutil.copyfile("app/build/outputs/apk/release/output-metadata.json",
+                        nested / "output-metadata.json")
+        with self.assertRaisesRegex(ValueError, "found 2"):
+            ci.find_release_output()
 
     def test_cleanup_is_idempotent(self):
         with patch.dict(os.environ, self.env), patch.object(ci.sys, "argv", ["ci-release.py", "cleanup"]):
