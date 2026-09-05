@@ -50,13 +50,6 @@ Build an arm64 release APK with:
 
 Never commit a keystore or `signing.properties`.
 
-## Documentation
-
-- [Kokoro OAuth and PKCE](docs/KokoroOAuth.md)
-- [Kokoro Custom Rules](docs/KokoroCustomRules.md)
-- [Release signing and CI](docs/ReleaseCI.md)
-- [Third-party components](docs/ThirdParty.md)
-
 ## Project
 
 KokoroBox is based on [YumeBox Material Design](https://github.com/Yizuka17/YumeBox-MaterialDesign), which continues [YumeBox](https://github.com/YumeLira/YumeBox).
