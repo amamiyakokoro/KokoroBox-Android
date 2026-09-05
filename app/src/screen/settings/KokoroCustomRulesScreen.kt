@@ -41,6 +41,9 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
 import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
 import com.github.yumelira.yumebox.presentation.component.AppDialog
+import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
 import com.github.yumelira.yumebox.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
@@ -72,7 +75,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     var pendingAction by remember { mutableStateOf<PendingRulesAction?>(null) }
     var editingRuleIndex by remember { mutableIntStateOf(-1) }
-    var showRuleDialog by remember { mutableStateOf(false) }
+    var showRuleSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.load() }
     LaunchedEffect(state.status) {
@@ -117,6 +120,18 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                         onClick = { requestAction(PendingRulesAction.Reload) },
                     ) {
                         Icon(AppMd3Icons.Action.Refresh, MLang.MetaFeature.CustomRules.Refresh)
+                    }
+                    IconButton(
+                        enabled = state.authState is KokoroAuthState.Authenticated &&
+                            state.defaultRuleSet != null &&
+                            state.draftRules.size < state.options.maxRulesPerSet &&
+                            !state.loading && !state.saving,
+                        onClick = {
+                            editingRuleIndex = -1
+                            showRuleSheet = true
+                        },
+                    ) {
+                        Icon(AppMd3Icons.Action.Add, MLang.MetaFeature.CustomRules.AddRule)
                     }
                     IconButton(
                         enabled = state.dirty && !state.saving && state.defaultRuleSet != null,
@@ -179,24 +194,13 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                                     canMoveDown = index < state.draftRules.lastIndex,
                                     onEdit = {
                                         editingRuleIndex = index
-                                        showRuleDialog = true
+                                        showRuleSheet = true
                                     },
                                     onDelete = { viewModel.deleteRule(index) },
                                     onMoveUp = { viewModel.moveRule(index, -1) },
                                     onMoveDown = { viewModel.moveRule(index, 1) },
                                 )
                             }
-                        }
-                        item("add-rule") {
-                            Button(
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = state.defaultRuleSet != null &&
-                                    state.draftRules.size < state.options.maxRulesPerSet && !state.saving,
-                                onClick = {
-                                    editingRuleIndex = -1
-                                    showRuleDialog = true
-                                },
-                            ) { Text(MLang.MetaFeature.CustomRules.AddRule) }
                         }
                         item("bottom-space") { Spacer(Modifier.height(UiDp.dp32)) }
                     }
@@ -219,15 +223,15 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
         }
     }
 
-    RuleEditorDialog(
-        show = showRuleDialog,
+    RuleEditorSheet(
+        show = showRuleSheet,
         options = state.options,
         initialRule = state.draftRules.getOrNull(editingRuleIndex),
-        onDismiss = { showRuleDialog = false },
+        onDismiss = { showRuleSheet = false },
         onConfirm = { rule ->
             if (editingRuleIndex >= 0) viewModel.updateRule(editingRuleIndex, rule)
             else viewModel.addRule(rule)
-            showRuleDialog = false
+            showRuleSheet = false
         },
     )
 
@@ -329,7 +333,7 @@ private fun RuleCard(
 }
 
 @Composable
-private fun RuleEditorDialog(
+private fun RuleEditorSheet(
     show: Boolean,
     options: KokoroCustomRulesOptions,
     initialRule: KokoroCustomRuleInput?,
@@ -354,60 +358,26 @@ private fun RuleEditorDialog(
     var target by remember(show, initialRule, targets) {
         mutableStateOf(initialRule?.target?.takeIf { it in targets } ?: defaultTarget)
     }
+    val canConfirm = type in options.ruleTypes && target in options.targets &&
+        (type == "MATCH" || payload.isNotEmpty()) &&
+        (type != "RULE-SET" || payload in providers)
 
-    AppDialog(
+    AppActionBottomSheet(
         show = show,
         title = if (initialRule == null) MLang.MetaFeature.CustomRules.AddRule
         else MLang.MetaFeature.CustomRules.EditRule,
         onDismissRequest = onDismiss,
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
-            Card {
-                YumeMd3DropdownPreference(
-                    title = MLang.MetaFeature.CustomRules.Type,
-                    items = types,
-                    selectedIndex = types.indexOf(type).coerceAtLeast(0),
-                    onSelectedIndexChange = { index ->
-                        type = types.getOrElse(index) { defaultType }
-                        when (type) {
-                            "MATCH" -> payload = ""
-                            "RULE-SET" -> if (payload !in providers) {
-                                payload = providers.firstOrNull().orEmpty()
-                            }
-                        }
-                    },
-                )
-                when (type) {
-                    "MATCH" -> Text(
-                        text = MLang.MetaFeature.CustomRules.MatchPayloadHint,
-                        modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    "RULE-SET" -> YumeMd3DropdownPreference(
-                        title = MLang.MetaFeature.CustomRules.Provider,
-                        items = providers,
-                        selectedIndex = providers.indexOf(payload).coerceAtLeast(0),
-                        onSelectedIndexChange = { index -> payload = providers.getOrNull(index).orEmpty() },
-                        enabled = providers.isNotEmpty(),
-                    )
-                    else -> YumeMd3OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
-                        value = payload,
-                        onValueChange = { if (it.length <= options.maxPayloadLength) payload = it },
-                        label = MLang.MetaFeature.CustomRules.Payload,
-                        singleLine = true,
-                    )
-                }
-                YumeMd3DropdownPreference(
-                    title = MLang.MetaFeature.CustomRules.Target,
-                    items = targets,
-                    selectedIndex = targets.indexOf(target).coerceAtLeast(0),
-                    onSelectedIndexChange = { index -> target = targets.getOrElse(index) { defaultTarget } },
-                )
-            }
-            DialogButtonRow(
-                onCancel = onDismiss,
-                onConfirm = {
+        startAction = {
+            AppBottomSheetCloseAction(
+                onClick = onDismiss,
+                contentDescription = MLang.MetaFeature.CustomRules.Cancel,
+            )
+        },
+        endAction = {
+            AppBottomSheetConfirmAction(
+                enabled = canConfirm,
+                contentDescription = MLang.MetaFeature.CustomRules.Confirm,
+                onClick = {
                     onConfirm(
                         KokoroCustomRuleInput(
                             type = type,
@@ -416,12 +386,52 @@ private fun RuleEditorDialog(
                         ),
                     )
                 },
-                cancelText = MLang.MetaFeature.CustomRules.Cancel,
-                confirmText = MLang.MetaFeature.CustomRules.Confirm,
-                confirmEnabled = type in options.ruleTypes && target in options.targets &&
-                    (type == "MATCH" || payload.isNotEmpty()) &&
-                    (type != "RULE-SET" || payload in providers),
+            )
+        },
+    ) {
+        Card {
+            YumeMd3DropdownPreference(
+                title = MLang.MetaFeature.CustomRules.Type,
+                items = types,
+                selectedIndex = types.indexOf(type).coerceAtLeast(0),
+                onSelectedIndexChange = { index ->
+                    type = types.getOrElse(index) { defaultType }
+                    when (type) {
+                        "MATCH" -> payload = ""
+                        "RULE-SET" -> if (payload !in providers) {
+                            payload = providers.firstOrNull().orEmpty()
+                        }
+                    }
+                },
+            )
+            when (type) {
+                "MATCH" -> Text(
+                    text = MLang.MetaFeature.CustomRules.MatchPayloadHint,
+                    modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                "RULE-SET" -> YumeMd3DropdownPreference(
+                    title = MLang.MetaFeature.CustomRules.Provider,
+                    items = providers,
+                    selectedIndex = providers.indexOf(payload).coerceAtLeast(0),
+                    onSelectedIndexChange = { index -> payload = providers.getOrNull(index).orEmpty() },
+                    enabled = providers.isNotEmpty(),
+                )
+                else -> YumeMd3OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
+                    value = payload,
+                    onValueChange = { if (it.length <= options.maxPayloadLength) payload = it },
+                    label = MLang.MetaFeature.CustomRules.Payload,
+                    singleLine = true,
+                )
+            }
+            YumeMd3DropdownPreference(
+                title = MLang.MetaFeature.CustomRules.Target,
+                items = targets,
+                selectedIndex = targets.indexOf(target).coerceAtLeast(0),
+                onSelectedIndexChange = { index -> target = targets.getOrElse(index) { defaultTarget } },
             )
         }
+        Spacer(Modifier.height(UiDp.dp16))
     }
 }
