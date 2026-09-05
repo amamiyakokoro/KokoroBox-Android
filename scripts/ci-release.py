@@ -200,10 +200,23 @@ def main():
         raise ValueError("Unknown release command")
 
 
+def failure_message(error):
+    if isinstance(error, ValueError):
+        return f"Release step failed: {error}"
+    if isinstance(error, KeyError):
+        return f"Release step failed: required metadata field {error} is missing"
+    if isinstance(error, OSError):
+        detail = error.strerror or type(error).__name__
+        return f"Release step failed: operating system error {error.errno}: {detail}"
+    if isinstance(error, subprocess.CalledProcessError):
+        program = Path(error.cmd[0]).name if isinstance(error.cmd, (list, tuple)) else "build command"
+        return f"Release step failed: {program} exited with status {error.returncode}"
+    return "Release step failed"
+
+
 if __name__ == "__main__":
     try:
         main()
-    except (ValueError, OSError, KeyError, subprocess.CalledProcessError) as error:
-        print(f"Release step failed: {error}" if isinstance(error, ValueError)
-              else "Release step failed; see preceding tool output", file=sys.stderr)
+    except (ValueError, KeyError, OSError, subprocess.CalledProcessError) as error:
+        print(failure_message(error), file=sys.stderr)
         sys.exit(1)

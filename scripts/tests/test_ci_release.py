@@ -191,6 +191,13 @@ class ReleaseTests(unittest.TestCase):
             ci.main()
             self.assertFalse(ci.keystore_path().exists())
 
+    def test_main_reports_safe_os_error_without_path_or_secret(self):
+        secret_path = "/private/keystore/private-secret.jks"
+        error = FileNotFoundError(2, "No such file or directory", secret_path)
+        rendered = ci.failure_message(error)
+        self.assertIn("operating system error 2", rendered)
+        self.assertNotIn(secret_path, rendered)
+
 
 if __name__ == "__main__":
     unittest.main()

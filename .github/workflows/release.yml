@@ -103,6 +103,8 @@ jobs:
           SDK_VERSION: ${{ steps.source.outputs.sdk }}
         run: |
           sdkmanager "platforms;android-$SDK_VERSION" "build-tools;37.0.0" "ndk;$NDK_VERSION" "cmake;3.22.1"
+          test -x "$ANDROID_HOME/build-tools/37.0.0/apksigner"
+          "$ANDROID_HOME/build-tools/37.0.0/apksigner" version
           cargo install cargo-ndk --locked
 
       - name: Checkout configured Mihomo release
