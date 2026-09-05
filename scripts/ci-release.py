@@ -90,23 +90,46 @@ def signing_environment(env, store):
         raise ValueError("Release keystore was not restored")
     result = dict(env)
     result.pop("SIGNING_KEYSTORE_BASE64", None)
-    for prop, value in {
-        "signing.store.file": str(store),
-        "signing.store.password": env["SIGNING_STORE_PASSWORD"],
-        "signing.key.alias": env["SIGNING_KEY_ALIAS"],
-        "signing.key.password": env["SIGNING_KEY_PASSWORD"],
-    }.items():
-        result[f"ORG_GRADLE_PROJECT_{prop}"] = value
     return result
 
 
-def build():
-    # Environment properties work with existing Gradle signing config, including old tags.
-    env = signing_environment(os.environ, keystore_path())
+def build_unsigned():
     subprocess.run([
         "./gradlew", "--no-daemon", "--no-configuration-cache", "--no-build-cache",
         "--console=plain", "-Pandroid.injected.build.abi=arm64-v8a", ":app:assembleRelease",
-    ], env=env, check=True)
+    ], check=True)
+
+
+def sign_release_apk(apksigner):
+    """Sign the packaged APK explicitly instead of relying on AGP signing wiring."""
+    env = signing_environment(os.environ, keystore_path())
+    apk, _ = find_release_apk(properties("gradle.properties"))
+    signed = Path(os.environ["RUNNER_TEMP"]) / "kokorobox-signed.apk"
+    signed.unlink(missing_ok=True)
+    try:
+        subprocess.run([
+            apksigner, "sign",
+            "--ks", str(keystore_path()),
+            "--ks-key-alias", env["SIGNING_KEY_ALIAS"],
+            "--ks-pass", "env:SIGNING_STORE_PASSWORD",
+            "--key-pass", "env:SIGNING_KEY_PASSWORD",
+            "--debuggable-apk-permitted", "false",
+            "--v4-signing-enabled", "false",
+            "--out", str(signed),
+            str(apk),
+        ], env=env, check=True)
+        if not signed.is_file() or signed.stat().st_size == 0:
+            raise ValueError("apksigner did not produce a signed APK")
+        os.replace(signed, apk)
+    finally:
+        signed.unlink(missing_ok=True)
+
+
+def build(apksigner):
+    # The selected tag may use a different AGP signing configuration. Always create
+    # the package first, then explicitly replace it with apksigner's signed output.
+    build_unsigned()
+    sign_release_apk(apksigner)
 
 
 def sync_kernel():
@@ -211,7 +234,7 @@ def main():
     elif command == "restore":
         restore_keystore(os.environ, keystore_path())
     elif command == "build":
-        build()
+        build(os.environ["APKSIGNER"])
     elif command == "sync-kernel":
         sync_kernel()
     elif command == "verify":

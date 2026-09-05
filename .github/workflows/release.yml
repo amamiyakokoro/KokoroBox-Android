@@ -141,6 +141,7 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
+          export APKSIGNER="$ANDROID_HOME/build-tools/37.0.0/apksigner"
           python3 "$RUNNER_TEMP/kokoro-release.py" build
 
       - name: Verify signature and prepare versioned APK

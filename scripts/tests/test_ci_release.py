@@ -66,17 +66,43 @@ class ReleaseTests(unittest.TestCase):
             self.assertFalse((self.root / "key").exists())
 
     def test_signing_passwords_are_only_in_environment(self):
-        with patch.dict(os.environ, self.env, clear=True), patch.object(ci.subprocess, "run") as run:
+        self.make_apk()
+
+        def run_command(args, **options):
+            if args[0] == "apksigner":
+                Path(args[args.index("--out") + 1]).write_bytes(b"signed-apk")
+            return subprocess.CompletedProcess(args, 0)
+
+        with patch.dict(os.environ, self.env, clear=True), \
+                patch.object(ci.subprocess, "run", side_effect=run_command) as run:
             ci.restore_keystore(self.env, ci.keystore_path())
-            ci.build()
-        args, options = run.call_args
-        for name in ci.SIGNING_NAMES:
-            self.assertNotIn(self.env[name], str(args))
-        self.assertEqual(options["env"]["ORG_GRADLE_PROJECT_signing.store.password"], self.env["SIGNING_STORE_PASSWORD"])
-        self.assertEqual(options["env"]["ORG_GRADLE_PROJECT_signing.key.password"], "another-secret")
-        self.assertNotIn("SIGNING_KEYSTORE_BASE64", options["env"])
-        self.assertIn("--no-configuration-cache", args[0])
+            ci.build("apksigner")
+        gradle_call, signer_call = run.call_args_list
+        self.assertIn("--no-configuration-cache", gradle_call.args[0])
+        self.assertNotIn("env", gradle_call.kwargs)
+        signer_args = signer_call.args[0]
+        signer_env = signer_call.kwargs["env"]
+        for password_name in ("SIGNING_STORE_PASSWORD", "SIGNING_KEY_PASSWORD"):
+            self.assertNotIn(self.env[password_name], str(signer_args))
+        self.assertEqual(signer_env["SIGNING_STORE_PASSWORD"], self.env["SIGNING_STORE_PASSWORD"])
+        self.assertEqual(signer_env["SIGNING_KEY_PASSWORD"], "another-secret")
+        self.assertNotIn("SIGNING_KEYSTORE_BASE64", signer_env)
+        self.assertIn("env:SIGNING_STORE_PASSWORD", signer_args)
+        self.assertIn("env:SIGNING_KEY_PASSWORD", signer_args)
         self.assertFalse(Path("signing.properties").exists())
+
+    def test_signing_failure_does_not_replace_unsigned_apk(self):
+        name = self.make_apk()
+        apk = Path("app/build/outputs/apk/release") / name
+        original = apk.read_bytes()
+        with patch.dict(os.environ, self.env, clear=True):
+            ci.restore_keystore(self.env, ci.keystore_path())
+        with patch.dict(os.environ, self.env, clear=True), \
+                patch.object(ci.subprocess, "run", side_effect=subprocess.CalledProcessError(1, "apksigner")), \
+                self.assertRaises(subprocess.CalledProcessError):
+            ci.sign_release_apk("apksigner")
+        self.assertEqual(apk.read_bytes(), original)
+        self.assertFalse((self.root / "kokorobox-signed.apk").exists())
 
     def test_no_restored_store_cannot_build(self):
         with self.assertRaises(ValueError):
