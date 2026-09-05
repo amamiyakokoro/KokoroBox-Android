@@ -22,7 +22,6 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidation
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationReason
 import com.github.yumelira.yumebox.screen.profiles.KokoroAccountClient
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -75,15 +74,14 @@ internal class KokoroCustomRulesViewModel(
         viewModelScope.launch {
             _state.update { it.copy(loading = true, status = KokoroRulesStatus.IDLE) }
             try {
-                val options = async { client.getOptions() }
-                val remoteState = async { client.getState() }
-                val loadedSets = remoteState.await().sets
+                val editorData = client.getEditorData()
+                val loadedSets = editorData.state.sets
                 val selected = loadedSets.firstOrNull { it.id == _state.value.selectedSetId }
                     ?: loadedSets.firstOrNull { it.name == "default" }
                     ?: loadedSets.firstOrNull()
                 _state.value = _state.value.copy(
                     loading = false,
-                    options = options.await(),
+                    options = editorData.options,
                     sets = loadedSets,
                     selectedSetId = selected?.id,
                     draftRules = selected?.rules.orEmpty().map { it.asInput() },

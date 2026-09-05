@@ -19,6 +19,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import java.io.IOException
+import java.util.Collections
 
 class KokoroCustomRulesClientTest {
     private class MemoryStore : KokoroAuthStore {
@@ -36,7 +37,7 @@ class KokoroCustomRulesClientTest {
     }
 
     private class Transport : Interceptor {
-        val requests = mutableListOf<Request>()
+        val requests: MutableList<Request> = Collections.synchronizedList(mutableListOf())
         var response: (Request) -> Pair<Int, String> = { 200 to STATE }
 
         override fun intercept(chain: Interceptor.Chain): Response {
@@ -95,6 +96,21 @@ class KokoroCustomRulesClientTest {
             assertEquals("Bearer access", it.header("Authorization"))
             assertTrue(it.url.queryParameterNames.isEmpty())
         }
+    }
+
+    @Test
+    fun editorLoadReportsServerFailureWithoutCancellingCaller() = runBlocking {
+        val f = Fixture()
+        f.transport.response = { request ->
+            if (request.url.encodedPath.endsWith("/options")) 200 to OPTIONS else 500 to "{}"
+        }
+
+        val result = runCatching { f.client.getEditorData() }
+
+        val error = result.exceptionOrNull()
+        assertTrue(error is KokoroRulesApiException)
+        assertEquals(500, (error as KokoroRulesApiException).statusCode)
+        assertEquals(2, f.transport.requests.size)
     }
 
     @Test

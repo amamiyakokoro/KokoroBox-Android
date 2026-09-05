@@ -10,6 +10,8 @@
 package com.github.yumelira.yumebox.data.integration.kokoro
 
 import android.content.Context
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -50,6 +52,15 @@ class KokoroCustomRulesClient internal constructor(
             Request.Builder().url(CUSTOM_RULES_OPTIONS_URL).get().build(),
             expectedCode = 200,
         ).also { requireSupportedSchema(it.schemaVersion) }
+
+    suspend fun getEditorData(): KokoroCustomRulesEditorData = supervisorScope {
+        val options = async { getOptions() }
+        val state = async { getState() }
+        KokoroCustomRulesEditorData(
+            options = options.await(),
+            state = state.await(),
+        )
+    }
 
     suspend fun createSet(name: String): KokoroRuleSet = executeJson(
         request = jsonRequest(
@@ -151,6 +162,11 @@ class KokoroCustomRulesClient internal constructor(
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
     }
 }
+
+data class KokoroCustomRulesEditorData(
+    val options: KokoroCustomRulesOptions,
+    val state: KokoroCustomRulesState,
+)
 
 @Serializable
 data class KokoroCustomRulesState(
