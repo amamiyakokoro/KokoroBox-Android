@@ -8,6 +8,23 @@ About = {
         VersionFailed = "Failed to load"
     }
 
+    Update = {
+        Checking = "Checking GitHub Releases…"
+        Available = "Update available"
+        UpToDate = "You are already using this version or a newer version."
+        UnknownVersion = "Cannot compare this build’s version. Check GitHub Releases manually."
+        NoRelease = "No published stable release is available yet."
+        RateLimited = "GitHub is limiting requests. Please wait before checking again."
+        NetworkError = "Unable to check for updates. Check your connection and try again."
+        InvalidResponse = "GitHub returned unsupported release information. Please try again later."
+        BrowserDownload = "Download the arm64 APK in your browser, then open it to update. Keep the same signing key to preserve your app data."
+        NoApk = "The compatible APK is not available yet. View the release page or check again later."
+        Download = "Download APK"
+        OpenRelease = "View release"
+        Ok = "OK"
+        NoBrowser = "No app is available to open this download."
+    }
+
     Section = {
         ProjectLinks = "Project Links"
         License = "License"

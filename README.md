@@ -96,6 +96,21 @@ The **Release APK** workflow uses Actions Secrets and automatically builds, sign
 and publishes verified APKs to GitHub Releases when a version tag is pushed.
 Manual runs can also build an existing tag, with optional Release publishing.
 
+### In-app update checks
+
+Open **About → Check for Updates** to query this repository's latest stable GitHub
+Release. Version numbers are compared numerically; drafts and prereleases are not
+offered. A newer release shows its notes and a browser download button for the
+version-matched arm64 release APK. If that asset is not ready, open the release
+page instead. Downloads and installation remain under your control; the app does
+not request package-installation permission or check for updates in the background.
+
+Checks use the public GitHub API without a token. Concurrent requests are combined,
+results are kept in memory for one minute, and rate-limit responses delay further
+requests. Network failures do not affect the VPN. Update APKs must use the same
+application ID and release signing certificate as your installed copy; do not
+uninstall the app to work around a signature mismatch, as that removes app data.
+
 ## Project structure
 
 | Path      | Purpose                                                      |

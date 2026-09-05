@@ -23,6 +23,8 @@
 package com.github.yumelira.yumebox.di
 
 import com.github.yumelira.yumebox.data.gateway.LogRecordGateway
+import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
+import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
 import com.github.yumelira.yumebox.screen.log.LogViewModel
 import com.github.yumelira.yumebox.screen.profiles.ProfilesViewModel
@@ -39,12 +41,14 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appIntegrationModule = module {
+    single { GitHubReleaseClient() }
     single<LogRecordGateway> { LogRecordServiceGateway() }
     single { KokoroAccountClient(androidApplication()) }
     single { ResourceDownloadClient(androidApplication(), get()) }
 }
 
 val appViewModelModule = module {
+    viewModel { AppUpdateViewModel(get()) }
     viewModel { AppSettingsViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get(), get(), get(), get(), get()) }
     viewModel { ProfilesViewModel(androidApplication(), get(), get(), get()) }

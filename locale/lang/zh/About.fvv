@@ -8,6 +8,23 @@ About = {
         VersionFailed = "Failed to load"
     }
 
+    Update = {
+        Checking = "正在检查 GitHub Releases…"
+        Available = "有可用更新"
+        UpToDate = "当前已是此版本或更新的版本。"
+        UnknownVersion = "无法比较此构建的版本，请手动查看 GitHub Releases。"
+        NoRelease = "目前尚无已发布的正式版本。"
+        RateLimited = "GitHub 已限制请求次数，请稍后再检查。"
+        NetworkError = "无法检查更新，请确认网络连接后重试。"
+        InvalidResponse = "GitHub 返回的版本信息不受支持，请稍后再试。"
+        BrowserDownload = "将通过浏览器下载 arm64 APK，下载后打开即可更新。更新包须使用相同签名才能保留应用数据。"
+        NoApk = "兼容的 APK 尚未就绪，请查看 Release 页面或稍后再检查。"
+        Download = "下载 APK"
+        OpenRelease = "查看 Release"
+        Ok = "确定"
+        NoBrowser = "没有可打开此下载的应用。"
+    }
+
     Section = {
         ProjectLinks = "项目链接"
         License = "许可证"
