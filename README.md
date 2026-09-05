@@ -84,8 +84,8 @@ Build the arm64 release APK or Android App Bundle:
 Expected outputs include:
 
 ```text
-app/build/outputs/apk/debug/KokoroBox-v0.5.5-arm64-v8a-debug.apk
-app/build/outputs/apk/release/KokoroBox-v0.5.5-arm64-v8a-release.apk
+app/build/outputs/apk/debug/KokoroBox-v0.5.6-arm64-v8a-debug.apk
+app/build/outputs/apk/release/KokoroBox-v0.5.6-arm64-v8a-release.apk
 app/build/outputs/bundle/release/KokoroBox-release.aab
 ```
 
