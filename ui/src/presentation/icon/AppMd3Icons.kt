@@ -23,6 +23,7 @@ package com.github.yumelira.yumebox.presentation.icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.FormatAlignLeft
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.rounded.Message
 import androidx.compose.material.icons.automirrored.rounded.ShowChart
 import androidx.compose.material.icons.automirrored.rounded.Sort
@@ -46,7 +47,6 @@ import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.Hub
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.PowerSettingsNew
@@ -80,7 +80,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 object AppMd3Icons {
     object Navigation {
         val Back: ImageVector = Icons.AutoMirrored.Rounded.ArrowBack
-        val Forward: ImageVector = Icons.Rounded.KeyboardArrowRight
+        val Forward: ImageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight
         val DownAngle: ImageVector = AppCustomIcons.DownAngle
     }
 
