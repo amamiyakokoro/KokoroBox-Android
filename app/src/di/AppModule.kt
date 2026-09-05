@@ -27,6 +27,8 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesClie
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
+import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
+import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
 import com.github.yumelira.yumebox.screen.log.LogViewModel
@@ -48,6 +50,14 @@ import org.koin.dsl.module
 
 val appIntegrationModule = module {
     single { GitHubReleaseClient() }
+    single {
+        AutomaticAppUpdateChecker(
+            client = get(),
+            settings = get(),
+            applicationScope = get(named(APPLICATION_SCOPE_NAME)),
+            currentVersionName = BuildConfig.VERSION_NAME,
+        )
+    }
     single<LogRecordGateway> { LogRecordServiceGateway() }
     single { KokoroAccountClient(androidApplication()) }
     single { KokoroCustomRulesClient(androidApplication()) }

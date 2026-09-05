@@ -17,6 +17,8 @@ AppSettings = {
         AutoStartSummary = "Automatically start proxy service on app launch and boot"
         AutoUpdateOnStartTitle = "Update on Start"
         AutoUpdateOnStartSummary = "Auto-update the active subscription profile on start"
+        AutomaticUpdateCheckTitle = "Automatically Check for Updates"
+        AutomaticUpdateCheckSummary = "Check GitHub Releases once a day when the app opens"
     }
 
     Interface = {

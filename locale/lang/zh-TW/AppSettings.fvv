@@ -17,6 +17,8 @@ AppSettings = {
         AutoStartSummary = "應用程式啟動和開機時自動啟動代理服務"
         AutoUpdateOnStartTitle = "啟動時更新設定檔"
         AutoUpdateOnStartSummary = "啟動時自動更新目前訂閱設定檔"
+        AutomaticUpdateCheckTitle = "自動檢查更新"
+        AutomaticUpdateCheckSummary = "開啟應用程式時每日檢查一次 GitHub Release"
     }
 
     Interface = {

@@ -54,6 +54,7 @@ import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
+import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
 import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
@@ -64,6 +65,7 @@ import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
 import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
 import com.github.yumelira.yumebox.presentation.theme.YumeTheme
 import com.github.yumelira.yumebox.screen.onboarding.OnboardingLauncher
+import com.github.yumelira.yumebox.screen.about.AppUpdateDialog
 import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -103,10 +105,12 @@ class MainActivity : FragmentActivity() {
     private val applicationScope: CoroutineScope by inject(qualifier = named(APPLICATION_SCOPE_NAME))
     private val kokoroRepository: KokoroRepository by inject()
     private val kokoroPreloadCoordinator: KokoroPreloadCoordinator by inject()
+    private val automaticAppUpdateChecker: AutomaticAppUpdateChecker by inject()
 
     override fun onStart() {
         super.onStart()
         kokoroPreloadCoordinator.preloadIfAuthenticated()
+        automaticAppUpdateChecker.checkIfDue()
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -162,6 +166,8 @@ class MainActivity : FragmentActivity() {
             val pageScale = appSettingsViewModel.pageScale.state.collectAsStateWithLifecycle().value
             val screenshotProtectionEnabled = appSettingsViewModel.screenshotProtectionEnabled.state.collectAsStateWithLifecycle().value
             val biometricUnlockEnabled by appSettingsViewModel.biometricUnlockEnabled.state.collectAsStateWithLifecycle()
+            val automaticUpdateCheckEnabled by appSettingsViewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
+            val availableUpdate by automaticAppUpdateChecker.availableUpdate.collectAsStateWithLifecycle()
 
             val biometricGateState = rememberStartupBiometricGateState(
                 activity = this@MainActivity,
@@ -174,6 +180,10 @@ class MainActivity : FragmentActivity() {
 
             LaunchedEffect(screenshotProtectionEnabled) {
                 this@MainActivity.applyScreenshotProtection(screenshotProtectionEnabled)
+            }
+
+            LaunchedEffect(automaticUpdateCheckEnabled) {
+                automaticAppUpdateChecker.onEnabledChanged(automaticUpdateCheckEnabled)
             }
 
             ProvideAndroidPlatformTheme {
@@ -214,6 +224,12 @@ class MainActivity : FragmentActivity() {
                                     )
                                     ToastDialogHost()
                                 }
+                            }
+                            availableUpdate?.let { release ->
+                                AppUpdateDialog(
+                                    result = release,
+                                    onDismiss = automaticAppUpdateChecker::dismiss,
+                                )
                             }
                         }
                     }

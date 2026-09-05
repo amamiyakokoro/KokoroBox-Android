@@ -110,6 +110,7 @@ fun AppSettingsScreen(
 private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
     val automaticRestart by viewModel.automaticRestart.state.collectAsStateWithLifecycle()
     val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsStateWithLifecycle()
+    val automaticUpdateCheckEnabled by viewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Behavior)
     Card {
@@ -124,6 +125,12 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
             summary = MLang.AppSettings.Behavior.AutoUpdateOnStartSummary,
             checked = autoUpdateCurrentProfileOnStart,
             onCheckedChange = viewModel::onAutoUpdateCurrentProfileOnStartChange,
+        )
+        PreferenceSwitchItem(
+            title = MLang.AppSettings.Behavior.AutomaticUpdateCheckTitle,
+            summary = MLang.AppSettings.Behavior.AutomaticUpdateCheckSummary,
+            checked = automaticUpdateCheckEnabled,
+            onCheckedChange = viewModel::onAutomaticUpdateCheckChange,
         )
     }
 }

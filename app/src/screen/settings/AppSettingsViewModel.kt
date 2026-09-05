@@ -64,6 +64,7 @@ class AppSettingsViewModel(
     val invertOnPrimaryColors: Preference<Boolean> = settings.invertOnPrimaryColors
     val automaticRestart: Preference<Boolean> = settings.automaticRestart
     val autoUpdateCurrentProfileOnStart: Preference<Boolean> = settings.autoUpdateCurrentProfileOnStart
+    val automaticUpdateCheckEnabled: Preference<Boolean> = settings.automaticUpdateCheckEnabled
     val hideAppIcon: Preference<Boolean> = settings.hideAppIcon
     val excludeFromRecents: Preference<Boolean> = settings.excludeFromRecents
     val showTrafficNotification: Preference<Boolean> = settings.showTrafficNotification
@@ -121,6 +122,7 @@ class AppSettingsViewModel(
     fun onPageScaleChange(scale: Float) = pageScale.set(scale)
     fun onAutomaticRestartChange(enabled: Boolean) = automaticRestart.set(enabled)
     fun onAutoUpdateCurrentProfileOnStartChange(enabled: Boolean) = autoUpdateCurrentProfileOnStart.set(enabled)
+    fun onAutomaticUpdateCheckChange(enabled: Boolean) = automaticUpdateCheckEnabled.set(enabled)
     fun onHideAppIconChange(hide: Boolean) = hideAppIcon.set(hide)
     fun onExcludeFromRecentsChange(exclude: Boolean) = excludeFromRecents.set(exclude)
     fun onShowTrafficNotificationChange(show: Boolean) = showTrafficNotification.set(show)

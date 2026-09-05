@@ -50,6 +50,8 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val invertOnPrimaryColors by boolFlow(false)
     val automaticRestart by boolFlow(false)
     val autoUpdateCurrentProfileOnStart by boolFlow(true)
+    val automaticUpdateCheckEnabled by boolFlow(true)
+    var lastAutomaticUpdateCheckAtMillis by long(0L)
     val hideAppIcon by boolFlow(false)
     val excludeFromRecents by boolFlow(false)
     val showTrafficNotification by boolFlow(true)
