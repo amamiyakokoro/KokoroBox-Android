@@ -29,8 +29,6 @@ object Intents {
     private fun intentAction(packageName: String, actionName: String): String = "$packageName.intent.action.$actionName"
 
     fun actionProvideUrl(packageName: String): String = "$packageName.action.PROVIDE_URL"
-    fun actionStartClash(packageName: String): String = "$packageName.action.START_CLASH"
-    fun actionStopClash(packageName: String): String = "$packageName.action.STOP_CLASH"
     fun actionToggleClash(packageName: String): String = "$packageName.action.TOGGLE_CLASH"
     fun actionServiceRecreated(packageName: String): String = intentAction(packageName, "CLASH_RECREATED")
     fun actionClashStarted(packageName: String): String = intentAction(packageName, "CLASH_STARTED")
@@ -49,12 +47,6 @@ object Intents {
 
     val ACTION_PROVIDE_URL: String
         get() = actionProvideUrl(packageName)
-
-    val ACTION_START_CLASH: String
-        get() = actionStartClash(packageName)
-
-    val ACTION_STOP_CLASH: String
-        get() = actionStopClash(packageName)
 
     val ACTION_TOGGLE_CLASH: String
         get() = actionToggleClash(packageName)

@@ -47,7 +47,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.github.yumelira.yumebox.common.runtime.StartupGate
 import com.github.yumelira.yumebox.common.util.AppLanguageManager
-import com.github.yumelira.yumebox.common.util.IntentController
 import com.github.yumelira.yumebox.common.util.ProxyAutoStartHelper
 import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
 import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
@@ -102,8 +101,6 @@ class MainActivity : FragmentActivity() {
     private val applicationScope: CoroutineScope by inject(qualifier = named(APPLICATION_SCOPE_NAME))
     private val kokoroAccountClient: KokoroAccountClient by inject()
 
-    private lateinit var intentController: IntentController
-
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLanguageManager.wrap(newBase))
     }
@@ -119,7 +116,6 @@ class MainActivity : FragmentActivity() {
         applyExcludeFromRecents(appSettingsStorage.excludeFromRecents.value)
         applyScreenshotProtection(appSettingsStorage.screenshotProtectionEnabled.value)
 
-        intentController = IntentController(lifecycleScope)
         handleIntent(intent)
 
         if (!appSettingsStorage.initialSetupCompleted.value) {
@@ -300,8 +296,6 @@ class MainActivity : FragmentActivity() {
                     }
                 }
             }
-
-            intentController.handleIntent(safeIntent)
         }
     }
 

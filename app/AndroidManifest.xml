@@ -67,14 +67,6 @@
                     android:host="oauth"
                     android:path="/callback"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="${applicationId}.action.START_CLASH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="${applicationId}.action.STOP_CLASH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
         </activity>
 
         <activity
