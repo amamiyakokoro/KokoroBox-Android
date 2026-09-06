@@ -36,8 +36,10 @@ import com.github.yumelira.yumebox.service.runtime.entity.Imported
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
 import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
 import com.github.yumelira.yumebox.service.runtime.records.SelectionDao
+import com.github.yumelira.yumebox.service.runtime.util.directoryLastModified
 import com.github.yumelira.yumebox.service.runtime.util.importedDir
 import com.github.yumelira.yumebox.service.runtime.util.sendProfileChanged
+import com.github.yumelira.yumebox.core.util.ProfileUpdatePolicy
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -398,7 +400,12 @@ object ProfileProcessor {
         return snapshotName
     }
 
-    suspend fun update(context: Context, uuid: UUID, callback: IFetchObserver?) {
+    suspend fun update(
+        context: Context,
+        uuid: UUID,
+        callback: IFetchObserver?,
+        onlyIfDue: Boolean = false,
+    ) {
         withContext(Dispatchers.IO + NonCancellable) {
             processLock.withLock {
                 val targetDir = context.importedDir.resolve(uuid.toString())
@@ -407,6 +414,22 @@ object ProfileProcessor {
                     val imported = ImportedDao.queryByUUID(uuid)
                         ?: throw IllegalArgumentException("profile $uuid not found")
 
+                    if (onlyIfDue) {
+                        if (imported.type != Profile.Type.Url) return@withContext
+                        if (!ProfileUpdatePolicy.isDue(
+                                now = System.currentTimeMillis(),
+                                interval = imported.interval,
+                                lastAttemptAt = imported.lastUpdateAttemptAt,
+                                lastAttemptFailed = imported.lastUpdateFailed,
+                                updatedAt = targetDir.directoryLastModified ?: imported.createdAt,
+                            )) return@withContext
+                    }
+
+                    // Persist before IO so an interrupted attempt also gets a retry delay.
+                    ImportedDao.update(imported.copy(
+                        lastUpdateAttemptAt = System.currentTimeMillis(),
+                        lastUpdateFailed = true,
+                    ))
                     stagingDir.deleteRecursively()
                     stagingDir.mkdirs()
 
@@ -474,6 +497,8 @@ object ProfileProcessor {
 
                             val updated = snapshot.imported.copy(
                                 name = finalName,
+                                lastUpdateAttemptAt = System.currentTimeMillis(),
+                                lastUpdateFailed = false,
                                 interval = if (snapshot.imported.type == Profile.Type.Url && subInfo != null) {
                                     subInfo.interval.toLong() * 60 * 60 * 1000
                                 } else snapshot.imported.interval,
@@ -489,6 +514,12 @@ object ProfileProcessor {
                     }
                 } catch (e: Exception) {
                     profileLock.withLock {
+                        ImportedDao.queryByUUID(uuid)?.let { current ->
+                            ImportedDao.update(current.copy(
+                                lastUpdateAttemptAt = System.currentTimeMillis(),
+                                lastUpdateFailed = true,
+                            ))
+                        }
                         if (!snapshot.hasCommittedConfig && ImportedDao.exists(snapshot.imported.uuid)) {
                             ImportedDao.remove(snapshot.imported.uuid)
                             SelectionDao.clear(snapshot.imported.uuid)

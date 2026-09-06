@@ -18,30 +18,23 @@
  *
  */
 
+package com.github.yumelira.yumebox.core.util
 
+object ProfileUpdatePolicy {
+    const val RETRY_INTERVAL_MILLIS = 60 * 60 * 1000L
 
-@file:UseSerializers(UUIDSerializer::class)
-
-package com.github.yumelira.yumebox.service.runtime.entity
-
-import com.github.yumelira.yumebox.service.runtime.util.UUIDSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
-import java.util.*
-
-@Serializable
-data class Imported(
-    val uuid: UUID,
-    val name: String,
-    val type: Profile.Type,
-    val source: String,
-    val interval: Long,
-    val upload: Long,
-    val download: Long,
-    val total: Long,
-    val expire: Long,
-    val createdAt: Long,
-    val userAgent: String = "",
-    val lastUpdateAttemptAt: Long = 0L,
-    val lastUpdateFailed: Boolean = false,
-)
+    fun isDue(
+        now: Long,
+        interval: Long,
+        lastAttemptAt: Long,
+        lastAttemptFailed: Boolean,
+        updatedAt: Long,
+    ): Boolean {
+        if (interval <= 0L) return false
+        val baseline = if (lastAttemptAt > 0L) lastAttemptAt else updatedAt
+        if (baseline <= 0L) return true
+        val wait = if (lastAttemptFailed) RETRY_INTERVAL_MILLIS else interval
+        // Recover if the wall clock was moved backwards.
+        return now < baseline || now - baseline >= wait
+    }
+}
