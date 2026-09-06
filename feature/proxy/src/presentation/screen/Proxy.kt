@@ -286,6 +286,11 @@ private fun ProxyTopBar(
                     Icon(AppMd3Icons.Action.SpeedTest, contentDescription = MLang.Proxy.Action.Test)
                 }
             }
+            if (onNavigateToProviders != null) {
+                IconButton(onClick = onNavigateToProviders) {
+                    Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
+                }
+            }
             Box {
                 MdIconButton(onClick = { onShowSortPopupChange(true) }) {
                     MdIcon(
@@ -300,11 +305,6 @@ private fun ProxyTopBar(
                     sortMode = sortMode,
                     onSortSelected = onSortSelected,
                 )
-            }
-            if (onNavigateToProviders != null) {
-                IconButton(onClick = onNavigateToProviders) {
-                    Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
-                }
             }
         },
     )
