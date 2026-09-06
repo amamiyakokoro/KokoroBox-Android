@@ -23,7 +23,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.presentation.component.AppDialog
+import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
+import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
 import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
 import com.github.yumelira.yumebox.presentation.theme.AppTheme
 import dev.oom_wg.purejoy.mlang.MLang
@@ -32,7 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun AgeKeyGeneratorDialog(
+fun AgeKeyGeneratorSheet(
     show: Boolean,
     hybrid: Boolean,
     onDismiss: () -> Unit,
@@ -43,10 +44,13 @@ fun AgeKeyGeneratorDialog(
     var publicKey by remember(show, hybrid) { mutableStateOf("") }
     var generating by remember(show, hybrid) { mutableStateOf(false) }
 
-    AppDialog(
+    AppActionBottomSheet(
         show = show,
         title = if (hybrid) MLang.MetaFeature.AgeKey.HybridTitle else MLang.MetaFeature.AgeKey.X25519Title,
         onDismissRequest = onDismiss,
+        startAction = {
+            AppBottomSheetCloseAction(onClick = onDismiss)
+        },
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
