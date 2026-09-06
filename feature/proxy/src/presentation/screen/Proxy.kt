@@ -78,7 +78,7 @@ import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
 import com.github.yumelira.yumebox.presentation.component.CenteredText
 import com.github.yumelira.yumebox.presentation.component.Md3ELoading
 import com.github.yumelira.yumebox.presentation.component.LocalBottomBarScrollBehavior
-import com.github.yumelira.yumebox.presentation.component.SmallTopBar
+import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.rememberRetainedLazyGridState
 import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
 import com.github.yumelira.yumebox.presentation.screen.node.NodeCard
@@ -272,21 +272,11 @@ private fun ProxyTopBar(
     sortMode: ProxySortMode,
     onSortSelected: (ProxySortMode) -> Unit,
 ) {
-    SmallTopBar(
+    TopBar(
         title = title,
         scrollBehavior = scrollBehavior,
-        navigationIconPadding = UiDp.dp12,
         actionIconPadding = UiDp.dp12,
         titlePadding = UiDp.dp12,
-        navigationIcon = {
-            Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
-                if (onNavigateToProviders != null) {
-                    IconButton(onClick = onNavigateToProviders) {
-                        Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
-                    }
-                }
-            }
-        },
         actions = {
             if (onTestDelay != null) {
                 IconButton(
@@ -295,7 +285,7 @@ private fun ProxyTopBar(
                 ) {
                     Icon(AppMd3Icons.Action.SpeedTest, contentDescription = MLang.Proxy.Action.Test)
                 }
-    }
+            }
             Box {
                 MdIconButton(onClick = { onShowSortPopupChange(true) }) {
                     MdIcon(
@@ -310,6 +300,11 @@ private fun ProxyTopBar(
                     sortMode = sortMode,
                     onSortSelected = onSortSelected,
                 )
+            }
+            if (onNavigateToProviders != null) {
+                IconButton(onClick = onNavigateToProviders) {
+                    Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
+                }
             }
         },
     )
