@@ -10,6 +10,11 @@ import (
 	"cfa/native/config"
 )
 
+type ageKeyPair struct {
+	SecretKey string `json:"secretKey"`
+	PublicKey string `json:"publicKey"`
+}
+
 type remoteValidCallback struct {
 	callback unsafe.Pointer
 }
@@ -80,4 +85,62 @@ func inspectCompiledGroups(yamlText C.c_string, profileDir C.c_string, excludeNo
 		return nil
 	}
 	return marshalJson(groups)
+}
+
+//export setAgeSecretKey
+func setAgeSecretKey(key C.c_string) {
+	if key == nil {
+		config.SetGlobalSecretKeys()
+		return
+	}
+
+	config.SetGlobalSecretKeys(C.GoString(key))
+}
+
+//export genX25519KeyPair
+func genX25519KeyPair() *C.char {
+	secretKey, publicKey, err := config.GenX25519KeyPair()
+	if err != nil {
+		return nil
+	}
+
+	return marshalJson(ageKeyPair{SecretKey: secretKey, PublicKey: publicKey})
+}
+
+//export genHybridKeyPair
+func genHybridKeyPair() *C.char {
+	secretKey, publicKey, err := config.GenHybridKeyPair()
+	if err != nil {
+		return nil
+	}
+
+	return marshalJson(ageKeyPair{SecretKey: secretKey, PublicKey: publicKey})
+}
+
+//export verifySecretKeys
+func verifySecretKeys(secretKeys C.c_string) C.int {
+	if config.VerifySecretKeys(C.GoString(secretKeys)) != nil {
+		return 0
+	}
+
+	return 1
+}
+
+//export toPublicKeys
+func toPublicKeys(secretKeys C.c_string) *C.char {
+	publicKeys, err := config.ToPublicKeys(C.GoString(secretKeys))
+	if err != nil {
+		return nil
+	}
+
+	return marshalJson(publicKeys)
+}
+
+//export verifyPublicKeys
+func verifyPublicKeys(publicKeys C.c_string) C.int {
+	if config.VerifyPublicKeys(C.GoString(publicKeys)) != nil {
+		return 0
+	}
+
+	return 1
 }

@@ -26,6 +26,8 @@ import com.github.yumelira.yumebox.core.util.parseInetSocketAddress
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -357,4 +359,25 @@ object Clash {
     fun setCustomUserAgent(userAgent: String) {
         Bridge.nativeSetCustomUserAgent(userAgent)
     }
+
+    fun setAgeSecretKey(key: String?) {
+        Bridge.nativeSetAgeSecretKey(key?.trim()?.takeIf { it.isNotEmpty() })
+    }
+
+    fun genX25519KeyPair(): AgeKeyPair? =
+        Bridge.nativeGenX25519KeyPair()?.let { Json.decodeFromString(AgeKeyPair.serializer(), it) }
+
+    fun genHybridKeyPair(): AgeKeyPair? =
+        Bridge.nativeGenHybridKeyPair()?.let { Json.decodeFromString(AgeKeyPair.serializer(), it) }
+
+    fun verifySecretKeys(secretKeys: String): Boolean =
+        Bridge.nativeVerifySecretKeys(secretKeys.trim())
+
+    fun toPublicKeys(secretKeys: String): List<String>? =
+        Bridge.nativeToPublicKeys(secretKeys.trim())?.let {
+            Json.decodeFromString(ListSerializer(String.serializer()), it)
+        }
+
+    fun verifyPublicKeys(publicKeys: String): Boolean =
+        Bridge.nativeVerifyPublicKeys(publicKeys.trim())
 }

@@ -7,6 +7,16 @@ MetaFeature = {
         GeoXUpdate = "GeoX Update"
     }
 
+    AgeKey = {
+        Section = "Age Keys"
+        X25519Title = "X25519"
+        HybridTitle = "mlkem768-x25519"
+        SecretKey = "Secret Key"
+        PublicKey = "Public Key"
+        Generate = "Generate"
+        DerivePublicKey = "Derive Public Key"
+    }
+
     CustomRules = {
         Title = "Custom Rules"
         BackToKokoroSettings = "Back to Kokoro Settings"

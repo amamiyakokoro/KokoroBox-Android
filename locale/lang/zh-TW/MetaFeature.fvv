@@ -7,6 +7,16 @@ MetaFeature = {
         GeoXUpdate = "GeoX 更新"
     }
 
+    AgeKey = {
+        Section = "Age 金鑰"
+        X25519Title = "X25519"
+        HybridTitle = "mlkem768-x25519"
+        SecretKey = "私密金鑰"
+        PublicKey = "公開金鑰"
+        Generate = "產生"
+        DerivePublicKey = "推導公開金鑰"
+    }
+
     CustomRules = {
         Title = "自訂規則"
         BackToKokoroSettings = "返回 Kokoro 設定"

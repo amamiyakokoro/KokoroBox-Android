@@ -93,6 +93,8 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
 
     val showGeoXDownloadSheet = remember { mutableStateOf(false) }
     val showGeoXImportSheet = remember { mutableStateOf(false) }
+    var ageKeyDialogVisible by remember { mutableStateOf(false) }
+    var ageKeyHybrid by remember { mutableStateOf(false) }
     var geoXUpdateRecords by remember { mutableStateOf(geoXDataController.getGeoFileUpdateRecords()) }
 
     fun refreshGeoXUpdateRecords() {
@@ -154,7 +156,32 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                     )
                 }
             }
+            item {
+                Title(MLang.MetaFeature.AgeKey.Section)
+                Card {
+                    PreferenceArrowItem(
+                        title = MLang.MetaFeature.AgeKey.X25519Title,
+                        onClick = {
+                            ageKeyHybrid = false
+                            ageKeyDialogVisible = true
+                        },
+                    )
+                    PreferenceArrowItem(
+                        title = MLang.MetaFeature.AgeKey.HybridTitle,
+                        onClick = {
+                            ageKeyHybrid = true
+                            ageKeyDialogVisible = true
+                        },
+                    )
+                }
+            }
         }
+
+        AgeKeyGeneratorDialog(
+            show = ageKeyDialogVisible,
+            hybrid = ageKeyHybrid,
+            onDismiss = { ageKeyDialogVisible = false },
+        )
 
         GeoXDownloadSheet(
             show = showGeoXDownloadSheet,
