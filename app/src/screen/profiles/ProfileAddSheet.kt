@@ -475,17 +475,23 @@ internal fun AddProfileSheet(
                 targetState = isDownloading,
                 transitionSpec = {
                     if (targetState) {
-                        (slideInHorizontally(
-                            animationSpec = tween(260),
-                            initialOffsetX = { it }) + fadeIn()) togetherWith
-                                (slideOutHorizontally(
-                                    animationSpec = tween(220),
-                                    targetOffsetX = { -it / 3 }) + fadeOut())
+                        (slideInVertically(
+                            animationSpec = tween(240, easing = FastOutSlowInEasing),
+                            initialOffsetY = { it / 8 },
+                        ) + fadeIn(animationSpec = tween(180, delayMillis = 40))) togetherWith
+                            (slideOutVertically(
+                                animationSpec = tween(180, easing = FastOutSlowInEasing),
+                                targetOffsetY = { -it / 12 },
+                            ) + fadeOut(animationSpec = tween(140)))
                     } else {
-                        (slideInHorizontally(
-                            animationSpec = tween(220),
-                            initialOffsetX = { -it / 3 }) + fadeIn()) togetherWith
-                                (slideOutHorizontally(animationSpec = tween(260), targetOffsetX = { it }) + fadeOut())
+                        (slideInVertically(
+                            animationSpec = tween(220, easing = FastOutSlowInEasing),
+                            initialOffsetY = { -it / 12 },
+                        ) + fadeIn(animationSpec = tween(180, delayMillis = 30))) togetherWith
+                            (slideOutVertically(
+                                animationSpec = tween(200, easing = FastOutSlowInEasing),
+                                targetOffsetY = { it / 8 },
+                            ) + fadeOut(animationSpec = tween(140)))
                     }
                 },
                 label = "ProfileImportContentSwitch",
