@@ -84,10 +84,11 @@ object SystemDetector {
     }
 
     val hostTag: String by lazy {
-        val arch = System.getProperty("os.arch")
         when (os) {
             "windows" -> "windows-x86_64"
-            "darwin" -> if (arch.contains("aarch64")) "darwin-arm64" else "darwin-x86_64"
+            // Android NDK ships its macOS host toolchain under darwin-x86_64 even on
+            // Apple Silicon; the binaries themselves are universal/native-compatible.
+            "darwin" -> "darwin-x86_64"
             "linux" -> "linux-x86_64"
             else -> "linux-x86_64"
         }
