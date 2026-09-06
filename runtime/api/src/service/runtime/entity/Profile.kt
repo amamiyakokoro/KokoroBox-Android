@@ -47,6 +47,7 @@ data class Profile(
     val total: Long,
     val expire: Long,
     val updatedAt: Long,
+    val userAgent: String = "",
 ) : Parcelable {
     enum class Type {
         File, Url, External

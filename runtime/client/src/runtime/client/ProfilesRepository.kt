@@ -52,11 +52,12 @@ class ProfilesRepository(
     suspend fun createProfile(
         type: Profile.Type,
         name: String,
-        source: String = ""
+        source: String = "",
+        userAgent: String = "",
     ): UUID = safeApiCall(TAG, "createProfile") {
         Timber.d("Creating profile: type=$type, name=$name")
         ServiceClient.connect(context)
-        ServiceClient.profile().create(type, name, source)
+        ServiceClient.profile().create(type, name, source, userAgent)
     }.getOrThrow()
 
     suspend fun cloneProfile(uuid: UUID): UUID = safeApiCall(TAG, "cloneProfile") {
@@ -146,12 +147,13 @@ class ProfilesRepository(
         uuid: UUID,
         name: String,
         source: String,
-        interval: Long
+        interval: Long,
+        userAgent: String,
     ) {
         safeApiCall(TAG, "patchProfile") {
         Timber.d("Patching profile: uuid=$uuid")
         ServiceClient.connect(context)
-        ServiceClient.profile().patch(uuid, name, source, interval)
+        ServiceClient.profile().patch(uuid, name, source, interval, userAgent)
         }.getOrThrow()
     }
 

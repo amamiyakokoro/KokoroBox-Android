@@ -51,7 +51,7 @@ class ProfileManager(private val context: Context) : IProfileManager,
         }
     }
 
-    override suspend fun create(type: Profile.Type, name: String, source: String): UUID {
+    override suspend fun create(type: Profile.Type, name: String, source: String, userAgent: String): UUID {
         val uuid = generateProfileUUID()
         val normalizedName = name.trim().ifBlank { "New Profile" }
         val now = System.currentTimeMillis()
@@ -67,6 +67,7 @@ class ProfileManager(private val context: Context) : IProfileManager,
             download = 0,
             expire = 0,
             createdAt = now,
+            userAgent = normalizeUserAgent(userAgent),
         )
 
         ImportedDao.insert(imported)
@@ -93,6 +94,7 @@ class ProfileManager(private val context: Context) : IProfileManager,
             download = imported.download,
             expire = imported.expire,
             createdAt = now,
+            userAgent = imported.userAgent,
         )
 
         val sourceDir = context.importedDir.resolve(uuid.toString())
@@ -110,7 +112,13 @@ class ProfileManager(private val context: Context) : IProfileManager,
         return newUUID
     }
 
-    override suspend fun patch(uuid: UUID, name: String, source: String, interval: Long) {
+    override suspend fun patch(
+        uuid: UUID,
+        name: String,
+        source: String,
+        interval: Long,
+        userAgent: String,
+    ) {
         val imported = ImportedDao.queryByUUID(uuid)
             ?: throw FileNotFoundException("profile $uuid not found")
 
@@ -118,6 +126,7 @@ class ProfileManager(private val context: Context) : IProfileManager,
             name = name,
             source = source,
             interval = interval,
+            userAgent = normalizeUserAgent(userAgent),
         )
 
         ImportedDao.update(updated)
@@ -220,22 +229,38 @@ class ProfileManager(private val context: Context) : IProfileManager,
         val name = ProfileNameUtils.resolveDisplayName(imported.name, imported.source)
 
         return Profile(
-            uuid,
-            name,
-            imported.type,
-            imported.source,
-            active != null && imported.uuid == active,
-            imported.interval,
-            imported.upload,
-            imported.download,
-            imported.total,
-            imported.expire,
-            resolveUpdatedAt(uuid),
+            uuid = uuid,
+            name = name,
+            type = imported.type,
+            source = imported.source,
+            active = active != null && imported.uuid == active,
+            interval = imported.interval,
+            upload = imported.upload,
+            download = imported.download,
+            total = imported.total,
+            expire = imported.expire,
+            updatedAt = resolveUpdatedAt(uuid),
+            userAgent = imported.userAgent,
         )
     }
 
     private fun resolveUpdatedAt(uuid: UUID): Long {
         return context.importedDir.resolve(uuid.toString()).directoryLastModified ?: -1
+    }
+
+    private fun normalizeUserAgent(userAgent: String): String {
+        val normalized = userAgent.trim()
+        require(normalized.length <= MAX_USER_AGENT_LENGTH) {
+            "User-Agent must not exceed $MAX_USER_AGENT_LENGTH characters"
+        }
+        require(normalized.all { it.code in 0x20..0x7e }) {
+            "User-Agent must contain printable ASCII characters only"
+        }
+        return normalized
+    }
+
+    private companion object {
+        const val MAX_USER_AGENT_LENGTH = 512
     }
 
 }

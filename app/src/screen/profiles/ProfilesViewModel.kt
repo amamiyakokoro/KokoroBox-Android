@@ -173,13 +173,14 @@ class ProfilesViewModel(
         name: String,
         source: String = "",
         interval: Long = 0L,
-        fileUri: Uri? = null
+        fileUri: Uri? = null,
+        userAgent: String = "",
     ) {
         viewModelScope.launch {
             var createdUuid: UUID? = null
             try {
                 applyLoading(true)
-                val uuid = profilesRepository.createProfile(type, name, source)
+                val uuid = profilesRepository.createProfile(type, name, source, userAgent)
                 createdUuid = uuid
 
                 _downloadProgress.value = DownloadProgress(
@@ -363,11 +364,11 @@ class ProfilesViewModel(
         }
     }
 
-    fun patchProfile(uuid: UUID, name: String, source: String, interval: Long) {
+    fun patchProfile(uuid: UUID, name: String, source: String, interval: Long, userAgent: String) {
         viewModelScope.launch {
             try {
                 applyLoading(true)
-                profilesRepository.patchProfile(uuid, name, source, interval)
+                profilesRepository.patchProfile(uuid, name, source, interval, userAgent)
                 showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(name))
                 refreshProfiles()
                 Timber.i("Profile patched: $uuid")
@@ -381,13 +382,19 @@ class ProfilesViewModel(
         }
     }
 
-    fun patchAndUpdateProfile(uuid: UUID, name: String, source: String, interval: Long) {
+    fun patchAndUpdateProfile(
+        uuid: UUID,
+        name: String,
+        source: String,
+        interval: Long,
+        userAgent: String,
+    ) {
         if (uuid in _updatingProfileIds.value) return
         viewModelScope.launch {
             var patched = false
             try {
                 applyLoading(true)
-                profilesRepository.patchProfile(uuid, name, source, interval)
+                profilesRepository.patchProfile(uuid, name, source, interval, userAgent)
                 refreshProfiles()
                 patched = true
                 Timber.i("Kokoro profile settings patched: $uuid")

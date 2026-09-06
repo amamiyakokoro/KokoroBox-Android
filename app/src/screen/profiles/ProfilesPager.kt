@@ -256,11 +256,11 @@ fun ProfilesPager(
         show = showAddBottomSheet,
         profileToEdit = profileToEdit,
         importUrl = importUrlFromScheme ?: scannedUrl,
-        onAddProfile = { name, source, type, interval, fileUri ->
-            profilesViewModel.createProfile(type, name, source, interval, fileUri)
+        onAddProfile = { name, source, type, interval, fileUri, userAgent ->
+            profilesViewModel.createProfile(type, name, source, interval, fileUri, userAgent)
         },
-        onUpdateProfile = { uuid, name, source, interval ->
-            profilesViewModel.patchProfile(uuid, name, source, interval)
+        onUpdateProfile = { uuid, name, source, interval, userAgent ->
+            profilesViewModel.patchProfile(uuid, name, source, interval, userAgent)
         },
         onDownloadComplete = {
             showAddBottomSheet.value = false
@@ -297,7 +297,7 @@ fun ProfilesPager(
                 profileToEdit = null
                 profileBinding = null
             },
-            onSaveProfileMeta = { newName, newSource, newInterval, refreshConfiguration ->
+            onSaveProfileMeta = { newName, newSource, newInterval, newUserAgent, refreshConfiguration ->
                 if (newName.isNotBlank() && newSource.isNotBlank()) {
                     if (refreshConfiguration) {
                         profilesViewModel.patchAndUpdateProfile(
@@ -305,6 +305,7 @@ fun ProfilesPager(
                             newName,
                             newSource,
                             newInterval,
+                            newUserAgent,
                         )
                     } else {
                         profilesViewModel.patchProfile(
@@ -312,6 +313,7 @@ fun ProfilesPager(
                             newName,
                             newSource,
                             newInterval,
+                            newUserAgent,
                         )
                     }
                 }

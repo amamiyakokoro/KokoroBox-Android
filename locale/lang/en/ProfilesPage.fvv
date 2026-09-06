@@ -94,6 +94,7 @@ ProfilesPage = {
     Input = {
         ProfileName = "Profile Name"
         SubscriptionUrl = "Subscription URL (HTTP/HTTPS)"
+        SubscriptionUserAgent = "User-Agent (blank uses global setting)"
         SelectFile = "Click to select file"
         NewProfile = "New Profile"
     }

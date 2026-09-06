@@ -86,8 +86,8 @@ internal fun AddProfileSheet(
     show: MutableState<Boolean>,
     profileToEdit: Profile? = null,
     importUrl: String? = null,
-    onAddProfile: (name: String, source: String, type: Profile.Type, interval: Long, fileUri: android.net.Uri?) -> Unit,
-    onUpdateProfile: (uuid: UUID, name: String, source: String, interval: Long) -> Unit,
+    onAddProfile: (name: String, source: String, type: Profile.Type, interval: Long, fileUri: android.net.Uri?, userAgent: String) -> Unit,
+    onUpdateProfile: (uuid: UUID, name: String, source: String, interval: Long, userAgent: String) -> Unit,
     onDownloadComplete: () -> Unit,
     profilesViewModel: ProfilesViewModel
 ) {
@@ -101,6 +101,7 @@ internal fun AddProfileSheet(
     var selectedTypeIndex by remember { mutableIntStateOf(PROFILE_TYPE_KOKORO) }
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
+    var userAgent by remember { mutableStateOf("") }
     var filePath by remember { mutableStateOf("") }
     var fileName by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
@@ -152,6 +153,7 @@ internal fun AddProfileSheet(
     val clearAllState = {
         name = ""
         url = ""
+        userAgent = ""
         filePath = ""
         fileName = ""
         error = ""
@@ -163,7 +165,10 @@ internal fun AddProfileSheet(
 
     val clearCurrentTypeState = {
         when (selectedTypeIndex) {
-            PROFILE_TYPE_SUBSCRIPTION -> url = ""
+            PROFILE_TYPE_SUBSCRIPTION -> {
+                url = ""
+                userAgent = ""
+            }
             PROFILE_TYPE_LOCAL_FILE -> {
                 filePath = ""
                 fileName = ""
@@ -232,6 +237,7 @@ internal fun AddProfileSheet(
                 if (profileToEdit.type == Profile.Type.Url) {
                     selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
                     url = profileToEdit.source
+                    userAgent = profileToEdit.userAgent
                 } else {
                     selectedTypeIndex = PROFILE_TYPE_LOCAL_FILE
                     filePath = profileToEdit.source
@@ -380,7 +386,8 @@ internal fun AddProfileSheet(
                     profileToEdit.uuid,
                     name,
                     url,
-                    profileToEdit.interval
+                    profileToEdit.interval,
+                    userAgent,
                 )
             } else {
                 onAddProfile(
@@ -388,7 +395,8 @@ internal fun AddProfileSheet(
                     url,
                     Profile.Type.Url,
                     0L,
-                    null
+                    null,
+                    userAgent,
                 )
             }
         } else if (selectedTypeIndex == PROFILE_TYPE_KOKORO && kokoroAccount != null) {
@@ -408,6 +416,7 @@ internal fun AddProfileSheet(
                         Profile.Type.Url,
                         KokoroApi.intervalMillis(normalizedKokoroSettings),
                         null,
+                        userAgent,
                     )
                 } catch (e: Exception) {
                     if (e is kotlinx.coroutines.CancellationException) throw e
@@ -421,7 +430,8 @@ internal fun AddProfileSheet(
                     profileToEdit.uuid,
                     name,
                     profileToEdit.source,
-                    profileToEdit.interval
+                    profileToEdit.interval,
+                    "",
                 )
             } else {
                 onAddProfile(
@@ -429,7 +439,8 @@ internal fun AddProfileSheet(
                     filePath,
                     Profile.Type.File,
                     0L,
-                    filePath.toUri()
+                    filePath.toUri(),
+                    "",
                 )
             }
         }
@@ -510,6 +521,7 @@ internal fun AddProfileSheet(
                         profileLocked = profileToEdit != null,
                         name = name,
                         url = url,
+                        userAgent = userAgent,
                         fileName = fileName,
                         error = error,
                         hasCameraPermission = hasCameraPermission,
@@ -527,6 +539,7 @@ internal fun AddProfileSheet(
                             url = it
                             error = ""
                         },
+                        onUserAgentChange = { userAgent = it },
                         onPickFile = { launcher.launch("*/*") },
                         onSelectQrImage = { qrImageLauncher.launch("image/*") },
                         onQrScanned = { scannedUrl ->
@@ -616,6 +629,7 @@ private fun ProfileFormContent(
     profileLocked: Boolean,
     name: String,
     url: String,
+    userAgent: String,
     fileName: String,
     error: String,
     hasCameraPermission: Boolean,
@@ -624,6 +638,7 @@ private fun ProfileFormContent(
     onTypeSelected: (Int) -> Unit,
     onNameChange: (String) -> Unit,
     onUrlChange: (String) -> Unit,
+    onUserAgentChange: (String) -> Unit,
     onPickFile: () -> Unit,
     onSelectQrImage: () -> Unit,
     onQrScanned: (String) -> Unit,
@@ -677,6 +692,18 @@ private fun ProfileFormContent(
                     onPickFile = onPickFile,
                 )
             }
+        }
+
+        if (selectedTypeIndex == PROFILE_TYPE_KOKORO ||
+            selectedTypeIndex == PROFILE_TYPE_SUBSCRIPTION
+        ) {
+            YumeMd3OutlinedTextField(
+                value = userAgent,
+                onValueChange = onUserAgentChange,
+                label = MLang.ProfilesPage.Input.SubscriptionUserAgent,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

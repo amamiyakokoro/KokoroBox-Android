@@ -72,7 +72,9 @@ object ProfileProcessor {
         .followRedirects(true)
         .build()
 
-    private fun resolveUserAgent(): String {
+    private fun resolveUserAgent(profileUserAgent: String): String {
+        val profileValue = profileUserAgent.trim()
+        if (profileValue.isNotEmpty()) return profileValue
         val settings = MMKV.mmkvWithID("settings", MMKV.MULTI_PROCESS_MODE)
         val custom = settings.decodeString("customUserAgent")?.trim().orEmpty()
         return custom.ifBlank { DEFAULT_USER_AGENT }
@@ -99,6 +101,7 @@ object ProfileProcessor {
         context: Context,
         url: String,
         targetFile: File,
+        userAgent: String,
         onProgress: ((Int) -> Unit)? = null
     ): SubscriptionInfo? = withContext(Dispatchers.IO + NonCancellable) {
         try {
@@ -107,7 +110,7 @@ object ProfileProcessor {
 
             val request = Request.Builder()
                 .url(url)
-                .header("User-Agent", resolveUserAgent())
+                .header("User-Agent", resolveUserAgent(userAgent))
                 .build()
 
             val isKokoroSubscription = KokoroApi.isAuthenticatedSubscriptionUrl(url)
@@ -365,11 +368,12 @@ object ProfileProcessor {
         context: Context,
         stagingDir: File,
         source: String,
+        userAgent: String,
         onProgress: (Int) -> Unit
     ): SubscriptionInfo? {
         onProgress(5)
         val tempFile = stagingDir.resolve("config.download.yaml")
-        val info = downloadWithSubscriptionInfo(context, source, tempFile) { progress ->
+        val info = downloadWithSubscriptionInfo(context, source, tempFile, userAgent) { progress ->
             onProgress(5 + (progress * 0.4).toInt())
         }
         tempFile.copyTo(stagingDir.resolve("config.yaml"), overwrite = true)
@@ -421,7 +425,12 @@ object ProfileProcessor {
 
                 try {
                     if (snapshot.imported.type == Profile.Type.Url) {
-                        subInfo = fetchUrlSubscription(context, stagingDir, snapshot.imported.source) { progress ->
+                        subInfo = fetchUrlSubscription(
+                            context,
+                            stagingDir,
+                            snapshot.imported.source,
+                            snapshot.imported.userAgent,
+                        ) { progress ->
                             try {
                                 cb?.updateStatus(
                                     com.github.yumelira.yumebox.core.model.FetchStatus(
@@ -463,19 +472,15 @@ object ProfileProcessor {
                                 resolveSubscriptionName(snapshot.imported.name, snapshot.imported.source, subInfo)
                             } else snapshot.imported.name
 
-                            val updated = Imported(
-                                snapshot.imported.uuid,
-                                finalName,
-                                snapshot.imported.type,
-                                snapshot.imported.source,
-                                if (snapshot.imported.type == Profile.Type.Url && subInfo != null) {
+                            val updated = snapshot.imported.copy(
+                                name = finalName,
+                                interval = if (snapshot.imported.type == Profile.Type.Url && subInfo != null) {
                                     subInfo.interval.toLong() * 60 * 60 * 1000
                                 } else snapshot.imported.interval,
-                                subInfo?.upload ?: snapshot.imported.upload,
-                                subInfo?.download ?: snapshot.imported.download,
-                                subInfo?.total ?: snapshot.imported.total,
-                                subInfo?.expire ?: snapshot.imported.expire,
-                                snapshot.imported.createdAt
+                                upload = subInfo?.upload ?: snapshot.imported.upload,
+                                download = subInfo?.download ?: snapshot.imported.download,
+                                total = subInfo?.total ?: snapshot.imported.total,
+                                expire = subInfo?.expire ?: snapshot.imported.expire,
                             )
                             ImportedDao.update(updated)
 

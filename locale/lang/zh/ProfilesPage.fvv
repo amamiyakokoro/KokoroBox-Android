@@ -94,6 +94,7 @@ ProfilesPage = {
     Input = {
         ProfileName = "配置名称"
         SubscriptionUrl = "订阅链接 (HTTP/HTTPS)"
+        SubscriptionUserAgent = "User-Agent（留空使用全局设置）"
         SelectFile = "点击选择文件"
         NewProfile = "新配置"
     }

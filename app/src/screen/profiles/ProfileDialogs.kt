@@ -169,7 +169,7 @@ internal fun ProfileSettingsDialog(
     subscriptionOptions: KokoroSubscriptionOptions,
     onDismiss: () -> Unit,
     onDismissFinished: () -> Unit,
-    onSaveProfileMeta: (String, String, Long, Boolean) -> Unit,
+    onSaveProfileMeta: (String, String, Long, String, Boolean) -> Unit,
     onSaveOverrideSettings: (Boolean, List<String>) -> Unit,
 ) {
     val spacing = AppTheme.spacing
@@ -185,16 +185,25 @@ internal fun ProfileSettingsDialog(
     val initialSubscriptionSettings = KokoroApi.parseConfigSettings(profile.source)
     var editName by remember { mutableStateOf(profile.name) }
     var editSource by remember { mutableStateOf("") }
+    var editUserAgent by remember { mutableStateOf(profile.userAgent) }
     var subscriptionSettings by remember(profile.uuid, profile.source) {
         mutableStateOf(initialSubscriptionSettings)
     }
     var systemPresetSelected by remember { mutableStateOf(initialSystemPresetEnabled) }
     var pendingSelectedUserOverrideIds by remember { mutableStateOf(emptyList<String>()) }
 
-    LaunchedEffect(show, profile.uuid, profile.name, binding?.overrideIds, binding?.enabled) {
+    LaunchedEffect(
+        show,
+        profile.uuid,
+        profile.name,
+        profile.userAgent,
+        binding?.overrideIds,
+        binding?.enabled,
+    ) {
         if (show) {
             editName = profile.name
             editSource = ""
+            editUserAgent = profile.userAgent
             subscriptionSettings = initialSubscriptionSettings
             systemPresetSelected = initialSystemPresetEnabled
             pendingSelectedUserOverrideIds = initialOverrideIds
@@ -216,11 +225,13 @@ internal fun ProfileSettingsDialog(
         }
         val targetInterval = normalizedSubscriptionSettings?.let(KokoroApi::intervalMillis)
             ?: profile.interval
+        val targetUserAgent = editUserAgent.trim()
         val shouldRefresh = normalizedSubscriptionSettings != null && targetSource != profile.source
         if (trimmedName.isNotEmpty() && targetSource.isNotEmpty() &&
-            (trimmedName != profile.name || targetSource != profile.source || targetInterval != profile.interval)
+            (trimmedName != profile.name || targetSource != profile.source ||
+                targetInterval != profile.interval || targetUserAgent != profile.userAgent)
         ) {
-            onSaveProfileMeta(trimmedName, targetSource, targetInterval, shouldRefresh)
+            onSaveProfileMeta(trimmedName, targetSource, targetInterval, targetUserAgent, shouldRefresh)
         }
 
         val finalSelectedOverrideIds = buildFinalOverrideIds(pendingSelectedUserOverrideIds)
@@ -285,6 +296,14 @@ internal fun ProfileSettingsDialog(
                             maxLines = 2,
                         )
                     }
+
+                    YumeMd3OutlinedTextField(
+                        value = editUserAgent,
+                        onValueChange = { editUserAgent = it },
+                        label = MLang.ProfilesPage.Input.SubscriptionUserAgent,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
 
                 Card {
