@@ -267,7 +267,7 @@ class ProxyTileService : TileService() {
 
         tile.icon = Icon.createWithResource(
             this,
-            R.drawable.ic_notification_furin
+            R.drawable.ic_proxy_tile_wind_chime
         )
 
         tile.updateTile()
@@ -286,7 +286,7 @@ class ProxyTileService : TileService() {
             }
         }
 
-        tile.icon = Icon.createWithResource(this, R.drawable.ic_notification_furin)
+        tile.icon = Icon.createWithResource(this, R.drawable.ic_proxy_tile_wind_chime)
         tile.updateTile()
     }
 
@@ -299,7 +299,7 @@ class ProxyTileService : TileService() {
             tile.subtitle = subtitle
         }
 
-        tile.icon = Icon.createWithResource(this, R.drawable.ic_notification_furin)
+        tile.icon = Icon.createWithResource(this, R.drawable.ic_proxy_tile_wind_chime)
         tile.updateTile()
     }
 
