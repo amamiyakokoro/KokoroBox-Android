@@ -656,6 +656,9 @@ class ProxyFacade(
 
             else -> {
                 runCatching {
+                    // Preview state is also refreshed while idle, before any service event has
+                    // initialized the local profile gateway.
+                    connectCurrentBackend()
                     val profile = ServiceClient.profile().queryActive()
                     _currentProfile.value = profile
                     updateProfileReady(profile)
@@ -1278,6 +1281,9 @@ class ProxyFacade(
     }
 
     private suspend fun queryPreviewProxyGroups(): List<ProxyGroupInfo> {
+        // The home screen can request preview groups during cold start, before the
+        // service-backed gateway has been initialized.
+        connectCurrentBackend()
         val activeProfile = ServiceClient.profile().queryActive().also {
             _currentProfile.value = it
             updateProfileReady(it)
@@ -1286,7 +1292,6 @@ class ProxyFacade(
         if (activeProfile == null) {
             return groupsForMode(proxyDisplaySettingsStorage.proxyMode.value, emptyList())
         }
-        connectCurrentBackend()
         val groups = ServiceClient.clash()
             .queryProfileProxyGroups(excludeNotSelectable = false)
             .map(::toProxyGroupInfo)
