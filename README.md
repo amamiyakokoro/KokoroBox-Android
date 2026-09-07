@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="artwork/app-icon/profile-image.png" width="112" alt="KokoroBox icon">
+<img src="artwork/app-icon/readme-icon.png" width="112" alt="KokoroBox icon">
 
 # KokoroBox
 
