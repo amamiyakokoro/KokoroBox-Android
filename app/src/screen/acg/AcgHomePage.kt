@@ -98,9 +98,7 @@ fun AcgHomePage(
     pageProgress: Float = 1f,
     sidebarProgress: Float = pageProgress,
 ) {
-    val effectiveWallpaperUri = remember(wallpaperUri) {
-        wallpaperUri.ifBlank { DEFAULT_ACG_WALLPAPERS.random() }
-    }
+    val effectiveWallpaperUri = wallpaperUri.ifBlank { DEFAULT_ACG_WALLPAPER }
     val homeViewModel = koinViewModel<HomeViewModel>()
     val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
     val context: Context = LocalContext.current
@@ -438,11 +436,7 @@ fun AcgHomePage(
     }
 }
 
-private val DEFAULT_ACG_WALLPAPERS = listOf(
-    "file:///android_asset/wallpaper.jpg",
-    "file:///android_asset/wallpaper-2.jpg",
-    "file:///android_asset/wallpaper-3.jpg",
-)
+private const val DEFAULT_ACG_WALLPAPER = "file:///android_asset/wallpaper.jpg"
 
 @Composable
 private fun AcgWallpaperBackground(
