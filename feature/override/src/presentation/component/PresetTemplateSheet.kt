@@ -72,6 +72,7 @@ fun OverridePresetTemplateSheet(
         modifier = Modifier,
         title = MLang.Override.Draft.PresetTemplate,
         enableNestedScroll = false,
+        contentScrollEnabled = false,
         dragHandleColor = Color.Transparent,
         startAction = {
             AppBottomSheetCloseAction(onClick = onDismiss)

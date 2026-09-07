@@ -66,6 +66,7 @@ fun OverrideSingleValueSelectionSheet(
         modifier = Modifier,
         title = title,
         enableNestedScroll = false,
+        contentScrollEnabled = false,
         startAction = {
             AppBottomSheetCloseAction(onClick = onDismiss)
         },
@@ -163,6 +164,7 @@ fun OverrideMultiValueSelectionSheet(
         modifier = Modifier,
         title = title,
         enableNestedScroll = false,
+        contentScrollEnabled = false,
         startAction = {
             AppBottomSheetCloseAction(onClick = onDismiss)
         },

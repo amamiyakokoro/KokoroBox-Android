@@ -130,6 +130,7 @@ fun StringMapEditorDialog(
             onDismiss()
         },
         onDismissRequest = onDismiss,
+        scrollable = false,
     ) {
         LazyColumn(
             modifier = Modifier.heightIn(max = UiDp.dp320),
