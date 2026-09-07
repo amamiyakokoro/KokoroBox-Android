@@ -162,7 +162,7 @@ class CloudflareSpeedTestClient(
         const val CALL_TIMEOUT_SECONDS = 45L
         const val LATENCY_SAMPLE_COUNT = 10
         const val PARALLEL_STREAM_COUNT = 4
-        const val DOWNLOAD_BYTES_PER_STREAM = 6_000_000L
+        const val DOWNLOAD_BYTES_PER_STREAM = 8_000_000L
         const val UPLOAD_BYTES_PER_STREAM = 2_000_000L
         const val BUFFER_SIZE = 32 * 1024
         const val NANOS_PER_MILLISECOND = 1_000_000.0

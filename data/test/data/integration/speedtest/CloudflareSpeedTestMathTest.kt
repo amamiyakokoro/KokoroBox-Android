@@ -63,6 +63,10 @@ class CloudflareSpeedTestMathTest {
 
         assertEquals("TPE", result.cloudflareColo)
         assertEquals(14, requests.count { it.path == "/__down" })
+        assertEquals(
+            32_000_000L,
+            requests.filter { it.path == "/__down" }.sumOf { it.bytes?.toLong() ?: 0L },
+        )
         assertEquals(4, requests.count { it.path == "/__up" })
         assertEquals(8_000_000L, requests.filter { it.path == "/__up" }.sumOf { it.bodyBytes })
         assertFalse(requests.any { it.path == "/__results" })
