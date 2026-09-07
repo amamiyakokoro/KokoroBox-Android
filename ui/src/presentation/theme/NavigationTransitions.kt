@@ -24,10 +24,12 @@ package com.github.yumelira.yumebox.presentation.theme
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.navigation.NavBackStackEntry
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
+import com.ramcosta.composedestinations.spec.DestinationStyle
 
 object NavigationTransitions {
 
@@ -81,6 +83,26 @@ object NavigationTransitions {
                     animationSpec = tween(durationMillis = FADE_DURATION, easing = LinearEasing),
                     targetAlpha = 0f
                 )
-            }
+        }
+    }
+
+    /**
+     * The app starts on a transient empty destination before navigating to the home screen.
+     * Keep that hand-off unobtrusive instead of applying the app-wide horizontal page transition.
+     */
+    object MainScreenStyle : DestinationStyle.Animated() {
+        override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+            fadeIn(
+                animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+                initialAlpha = 0f,
+            )
+        }
+
+        override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+            fadeOut(
+                animationSpec = tween(durationMillis = 120, easing = LinearEasing),
+                targetAlpha = 0f,
+            )
+        }
     }
 }

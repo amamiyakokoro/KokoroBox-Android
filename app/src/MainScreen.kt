@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.github.yumelira.yumebox.presentation.component.*
 import com.github.yumelira.yumebox.presentation.screen.ProxyPager
+import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
 import com.github.yumelira.yumebox.screen.acg.AcgHomePage
 import com.github.yumelira.yumebox.screen.acg.calculateHomeVisibility
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
@@ -64,7 +65,7 @@ import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-@Destination<RootGraph>
+@Destination<RootGraph>(style = NavigationTransitions.MainScreenStyle::class)
 fun MainScreen(
     navigator: DestinationsNavigator,
     initialPage: Int = 0,
