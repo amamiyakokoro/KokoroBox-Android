@@ -229,7 +229,7 @@ jobs:
           sha256sum --check SHA256SUMS
           notes="Automated development build ${NIGHTLY_VERSION} from ${SOURCE_SHA}."
           if gh release view nightly >/dev/null 2>&1; then
-            gh release edit nightly --title "KokoroBox Nightly (${NIGHTLY_VERSION})" --prerelease --notes "$notes"
+            gh release edit nightly --title "KokoroBox Nightly" --prerelease --notes "$notes"
             gh release view nightly --json assets --jq '.assets[].name' | while IFS= read -r asset; do
               if [[ "$asset" == *.apk || "$asset" == "SHA256SUMS" || "$asset" == "SIGNING-CERT-SHA256.txt" ]]; then
                 gh release delete-asset nightly "$asset" --yes
@@ -238,5 +238,5 @@ jobs:
             gh release upload nightly ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt --clobber
           else
             gh release create nightly ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt \
-              --title "KokoroBox Nightly (${NIGHTLY_VERSION})" --prerelease --notes "$notes"
+              --title "KokoroBox Nightly" --prerelease --notes "$notes"
           fi
