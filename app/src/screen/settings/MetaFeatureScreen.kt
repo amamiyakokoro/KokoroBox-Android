@@ -289,6 +289,9 @@ private fun GeoXDownloadSheet(
                                 downloadJob = null
                                 onUpdateRecordsChanged(geoXDataController.getGeoFileUpdateRecords())
                                 completedCounts = successCount to totalCount
+                                if (successCount == totalCount) {
+                                    progressItems.clear()
+                                }
                             }
                         },
                     )
