@@ -153,7 +153,9 @@ class ProfilesViewModel(
         viewModelScope.launch {
             try {
                 applyLoading(true)
-                val allProfiles = profilesRepository.queryAllProfiles()
+                val allProfiles = normalizeKokoroSubscriptionUserAgents(
+                    profilesRepository.queryAllProfiles(),
+                )
                 val active = profilesRepository.queryActiveProfile()
 
                 _profiles.value = allProfiles
@@ -180,7 +182,8 @@ class ProfilesViewModel(
             var createdUuid: UUID? = null
             try {
                 applyLoading(true)
-                val uuid = profilesRepository.createProfile(type, name, source, userAgent)
+                val effectiveUserAgent = resolveProfileUserAgent(type, source, userAgent)
+                val uuid = profilesRepository.createProfile(type, name, source, effectiveUserAgent)
                 createdUuid = uuid
 
                 _downloadProgress.value = DownloadProgress(
@@ -368,7 +371,13 @@ class ProfilesViewModel(
         viewModelScope.launch {
             try {
                 applyLoading(true)
-                profilesRepository.patchProfile(uuid, name, source, interval, userAgent)
+                profilesRepository.patchProfile(
+                    uuid,
+                    name,
+                    source,
+                    interval,
+                    resolveProfileUserAgent(Profile.Type.Url, source, userAgent),
+                )
                 showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(name))
                 refreshProfiles()
                 Timber.i("Profile patched: $uuid")
@@ -394,7 +403,13 @@ class ProfilesViewModel(
             var patched = false
             try {
                 applyLoading(true)
-                profilesRepository.patchProfile(uuid, name, source, interval, userAgent)
+                profilesRepository.patchProfile(
+                    uuid,
+                    name,
+                    source,
+                    interval,
+                    resolveProfileUserAgent(Profile.Type.Url, source, userAgent),
+                )
                 refreshProfiles()
                 patched = true
                 Timber.i("Kokoro profile settings patched: $uuid")
@@ -415,6 +430,40 @@ class ProfilesViewModel(
             name = name,
             fileUri = uri
         )
+    }
+
+    private suspend fun normalizeKokoroSubscriptionUserAgents(
+        profiles: List<Profile>,
+    ): List<Profile> = profiles.map { profile ->
+        val expectedUserAgent = resolveProfileUserAgent(profile.type, profile.source, profile.userAgent)
+        if (expectedUserAgent == profile.userAgent) {
+            profile
+        } else {
+            try {
+                profilesRepository.patchProfile(
+                    profile.uuid,
+                    profile.name,
+                    profile.source,
+                    profile.interval,
+                    expectedUserAgent,
+                )
+                profile.copy(userAgent = expectedUserAgent)
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Timber.w(e, "Unable to normalize Kokoro subscription User-Agent")
+                profile
+            }
+        }
+    }
+
+    private fun resolveProfileUserAgent(
+        type: Profile.Type,
+        source: String,
+        requestedUserAgent: String,
+    ): String = if (type == Profile.Type.Url && KokoroApi.isManagedConfigUrl(source)) {
+        KokoroApi.subscriptionUserAgent
+    } else {
+        requestedUserAgent
     }
 
     fun reorderProfiles(from: Int, to: Int) {

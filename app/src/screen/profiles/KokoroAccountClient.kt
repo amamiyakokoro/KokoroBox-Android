@@ -11,6 +11,7 @@ package com.github.yumelira.yumebox.screen.profiles
 
 import android.content.Context
 import android.net.Uri
+import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi as KokoroBackendApi
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
@@ -35,6 +36,9 @@ internal object KokoroApi {
     const val OPTIONS_URL = KokoroBackendApi.SUBSCRIPTION_OPTIONS_URL
     const val RESOLVE_URL = KokoroBackendApi.SUBSCRIPTION_RESOLVE_URL
     const val CONFIG_URL = KokoroBackendApi.SUBSCRIPTION_CONFIG_URL
+
+    val subscriptionUserAgent: String
+        get() = "KokoroBox-Android/${BuildConfig.VERSION_NAME}"
 
     fun isManagedConfigUrl(source: String): Boolean = KokoroBackendApi.isManagedSubscriptionUrl(source)
 

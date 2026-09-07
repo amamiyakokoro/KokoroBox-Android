@@ -416,7 +416,7 @@ internal fun AddProfileSheet(
                         Profile.Type.Url,
                         KokoroApi.intervalMillis(normalizedKokoroSettings),
                         null,
-                        userAgent,
+                        KokoroApi.subscriptionUserAgent,
                     )
                 } catch (e: Exception) {
                     if (e is kotlinx.coroutines.CancellationException) throw e
@@ -694,9 +694,7 @@ private fun ProfileFormContent(
             }
         }
 
-        if (selectedTypeIndex == PROFILE_TYPE_KOKORO ||
-            selectedTypeIndex == PROFILE_TYPE_SUBSCRIPTION
-        ) {
+        if (selectedTypeIndex == PROFILE_TYPE_SUBSCRIPTION) {
             YumeMd3OutlinedTextField(
                 value = userAgent,
                 onValueChange = onUserAgentChange,

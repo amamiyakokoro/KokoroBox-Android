@@ -183,6 +183,7 @@ internal fun ProfileSettingsDialog(
         .filterNot(::isBuiltinPresetOverrideId)
     val appliedOverrideIds = initialOverrideIds
     val initialSubscriptionSettings = KokoroApi.parseConfigSettings(profile.source)
+    val isKokoroSubscription = KokoroApi.isManagedConfigUrl(profile.source)
     var editName by remember { mutableStateOf(profile.name) }
     var editSource by remember { mutableStateOf("") }
     var editUserAgent by remember { mutableStateOf(profile.userAgent) }
@@ -225,7 +226,11 @@ internal fun ProfileSettingsDialog(
         }
         val targetInterval = normalizedSubscriptionSettings?.let(KokoroApi::intervalMillis)
             ?: profile.interval
-        val targetUserAgent = editUserAgent.trim()
+        val targetUserAgent = if (isKokoroSubscription) {
+            KokoroApi.subscriptionUserAgent
+        } else {
+            editUserAgent.trim()
+        }
         val shouldRefresh = normalizedSubscriptionSettings != null && targetSource != profile.source
         if (trimmedName.isNotEmpty() && targetSource.isNotEmpty() &&
             (trimmedName != profile.name || targetSource != profile.source ||
@@ -297,13 +302,15 @@ internal fun ProfileSettingsDialog(
                         )
                     }
 
-                    YumeMd3OutlinedTextField(
-                        value = editUserAgent,
-                        onValueChange = { editUserAgent = it },
-                        label = MLang.ProfilesPage.Input.SubscriptionUserAgent,
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    if (!isKokoroSubscription) {
+                        YumeMd3OutlinedTextField(
+                            value = editUserAgent,
+                            onValueChange = { editUserAgent = it },
+                            label = MLang.ProfilesPage.Input.SubscriptionUserAgent,
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
 
                 Card {
