@@ -274,6 +274,7 @@ object Clash {
         path: File,
         url: String,
         force: Boolean,
+        downloadProviders: Boolean = true,
         reportStatus: (FetchStatus) -> Unit,
     ): CompletableDeferred<Unit> {
         return CompletableDeferred<Unit>().apply {
@@ -298,6 +299,7 @@ object Clash {
                 path.absolutePath,
                 url,
                 force,
+                downloadProviders,
             )
         }
     }

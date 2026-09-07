@@ -52,7 +52,6 @@ func openUrl(ctx context.Context, url string) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-
 	return response.Body, nil
 }
 
@@ -103,6 +102,7 @@ func FetchAndValid(
 	path string,
 	url string,
 	force bool,
+	downloadProviders bool,
 	reportStatus func(string),
 ) error {
 	configPath := P.Join(path, "config.yaml")
@@ -134,41 +134,43 @@ func FetchAndValid(
 		return err
 	}
 
-	forEachProviders(rawCfg, func(index int, total int, name string, provider map[string]any, prefix string) {
-		bytes, _ := json.Marshal(&Status{
-			Action:      "FetchProviders",
-			Args:        []string{name},
-			Progress:    index,
-			MaxProgress: total,
+	if downloadProviders {
+		forEachProviders(rawCfg, func(index int, total int, name string, provider map[string]any, prefix string) {
+			bytes, _ := json.Marshal(&Status{
+				Action:      "FetchProviders",
+				Args:        []string{name},
+				Progress:    index,
+				MaxProgress: total,
+			})
+
+			reportStatus(string(bytes))
+
+			u, uok := provider["url"]
+			p, pok := provider["path"]
+
+			if !uok || !pok {
+				return
+			}
+
+			us, uok := u.(string)
+			ps, pok := p.(string)
+
+			if !uok || !pok {
+				return
+			}
+
+			if _, err := os.Stat(ps); err == nil {
+				return
+			}
+
+			url, err := U.Parse(us)
+			if err != nil {
+				return
+			}
+
+			_ = fetch(url, ps)
 		})
-
-		reportStatus(string(bytes))
-
-		u, uok := provider["url"]
-		p, pok := provider["path"]
-
-		if !uok || !pok {
-			return
-		}
-
-		us, uok := u.(string)
-		ps, pok := p.(string)
-
-		if !uok || !pok {
-			return
-		}
-
-		if _, err := os.Stat(ps); err == nil {
-			return
-		}
-
-		url, err := U.Parse(us)
-		if err != nil {
-			return
-		}
-
-		_ = fetch(url, ps)
-	})
+	}
 
 	bytes, _ := json.Marshal(&Status{
 		Action:      "Verifying",

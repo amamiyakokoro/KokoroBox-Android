@@ -66,6 +66,7 @@ object Bridge {
         path: String,
         url: String,
         force: Boolean,
+        downloadProviders: Boolean,
     )
 
     external fun nativeLoad(completable: CompletableDeferred<Unit>, path: String)

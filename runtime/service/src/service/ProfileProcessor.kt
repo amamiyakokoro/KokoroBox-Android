@@ -41,8 +41,12 @@ import com.github.yumelira.yumebox.service.runtime.util.importedDir
 import com.github.yumelira.yumebox.service.runtime.util.sendProfileChanged
 import com.github.yumelira.yumebox.core.util.ProfileUpdatePolicy
 import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -67,6 +71,7 @@ object ProfileProcessor {
 
     private val profileLock = Mutex()
     private val processLock = Mutex()
+    private val providerPrefetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
@@ -98,6 +103,36 @@ object ProfileProcessor {
     )
 
     private class SubscriptionDownloadException(message: String) : IOException(message)
+
+    /**
+     * Fetches providers only after a newly imported Kokoro profile has been committed. The
+     * configuration is already present at this point, so native validation will not try to fetch
+     * the bearer-token-protected subscription URL again.
+     */
+    private fun prefetchKokoroProviders(context: Context, uuid: UUID) {
+        val appContext = context.applicationContext
+        providerPrefetchScope.launch {
+            try {
+                val profileDir = appContext.importedDir.resolve(uuid.toString())
+                if (!profileDir.resolve("config.yaml").isFile) return@launch
+
+                Clash.fetchAndValid(
+                    path = profileDir,
+                    // config.yaml is present, so the native layer only needs to fetch missing
+                    // providers. Do not retain or pass the authenticated subscription URL.
+                    url = "",
+                    force = false,
+                    downloadProviders = true,
+                    reportStatus = {},
+                ).await()
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                // Provider downloads are an optimization after a successful import. A later
+                // profile update or Mihomo itself can retry missing providers.
+                Log.w("Kokoro provider prefetch failed", e)
+            }
+        }
+    }
 
     private suspend fun downloadWithSubscriptionInfo(
         context: Context,
@@ -474,8 +509,17 @@ object ProfileProcessor {
                     // HTTP client cannot attach the App bearer token and would overwrite config.yaml
                     // with the 401 response body before validation.
                     val requiresNativeFetch = snapshot.imported.type != Profile.Type.Url
+                    val deferKokoroProviderDownloads =
+                        snapshot.imported.type == Profile.Type.Url &&
+                            !snapshot.hasCommittedConfig &&
+                            KokoroApi.isManagedSubscriptionUrl(snapshot.imported.source)
                     StartupTaskCoordinator.awaitGeoInitialization()
-                    Clash.fetchAndValid(stagingDir, snapshot.imported.source, requiresNativeFetch) {
+                    Clash.fetchAndValid(
+                        path = stagingDir,
+                        url = snapshot.imported.source,
+                        force = requiresNativeFetch,
+                        downloadProviders = !deferKokoroProviderDownloads,
+                    ) {
                         try {
                             cb?.updateStatus(
                                 it
@@ -486,7 +530,7 @@ object ProfileProcessor {
                         }
                     }.await()
 
-                    profileLock.withLock {
+                    val committed = profileLock.withLock {
                         if (ImportedDao.exists(snapshot.imported.uuid)) {
                             targetDir.deleteRecursively()
                             stagingDir.copyRecursively(targetDir, overwrite = true)
@@ -510,7 +554,13 @@ object ProfileProcessor {
                             ImportedDao.update(updated)
 
                             context.sendProfileChanged(snapshot.imported.uuid)
+                            true
+                        } else {
+                            false
                         }
+                    }
+                    if (committed && deferKokoroProviderDownloads) {
+                        prefetchKokoroProviders(context, snapshot.imported.uuid)
                     }
                 } catch (e: Exception) {
                     profileLock.withLock {
