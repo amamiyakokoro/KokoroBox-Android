@@ -24,6 +24,7 @@ class GitHubReleaseClientTest {
         assertTrue(ReleaseVersion.parse("v0.5.10")!! > ReleaseVersion.parse("0.5.9")!!)
         assertTrue(ReleaseVersion.parse("v1.0.0")!! > ReleaseVersion.parse("v0.99.99")!!)
         assertEquals(ReleaseVersion.parse("v0.5.6"), ReleaseVersion.parse("0.5.6"))
+        assertEquals(ReleaseVersion.parse("0.5.6"), ReleaseVersion.parse("0.5.6-nightly"))
         listOf("v0.5.6-beta1", "dev", "v01.0.0", "v0.5.6/evil", "0.5", "999999999999999999999.0.0")
             .forEach { assertNull(ReleaseVersion.parse(it)) }
     }

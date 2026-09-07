@@ -25,7 +25,7 @@ data class ReleaseVersion(val major: Long, val minor: Long, val patch: Long) : C
 
     companion object {
         fun parse(value: String): ReleaseVersion? {
-            val parts = Regex("v?(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)")
+            val parts = Regex("v?(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-nightly)?")
                 .matchEntire(value)?.groupValues?.drop(1)?.map { it.toLongOrNull() ?: return null }
                 ?: return null
             return ReleaseVersion(parts[0], parts[1], parts[2])

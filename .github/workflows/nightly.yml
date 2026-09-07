@@ -1,0 +1,223 @@
+name: Nightly APK
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-apk-dev
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    environment: release-signing
+    timeout-minutes: 90
+    outputs:
+      version: ${{ steps.source.outputs.version }}
+      sha: ${{ steps.source.outputs.sha }}
+      ndk: ${{ steps.source.outputs.ndk }}
+      sdk: ${{ steps.source.outputs.sdk }}
+    steps:
+      - name: Checkout dev source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set nightly version metadata
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_version="$(sed -n 's/^project\.version\.name=//p' gradle.properties)"
+          if [[ ! "$base_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "project.version.name must be MAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          version="${base_version}-nightly"
+          base_code="$(sed -n 's/^project\.version\.code=//p' gradle.properties)"
+          release_tag="v${base_version}"
+          if ! git rev-parse --verify --quiet "${release_tag}^{commit}" >/dev/null; then
+            echo "Missing base release tag ${release_tag}" >&2
+            exit 1
+          fi
+          nightly_offset="$(git rev-list --count "${release_tag}..HEAD")"
+          nightly_offset="$((nightly_offset > 0 ? nightly_offset : 1))"
+          if (( nightly_offset > 99 )); then
+            echo "More than 99 commits since ${release_tag}; bump the release version before publishing another nightly" >&2
+            exit 1
+          fi
+          version_code="$((base_code + nightly_offset))"
+          sdk_major="$(sed -n 's/^android\.compileSdk=//p' gradle.properties)"
+          sdk_minor="$(sed -n 's/^android\.compileSdkMinor=//p' gradle.properties)"
+          if [[ "$sdk_major" -ge 37 || "$sdk_minor" != "0" ]]; then
+            sdk="${sdk_major}.${sdk_minor}"
+          else
+            sdk="$sdk_major"
+          fi
+          sed -i "s/^project\.version\.name=.*/project.version.name=${version}/" gradle.properties
+          sed -i "s/^project\.version\.code=.*/project.version.code=${version_code}/" gradle.properties
+          {
+            echo "version=$version"
+            echo "version_code=$version_code"
+            echo "sha=$(git rev-parse HEAD)"
+            echo "ndk=$(sed -n 's/^android\.ndkVersion=//p' gradle.properties)"
+            echo "sdk=$sdk"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check signing secrets before building
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: python3 scripts/ci-release.py check-secrets
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Setup Kotlin
+        uses: fwilhe2/setup-kotlin@74982ab1a6e647402f7ad39aba2ba10f3a694c54 # pinned main
+
+      - name: Setup Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: lib/native/go/go.mod
+          cache: false
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # pinned stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-disabled: true
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ""
+
+      - name: Install native and Android build tools
+        env:
+          NDK_VERSION: ${{ steps.source.outputs.ndk }}
+          SDK_VERSION: ${{ steps.source.outputs.sdk }}
+        run: |
+          sdkmanager "platforms;android-$SDK_VERSION" "build-tools;37.0.0" "ndk;$NDK_VERSION" "cmake;3.22.1"
+          test -x "$ANDROID_HOME/build-tools/37.0.0/apksigner"
+          test -x "$ANDROID_HOME/build-tools/37.0.0/aapt2"
+          cargo install cargo-ndk --locked
+
+      - name: Checkout configured Mihomo release
+        run: python3 scripts/ci-release.py sync-kernel
+
+      - name: Build native runtime, Geo assets and locale
+        env:
+          ABI_APP_LIST: arm64-v8a
+          NDK_VERSION: ${{ steps.source.outputs.ndk }}
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/$NDK_VERSION"
+          kotlin scripts/native-build.main.kts --all
+          kotlin scripts/generate-locale.main.kts .
+          test -s jniLibs/arm64-v8a/libclash.so
+          test -s jniLibs/arm64-v8a/liboverride.so
+          test -s jniLibs/arm64-v8a/libbridge.so
+          test -s build/generated/assets/geo/geoip.metadb.xz
+          test -s build/generated/assets/geo/geosite.dat.xz
+          test -s build/generated/assets/geo/ASN.mmdb.xz
+
+      - name: Restore private release keystore
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: python3 scripts/ci-release.py restore
+
+      - name: Build signed nightly APK
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          export APKSIGNER="$ANDROID_HOME/build-tools/37.0.0/apksigner"
+          python3 scripts/ci-release.py build
+
+      - name: Verify signature and prepare nightly APK
+        env:
+          SIGNING_CERT_SHA256: ${{ vars.SIGNING_CERT_SHA256 }}
+        run: |
+          export APKSIGNER="$ANDROID_HOME/build-tools/37.0.0/apksigner"
+          export AAPT2="$ANDROID_HOME/build-tools/37.0.0/aapt2"
+          python3 scripts/ci-release.py verify
+
+      - name: Remove private keystore
+        if: always()
+        run: python3 scripts/ci-release.py cleanup
+
+      - name: Upload signed nightly APK and checksums
+        uses: actions/upload-artifact@v7
+        with:
+          name: KokoroBox-${{ steps.source.outputs.version }}-arm64-release
+          path: |
+            publish/*.apk
+            publish/SHA256SUMS
+            publish/SIGNING-CERT-SHA256.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository for the moving nightly tag
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+
+      - name: Move nightly tag to this source revision
+        env:
+          SOURCE_SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          git tag --force nightly "$SOURCE_SHA"
+          git push --force origin refs/tags/nightly
+
+      - name: Download verified nightly artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: KokoroBox-${{ needs.build.outputs.version }}-arm64-release
+          path: publish
+
+      - name: Publish rolling pre-release
+        working-directory: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NIGHTLY_VERSION: ${{ needs.build.outputs.version }}
+          SOURCE_SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          set -euo pipefail
+          sha256sum --check SHA256SUMS
+          notes="Automated development build ${NIGHTLY_VERSION} from ${SOURCE_SHA}."
+          if gh release view nightly >/dev/null 2>&1; then
+            gh release edit nightly --title "KokoroBox Nightly (${NIGHTLY_VERSION})" --prerelease --notes "$notes"
+            gh release upload nightly ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt --clobber
+          else
+            gh release create nightly ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt \
+              --title "KokoroBox Nightly (${NIGHTLY_VERSION})" --prerelease --notes "$notes"
+          fi
