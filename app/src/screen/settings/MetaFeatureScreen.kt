@@ -311,6 +311,7 @@ private fun GeoXDownloadSheet(
                     )
                 }
                 geoXItems.forEach { item ->
+                    val progress = progressItems[item.type]
                     PreferenceListItem(
                         title = item.title,
                         summary = item.lastUpdateSummary(updateRecords[item.fileName]),
@@ -325,13 +326,10 @@ private fun GeoXDownloadSheet(
                             null
                         } else {
                             { selectedItems[item.type] = !(selectedItems[item.type] ?: false) }
-                        }
-                    )
-                }
-                if (isDownloading || progressItems.isNotEmpty()) {
-                    GeoXDownloadProgressContent(
-                        items = geoXItems.mapNotNull { progressItems[it.type] },
-                        isUpdating = isDownloading,
+                        },
+                        bottomAction = progress?.let { itemProgress ->
+                            { GeoXDownloadInlineProgress(itemProgress) }
+                        },
                     )
                 }
             }
@@ -504,53 +502,8 @@ private fun ResourceDownloadProgress.toGeoXProgressState(
     )
 }
 
-private fun GeoXDownloadProgressState.isInProgress(): Boolean {
-    return status == GeoXDownloadStatus.Pending ||
-        status == GeoXDownloadStatus.Downloading ||
-        status == GeoXDownloadStatus.Validating
-}
-
 @Composable
-private fun GeoXDownloadProgressContent(
-    items: List<GeoXDownloadProgressState>,
-    isUpdating: Boolean,
-) {
-    val showUpdatingHeader = isUpdating && items.any(GeoXDownloadProgressState::isInProgress)
-    val spacing = com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = spacing.space16, vertical = spacing.space12),
-        verticalArrangement = Arrangement.spacedBy(spacing.space12),
-    ) {
-        if (showUpdatingHeader) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.space12),
-            ) {
-                Md3ELoading(modifier = Modifier.size(spacing.space32))
-                Column {
-                    Text(
-                        text = MLang.MetaFeature.Download.ProgressTitle,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = MLang.MetaFeature.Download.ProgressSummary,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-        items.forEach { item ->
-            GeoXDownloadProgressRow(item)
-        }
-    }
-}
-
-@Composable
-private fun GeoXDownloadProgressRow(item: GeoXDownloadProgressState) {
+private fun GeoXDownloadInlineProgress(item: GeoXDownloadProgressState) {
     val spacing = com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
     Column(
         modifier = Modifier.fillMaxWidth(),
