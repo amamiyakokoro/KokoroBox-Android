@@ -6,6 +6,7 @@ NetworkSettings = {
         VpnService = "代理模式"
         VpnOptions = "服务配置"
         ProxyOptions = "访问控制"
+        Network = "网络"
     }
 
     VpnService = {
@@ -37,6 +38,12 @@ NetworkSettings = {
         RejectSelected = "拒绝选择"
         ManageAccessControlTitle = "管理访问控制列表"
         ManageAccessControlSummary = "为应用和域名配置访问控制规则"
+    }
+
+    Network = {
+        CustomUserAgentTitle = "自定义 User-Agent"
+        CustomUserAgentSummaryDefault = "未设置，使用默认值"
+        UserAgentDialogTitle = "编辑 User-Agent"
     }
 
     RootTun = {

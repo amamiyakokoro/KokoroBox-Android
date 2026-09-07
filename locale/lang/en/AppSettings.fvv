@@ -7,7 +7,6 @@ AppSettings = {
         Interface = "Interface"
         Privacy = "Privacy"
         Service = "Service"
-        Network = "Network"
         Backup = "Backup"
         Experimental = "Experimental"
     }
@@ -107,11 +106,6 @@ AppSettings = {
         BatteryOptimizationTitle = "Unrestricted Battery"
     }
 
-    Network = {
-        CustomUserAgentTitle = "Custom User-Agent"
-        CustomUserAgentSummaryDefault = "Not set, using default"
-    }
-
     Backup = {
         ExportTitle = "Export Settings Backup"
         ExportSummary = "Save app preferences, network options, profile links, and display settings as a JSON file"
@@ -129,10 +123,6 @@ AppSettings = {
         Title = "Warning"
         HideIconMsg1 = "Please make sure you can access this app's settings before hiding!"
         HideIconMsg2 = "For HyperOS, please enable Auto-start and Background Pop-up permissions to receive dialer codes!"
-    }
-
-    EditDialog = {
-        UserAgentTitle = "Edit User-Agent"
     }
 
     Button = {

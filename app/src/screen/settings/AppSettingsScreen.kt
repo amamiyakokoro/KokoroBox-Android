@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.input.TextFieldValue
 import com.github.yumelira.yumebox.common.util.AppIconHelper
 import com.github.yumelira.yumebox.common.util.BiometricHelper
 import com.github.yumelira.yumebox.common.util.toast
@@ -58,7 +57,6 @@ import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.TextEditBottomSheet
 import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.TopBar
 import com.github.yumelira.yumebox.presentation.component.WarningBottomSheet
@@ -95,7 +93,6 @@ fun AppSettingsScreen(
             item { AppInterfaceSettingsSection(viewModel) }
             item { AppPrivacySettingsSection(viewModel) }
             item { AppServiceSettingsSection(viewModel) }
-            item { AppNetworkSettingsSection(viewModel) }
             item {
                 AppExperimentalSettingsSection(
                     viewModel = viewModel,
@@ -306,19 +303,6 @@ private fun AppServiceSettingsSection(viewModel: AppSettingsViewModel) {
                     context.toast(MLang.Util.Error.UnknownError)
                 }
             },
-        )
-    }
-}
-
-@Composable
-private fun AppNetworkSettingsSection(viewModel: AppSettingsViewModel) {
-    val customUserAgent by viewModel.customUserAgent.state.collectAsStateWithLifecycle()
-
-    Title(MLang.AppSettings.Section.Network)
-    Card {
-        CustomUserAgentPreferenceItem(
-            customUserAgent = customUserAgent,
-            onConfirm = viewModel::applyCustomUserAgent,
         )
     }
 }
@@ -639,36 +623,6 @@ private fun PageScalePreferenceItem(
         onPageScaleChange = { pageScaleLocal = it },
         onApply = onApply,
         onDismissRequest = { showPageScaleDialogState.value = false },
-    )
-}
-
-@Composable
-private fun CustomUserAgentPreferenceItem(
-    customUserAgent: String,
-    onConfirm: (String) -> Unit,
-) {
-    val customUserAgentSummary = remember(customUserAgent) {
-        customUserAgent.ifEmpty {
-            MLang.AppSettings.Network.CustomUserAgentSummaryDefault
-        }
-    }
-    val showEditCustomUserAgentDialogState = remember { mutableStateOf(false) }
-    val customUserAgentTextFieldState = remember { mutableStateOf(TextFieldValue()) }
-
-    PreferenceValueItem(
-        title = MLang.AppSettings.Network.CustomUserAgentTitle,
-        summary = customUserAgentSummary,
-        onClick = {
-            customUserAgentTextFieldState.value = TextFieldValue(customUserAgent)
-            showEditCustomUserAgentDialogState.value = true
-        },
-    )
-
-    TextEditBottomSheet(
-        show = showEditCustomUserAgentDialogState,
-        title = MLang.AppSettings.EditDialog.UserAgentTitle,
-        textFieldValue = customUserAgentTextFieldState,
-        onConfirm = onConfirm,
     )
 }
 

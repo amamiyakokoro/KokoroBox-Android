@@ -6,6 +6,7 @@ NetworkSettings = {
         VpnService = "Proxy Mode"
         VpnOptions = "Service Options"
         ProxyOptions = "Access Control"
+        Network = "Network"
     }
 
     VpnService = {
@@ -37,6 +38,12 @@ NetworkSettings = {
         RejectSelected = "Reject Selected"
         ManageAccessControlTitle = "Manage Access Control"
         ManageAccessControlSummary = "Configure access control rules for apps and domains"
+    }
+
+    Network = {
+        CustomUserAgentTitle = "Custom User-Agent"
+        CustomUserAgentSummaryDefault = "Not set, using default"
+        UserAgentDialogTitle = "Edit User-Agent"
     }
 
     RootTun = {

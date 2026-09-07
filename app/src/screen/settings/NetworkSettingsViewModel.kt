@@ -26,11 +26,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.core.model.RootTunDnsMode
+import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.controller.NetworkSettingsController
 import com.github.yumelira.yumebox.data.model.AccessControlMode
 import com.github.yumelira.yumebox.data.model.ProxyMode
 import com.github.yumelira.yumebox.data.model.TunStack
 import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
+import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.data.store.Preference
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
 import com.github.yumelira.yumebox.runtime.client.RuntimeStateMapper
@@ -51,8 +53,10 @@ import kotlinx.coroutines.launch
 class NetworkSettingsViewModel(
     application: Application,
     settings: NetworkSettingsStore,
+    appSettings: AppSettingsStore,
     private val controller: NetworkSettingsController,
     private val proxyFacade: ProxyFacade,
+    private val appSettingsController: AppSettingsController,
 ) : AndroidViewModel(application) {
 
     val proxyMode: Preference<ProxyMode> = settings.proxyMode
@@ -67,6 +71,7 @@ class NetworkSettingsViewModel(
     val rootTunAutoRedirect: Preference<Boolean> = settings.rootTunAutoRedirect
     val rootTunDnsMode: Preference<RootTunDnsMode> = settings.rootTunDnsMode
     val accessControlMode: Preference<AccessControlMode> = settings.accessControlMode
+    val customUserAgent: Preference<String> = appSettings.customUserAgent
 
     private val rootTunIfName = settings.rootTunIfName
     private val rootTunMtu = settings.rootTunMtu
@@ -275,6 +280,10 @@ class NetworkSettingsViewModel(
 
     fun onAccessControlModeChange(mode: AccessControlMode) {
         controller.setAndRestartIfNeeded(accessControlMode, mode)
+    }
+
+    fun applyCustomUserAgent(userAgent: String) {
+        appSettingsController.applyCustomUserAgent(userAgent)
     }
 
     fun onRootTunIfNameDraftChange(value: String) {

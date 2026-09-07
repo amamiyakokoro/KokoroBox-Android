@@ -6,6 +6,7 @@ NetworkSettings = {
         VpnService = "代理模式"
         VpnOptions = "服務設定"
         ProxyOptions = "存取控制"
+        Network = "網路"
     }
 
     VpnService = {
@@ -37,6 +38,12 @@ NetworkSettings = {
         RejectSelected = "拒絕選擇"
         ManageAccessControlTitle = "管理存取控制清單"
         ManageAccessControlSummary = "為應用程式和網域設定存取控制規則"
+    }
+
+    Network = {
+        CustomUserAgentTitle = "自訂 User-Agent"
+        CustomUserAgentSummaryDefault = "未設定，使用預設值"
+        UserAgentDialogTitle = "編輯 User-Agent"
     }
 
     RootTun = {

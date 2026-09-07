@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import com.github.yumelira.yumebox.common.util.VpnUtils
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.core.model.RootTunDnsMode
@@ -49,7 +50,9 @@ import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
 import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
+import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
 import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
+import com.github.yumelira.yumebox.presentation.component.TextEditBottomSheet
 import com.github.yumelira.yumebox.presentation.component.Title
 import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
 import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
@@ -127,6 +130,7 @@ fun NetworkSettingsScreen(
                     onAccessControlModeChange = viewModel::onAccessControlModeChange,
                 )
             }
+            item { NetworkHttpSettingsSection(viewModel) }
         }
     }
 }
@@ -278,6 +282,35 @@ private fun NetworkProxyOptionsSection(
             },
         )
     }
+}
+
+@Composable
+private fun NetworkHttpSettingsSection(viewModel: NetworkSettingsViewModel) {
+    val customUserAgent by viewModel.customUserAgent.state.collectAsStateWithLifecycle()
+    val customUserAgentSummary = remember(customUserAgent) {
+        customUserAgent.ifEmpty { MLang.NetworkSettings.Network.CustomUserAgentSummaryDefault }
+    }
+    val showEditUserAgent = remember { mutableStateOf(false) }
+    val userAgentTextField = remember { mutableStateOf(TextFieldValue()) }
+
+    Title(MLang.NetworkSettings.Section.Network)
+    Card {
+        PreferenceValueItem(
+            title = MLang.NetworkSettings.Network.CustomUserAgentTitle,
+            summary = customUserAgentSummary,
+            onClick = {
+                userAgentTextField.value = TextFieldValue(customUserAgent)
+                showEditUserAgent.value = true
+            },
+        )
+    }
+
+    TextEditBottomSheet(
+        show = showEditUserAgent,
+        title = MLang.NetworkSettings.Network.UserAgentDialogTitle,
+        textFieldValue = userAgentTextField,
+        onConfirm = viewModel::applyCustomUserAgent,
+    )
 }
 
 @Composable

@@ -83,7 +83,7 @@ class AppSettingsViewModel(
     val biometricUnlockEnabled: Preference<Boolean> = settings.biometricUnlockEnabled
     val exitUiWhenBackground: Preference<Boolean> = settings.exitUiWhenBackground
 
-    val customUserAgent: Preference<String> = settings.customUserAgent
+    private val customUserAgent: Preference<String> = settings.customUserAgent
 
     fun onThemeModeChange(mode: ThemeMode) = themeMode.set(mode)
     fun onAppLanguageChange(language: AppLanguage) = controller.applyAppLanguage(language)
@@ -136,8 +136,6 @@ class AppSettingsViewModel(
     fun onScreenshotProtectionEnabledChange(enabled: Boolean) = screenshotProtectionEnabled.set(enabled)
     fun onBiometricUnlockEnabledChange(enabled: Boolean) = biometricUnlockEnabled.set(enabled)
     fun onExitUiWhenBackgroundChange(enabled: Boolean) = exitUiWhenBackground.set(enabled)
-
-    fun applyCustomUserAgent(userAgent: String) = controller.applyCustomUserAgent(userAgent)
 
     fun exportUserSettingsBackup(resolver: ContentResolver, uri: Uri, onResult: (Result<Unit>) -> Unit) {
         launchBackup(onResult = onResult) {

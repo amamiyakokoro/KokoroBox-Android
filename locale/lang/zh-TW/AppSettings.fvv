@@ -7,7 +7,6 @@ AppSettings = {
         Interface = "介面"
         Privacy = "隱私"
         Service = "服務"
-        Network = "網路"
         Backup = "備份"
         Experimental = "實驗性內容"
     }
@@ -107,11 +106,6 @@ AppSettings = {
         BatteryOptimizationTitle = "電池最佳化無限制"
     }
 
-    Network = {
-        CustomUserAgentTitle = "自訂 User-Agent"
-        CustomUserAgentSummaryDefault = "未設定，使用預設值"
-    }
-
     Backup = {
         ExportTitle = "匯出設定備份"
         ExportSummary = "將應用程式偏好、網路選項、設定檔連結和顯示設定儲存為 JSON 檔案"
@@ -129,10 +123,6 @@ AppSettings = {
         Title = "警告"
         HideIconMsg1 = "請在隱藏之前確認你能夠存取本應用程式的設定介面！"
         HideIconMsg2 = "對於 HyperOS, 請開啟 自啟動 和 背景彈出介面 權限，以接受撥號介面程式碼！"
-    }
-
-    EditDialog = {
-        UserAgentTitle = "編輯 User-Agent"
     }
 
     Button = {
