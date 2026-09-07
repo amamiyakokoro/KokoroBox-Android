@@ -7,4 +7,25 @@ Feature = {
         HealthCheckConcurrencyTitle = "测速并发数"
         HealthCheckConcurrencySummary = "当前选项：%s"
     }
+
+    SpeedTest = {
+        Section = "网络测试"
+        Title = "Cloudflare 速度测试"
+        Summary = "测量当前连接至 Cloudflare Edge 的质量"
+        DataUsage = "每次测试最多使用 32 MB 下载与 8 MB 上传流量"
+        PrivacyNotice = "测试流量会发送至 Cloudflare；不包含丢包测试。"
+        Start = "开始测试"
+        Cancel = "取消"
+        Preparing = "正在准备测试…"
+        TestingLatency = "正在测量延迟…"
+        TestingDownload = "正在测量下载速度…"
+        TestingUpload = "正在测量上传速度…"
+        Download = "下载"
+        Upload = "上传"
+        Latency = "延迟"
+        Jitter = "抖动"
+        EdgeLocation = "Cloudflare Edge"
+        LocationUnknown = "未知"
+        Error = "无法完成速度测试，请检查连接后再试一次。"
+    }
 }

@@ -7,4 +7,25 @@ Feature = {
         HealthCheckConcurrencyTitle = "Health Check Concurrency"
         HealthCheckConcurrencySummary = "Current option: %s"
     }
+
+    SpeedTest = {
+        Section = "Network Test"
+        Title = "Cloudflare Speed Test"
+        Summary = "Measure the current connection to Cloudflare's edge"
+        DataUsage = "Uses up to 32 MB download and 8 MB upload per test"
+        PrivacyNotice = "Test traffic is sent to Cloudflare. Packet-loss testing is not included."
+        Start = "Start test"
+        Cancel = "Cancel"
+        Preparing = "Preparing test…"
+        TestingLatency = "Measuring latency…"
+        TestingDownload = "Measuring download speed…"
+        TestingUpload = "Measuring upload speed…"
+        Download = "Download"
+        Upload = "Upload"
+        Latency = "Latency"
+        Jitter = "Jitter"
+        EdgeLocation = "Cloudflare edge"
+        LocationUnknown = "Unknown"
+        Error = "The speed test could not be completed. Check your connection and try again."
+    }
 }

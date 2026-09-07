@@ -28,6 +28,7 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordina
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
 import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
+import com.github.yumelira.yumebox.data.integration.speedtest.CloudflareSpeedTestClient
 import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
@@ -41,6 +42,7 @@ import com.github.yumelira.yumebox.screen.settings.KokoroCustomRulesViewModel
 import com.github.yumelira.yumebox.screen.settings.KokoroSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.NetworkSettingsViewModel
 import com.github.yumelira.yumebox.screen.settings.ResourceDownloadClient
+import com.github.yumelira.yumebox.screen.settings.CloudflareSpeedTestViewModel
 import com.github.yumelira.yumebox.service.LogRecordServiceGateway
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
@@ -64,6 +66,7 @@ val appIntegrationModule = module {
     single { KokoroRepository(get(), get()) }
     single { KokoroPreloadCoordinator(get(), get(named(APPLICATION_SCOPE_NAME))) }
     single { ResourceDownloadClient(androidApplication(), get()) }
+    single { CloudflareSpeedTestClient() }
 }
 
 val appViewModelModule = module {
@@ -77,6 +80,7 @@ val appViewModelModule = module {
     viewModel { LogViewModel(get()) }
     viewModel { KokoroCustomRulesViewModel(get()) }
     viewModel { KokoroSettingsViewModel(get()) }
+    viewModel { CloudflareSpeedTestViewModel(get()) }
 }
 
 val appModule: List<Module> = coreDiModules + listOf(
