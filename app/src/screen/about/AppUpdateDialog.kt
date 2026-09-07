@@ -60,9 +60,6 @@ fun AppUpdateDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(MLang.About.Update.Ok) }
-        },
-        dismissButton = {
             if (newer) {
                 TextButton(
                     onClick = {
@@ -83,6 +80,13 @@ fun AppUpdateDialog(
                         else MLang.About.Update.OpenRelease,
                     )
                 }
+            } else {
+                TextButton(onClick = onDismiss) { Text(MLang.About.Update.Ok) }
+            }
+        },
+        dismissButton = {
+            if (newer) {
+                TextButton(onClick = onDismiss) { Text(MLang.About.Update.Ok) }
             }
         },
     )
