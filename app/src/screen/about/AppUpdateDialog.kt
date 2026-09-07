@@ -3,10 +3,6 @@ package com.github.yumelira.yumebox.screen.about
 import android.content.ActivityNotFoundException
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -17,7 +13,6 @@ import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
 import com.github.yumelira.yumebox.data.integration.update.ReleaseVersion
-import com.github.yumelira.yumebox.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
@@ -44,18 +39,13 @@ fun AppUpdateDialog(
         onDismissRequest = onDismiss,
         title = { Text(MLang.About.License.CheckUpdate) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+            Column {
                 Text(message)
                 if (newer) {
-                    Spacer(Modifier.height(UiDp.dp12))
                     Text(
                         if (release.apkUrl != null) MLang.About.Update.BrowserDownload
                         else MLang.About.Update.NoApk,
                     )
-                    if (release.notes.isNotBlank()) {
-                        Spacer(Modifier.height(UiDp.dp12))
-                        Text(release.notes)
-                    }
                 }
             }
         },
