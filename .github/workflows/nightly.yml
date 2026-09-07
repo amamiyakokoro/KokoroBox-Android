@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 90
     outputs:
       version: ${{ steps.source.outputs.version }}
+      version_code: ${{ steps.source.outputs.version_code }}
       sha: ${{ steps.source.outputs.sha }}
       ndk: ${{ steps.source.outputs.ndk }}
       sdk: ${{ steps.source.outputs.sdk }}
@@ -163,6 +164,19 @@ jobs:
           export AAPT2="$ANDROID_HOME/build-tools/37.0.0/aapt2"
           python3 scripts/ci-release.py verify
 
+      - name: Name nightly APK with its version code
+        env:
+          NIGHTLY_VERSION: ${{ steps.source.outputs.version }}
+          NIGHTLY_VERSION_CODE: ${{ steps.source.outputs.version_code }}
+        working-directory: publish
+        run: |
+          set -euo pipefail
+          source_apk="$(find . -maxdepth 1 -type f -name '*.apk' -print -quit)"
+          test -n "$source_apk"
+          target="KokoroBox-v${NIGHTLY_VERSION}-code${NIGHTLY_VERSION_CODE}-arm64-v8a-release.apk"
+          mv "$source_apk" "$target"
+          sha256sum "$target" > SHA256SUMS
+
       - name: Remove private keystore
         if: always()
         run: python3 scripts/ci-release.py cleanup
@@ -216,6 +230,11 @@ jobs:
           notes="Automated development build ${NIGHTLY_VERSION} from ${SOURCE_SHA}."
           if gh release view nightly >/dev/null 2>&1; then
             gh release edit nightly --title "KokoroBox Nightly (${NIGHTLY_VERSION})" --prerelease --notes "$notes"
+            gh release view nightly --json assets --jq '.assets[].name' | while IFS= read -r asset; do
+              if [[ "$asset" == *.apk || "$asset" == "SHA256SUMS" || "$asset" == "SIGNING-CERT-SHA256.txt" ]]; then
+                gh release delete-asset nightly "$asset" --yes
+              fi
+            done
             gh release upload nightly ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt --clobber
           else
             gh release create nightly ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt \

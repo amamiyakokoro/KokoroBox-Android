@@ -167,6 +167,7 @@ class MainActivity : FragmentActivity() {
             val screenshotProtectionEnabled = appSettingsViewModel.screenshotProtectionEnabled.state.collectAsStateWithLifecycle().value
             val biometricUnlockEnabled by appSettingsViewModel.biometricUnlockEnabled.state.collectAsStateWithLifecycle()
             val automaticUpdateCheckEnabled by appSettingsViewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
+            val appUpdateChannel by appSettingsViewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
             val availableUpdate by automaticAppUpdateChecker.availableUpdate.collectAsStateWithLifecycle()
 
             val biometricGateState = rememberStartupBiometricGateState(
@@ -182,7 +183,7 @@ class MainActivity : FragmentActivity() {
                 this@MainActivity.applyScreenshotProtection(screenshotProtectionEnabled)
             }
 
-            LaunchedEffect(automaticUpdateCheckEnabled) {
+            LaunchedEffect(automaticUpdateCheckEnabled, appUpdateChannel) {
                 automaticAppUpdateChecker.onEnabledChanged(automaticUpdateCheckEnabled)
             }
 

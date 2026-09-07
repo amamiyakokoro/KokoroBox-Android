@@ -35,6 +35,7 @@ import com.github.yumelira.yumebox.core.model.TunnelState
 import com.github.yumelira.yumebox.data.model.AccessControlMode
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
+import com.github.yumelira.yumebox.data.model.AppUpdateChannel
 import com.github.yumelira.yumebox.data.model.MonetContrast
 import com.github.yumelira.yumebox.data.model.MonetStyle
 import com.github.yumelira.yumebox.data.model.ProxyDisplayMode
@@ -171,6 +172,7 @@ class UserSettingsBackupController(
         put("automaticRestart", appSettingsStore.automaticRestart.value)
         put("autoUpdateCurrentProfileOnStart", appSettingsStore.autoUpdateCurrentProfileOnStart.value)
         put("automaticUpdateCheckEnabled", appSettingsStore.automaticUpdateCheckEnabled.value)
+        put("appUpdateChannel", appSettingsStore.appUpdateChannel.value.name)
         put("hideAppIcon", appSettingsStore.hideAppIcon.value)
         put("excludeFromRecents", appSettingsStore.excludeFromRecents.value)
         put("showTrafficNotification", appSettingsStore.showTrafficNotification.value)
@@ -203,6 +205,7 @@ class UserSettingsBackupController(
         obj.bool("automaticRestart")?.let(appSettingsStore.automaticRestart::set)
         obj.bool("autoUpdateCurrentProfileOnStart")?.let(appSettingsStore.autoUpdateCurrentProfileOnStart::set)
         obj.bool("automaticUpdateCheckEnabled")?.let(appSettingsStore.automaticUpdateCheckEnabled::set)
+        obj.enumValue<AppUpdateChannel>("appUpdateChannel")?.let(appSettingsStore.appUpdateChannel::set)
         obj.bool("hideAppIcon")?.let(appSettingsStore.hideAppIcon::set)
         obj.bool("excludeFromRecents")?.let(appSettingsStore.excludeFromRecents::set)
         obj.bool("showTrafficNotification")?.let(appSettingsStore.showTrafficNotification::set)

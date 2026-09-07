@@ -18,6 +18,10 @@ AppSettings = {
         AutoUpdateOnStartSummary = "啟動時自動更新目前訂閱設定檔"
         AutomaticUpdateCheckTitle = "自動檢查更新"
         AutomaticUpdateCheckSummary = "開啟應用程式時每日檢查一次 GitHub Release"
+        UpdateChannelTitle = "更新通道"
+        UpdateChannelSummary = "選擇正式版或開發中的 nightly 測試版"
+        UpdateChannelStable = "正式版"
+        UpdateChannelNightly = "測試版（nightly）"
     }
 
     Interface = {

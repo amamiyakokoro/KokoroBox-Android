@@ -49,6 +49,7 @@ import com.github.yumelira.yumebox.common.util.BiometricHelper
 import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
+import com.github.yumelira.yumebox.data.model.AppUpdateChannel
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
@@ -108,6 +109,7 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
     val automaticRestart by viewModel.automaticRestart.state.collectAsStateWithLifecycle()
     val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsStateWithLifecycle()
     val automaticUpdateCheckEnabled by viewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
+    val appUpdateChannel by viewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Behavior)
     Card {
@@ -128,6 +130,17 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
             summary = MLang.AppSettings.Behavior.AutomaticUpdateCheckSummary,
             checked = automaticUpdateCheckEnabled,
             onCheckedChange = viewModel::onAutomaticUpdateCheckChange,
+        )
+        PreferenceEnumItem(
+            title = MLang.AppSettings.Behavior.UpdateChannelTitle,
+            summary = MLang.AppSettings.Behavior.UpdateChannelSummary,
+            currentValue = appUpdateChannel,
+            items = listOf(
+                MLang.AppSettings.Behavior.UpdateChannelStable,
+                MLang.AppSettings.Behavior.UpdateChannelNightly,
+            ),
+            values = AppUpdateChannel.entries,
+            onValueChange = viewModel::onAppUpdateChannelChange,
         )
     }
 }

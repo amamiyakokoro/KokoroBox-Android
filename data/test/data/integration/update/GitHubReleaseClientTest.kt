@@ -1,5 +1,6 @@
 package com.github.yumelira.yumebox.data.integration.update
 
+import com.github.yumelira.yumebox.data.model.AppUpdateChannel
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.async
@@ -20,6 +21,15 @@ class GitHubReleaseClientTest {
          "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/$tag/KokoroBox-$tag-arm64-v8a-release.apk"}]}
     """.trimIndent()
 
+    private fun nightlyRelease(version: String = "0.5.8", versionCode: Int = 5801): String {
+        val filename = "KokoroBox-v${version}-nightly-code${versionCode}-arm64-v8a-release.apk"
+        return """
+            {"tag_name":"nightly","draft":false,"prerelease":true,"body":"Nightly notes",
+             "assets":[{"name":"$filename","state":"uploaded","size":1024,
+             "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/nightly/$filename"}]}
+        """.trimIndent()
+    }
+
     @Test fun comparesNumericVersionsAndRejectsNonStableVersions() {
         assertTrue(ReleaseVersion.parse("v0.5.10")!! > ReleaseVersion.parse("0.5.9")!!)
         assertTrue(ReleaseVersion.parse("v1.0.0")!! > ReleaseVersion.parse("v0.99.99")!!)
@@ -35,6 +45,18 @@ class GitHubReleaseClientTest {
         assertEquals("Release notes", result.notes)
         assertTrue(result.apkUrl!!.endsWith("/KokoroBox-v0.5.7-arm64-v8a-release.apk"))
         assertEquals("${GitHubReleaseClient.REPOSITORY_URL}/releases/tag/v0.5.7", result.releaseUrl)
+    }
+
+    @Test fun parsesNightlyReleaseAndUsesVersionCodeForOrdering() {
+        val result = GitHubReleaseClient.parseRelease(
+            nightlyRelease(),
+            AppUpdateChannel.Nightly,
+        ) as ReleaseCheck.Published
+        assertEquals("nightly", result.tag)
+        assertEquals(5801, result.versionCode)
+        assertTrue(result.apkUrl!!.endsWith("KokoroBox-v0.5.8-nightly-code5801-arm64-v8a-release.apk"))
+        assertTrue(result.isNewerThan("0.5.8-nightly", 5800))
+        assertFalse(result.isNewerThan("0.5.8-nightly", 5801))
     }
 
     @Test fun missingWrongOrUnfinishedApkStillAllowsViewingRelease() {
@@ -76,6 +98,16 @@ class GitHubReleaseClientTest {
         now = 60_001
         client.check()
         assertEquals(2, requests.get())
+    }
+
+    @Test fun nightlyChecksUseTheNightlyEndpoint() = runBlocking {
+        val http = OkHttpClient.Builder().addInterceptor { chain ->
+            assertEquals(GitHubReleaseClient.NIGHTLY_API_URL, chain.request().url.toString())
+            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                .code(200).message("OK")
+                .body(nightlyRelease().toResponseBody("application/json".toMediaType())).build()
+        }.build()
+        assertTrue(GitHubReleaseClient(http).check(AppUpdateChannel.Nightly) is ReleaseCheck.Published)
     }
 
     @Test fun reportsHttpFailuresAndHonorsRateLimitCooldown() = runBlocking {

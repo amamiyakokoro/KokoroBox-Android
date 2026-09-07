@@ -1,5 +1,6 @@
 package com.github.yumelira.yumebox.data.integration.update
 
+import com.github.yumelira.yumebox.data.model.AppUpdateChannel
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -40,6 +41,8 @@ sealed interface ReleaseCheck {
         val notes: String,
         val releaseUrl: String,
         val apkUrl: String?,
+        /** Present for nightly builds so builds sharing a version name remain ordered. */
+        val versionCode: Int? = null,
     ) : ReleaseCheck
     enum class Failure : ReleaseCheck { NoRelease, RateLimited, Network, InvalidResponse }
 }
@@ -54,19 +57,19 @@ class GitHubReleaseClient(
     private val nowMillis: () -> Long = { System.nanoTime() / 1_000_000 },
 ) {
     private val mutex = Mutex()
-    private var cached: ReleaseCheck? = null
-    private var cacheUntil = 0L
+    private data class CachedRelease(val result: ReleaseCheck, val cacheUntil: Long)
 
-    suspend fun check(): ReleaseCheck = mutex.withLock {
-        cached?.takeIf { nowMillis() < cacheUntil }?.let { return@withLock it }
-        val (result, cooldown) = fetch()
-        cached = result
-        cacheUntil = nowMillis() + cooldown
+    private val cache = mutableMapOf<AppUpdateChannel, CachedRelease>()
+
+    suspend fun check(channel: AppUpdateChannel = AppUpdateChannel.Stable): ReleaseCheck = mutex.withLock {
+        cache[channel]?.takeIf { nowMillis() < it.cacheUntil }?.let { return@withLock it.result }
+        val (result, cooldown) = fetch(channel)
+        cache[channel] = CachedRelease(result, nowMillis() + cooldown)
         result
     }
 
-    private suspend fun fetch(): Pair<ReleaseCheck, Long> = suspendCancellableCoroutine { continuation ->
-        val request = Request.Builder().url(API_URL)
+    private suspend fun fetch(channel: AppUpdateChannel): Pair<ReleaseCheck, Long> = suspendCancellableCoroutine { continuation ->
+        val request = Request.Builder().url(channel.apiUrl)
             .header("Accept", "application/vnd.github+json")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .header("User-Agent", "KokoroBox-Android-UpdateCheck")
@@ -98,7 +101,7 @@ class GitHubReleaseClient(
                                 source.request(MAX_RESPONSE_BYTES + 1)
                                 if (source.buffer.size > MAX_RESPONSE_BYTES) {
                                     ReleaseCheck.Failure.InvalidResponse
-                                } else parseRelease(it.body.string())
+                                } else parseRelease(it.body.string(), channel)
                             }
                         }
                     } catch (_: IOException) {
@@ -115,38 +118,104 @@ class GitHubReleaseClient(
     companion object {
         const val REPOSITORY_URL = "https://github.com/amamiyakokoro/KokoroBox-Android"
         const val API_URL = "https://api.github.com/repos/amamiyakokoro/KokoroBox-Android/releases/latest"
+        const val NIGHTLY_API_URL = "https://api.github.com/repos/amamiyakokoro/KokoroBox-Android/releases/tags/nightly"
         private const val MAX_RESPONSE_BYTES = 1_048_576L
 
-        internal fun parseRelease(body: String): ReleaseCheck = try {
-            parseReleaseObject(body)
+        internal fun parseRelease(
+            body: String,
+            channel: AppUpdateChannel = AppUpdateChannel.Stable,
+        ): ReleaseCheck = try {
+            parseReleaseObject(body, channel)
         } catch (_: IllegalArgumentException) {
             ReleaseCheck.Failure.InvalidResponse
         } catch (_: IllegalStateException) {
             ReleaseCheck.Failure.InvalidResponse
         }
 
-        private fun parseReleaseObject(body: String): ReleaseCheck {
+        private fun parseReleaseObject(body: String, channel: AppUpdateChannel): ReleaseCheck {
             val obj = Json.parseToJsonElement(body) as? JsonObject
                 ?: return ReleaseCheck.Failure.InvalidResponse
             if (obj["draft"]?.jsonPrimitive?.boolean != false ||
-                obj["prerelease"]?.jsonPrimitive?.boolean != false) return ReleaseCheck.Failure.NoRelease
+                obj["prerelease"]?.jsonPrimitive?.boolean != channel.isPrerelease) {
+                return ReleaseCheck.Failure.NoRelease
+            }
             val tag = obj["tag_name"]?.jsonPrimitive?.content ?: return ReleaseCheck.Failure.InvalidResponse
+            val assets = obj["assets"] as? JsonArray ?: return ReleaseCheck.Failure.InvalidResponse
+            return when (channel) {
+                AppUpdateChannel.Stable -> parseStableRelease(tag, obj, assets)
+                AppUpdateChannel.Nightly -> parseNightlyRelease(tag, obj, assets)
+            }
+        }
+
+        private fun parseStableRelease(
+            tag: String,
+            obj: JsonObject,
+            assets: JsonArray,
+        ): ReleaseCheck {
             val version = ReleaseVersion.parse(tag) ?: return ReleaseCheck.Failure.InvalidResponse
             if (!tag.startsWith("v")) return ReleaseCheck.Failure.InvalidResponse
-            // Build links from a validated tag; never open arbitrary URLs supplied by metadata.
+            return publishedRelease(tag, version, obj, assets, "KokoroBox-$tag-arm64-v8a-release.apk")
+        }
+
+        private fun parseNightlyRelease(
+            tag: String,
+            obj: JsonObject,
+            assets: JsonArray,
+        ): ReleaseCheck {
+            if (tag != "nightly") return ReleaseCheck.Failure.InvalidResponse
+            val filename = assets.filterIsInstance<JsonObject>()
+                .mapNotNull { it["name"]?.jsonPrimitive?.content }
+                .singleOrNull { NIGHTLY_APK_FILE.matchEntire(it) != null }
+                ?: return ReleaseCheck.Failure.InvalidResponse
+            val groups = NIGHTLY_APK_FILE.matchEntire(filename)?.groupValues ?: return ReleaseCheck.Failure.InvalidResponse
+            val version = ReleaseVersion.parse(groups[1]) ?: return ReleaseCheck.Failure.InvalidResponse
+            val versionCode = groups[2].toIntOrNull() ?: return ReleaseCheck.Failure.InvalidResponse
+            return publishedRelease(tag, version, obj, assets, filename, versionCode)
+        }
+
+        private fun publishedRelease(
+            tag: String,
+            version: ReleaseVersion,
+            obj: JsonObject,
+            assets: JsonArray,
+            filename: String,
+            versionCode: Int? = null,
+        ): ReleaseCheck {
+            // Build links from validated release metadata; never open arbitrary URLs from it.
             val releaseUrl = "$REPOSITORY_URL/releases/tag/$tag"
-            val filename = "KokoroBox-$tag-arm64-v8a-release.apk"
             val expectedApk = "$REPOSITORY_URL/releases/download/$tag/$filename"
-            val assets = obj["assets"] as? JsonArray ?: return ReleaseCheck.Failure.InvalidResponse
             val apk = assets.filterIsInstance<JsonObject>().singleOrNull {
                 it["name"]?.jsonPrimitive?.content == filename &&
                     it["state"]?.jsonPrimitive?.content == "uploaded" &&
                     (it["size"]?.jsonPrimitive?.long ?: 0) > 0 &&
                     it["browser_download_url"]?.jsonPrimitive?.content == expectedApk
             }
-            return ReleaseCheck.Published(tag, version,
-                obj["body"]?.jsonPrimitive?.contentOrNull?.take(12_000).orEmpty(),
-                releaseUrl, expectedApk.takeIf { apk != null })
+            return ReleaseCheck.Published(
+                tag = tag,
+                version = version,
+                notes = obj["body"]?.jsonPrimitive?.contentOrNull?.take(12_000).orEmpty(),
+                releaseUrl = releaseUrl,
+                apkUrl = expectedApk.takeIf { apk != null },
+                versionCode = versionCode,
+            )
         }
+
+        private val NIGHTLY_APK_FILE = Regex(
+            "KokoroBox-v((?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*))-nightly-code([1-9][0-9]*)-arm64-v8a-release\\.apk",
+        )
     }
+}
+
+private val AppUpdateChannel.apiUrl: String
+    get() = when (this) {
+        AppUpdateChannel.Stable -> GitHubReleaseClient.API_URL
+        AppUpdateChannel.Nightly -> GitHubReleaseClient.NIGHTLY_API_URL
+    }
+
+private val AppUpdateChannel.isPrerelease: Boolean
+    get() = this == AppUpdateChannel.Nightly
+
+fun ReleaseCheck.Published.isNewerThan(currentVersionName: String, currentVersionCode: Int): Boolean {
+    val currentVersion = ReleaseVersion.parse(currentVersionName) ?: return false
+    return versionCode?.let { it > currentVersionCode } ?: (version > currentVersion)
 }

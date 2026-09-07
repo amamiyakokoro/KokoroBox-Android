@@ -18,6 +18,10 @@ AppSettings = {
         AutoUpdateOnStartSummary = "启动时自动更新当前订阅配置"
         AutomaticUpdateCheckTitle = "自动检查更新"
         AutomaticUpdateCheckSummary = "打开应用时每天检查一次 GitHub Release"
+        UpdateChannelTitle = "更新通道"
+        UpdateChannelSummary = "选择正式版或开发中的 nightly 测试版"
+        UpdateChannelStable = "正式版"
+        UpdateChannelNightly = "测试版（nightly）"
     }
 
     Interface = {

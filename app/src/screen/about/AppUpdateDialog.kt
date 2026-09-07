@@ -13,6 +13,7 @@ import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.common.util.openUrl
 import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
 import com.github.yumelira.yumebox.data.integration.update.ReleaseVersion
+import com.github.yumelira.yumebox.data.integration.update.isNewerThan
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
@@ -23,7 +24,7 @@ fun AppUpdateDialog(
     val context = LocalContext.current
     val release = result as? ReleaseCheck.Published
     val currentVersion = ReleaseVersion.parse(BuildConfig.VERSION_NAME)
-    val newer = release != null && currentVersion != null && release.version > currentVersion
+    val newer = release?.isNewerThan(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) == true
     val message = when (result) {
         is ReleaseCheck.Published -> when {
             currentVersion == null -> MLang.About.Update.UnknownVersion

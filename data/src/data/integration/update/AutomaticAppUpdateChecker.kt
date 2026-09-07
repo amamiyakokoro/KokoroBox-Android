@@ -13,12 +13,13 @@ class AutomaticAppUpdateChecker(
     private val client: GitHubReleaseClient,
     private val settings: AppSettingsStore,
     private val applicationScope: CoroutineScope,
-    currentVersionName: String,
+    private val currentVersionName: String,
+    private val currentVersionCode: Int,
     private val nowMillis: () -> Long = System::currentTimeMillis,
 ) {
-    private val currentVersion = ReleaseVersion.parse(currentVersionName)
     private val checkMutex = Mutex()
     private val mutableAvailableUpdate = MutableStateFlow<ReleaseCheck.Published?>(null)
+    private var checkedChannel = settings.appUpdateChannel.value
     val availableUpdate = mutableAvailableUpdate.asStateFlow()
 
     fun checkIfDue() {
@@ -28,6 +29,11 @@ class AutomaticAppUpdateChecker(
         }
         applicationScope.launch {
             checkMutex.withLock {
+                val channel = settings.appUpdateChannel.value
+                if (channel != checkedChannel) {
+                    checkedChannel = channel
+                    mutableAvailableUpdate.value = null
+                }
                 if (!settings.initialSetupCompleted.value ||
                     !settings.automaticUpdateCheckEnabled.value
                 ) return@withLock
@@ -43,16 +49,16 @@ class AutomaticAppUpdateChecker(
                 // process restarts cannot repeatedly hit the unauthenticated GitHub API.
                 settings.lastAutomaticUpdateCheckAtMillis = now
                 val release = try {
-                    client.check() as? ReleaseCheck.Published
+                    client.check(channel) as? ReleaseCheck.Published
                 } catch (error: CancellationException) {
                     throw error
                 } catch (_: Exception) {
                     return@withLock
                 }
                 if (settings.automaticUpdateCheckEnabled.value &&
-                    currentVersion != null &&
+                    settings.appUpdateChannel.value == channel &&
                     release != null &&
-                    release.version > currentVersion
+                    release.isNewerThan(currentVersionName, currentVersionCode)
                 ) {
                     mutableAvailableUpdate.value = release
                 }

@@ -58,6 +58,7 @@ val appIntegrationModule = module {
             settings = get(),
             applicationScope = get(named(APPLICATION_SCOPE_NAME)),
             currentVersionName = BuildConfig.VERSION_NAME,
+            currentVersionCode = BuildConfig.VERSION_CODE,
         )
     }
     single<LogRecordGateway> { LogRecordServiceGateway() }
@@ -70,7 +71,7 @@ val appIntegrationModule = module {
 }
 
 val appViewModelModule = module {
-    viewModel { AppUpdateViewModel(get()) }
+    viewModel { AppUpdateViewModel(get(), get()) }
     viewModel { AppSettingsViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get(), get(), get(), get(), get()) }
     viewModel { ProfilesViewModel(androidApplication(), get(), get(), get()) }

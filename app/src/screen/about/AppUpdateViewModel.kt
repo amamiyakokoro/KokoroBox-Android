@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
 import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
+import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,10 @@ import kotlinx.coroutines.launch
 
 data class AppUpdateState(val checking: Boolean = false, val result: ReleaseCheck? = null)
 
-class AppUpdateViewModel(private val client: GitHubReleaseClient) : ViewModel() {
+class AppUpdateViewModel(
+    private val client: GitHubReleaseClient,
+    private val settings: AppSettingsStore,
+) : ViewModel() {
     private val mutableState = MutableStateFlow(AppUpdateState())
     val state = mutableState.asStateFlow()
 
@@ -20,7 +24,7 @@ class AppUpdateViewModel(private val client: GitHubReleaseClient) : ViewModel() 
         mutableState.value = AppUpdateState(checking = true)
         viewModelScope.launch {
             try {
-                mutableState.value = AppUpdateState(result = client.check())
+                mutableState.value = AppUpdateState(result = client.check(settings.appUpdateChannel.value))
             } catch (error: CancellationException) {
                 throw error
             } finally {
