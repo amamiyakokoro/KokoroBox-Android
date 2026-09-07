@@ -99,7 +99,8 @@ object ProfileProcessor {
 
     private data class UpdateSnapshot(
         val imported: Imported,
-        val hasCommittedConfig: Boolean
+        val hasExistingConfig: Boolean,
+        val hasCommittedRuntime: Boolean,
     )
 
     private class SubscriptionDownloadException(message: String) : IOException(message)
@@ -474,7 +475,8 @@ object ProfileProcessor {
 
                     UpdateSnapshot(
                         imported = imported,
-                        hasCommittedConfig = targetDir.resolve("runtime.yaml").isFile
+                        hasExistingConfig = targetDir.resolve("config.yaml").isFile,
+                        hasCommittedRuntime = targetDir.resolve("runtime.yaml").isFile,
                     )
                 }
 
@@ -511,7 +513,7 @@ object ProfileProcessor {
                     val requiresNativeFetch = snapshot.imported.type != Profile.Type.Url
                     val deferKokoroProviderDownloads =
                         snapshot.imported.type == Profile.Type.Url &&
-                            !snapshot.hasCommittedConfig &&
+                            !snapshot.hasCommittedRuntime &&
                             KokoroApi.isManagedSubscriptionUrl(snapshot.imported.source)
                     StartupTaskCoordinator.awaitGeoInitialization()
                     Clash.fetchAndValid(
@@ -570,7 +572,7 @@ object ProfileProcessor {
                                 lastUpdateFailed = true,
                             ))
                         }
-                        if (!snapshot.hasCommittedConfig && ImportedDao.exists(snapshot.imported.uuid)) {
+                        if (!snapshot.hasExistingConfig && ImportedDao.exists(snapshot.imported.uuid)) {
                             ImportedDao.remove(snapshot.imported.uuid)
                             SelectionDao.clear(snapshot.imported.uuid)
                             targetDir.deleteRecursively()

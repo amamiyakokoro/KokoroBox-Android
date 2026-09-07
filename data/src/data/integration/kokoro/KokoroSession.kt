@@ -38,6 +38,7 @@ import okhttp3.Response
 import java.io.IOException
 import java.security.KeyStore
 import java.security.SecureRandom
+import java.util.concurrent.TimeUnit
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -105,7 +106,7 @@ object KokoroApi {
  */
 class KokoroSession internal constructor(
     private val tokenStore: KokoroAuthStore,
-    private val httpClient: OkHttpClient = OkHttpClient(),
+    private val httpClient: OkHttpClient = defaultHttpClient(),
     private val now: () -> Long = System::currentTimeMillis,
     private val secureRandom: SecureRandom = SecureRandom(),
 ) {
@@ -389,6 +390,13 @@ class KokoroSession internal constructor(
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
         val refreshMutex = Mutex()
         const val ACCESS_TOKEN_REFRESH_MARGIN_MS = 60_000L
+
+        fun defaultHttpClient(): OkHttpClient = OkHttpClient.Builder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .callTimeout(90, TimeUnit.SECONDS)
+            .build()
     }
 }
 
