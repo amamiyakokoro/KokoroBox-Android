@@ -52,6 +52,7 @@ class SessionRuntime(
     @Volatile
     private var interruptReason: String? = null
     private var currentSpec: RuntimeSpec? = null
+    private var logCollectionEnabled = false
     private var currentSnapshot: RuntimeSnapshot = RuntimeSnapshot(targetMode = host.mode)
     private var networkObserver: ServiceNetworkObserver? = null
     private val queryCache = SessionRuntimeQueryCache()
@@ -295,6 +296,18 @@ class SessionRuntime(
 
     fun setLogObserver(observer: ((LogMessage) -> Unit)?) {
         telemetry.setLogObserver(observer)
+        setLogCollectionEnabled(observer != null)
+    }
+
+    fun setLogCollectionEnabled(enabled: Boolean) {
+        synchronized(lock) {
+            logCollectionEnabled = enabled
+            if (enabled && currentSnapshot.phase == RuntimePhase.Running) {
+                startLogStream()
+            } else if (!enabled) {
+                stopLogStream()
+            }
+        }
     }
 
     fun queryRecentLogsJson(sinceSeq: Long): RuntimeLogChunk {
@@ -331,7 +344,9 @@ class SessionRuntime(
         awaitProxyGroupsReady(spec)
         ensureNotInterrupted(spec)
         restoreSelections(spec)
-        startLogStream()
+        if (logCollectionEnabled) {
+            startLogStream()
+        }
         startupLog(spec, "snapshot refresh: begin")
         refreshRuntimeSnapshot()
         startupLog(spec, "snapshot refresh: done")
@@ -616,6 +631,7 @@ class SessionRuntime(
     }
 
     private fun startLogStream() {
+        if (telemetry.isLogStreaming()) return
         telemetry.startLogStream(Clash::subscribeLogcat)
     }
 

@@ -325,6 +325,10 @@ object RootTunController {
         }
     }
 
+    suspend fun setLogCollectionEnabled(context: Context, enabled: Boolean) {
+        remoteCall(context) { service -> service.setLogCollectionEnabled(enabled) }
+    }
+
     suspend fun queryRecentLogs(context: Context, sinceSeq: Long): RootTunLogChunk {
         return remoteCall(context) { service ->
             val raw = service.queryRecentLogsJson(sinceSeq)

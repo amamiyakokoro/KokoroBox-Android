@@ -94,6 +94,7 @@ internal class SessionRuntimeTelemetry(
             recentLogs.clear()
         }
         host.onLogReady(false)
+        onLogReadyChanged(false)
     }
 
     private companion object {

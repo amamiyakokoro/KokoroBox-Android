@@ -23,5 +23,6 @@ interface IRootTunService {
     String healthCheckProxy(String group, String proxyName);
     String updateProvider(String type, String name);
     void requestStop();
+    void setLogCollectionEnabled(boolean enabled);
     String queryRecentLogsJson(long sinceSeq);
 }

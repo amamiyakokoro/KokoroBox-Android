@@ -192,6 +192,10 @@ class RootTunRootService : RootService() {
             stopSelf()
         }
 
+        override fun setLogCollectionEnabled(enabled: Boolean) {
+            runtime.setLogCollectionEnabled(enabled)
+        }
+
         override fun queryRecentLogsJson(sinceSeq: Long): String {
             return RootTunJson.Default.encodeToString(
                 RootTunLogChunk.serializer(),

@@ -213,33 +213,57 @@ class RuntimeClashManager(
     override fun setLogObserver(observer: ILogObserver?) {
         if (useRootRuntime()) {
             local.setLogObserver(null)
-            rootLogJob?.cancel()
+            val previousJob = rootLogJob
             if (observer == null) {
-                rootLogSeq = 0L
+                rootLogJob = scope.launch {
+                    previousJob?.cancelAndJoin()
+                    rootLogSeq = 0L
+                    runCatching { RootTunController.setLogCollectionEnabled(appContext, false) }
+                        .onFailure { error -> Timber.d(error, "Root runtime log shutdown skipped") }
+                }
                 return
             }
             rootLogJob = scope.launch {
-                PollingTimers.ticks(PollingTimerSpecs.RuntimeRootLogPolling).collect {
-                    runCatching {
-                        val chunk = RootTunController.queryRecentLogs(appContext, rootLogSeq)
-                        if (chunk.items.isNotEmpty()) {
-                            chunk.items.forEach { raw ->
-                                observer.newItem(
-                                    com.github.yumelira.yumebox.service.root.RootTunJson.Default.decodeFromString(
-                                        LogMessage.serializer(),
-                                        raw,
-                                    ),
-                                )
+                previousJob?.cancelAndJoin()
+                rootLogSeq = 0L
+                val enabled = runCatching {
+                    RootTunController.setLogCollectionEnabled(appContext, true)
+                }.onFailure { error ->
+                    Timber.d(error, "Root runtime log startup skipped")
+                }.isSuccess
+                if (!enabled) return@launch
+
+                try {
+                    PollingTimers.ticks(PollingTimerSpecs.RuntimeRootLogPolling).collect {
+                        runCatching {
+                            val chunk = RootTunController.queryRecentLogs(appContext, rootLogSeq)
+                            if (chunk.items.isNotEmpty()) {
+                                chunk.items.forEach { raw ->
+                                    observer.newItem(
+                                        com.github.yumelira.yumebox.service.root.RootTunJson.Default.decodeFromString(
+                                            LogMessage.serializer(),
+                                            raw,
+                                        ),
+                                    )
+                                }
                             }
+                            rootLogSeq = chunk.nextSeq
+                        }.onFailure { error ->
+                            Timber.d(error, "Root runtime log polling skipped")
                         }
-                        rootLogSeq = chunk.nextSeq
-                    }.onFailure { error ->
-                        Timber.d(error, "Root runtime log polling skipped")
+                    }
+                } finally {
+                    withContext(NonCancellable) {
+                        runCatching { RootTunController.setLogCollectionEnabled(appContext, false) }
                     }
                 }
             }
         } else {
-            rootLogJob?.cancel()
+            val previousJob = rootLogJob
+            rootLogJob = scope.launch {
+                previousJob?.cancelAndJoin()
+                runCatching { RootTunController.setLogCollectionEnabled(appContext, false) }
+            }
             rootLogSeq = 0L
             local.setLogObserver(observer)
         }
