@@ -60,6 +60,7 @@ class ServiceNotificationManager(
     private var cachedTodayTrafficBytes: Long = 0L
     private var lastTodayTrafficRefreshAt: Long = 0L
     private var lastNotificationFingerprint: String? = null
+    private var lastTrafficDisplayEnabled: Boolean? = null
 
     fun createChannel() {
         notificationManager.createNotificationChannel(
@@ -71,17 +72,28 @@ class ServiceNotificationManager(
     }
 
     fun createInitialNotification(): Notification {
-        return buildRunningNotification()
+        val showTraffic = shouldShowTrafficNotification()
+        lastTrafficDisplayEnabled = showTraffic
+        return buildRunningNotification(showTraffic).also {
+            lastNotificationFingerprint = notificationFingerprint(it)
+        }
     }
 
     @SuppressLint("MissingPermission")
     fun startTrafficUpdate(scope: CoroutineScope): Job {
         return scope.launch(Dispatchers.Default) {
-            PollingTimers.ticks(PollingTimerSpecs.RuntimeTrafficPolling).collect {
-                val notification = buildRunningNotification()
-                val fingerprint = "${notification.extras.getCharSequence(Notification.EXTRA_TITLE)}|" +
-                    "${notification.extras.getCharSequence(Notification.EXTRA_TEXT)}|" +
-                    "${notification.extras.getCharSequence(Notification.EXTRA_SUB_TEXT)}"
+            var disabledRefreshTicks = 0
+            PollingTimers.ticks(PollingTimerSpecs.ForegroundNotificationRefresh).collect {
+                val showTraffic = shouldShowTrafficNotification()
+                if (!showTraffic && lastTrafficDisplayEnabled == false) {
+                    disabledRefreshTicks++
+                    if (disabledRefreshTicks < DISABLED_NOTIFICATION_REFRESH_TICKS) return@collect
+                }
+                disabledRefreshTicks = 0
+
+                val notification = buildRunningNotification(showTraffic)
+                val fingerprint = notificationFingerprint(notification)
+                lastTrafficDisplayEnabled = showTraffic
                 if (fingerprint != lastNotificationFingerprint) {
                     lastNotificationFingerprint = fingerprint
                     notificationManager.notify(config.notificationId, notification)
@@ -90,9 +102,9 @@ class ServiceNotificationManager(
         }
     }
 
-    private fun buildRunningNotification(): Notification {
+    private fun buildRunningNotification(showTraffic: Boolean): Notification {
         val profileName = resolveProfileName()
-        if (!shouldShowTrafficNotification()) {
+        if (!showTraffic) {
             return buildNotification(
                 NotificationPresentationFactory.createStatus(
                     profileName = profileName,
@@ -113,6 +125,11 @@ class ServiceNotificationManager(
             ),
         )
     }
+
+    private fun notificationFingerprint(notification: Notification): String =
+        "${notification.extras.getCharSequence(Notification.EXTRA_TITLE)}|" +
+            "${notification.extras.getCharSequence(Notification.EXTRA_TEXT)}|" +
+            "${notification.extras.getCharSequence(Notification.EXTRA_SUB_TEXT)}"
 
     private fun buildNotification(presentation: NotificationPresentation): Notification {
         val contentIntent = PendingIntent.getActivity(
@@ -175,7 +192,8 @@ class ServiceNotificationManager(
     }
 
     companion object {
-        private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 5_000L
+        private const val DISABLED_NOTIFICATION_REFRESH_TICKS = 6
+        private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 30_000L
 
         val VPN_CONFIG = Config(
             notificationId = 1001,

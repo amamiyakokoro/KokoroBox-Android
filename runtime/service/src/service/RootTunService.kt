@@ -29,6 +29,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -47,6 +48,7 @@ import com.github.yumelira.yumebox.service.root.RootTunStateStore
 import com.github.yumelira.yumebox.service.root.RootTunStatus
 import com.github.yumelira.yumebox.service.runtime.util.sendClashStarted
 import com.github.yumelira.yumebox.service.runtime.util.sendClashStopped
+import com.tencent.mmkv.MMKV
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -58,6 +60,10 @@ class RootTunService : BaseService() {
     private var cachedTodayTrafficBytes: Long = 0L
     private var lastTodayTrafficRefreshAt: Long = 0L
     private var notificationJob: Job? = null
+    private val settingsStore by lazy { MMKV.mmkvWithID("settings", MMKV.MULTI_PROCESS_MODE) }
+    private var lastNotificationFingerprint: String? = null
+    private var lastTrafficDisplayEnabled: Boolean? = null
+    private var lastTrafficNotificationAt: Long = 0L
 
     override fun onCreate() {
         super.onCreate()
@@ -76,15 +82,14 @@ class RootTunService : BaseService() {
 
             ACTION_START, null -> {
                 val cachedStatus = stateStore.snapshot()
-                startForeground(
-                    NOTIFICATION_ID,
-                    buildNotification(
-                        NotificationPresentationFactory.createStatus(
-                            profileName = cachedStatus.profileName ?: MLang.Service.Notification.UnknownProfile,
-                            status = describeStatus(cachedStatus),
-                        ),
+                val initialNotification = buildNotification(
+                    NotificationPresentationFactory.createStatus(
+                        profileName = cachedStatus.profileName ?: MLang.Service.Notification.UnknownProfile,
+                        status = describeStatus(cachedStatus),
                     ),
                 )
+                lastNotificationFingerprint = notificationFingerprint(initialNotification)
+                startForeground(NOTIFICATION_ID, initialNotification)
                 if (!cachedStatus.state.isActive && !cachedStatus.state.isRecovering) {
                     stopSelf()
                     return START_NOT_STICKY
@@ -96,7 +101,7 @@ class RootTunService : BaseService() {
                         var unreachableCount = 0
                         var lastStatus = cachedStatus
 
-                        PollingTimers.ticks(PollingTimerSpecs.RuntimeTrafficPolling).collect {
+                        PollingTimers.ticks(PollingTimerSpecs.RootTunStatusPolling).collect {
                             val snapshotResult = runCatching {
                                 RootTunServiceBridge.queryStatus(appContextOrSelf)
                             }
@@ -117,8 +122,7 @@ class RootTunService : BaseService() {
                                 } else {
                                     error?.message ?: "Waiting for reconnect"
                                 }
-                                notificationManager.notify(
-                                    NOTIFICATION_ID,
+                                notifyIfChanged(
                                     buildNotification(
                                         NotificationPresentationFactory.createStatus(
                                             profileName = title,
@@ -134,6 +138,8 @@ class RootTunService : BaseService() {
                             }
 
                             unreachableCount = 0
+                            val statusPresentationChanged =
+                                snapshot.state != lastStatus.state || snapshot.profileName != lastStatus.profileName
                             lastStatus = snapshot
                             syncStatus(snapshot)
 
@@ -143,8 +149,7 @@ class RootTunService : BaseService() {
                             }
 
                             if (snapshot.state == RootTunState.Idle || snapshot.state == RootTunState.Failed) {
-                                notificationManager.notify(
-                                    NOTIFICATION_ID,
+                                notifyIfChanged(
                                     buildNotification(
                                         NotificationPresentationFactory.createStatus(
                                             profileName = snapshot.profileName ?: MLang.Service.Notification.UnknownProfile,
@@ -157,15 +162,32 @@ class RootTunService : BaseService() {
                             }
 
                             val profileName = snapshot.profileName ?: MLang.Service.Notification.UnknownProfile
+                            val showTraffic = shouldShowTrafficNotification()
+                            val now = SystemClock.elapsedRealtime()
+                            val trafficDisplayChanged = showTraffic != lastTrafficDisplayEnabled
+                            val trafficRefreshDue = showTraffic &&
+                                now - lastTrafficNotificationAt >= TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS
+                            if (!statusPresentationChanged && !trafficDisplayChanged && !trafficRefreshDue) {
+                                return@collect
+                            }
                             val presentation = if (snapshot.state == RootTunState.Running) {
-                                buildTrafficPresentation(profileName)
+                                if (showTraffic) {
+                                    lastTrafficNotificationAt = now
+                                    buildTrafficPresentation(profileName)
+                                } else {
+                                    NotificationPresentationFactory.createStatus(
+                                        profileName = profileName,
+                                        status = MLang.Service.Notification.Running,
+                                    )
+                                }
                             } else {
                                 NotificationPresentationFactory.createStatus(
                                     profileName = profileName,
                                     status = describeStatus(snapshot),
                                 )
                             }
-                            notificationManager.notify(NOTIFICATION_ID, buildNotification(presentation))
+                            lastTrafficDisplayEnabled = showTraffic
+                            notifyIfChanged(buildNotification(presentation))
                         }
                     }
                 }
@@ -246,6 +268,22 @@ class RootTunService : BaseService() {
             .build()
     }
 
+    @SuppressLint("MissingPermission")
+    private fun notifyIfChanged(notification: Notification) {
+        val fingerprint = notificationFingerprint(notification)
+        if (fingerprint == lastNotificationFingerprint) return
+        lastNotificationFingerprint = fingerprint
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    private fun notificationFingerprint(notification: Notification): String =
+        "${notification.extras.getCharSequence(Notification.EXTRA_TITLE)}|" +
+            "${notification.extras.getCharSequence(Notification.EXTRA_TEXT)}|" +
+            "${notification.extras.getCharSequence(Notification.EXTRA_SUB_TEXT)}"
+
+    private fun shouldShowTrafficNotification(): Boolean =
+        settingsStore.decodeBool("showTrafficNotification", true)
+
     private fun createChannel() {
         notificationManager.createNotificationChannel(
             NotificationChannelCompat.Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
@@ -290,7 +328,8 @@ class RootTunService : BaseService() {
         private const val NOTIFICATION_ID = 1003
         private const val CHANNEL_ID = "clash_root_tun_service"
         private const val CHANNEL_NAME = "Clash RootTun Service"
-        private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 5_000L
+        private const val TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS = 5_000L
+        private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 30_000L
 
         fun start(context: Context) {
             val intent = Intent(context, RootTunService::class.java).setAction(ACTION_START)
