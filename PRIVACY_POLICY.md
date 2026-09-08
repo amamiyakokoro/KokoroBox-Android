@@ -1,48 +1,44 @@
-## Privacy Policy
+# KokoroBox Privacy Policy
 
-The YumeBox is built as an Open Source software. This app is provided by personal at no cost and is intended for use as is.
+_Last updated: 8 September 2026_
 
-This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our app.
+KokoroBox is open-source software for running Mihomo on Android. It is provided as-is. This policy explains the information processed by the app and the optional services you may choose to use.
 
-If you choose to use our app, then you agree to the collection and use of information in relation to this policy. The Personal Information that we collect is used for providing and improving the app. We will not use or share your information with anyone except as described in this Privacy Policy.
+## Data stored on your device
 
-The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at Clash for Android unless otherwise defined in this Privacy Policy.
+KokoroBox stores the profiles, subscription links, proxy and network settings, customisation choices, and locally generated traffic or diagnostic information that it needs to operate. This information remains on your device unless you choose to share it, export a backup, or use a remote service.
 
-**Information Collection and Use**
+The app does not include advertising, analytics, or crash-reporting SDKs, and it does not send diagnostic logs to KokoroBox developers automatically. If you copy or export logs, profiles, or a settings backup, you choose where that material is sent and should review it before sharing it.
 
-For a better experience, while using our app, we may require you to provide us with certain personally identifiable information. The information that we request will be retained by us and used as described in this privacy policy.
+## Proxy and subscription traffic
 
-The app does use third party services that may collect information used to identify you.
+When the VPN/proxy service is enabled, traffic is processed locally by the bundled Mihomo runtime and sent to the proxy servers, DNS resolvers, subscription providers, and other destinations configured by you or in your selected profile. KokoroBox does not operate a separate traffic-relay or telemetry service and does not inspect or retain the contents of that traffic for its own purposes.
 
-Link to privacy policy of third party service providers used by the app
+Those third parties can receive information inherent in a network connection, such as your IP address, connection time, requested host or destination metadata where applicable, and the request headers used by their service. Their privacy practices apply; only use providers you trust.
 
+## Optional online features
 
-**Log Data**
+KokoroBox contacts external services only when a feature requires it:
 
-We want to inform you that whenever you use our app, in a case of an error in the app we collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing our App, the time and date of your use of the app, and other statistics.
+- **Subscription and external-resource updates:** the configured provider receives the request needed to download the selected configuration or resource, including your network address and ordinary HTTP request metadata.
+- **App update checks:** manual checks, and automatic checks when enabled, request public GitHub Release metadata. The selected stable or nightly channel determines the release endpoint used. Downloading an APK opens GitHub in your browser. GitHub's privacy policy applies.
+- **Cloudflare Speed Test:** when you start this test in Lab, the app sends bounded latency, download, and upload test traffic to `speed.cloudflare.com` (up to 32 MB download and 8 MB upload per test). Cloudflare can observe the connection and edge location information necessary to provide the test. Results are shown in the app and are not uploaded by KokoroBox.
+- **Kokoro integration:** this is optional and begins only after you choose to sign in. The system browser performs the Kokoro OAuth login. The app then sends the access token only to the trusted Kokoro API over HTTPS to retrieve account and subscription options, create configurations, and read or save Custom Rules. Account display data, subscription usage and expiry details, and Custom Rule values are processed by Kokoro to provide those features. Access and refresh tokens are stored encrypted with an Android Keystore key; they are not placed in profile URLs or app logs. Account and rule data cached for faster display is kept in memory only and is cleared on sign-out or when it expires.
 
-**Cookies**
+The third-party services named above have their own privacy policies and terms. KokoroBox does not control their practices.
 
-Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device's internal memory.
+## Cookies and browser pages
 
-This app does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this app.
+KokoroBox does not use cookies itself. The system browser used for OAuth, GitHub downloads, or other external links may use cookies and other storage under the relevant website's policies.
 
-**Security**
+## Your choices
 
-We value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and we cannot guarantee its absolute security.
+You can avoid optional online features by not signing in to Kokoro, disabling automatic update checks, not running a speed test, and removing remote subscriptions. You can sign out of Kokoro from Kokoro Settings. You can remove profiles and settings in the app, or clear KokoroBox's app data in Android system settings to remove locally stored app data and encrypted session credentials.
 
-**Links to Other Sites**
+## Security
 
-This app may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by us. Therefore, we strongly advise you to review the Privacy Policy of these websites. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
+KokoroBox uses HTTPS for its built-in GitHub, Cloudflare, and Kokoro requests, and uses Android Keystore-backed encryption for Kokoro session credentials. No transmission or storage method is completely secure; protect your device and only import profiles or use services you trust.
 
-**Children’s Privacy**
+## Changes and contact
 
-These Services do not address anyone under the age of 13\. We do not knowingly collect personally identifiable information from children under 13\. In the case we discover that a child under 13 has provided us with personal information, we immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact us so that we will be able to do necessary actions.
-
-**Changes to This Privacy Policy**
-
-We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page. These changes are effective immediately after they are posted on this page.
-
-**Contact Us**
-
-If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us.
+We may revise this policy as the app changes. The current version is published in this repository and in the app onboarding screen. For questions or suggestions, open an issue in the [KokoroBox repository](https://github.com/amamiyakokoro/KokoroBox-Android/issues).
