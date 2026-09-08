@@ -65,7 +65,7 @@ import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-@Destination<RootGraph>(style = NavigationTransitions.MainScreenStyle::class)
+@Destination<RootGraph>(start = true, style = NavigationTransitions.MainScreenStyle::class)
 fun MainScreen(
     navigator: DestinationsNavigator,
     initialPage: Int = 0,
