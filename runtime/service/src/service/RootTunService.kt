@@ -29,6 +29,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.os.SystemClock
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -61,6 +62,7 @@ class RootTunService : BaseService() {
     private var lastTodayTrafficRefreshAt: Long = 0L
     private var notificationJob: Job? = null
     private val settingsStore by lazy { MMKV.mmkvWithID("settings", MMKV.MULTI_PROCESS_MODE) }
+    private val powerManager by lazy { getSystemService(PowerManager::class.java) }
     private var lastNotificationFingerprint: String? = null
     private var lastTrafficDisplayEnabled: Boolean? = null
     private var lastTrafficNotificationAt: Long = 0L
@@ -165,8 +167,13 @@ class RootTunService : BaseService() {
                             val showTraffic = shouldShowTrafficNotification()
                             val now = SystemClock.elapsedRealtime()
                             val trafficDisplayChanged = showTraffic != lastTrafficDisplayEnabled
+                            val trafficRefreshInterval = if (powerManager?.isInteractive != false) {
+                                TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS
+                            } else {
+                                TRAFFIC_NOTIFICATION_SCREEN_OFF_REFRESH_INTERVAL_MS
+                            }
                             val trafficRefreshDue = showTraffic &&
-                                now - lastTrafficNotificationAt >= TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS
+                                now - lastTrafficNotificationAt >= trafficRefreshInterval
                             if (!statusPresentationChanged && !trafficDisplayChanged && !trafficRefreshDue) {
                                 return@collect
                             }
@@ -329,6 +336,7 @@ class RootTunService : BaseService() {
         private const val CHANNEL_ID = "clash_root_tun_service"
         private const val CHANNEL_NAME = "Clash RootTun Service"
         private const val TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS = 5_000L
+        private const val TRAFFIC_NOTIFICATION_SCREEN_OFF_REFRESH_INTERVAL_MS = 30_000L
         private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 30_000L
 
         fun start(context: Context) {

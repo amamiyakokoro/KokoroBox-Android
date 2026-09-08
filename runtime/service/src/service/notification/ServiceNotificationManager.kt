@@ -35,6 +35,7 @@ import com.github.yumelira.yumebox.core.Clash
 import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
 import com.github.yumelira.yumebox.core.util.PollingTimers
 import com.github.yumelira.yumebox.runtime.service.R
+import com.github.yumelira.yumebox.service.ServicePowerController
 import com.github.yumelira.yumebox.service.common.constants.Components
 import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
 import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
@@ -42,6 +43,7 @@ import com.tencent.mmkv.MMKV
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 
 class ServiceNotificationManager(
     private val service: Service,
@@ -82,22 +84,35 @@ class ServiceNotificationManager(
     @SuppressLint("MissingPermission")
     fun startTrafficUpdate(scope: CoroutineScope): Job {
         return scope.launch(Dispatchers.Default) {
+            val powerController = ServicePowerController(service).also(ServicePowerController::start)
             var disabledRefreshTicks = 0
-            PollingTimers.ticks(PollingTimerSpecs.ForegroundNotificationRefresh).collect {
-                val showTraffic = shouldShowTrafficNotification()
-                if (!showTraffic && lastTrafficDisplayEnabled == false) {
-                    disabledRefreshTicks++
-                    if (disabledRefreshTicks < DISABLED_NOTIFICATION_REFRESH_TICKS) return@collect
-                }
-                disabledRefreshTicks = 0
+            try {
+                powerController.screenOn
+                    .collectLatest { screenOn ->
+                        val timer = if (screenOn) {
+                            PollingTimerSpecs.ForegroundNotificationRefresh
+                        } else {
+                            PollingTimerSpecs.ForegroundNotificationRefreshScreenOff
+                        }
+                        PollingTimers.ticks(timer).collect {
+                            val showTraffic = shouldShowTrafficNotification()
+                            if (!showTraffic && lastTrafficDisplayEnabled == false) {
+                                disabledRefreshTicks++
+                                if (disabledRefreshTicks < DISABLED_NOTIFICATION_REFRESH_TICKS) return@collect
+                            }
+                            disabledRefreshTicks = 0
 
-                val notification = buildRunningNotification(showTraffic)
-                val fingerprint = notificationFingerprint(notification)
-                lastTrafficDisplayEnabled = showTraffic
-                if (fingerprint != lastNotificationFingerprint) {
-                    lastNotificationFingerprint = fingerprint
-                    notificationManager.notify(config.notificationId, notification)
-                }
+                            val notification = buildRunningNotification(showTraffic)
+                            val fingerprint = notificationFingerprint(notification)
+                            lastTrafficDisplayEnabled = showTraffic
+                            if (fingerprint != lastNotificationFingerprint) {
+                                lastNotificationFingerprint = fingerprint
+                                notificationManager.notify(config.notificationId, notification)
+                            }
+                        }
+                    }
+            } finally {
+                powerController.stop()
             }
         }
     }

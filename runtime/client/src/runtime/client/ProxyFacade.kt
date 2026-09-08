@@ -68,6 +68,7 @@ enum class ProxyGroupSyncPriority {
 
 class ProxyFacade(
     private val context: Context,
+    private val screenOnFlow: StateFlow<Boolean>,
 ) {
     private companion object {
         const val TRAFFIC_TOTAL_POLL_TICKS = 10
@@ -733,26 +734,34 @@ class ProxyFacade(
         if (trafficPollingJob?.isActive == true) return
         trafficPollingJob = scope.launch {
             var tick = 0
-            PollingTimers.ticks(PollingTimerSpecs.RuntimeTrafficPolling).collect {
-                val snapshot = _runtimeSnapshot.value
-                if (!snapshot.running) {
-                    return@collect
-                }
-
-                runCatching {
-                    queryTrafficNow()
-                    if (tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
-                        queryTrafficTotal()
+            screenOnFlow
+                .collectLatest { screenOn ->
+                    val timer = if (screenOn) {
+                        PollingTimerSpecs.RuntimeTrafficPolling
+                    } else {
+                        PollingTimerSpecs.RuntimeTrafficPollingScreenOff
                     }
-                }.onFailure { error ->
-                    Timber.d(error, "Traffic polling skipped")
-                }
-                tick++
+                    PollingTimers.ticks(timer).collect {
+                        val snapshot = _runtimeSnapshot.value
+                        if (!snapshot.running) {
+                            return@collect
+                        }
 
-                if (tick % RUNTIME_PAYLOAD_REFRESH_TICKS == 0 && shouldRefreshRuntimePayload()) {
-                    refreshAllSafely()
+                        runCatching {
+                            queryTrafficNow()
+                            if (tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
+                                queryTrafficTotal()
+                            }
+                        }.onFailure { error ->
+                            Timber.d(error, "Traffic polling skipped")
+                        }
+                        tick++
+
+                        if (tick % RUNTIME_PAYLOAD_REFRESH_TICKS == 0 && shouldRefreshRuntimePayload()) {
+                            refreshAllSafely()
+                        }
+                    }
                 }
-            }
         }
     }
 

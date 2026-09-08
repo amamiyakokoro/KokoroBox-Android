@@ -52,6 +52,7 @@ import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
 import com.github.yumelira.yumebox.runtime.client.RuntimeStateMapper
 import com.github.yumelira.yumebox.runtime.client.root.RootTunReloadScheduler
+import com.github.yumelira.yumebox.service.ServicePowerController
 import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.common.util.AppLanguageManager
 import com.tencent.mmkv.MMKV
@@ -152,7 +153,8 @@ val appDataRuntimeModule = module {
         )
     }
 
-    single { ProxyFacade(androidContext()) }
+    single { ServicePowerController(androidContext()).also(ServicePowerController::start) }
+    single { ProxyFacade(androidContext(), get<ServicePowerController>().screenOn) }
     single { AppIdentityResolver(androidContext()) }
     single { ProfilesRepository(androidContext()) }
     single {
@@ -172,6 +174,7 @@ val appDataRuntimeModule = module {
                 proxyFacade.refreshCurrentProfile()
                 proxyFacade.currentProfile.value?.uuid?.toString()
             },
+            screenOnFlow = get<ServicePowerController>().screenOn,
         )
     }
 }

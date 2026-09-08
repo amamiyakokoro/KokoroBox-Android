@@ -37,6 +37,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -48,6 +49,7 @@ class AppTrafficStatisticsCollector(
     private val queryTrafficTotal: suspend () -> TrafficData,
     private val queryConnections: suspend () -> ConnectionSnapshot,
     private val queryActiveProfileId: suspend () -> String?,
+    private val screenOnFlow: Flow<Boolean>,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
 ) {
     private var collectionJob: Job? = null
@@ -81,13 +83,22 @@ class AppTrafficStatisticsCollector(
             lastTotalDownload = trafficStatisticsStore.getLastTrafficDownload()
             lastProfileId = trafficStatisticsStore.getLastProfileId()
             connectionBaselines.clear()
-            PollingTimers.ticks(PollingTimerSpecs.TrafficStatsCollection).collect {
-                runCatching { collectTrafficData() }
-                    .onFailure { error ->
-                        if (error is CancellationException) throw error
-                        Timber.tag(TAG).e(error, "App traffic collection failed")
+            screenOnFlow
+                .distinctUntilChanged()
+                .collectLatest { screenOn ->
+                    val timer = if (screenOn) {
+                        PollingTimerSpecs.TrafficStatsCollection
+                    } else {
+                        PollingTimerSpecs.TrafficStatsCollectionScreenOff
                     }
-            }
+                    PollingTimers.ticks(timer).collect {
+                        runCatching { collectTrafficData() }
+                            .onFailure { error ->
+                                if (error is CancellationException) throw error
+                                Timber.tag(TAG).e(error, "App traffic collection failed")
+                            }
+                    }
+                }
         }
     }
 
