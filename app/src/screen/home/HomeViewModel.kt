@@ -125,6 +125,7 @@ class HomeViewModel(
 
     private var reconcileJob: Job? = null
     private var speedSamplingJob: Job? = null
+    private val homeScreenActive = MutableStateFlow(false)
 
     private val mainProxyNode: StateFlow<com.github.yumelira.yumebox.core.model.Proxy?> =
         proxyFacade.resolvedPrimaryNode
@@ -137,16 +138,23 @@ class HomeViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val ipMonitoringState: StateFlow<IpMonitoringState> = combine(isRunning, tunnelMode) { running, mode ->
-        running to mode
-    }.flatMapLatest { (running, _) ->
-        if (running) {
-            networkInfoService.startIpMonitoring(
-                isProxyActiveFlow = isRunning,
-                externalRefreshFlow = PollingTimers.ticks(PollingTimerSpecs.HomeIpRefresh).map { Unit },
-            )
-        } else {
-            flowOf(IpMonitoringState.Loading)
+    val ipMonitoringState: StateFlow<IpMonitoringState> = combine(
+        isRunning,
+        tunnelMode,
+        homeScreenActive,
+    ) { running, _, isHomeActive ->
+        running to isHomeActive
+    }.flatMapLatest { (running, isHomeActive) ->
+        when {
+            running && isHomeActive -> {
+                networkInfoService.startIpMonitoring(
+                    isProxyActiveFlow = isRunning,
+                    externalRefreshFlow = PollingTimers.ticks(PollingTimerSpecs.HomeIpRefresh).map { Unit },
+                )
+            }
+
+            running -> emptyFlow()
+            else -> flowOf(IpMonitoringState.Loading)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), IpMonitoringState.Loading)
 
@@ -281,6 +289,7 @@ class HomeViewModel(
     }
 
     fun setHomeScreenActive(isActive: Boolean) {
+        homeScreenActive.value = isActive
         proxyFacade.setProxyGroupSyncPriority(
             priority = if (isActive) ProxyGroupSyncPriority.FAST else ProxyGroupSyncPriority.OFF,
             source = "home",
