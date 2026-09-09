@@ -31,6 +31,7 @@ import com.github.yumelira.yumebox.data.controller.AppSettingsController
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.AppUpdateChannel
+import com.github.yumelira.yumebox.data.model.AppUpdateInstallMethod
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.data.store.Preference
@@ -67,6 +68,7 @@ class AppSettingsViewModel(
     val autoUpdateCurrentProfileOnStart: Preference<Boolean> = settings.autoUpdateCurrentProfileOnStart
     val automaticUpdateCheckEnabled: Preference<Boolean> = settings.automaticUpdateCheckEnabled
     val appUpdateChannel: Preference<AppUpdateChannel> = settings.appUpdateChannel
+    val appUpdateInstallMethod: Preference<AppUpdateInstallMethod> = settings.appUpdateInstallMethod
     val hideAppIcon: Preference<Boolean> = settings.hideAppIcon
     val excludeFromRecents: Preference<Boolean> = settings.excludeFromRecents
     val showTrafficNotification: Preference<Boolean> = settings.showTrafficNotification
@@ -131,6 +133,7 @@ class AppSettingsViewModel(
             settings.lastAutomaticUpdateCheckAtMillis = 0L
         }
     }
+    fun onAppUpdateInstallMethodChange(method: AppUpdateInstallMethod) = appUpdateInstallMethod.set(method)
     fun onHideAppIconChange(hide: Boolean) = hideAppIcon.set(hide)
     fun onExcludeFromRecentsChange(exclude: Boolean) = excludeFromRecents.set(exclude)
     fun onShowTrafficNotificationChange(show: Boolean) = showTrafficNotification.set(show)

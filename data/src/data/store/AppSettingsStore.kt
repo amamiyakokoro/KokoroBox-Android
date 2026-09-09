@@ -25,6 +25,7 @@ package com.github.yumelira.yumebox.data.store
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.AppUpdateChannel
+import com.github.yumelira.yumebox.data.model.AppUpdateInstallMethod
 import com.github.yumelira.yumebox.data.model.MonetContrast
 import com.github.yumelira.yumebox.data.model.MonetStyle
 import com.github.yumelira.yumebox.data.model.ThemeMode
@@ -53,6 +54,7 @@ class AppSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = exter
     val autoUpdateCurrentProfileOnStart by boolFlow(true)
     val automaticUpdateCheckEnabled by boolFlow(true)
     val appUpdateChannel by enumFlow(AppUpdateChannel.Stable)
+    val appUpdateInstallMethod by enumFlow(AppUpdateInstallMethod.System)
     var lastAutomaticUpdateCheckAtMillis by long(0L)
     val hideAppIcon by boolFlow(false)
     val excludeFromRecents by boolFlow(false)

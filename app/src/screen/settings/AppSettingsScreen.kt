@@ -50,6 +50,7 @@ import com.github.yumelira.yumebox.common.util.toast
 import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.model.AppLanguage
 import com.github.yumelira.yumebox.data.model.AppUpdateChannel
+import com.github.yumelira.yumebox.data.model.AppUpdateInstallMethod
 import com.github.yumelira.yumebox.data.model.ThemeMode
 import com.github.yumelira.yumebox.presentation.component.Card
 import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
@@ -110,6 +111,7 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
     val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsStateWithLifecycle()
     val automaticUpdateCheckEnabled by viewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
     val appUpdateChannel by viewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
+    val appUpdateInstallMethod by viewModel.appUpdateInstallMethod.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Behavior)
     Card {
@@ -141,6 +143,14 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
             ),
             values = AppUpdateChannel.entries,
             onValueChange = viewModel::onAppUpdateChannelChange,
+        )
+        PreferenceEnumItem(
+            title = "Update installation method",
+            summary = "Advanced: System is recommended. Shizuku and Root bypass Android's install confirmation.",
+            currentValue = appUpdateInstallMethod,
+            items = listOf("System", "Shizuku", "Root"),
+            values = AppUpdateInstallMethod.entries,
+            onValueChange = viewModel::onAppUpdateInstallMethodChange,
         )
     }
 }
