@@ -150,7 +150,7 @@ class HomeViewModel(
             running && isHomeActive -> {
                 networkInfoService.startIpMonitoring(
                     isProxyActiveFlow = isRunning,
-                    externalRefreshFlow = PollingTimers.ticks(PollingTimerSpecs.HomeIpRefresh).map { Unit },
+                    externalRefreshFlow = PollingTimers.ticks(PollingTimerSpecs.HomeIpFallbackRefresh).map { Unit },
                 )
             }
 

@@ -22,10 +22,17 @@
 
 package com.github.yumelira.yumebox.data.gateway
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import com.github.yumelira.yumebox.core.util.NetworkInterfaces
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -66,6 +73,7 @@ class NetworkInfoService(
         .callTimeout(5, TimeUnit.SECONDS)
         .build(),
     private val externalIpEndpoints: List<String> = EXTERNAL_IP_ENDPOINTS,
+    private val context: Context? = null,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -107,36 +115,23 @@ class NetworkInfoService(
         }
     }
 
+    @OptIn(FlowPreview::class)
     fun startIpMonitoring(
         isProxyActiveFlow: Flow<Boolean>,
         externalRefreshFlow: Flow<Unit> = emptyFlow(),
-    ): Flow<IpMonitoringState> = flow {
+    ): Flow<IpMonitoringState> {
         var lastSuccessfulState: IpMonitoringState.Success? = null
-
-        try {
-            val localIp = getLocalIp()
-            val externalIp = getExternalIp()
-            val newState = IpMonitoringState.Success(localIp, externalIp)
-            lastSuccessfulState = newState
-            emit(newState)
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            if (lastSuccessfulState == null) {
-                emit(IpMonitoringState.Error(e.message ?: "Unknown error"))
-            }
-        }
 
         val refreshFlow = merge(
             flowOf(Unit),
             _refreshTrigger,
             externalRefreshFlow,
-            isProxyActiveFlow
-                .distinctUntilChanged()
-                .drop(1)
-                .map { },
-        )
+            observeNetworkChanges(),
+        ).debounce(NETWORK_CHANGE_DEBOUNCE_MS)
 
-        combine(refreshFlow, isProxyActiveFlow) { _, isProxyActive ->
+        return combine(refreshFlow, isProxyActiveFlow.distinctUntilChanged()) { _, isProxyActive ->
+            isProxyActive
+        }.map { isProxyActive ->
             try {
                 val localIp = getLocalIp()
                 val externalIp = getExternalIp()
@@ -148,9 +143,38 @@ class NetworkInfoService(
                 lastSuccessfulState?.copy(isProxyActive = isProxyActive)
                     ?: IpMonitoringState.Error(e.message ?: "Unknown error")
             }
-        }.collect { state ->
-            emit(state)
         }
+    }
+
+    private fun observeNetworkChanges(): Flow<Unit> {
+        val connectivityManager = context?.getSystemService(ConnectivityManager::class.java)
+            ?: return emptyFlow()
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+            .build()
+        return callbackFlow {
+            val callback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) = trigger()
+
+                override fun onLost(network: Network) = trigger()
+
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) = trigger()
+
+                private fun trigger() {
+                    trySend(Unit)
+                }
+            }
+            runCatching { connectivityManager.registerNetworkCallback(request, callback) }
+                .onFailure { close(it) }
+            awaitClose {
+                runCatching { connectivityManager.unregisterNetworkCallback(callback) }
+            }
+        }.buffer(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    }
+
+    private companion object {
+        const val NETWORK_CHANGE_DEBOUNCE_MS = 750L
     }
 }
 

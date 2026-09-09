@@ -113,7 +113,7 @@ val appDataRuntimeModule = module {
         )
     }
     single { LogStore(androidApplication(), get()) }
-    single { NetworkInfoService() }
+    single { NetworkInfoService(context = androidContext()) }
     single {
         val profilesRepository = get<ProfilesRepository>()
         RuntimeOverrideController(
