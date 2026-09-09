@@ -34,6 +34,7 @@ import com.github.yumelira.yumebox.data.controller.GeoXDataController
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import com.github.yumelira.yumebox.di.appModule
+import com.github.yumelira.yumebox.integration.update.AppUpdateWorkScheduler
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
@@ -77,6 +78,7 @@ class App : Application() {
             geoXDataController.ensureGeoFiles()
         }
         appSettingsStorage.syncAppVersion(BuildConfig.VERSION_CODE)
+        AppUpdateWorkScheduler.sync(this, appSettingsStorage.automaticUpdateCheckEnabled.value)
         scheduleDeferredStartupTasks(koinApp.koin)
         ProfileUpdateJobService.ensureScheduled(this)
         koinApp.koin.get<KokoroPreloadCoordinator>().preloadIfAuthenticated()

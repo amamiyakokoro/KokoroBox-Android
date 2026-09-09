@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.github.yumelira.yumebox.MainActivity
 import dev.oom_wg.purejoy.mlang.MLang
 
 /** Delivers a deferred PackageInstaller confirmation through an explicit user notification. */
@@ -17,11 +18,7 @@ class AppUpdateInstallNotifier(
     private val context: Context,
 ) {
     fun showConfirmation(confirmationIntent: Intent): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return false
-        }
+        if (!canPostNotifications()) return false
         createChannel()
         val contentIntent = PendingIntent.getActivity(
             context,
@@ -45,6 +42,34 @@ class AppUpdateInstallNotifier(
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
         return true
     }
+
+    fun showAvailableUpdate(tag: String): Boolean {
+        if (!canPostNotifications()) return false
+        createChannel()
+        val contentIntent = PendingIntent.getActivity(
+            context,
+            NOTIFICATION_ID + 1,
+            Intent(context, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        NotificationManagerCompat.from(context).notify(
+            NOTIFICATION_ID + 1,
+            NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(context.applicationInfo.icon)
+                .setContentTitle("${MLang.About.Update.Available}: $tag")
+                .setContentText(MLang.About.License.CheckUpdateSummary)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .build(),
+        )
+        return true
+    }
+
+    private fun canPostNotifications(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return

@@ -56,6 +56,7 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordina
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
 import com.github.yumelira.yumebox.integration.update.AppUpdateManager
+import com.github.yumelira.yumebox.integration.update.AppUpdateWorkScheduler
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
 import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
@@ -188,6 +189,7 @@ class MainActivity : FragmentActivity() {
 
             LaunchedEffect(automaticUpdateCheckEnabled, appUpdateChannel) {
                 automaticAppUpdateChecker.onEnabledChanged(automaticUpdateCheckEnabled)
+                AppUpdateWorkScheduler.sync(this@MainActivity, automaticUpdateCheckEnabled)
             }
 
             ProvideAndroidPlatformTheme {
