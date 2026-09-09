@@ -2,6 +2,7 @@
 ProfilesVM = {
     Message = {
         ProfileAdded = "配置已添加：%s"
+        ProfileAddedAndActivated = "配置已添加并启用：%s"
         AddFailed = "添加配置失败：%s"
         ProfileDeleted = "配置已删除"
         DeleteFailed = "删除配置失败：%s"

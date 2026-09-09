@@ -200,13 +200,25 @@ class ProfilesViewModel(
                 }
 
                 profilesRepository.updateProfile(uuid, observer)
+                val activateNewKokoroSubscription =
+                    type == Profile.Type.Url && KokoroApi.isManagedConfigUrl(source)
+                if (activateNewKokoroSubscription) {
+                    profilesRepository.setActiveProfile(uuid)
+                    Timber.i("New Kokoro subscription activated: $uuid")
+                }
                 _downloadProgress.value = DownloadProgress(
                     percent = 100,
                     message = MLang.ProfilesVM.Progress.ImportComplete,
                     isCompleted = true,
                 )
 
-                showMessage(MLang.ProfilesVM.Message.ProfileAdded.format(name))
+                showMessage(
+                    if (activateNewKokoroSubscription) {
+                        MLang.ProfilesVM.Message.ProfileAddedAndActivated.format(name)
+                    } else {
+                        MLang.ProfilesVM.Message.ProfileAdded.format(name)
+                    },
+                )
                 refreshProfiles()
                 Timber.i("Profile created: $uuid")
             } catch (e: Exception) {

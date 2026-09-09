@@ -2,6 +2,7 @@
 ProfilesVM = {
     Message = {
         ProfileAdded = "Profile added: %s"
+        ProfileAddedAndActivated = "Profile added and activated: %s"
         AddFailed = "Add profile failed: %s"
         ProfileDeleted = "Profile deleted"
         DeleteFailed = "Delete profile failed: %s"
