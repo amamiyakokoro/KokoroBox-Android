@@ -87,7 +87,7 @@ val appIntegrationModule = module {
 }
 
 val appViewModelModule = module {
-    viewModel { AppUpdateViewModel(get(), get()) }
+    viewModel { AppUpdateViewModel(get(), get(), get()) }
     viewModel { AppSettingsViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(androidApplication(), get(), get(), get(), get(), get()) }
     viewModel { ProfilesViewModel(androidApplication(), get(), get(), get()) }

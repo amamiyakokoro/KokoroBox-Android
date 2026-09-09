@@ -70,9 +70,13 @@ fun AboutScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val updateViewModel = koinViewModel<AppUpdateViewModel>()
     val updateState by updateViewModel.state.collectAsStateWithLifecycle()
+    val updateInstallState by updateViewModel.installState.collectAsStateWithLifecycle()
     updateState.result?.let { result ->
         AppUpdateDialog(
             result = result,
+            installState = updateInstallState,
+            onDownloadAndInstall = updateViewModel::downloadAndInstall,
+            onContinueInstall = updateViewModel::continueInstall,
             onDismiss = updateViewModel::dismiss,
         )
     }

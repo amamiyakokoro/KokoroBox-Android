@@ -55,6 +55,7 @@ import com.github.yumelira.yumebox.data.model.AppColorTheme
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
+import com.github.yumelira.yumebox.integration.update.AppUpdateManager
 import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
 import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
 import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
@@ -106,6 +107,7 @@ class MainActivity : FragmentActivity() {
     private val kokoroRepository: KokoroRepository by inject()
     private val kokoroPreloadCoordinator: KokoroPreloadCoordinator by inject()
     private val automaticAppUpdateChecker: AutomaticAppUpdateChecker by inject()
+    private val appUpdateManager: AppUpdateManager by inject()
 
     override fun onStart() {
         super.onStart()
@@ -169,6 +171,7 @@ class MainActivity : FragmentActivity() {
             val automaticUpdateCheckEnabled by appSettingsViewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
             val appUpdateChannel by appSettingsViewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
             val availableUpdate by automaticAppUpdateChecker.availableUpdate.collectAsStateWithLifecycle()
+            val updateInstallState by appUpdateManager.state.collectAsStateWithLifecycle()
 
             val biometricGateState = rememberStartupBiometricGateState(
                 activity = this@MainActivity,
@@ -229,7 +232,13 @@ class MainActivity : FragmentActivity() {
                             availableUpdate?.let { release ->
                                 AppUpdateDialog(
                                     result = release,
-                                    onDismiss = automaticAppUpdateChecker::dismiss,
+                                    installState = updateInstallState,
+                                    onDownloadAndInstall = appUpdateManager::downloadAndPrepare,
+                                    onContinueInstall = appUpdateManager::installPreparedUpdate,
+                                    onDismiss = {
+                                        appUpdateManager.dismiss()
+                                        automaticAppUpdateChecker.dismiss()
+                                    },
                                 )
                             }
                         }
