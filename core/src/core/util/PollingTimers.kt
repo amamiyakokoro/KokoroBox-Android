@@ -64,7 +64,9 @@ object PollingTimerSpecs {
     val RuntimeRootLogPolling = PollingTimerSpec("runtime_root_log_polling", 300L, 0L)
     val ProxyTileRefresh = PollingTimerSpec("proxy_tile_refresh", 1_000L, 0L)
     val HomeIpRefresh = PollingTimerSpec("home_ip_refresh", 15_000L, 0L)
-    val TrafficStatsCollection = PollingTimerSpec("traffic_stats_collection", 10_000L, 0L)
+    // Per-app attribution requires a full connections snapshot; it is intentionally less frequent
+    // than the live traffic display to avoid repeated IPC and metadata resolution.
+    val TrafficStatsCollection = PollingTimerSpec("traffic_stats_collection", 30_000L, 0L)
     val TrafficStatsCollectionScreenOff = PollingTimerSpec("traffic_stats_collection_screen_off", 60_000L, 60_000L)
     val ProxyHealthcheckRefresh = PollingTimerSpec("proxy_healthcheck_refresh", 1_500L, 1_500L)
     val ProxyTestingSortHold = PollingTimerSpec("proxy_testing_sort_hold", 2_200L, 2_200L)
