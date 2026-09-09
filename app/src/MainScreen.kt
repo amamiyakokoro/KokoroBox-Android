@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
 
 
 import com.amamiyakokoro.box.presentation.theme.UiDp
@@ -61,7 +60,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ProvidersScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -137,12 +135,15 @@ fun MainScreen(
     ) { result ->
         homeViewModel.onVpnPermissionResult(result.resultCode == Activity.RESULT_OK)
     }
+    val vpnPrepareIntent by homeViewModel.vpnPrepareIntent.collectAsStateWithLifecycle()
 
-    LaunchedEffect(homeViewModel, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            homeViewModel.vpnPrepareIntent.collect { intent ->
+    LaunchedEffect(vpnPrepareIntent) {
+        vpnPrepareIntent?.let { intent ->
+            runCatching {
                 vpnPermissionLauncher.launch(intent)
-            }
+            }.onSuccess {
+                homeViewModel.onVpnPermissionLaunchStarted(intent)
+            }.onFailure(homeViewModel::onVpnPermissionLaunchFailed)
         }
     }
 

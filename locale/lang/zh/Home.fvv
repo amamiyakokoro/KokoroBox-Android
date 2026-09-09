@@ -6,6 +6,8 @@ Home = {
         ConfigSwitched = "配置已切换"
         ConfigSwitchFailed = "配置切换失败：%s"
         Preparing = "正在准备..."
+        WaitingForVpnPermission = "正在等待 VPN 授权"
+        ControlBusy = "代理%s，请稍候。"
         StartFailed = "启动失败：%s"
         StopFailed = "停止失败：%s"
     }

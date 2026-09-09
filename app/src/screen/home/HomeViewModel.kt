@@ -46,7 +46,6 @@ import com.amamiyakokoro.box.service.runtime.entity.Profile
 import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
@@ -105,10 +104,8 @@ class HomeViewModel(
     private val _pendingTransition = MutableStateFlow(PendingTransition.None)
     private var pendingStartRequest: PendingStartRequest? = null
 
-    private val _vpnPrepareIntent = MutableSharedFlow<Intent>(
-        replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val vpnPrepareIntent = _vpnPrepareIntent.asSharedFlow()
+    private val _vpnPrepareIntent = MutableStateFlow<Intent?>(null)
+    val vpnPrepareIntent: StateFlow<Intent?> = _vpnPrepareIntent.asStateFlow()
 
     val controlState: StateFlow<HomeProxyControlState> = combine(
         runtimeSnapshot,
@@ -348,7 +345,17 @@ class HomeViewModel(
     }
 
     fun startProxy(profileId: String, mode: ProxyMode? = null) {
-        if (!controlState.value.canInteract || controlState.value != HomeProxyControlState.Idle) return
+        val currentControlState = controlState.value
+        if (currentControlState != HomeProxyControlState.Idle) {
+            showMessage(
+                if (_pendingTransition.value == PendingTransition.AwaitingPermission) {
+                    MLang.Home.Message.WaitingForVpnPermission
+                } else {
+                    MLang.Home.Message.ControlBusy.format(currentControlState.label)
+                },
+            )
+            return
+        }
 
         val request = PendingStartRequest(
             profileId = profileId,
@@ -377,6 +384,7 @@ class HomeViewModel(
     fun onVpnPermissionResult(granted: Boolean) {
         val request = pendingStartRequest ?: return
         if (_pendingTransition.value != PendingTransition.AwaitingPermission) return
+        _vpnPrepareIntent.value = null
 
         if (!granted) {
             clearPendingStart()
@@ -389,6 +397,20 @@ class HomeViewModel(
         viewModelScope.launch {
             startProxyInternal(request)
         }
+    }
+
+    fun onVpnPermissionLaunchStarted(intent: Intent) {
+        if (_vpnPrepareIntent.value == intent) {
+            _vpnPrepareIntent.value = null
+        }
+    }
+
+    fun onVpnPermissionLaunchFailed(error: Throwable) {
+        _vpnPrepareIntent.value = null
+        clearPendingStart()
+        _pendingTransition.value = PendingTransition.None
+        Timber.e(error, "Failed to launch VPN permission request")
+        showError(MLang.Home.Message.StartFailed.format(error.message ?: "VPN permission request failed"))
     }
 
     suspend fun stopProxy() {
@@ -474,7 +496,7 @@ class HomeViewModel(
             Timber.i("Home startProxy completed in ${System.currentTimeMillis() - startedAt}ms, mode=${request.mode}")
         } catch (e: com.amamiyakokoro.box.remote.VpnPermissionRequired) {
             _pendingTransition.value = PendingTransition.AwaitingPermission
-            _vpnPrepareIntent.emit(e.intent)
+            _vpnPrepareIntent.value = e.intent
             Timber.i("VPN permission required")
         } catch (e: Exception) {
             if (e is CancellationException) throw e
@@ -488,6 +510,14 @@ class HomeViewModel(
     private fun clearPendingStart() {
         pendingStartRequest = null
     }
+
+    private val HomeProxyControlState.label: String
+        get() = when (this) {
+            HomeProxyControlState.Idle -> MLang.Home.Status.TapToStart
+            HomeProxyControlState.Connecting -> MLang.Home.Status.Connecting
+            HomeProxyControlState.Running -> MLang.Home.Status.Running
+            HomeProxyControlState.Disconnecting -> MLang.Home.Status.Disconnecting
+        }
 
     private fun resolveControlState(
         phase: RuntimePhase,

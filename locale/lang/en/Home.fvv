@@ -6,6 +6,8 @@ Home = {
         ConfigSwitched = "Config switched"
         ConfigSwitchFailed = "Config switch failed: %s"
         Preparing = "Preparing..."
+        WaitingForVpnPermission = "Waiting for VPN permission"
+        ControlBusy = "Proxy is %s. Please wait."
         StartFailed = "Start failed: %s"
         StopFailed = "Stop failed: %s"
     }
