@@ -129,6 +129,10 @@
                 android:enabled="true"
                 android:exported="false"/>
 
+        <receiver
+                android:name=".integration.update.AppUpdateInstallReceiver"
+                android:exported="false"/>
+
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="${applicationId}.fileprovider"

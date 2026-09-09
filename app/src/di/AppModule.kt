@@ -28,8 +28,12 @@ import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordina
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
 import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
 import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
+import com.github.yumelira.yumebox.data.integration.update.AppUpdateDownloader
 import com.github.yumelira.yumebox.data.integration.speedtest.CloudflareSpeedTestClient
 import com.github.yumelira.yumebox.BuildConfig
+import com.github.yumelira.yumebox.common.update.ApkUpdateVerifier
+import com.github.yumelira.yumebox.common.update.PackageUpdateInstaller
+import com.github.yumelira.yumebox.integration.update.AppUpdateManager
 import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
 import com.github.yumelira.yumebox.screen.log.LogViewModel
@@ -52,6 +56,18 @@ import org.koin.dsl.module
 
 val appIntegrationModule = module {
     single { GitHubReleaseClient() }
+    single { AppUpdateDownloader(androidApplication()) }
+    single { ApkUpdateVerifier(androidApplication()) }
+    single { PackageUpdateInstaller(androidApplication()) }
+    single {
+        AppUpdateManager(
+            context = androidApplication(),
+            downloader = get(),
+            verifier = get(),
+            installer = get(),
+            applicationScope = get(named(APPLICATION_SCOPE_NAME)),
+        )
+    }
     single {
         AutomaticAppUpdateChecker(
             client = get(),
