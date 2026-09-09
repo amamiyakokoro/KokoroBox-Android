@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.remote
+package com.amamiyakokoro.box.remote
 
 import android.content.Context
-import com.github.yumelira.yumebox.core.model.*
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.runtime.client.root.RootTunController
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
-import com.github.yumelira.yumebox.service.remote.IClashManager
-import com.github.yumelira.yumebox.service.remote.ILogObserver
-import com.github.yumelira.yumebox.service.root.RootTunRuntimeRecovery
-import com.github.yumelira.yumebox.service.root.RootTunStateStore
+import com.amamiyakokoro.box.core.model.*
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.runtime.client.root.RootTunController
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.service.remote.IClashManager
+import com.amamiyakokoro.box.service.remote.ILogObserver
+import com.amamiyakokoro.box.service.root.RootTunRuntimeRecovery
+import com.amamiyakokoro.box.service.root.RootTunStateStore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.json.int
@@ -240,7 +240,7 @@ class RuntimeClashManager(
                             if (chunk.items.isNotEmpty()) {
                                 chunk.items.forEach { raw ->
                                     observer.newItem(
-                                        com.github.yumelira.yumebox.service.root.RootTunJson.Default.decodeFromString(
+                                        com.amamiyakokoro.box.service.root.RootTunJson.Default.decodeFromString(
                                             LogMessage.serializer(),
                                             raw,
                                         ),

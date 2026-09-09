@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.presentation.icon
+package com.amamiyakokoro.box.presentation.icon
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -73,7 +73,7 @@ import androidx.compose.material.icons.rounded.Wifi
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
- * Material Design 3 semantic icon catalog for YumeBox UI.
+ * Material Design 3 semantic icon catalog for KokoroBox UI.
  *
  * New MD3/MD3E screens should depend on these semantic entries instead of importing
  * individual Material icon assets directly. The historical [Yume] icon set is kept

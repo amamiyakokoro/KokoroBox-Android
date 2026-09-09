@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,47 +14,47 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.di
+package com.amamiyakokoro.box.di
 
-import com.github.yumelira.yumebox.data.controller.AccessControlController
-import com.github.yumelira.yumebox.data.controller.AcgWallpaperStorage
-import com.github.yumelira.yumebox.data.controller.AppSettingsController
-import com.github.yumelira.yumebox.data.controller.NetworkSettingsController
-import com.github.yumelira.yumebox.data.controller.RuntimeOverrideController
-import com.github.yumelira.yumebox.data.controller.UserSettingsBackupController
-import com.github.yumelira.yumebox.data.controller.ActiveProfileOverrideReloader
-import com.github.yumelira.yumebox.data.controller.AppIdentityResolver
-import com.github.yumelira.yumebox.data.controller.AppTrafficStatisticsCollector
-import com.github.yumelira.yumebox.data.controller.GeoXDataController
-import com.github.yumelira.yumebox.data.store.LogStore
-import com.github.yumelira.yumebox.data.gateway.LogRecordGateway
-import com.github.yumelira.yumebox.data.gateway.NetworkInfoService
-import com.github.yumelira.yumebox.data.store.OverrideConfigProvider
-import com.github.yumelira.yumebox.data.store.OverrideConfigStore
-import com.github.yumelira.yumebox.data.controller.OverrideResolver
-import com.github.yumelira.yumebox.data.controller.OverrideService
-import com.github.yumelira.yumebox.data.store.ProfileBindingProvider
-import com.github.yumelira.yumebox.data.store.ProfileBindingStore
-import com.github.yumelira.yumebox.data.controller.ProvidersController
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.MMKVProvider
-import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
-import com.github.yumelira.yumebox.data.store.ProfileLinksStore
-import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
-import com.github.yumelira.yumebox.data.store.TrafficStatisticsStore
-import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
-import com.github.yumelira.yumebox.runtime.client.ProxyFacade
-import com.github.yumelira.yumebox.runtime.client.RuntimeStateMapper
-import com.github.yumelira.yumebox.runtime.client.root.RootTunReloadScheduler
-import com.github.yumelira.yumebox.service.ServicePowerController
-import com.github.yumelira.yumebox.domain.model.TrafficData
-import com.github.yumelira.yumebox.common.util.AppLanguageManager
+import com.amamiyakokoro.box.data.controller.AccessControlController
+import com.amamiyakokoro.box.data.controller.AcgWallpaperStorage
+import com.amamiyakokoro.box.data.controller.AppSettingsController
+import com.amamiyakokoro.box.data.controller.NetworkSettingsController
+import com.amamiyakokoro.box.data.controller.RuntimeOverrideController
+import com.amamiyakokoro.box.data.controller.UserSettingsBackupController
+import com.amamiyakokoro.box.data.controller.ActiveProfileOverrideReloader
+import com.amamiyakokoro.box.data.controller.AppIdentityResolver
+import com.amamiyakokoro.box.data.controller.AppTrafficStatisticsCollector
+import com.amamiyakokoro.box.data.controller.GeoXDataController
+import com.amamiyakokoro.box.data.store.LogStore
+import com.amamiyakokoro.box.data.gateway.LogRecordGateway
+import com.amamiyakokoro.box.data.gateway.NetworkInfoService
+import com.amamiyakokoro.box.data.store.OverrideConfigProvider
+import com.amamiyakokoro.box.data.store.OverrideConfigStore
+import com.amamiyakokoro.box.data.controller.OverrideResolver
+import com.amamiyakokoro.box.data.controller.OverrideService
+import com.amamiyakokoro.box.data.store.ProfileBindingProvider
+import com.amamiyakokoro.box.data.store.ProfileBindingStore
+import com.amamiyakokoro.box.data.controller.ProvidersController
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.data.store.MMKVProvider
+import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.data.store.ProfileLinksStore
+import com.amamiyakokoro.box.data.store.ProxyDisplaySettingsStore
+import com.amamiyakokoro.box.data.store.TrafficStatisticsStore
+import com.amamiyakokoro.box.runtime.client.ProfilesRepository
+import com.amamiyakokoro.box.runtime.client.ProxyFacade
+import com.amamiyakokoro.box.runtime.client.RuntimeStateMapper
+import com.amamiyakokoro.box.runtime.client.root.RootTunReloadScheduler
+import com.amamiyakokoro.box.service.ServicePowerController
+import com.amamiyakokoro.box.domain.model.TrafficData
+import com.amamiyakokoro.box.common.util.AppLanguageManager
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -124,8 +124,8 @@ val appDataRuntimeModule = module {
     single {
         val appContext = androidContext()
         ProvidersController(appContext) {
-            com.github.yumelira.yumebox.remote.ServiceClient.connect(appContext)
-            com.github.yumelira.yumebox.remote.ServiceClient.clash().queryProviders()
+            com.amamiyakokoro.box.remote.ServiceClient.connect(appContext)
+            com.amamiyakokoro.box.remote.ServiceClient.clash().queryProviders()
         }
     }
 

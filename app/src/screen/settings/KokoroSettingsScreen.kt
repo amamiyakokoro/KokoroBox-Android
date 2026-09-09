@@ -1,13 +1,13 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,17 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.yumelira.yumebox.MainActivity
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccountCard
-import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
+import com.amamiyakokoro.box.MainActivity
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.PreferenceArrowItem
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.screen.profiles.KokoroAccountCard
+import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.KokoroCustomRulesScreenDestination

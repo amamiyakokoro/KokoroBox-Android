@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.data.util
+package com.amamiyakokoro.box.data.util
 
-import com.github.yumelira.yumebox.core.model.ConfigurationOverride
-import com.github.yumelira.yumebox.core.model.OfficialMrsPresetSelection
-import com.github.yumelira.yumebox.core.model.buildOfficialMrsConfigurationOverride
-import com.github.yumelira.yumebox.core.model.defaultOfficialMrsEnabledItemIds
-import com.github.yumelira.yumebox.core.model.inferOfficialMrsPresetSelection
-import com.github.yumelira.yumebox.core.model.officialMrsItemById
-import com.github.yumelira.yumebox.core.model.officialMrsRegionById
-import com.github.yumelira.yumebox.core.model.orderedOfficialMrsBaseItems
-import com.github.yumelira.yumebox.core.model.orderedOfficialMrsItems
-import com.github.yumelira.yumebox.core.model.orderedOfficialMrsServiceItems
-import com.github.yumelira.yumebox.core.model.orderedOfficialMrsRegions
-import com.github.yumelira.yumebox.core.model.sortOfficialMrsItemIds
+import com.amamiyakokoro.box.core.model.ConfigurationOverride
+import com.amamiyakokoro.box.core.model.OfficialMrsPresetSelection
+import com.amamiyakokoro.box.core.model.buildOfficialMrsConfigurationOverride
+import com.amamiyakokoro.box.core.model.defaultOfficialMrsEnabledItemIds
+import com.amamiyakokoro.box.core.model.inferOfficialMrsPresetSelection
+import com.amamiyakokoro.box.core.model.officialMrsItemById
+import com.amamiyakokoro.box.core.model.officialMrsRegionById
+import com.amamiyakokoro.box.core.model.orderedOfficialMrsBaseItems
+import com.amamiyakokoro.box.core.model.orderedOfficialMrsItems
+import com.amamiyakokoro.box.core.model.orderedOfficialMrsServiceItems
+import com.amamiyakokoro.box.core.model.orderedOfficialMrsRegions
+import com.amamiyakokoro.box.core.model.sortOfficialMrsItemIds
 
 const val OFFICIAL_MRS_PRESET_TITLE = "官方 MRS 常用分流"
 const val OFFICIAL_MRS_PRESET_SUMMARY =

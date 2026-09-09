@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.integration.update
+package com.amamiyakokoro.box.integration.update
 
 import android.content.ComponentName
 import android.content.Context
@@ -6,7 +6,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import com.github.yumelira.yumebox.BuildConfig
+import com.amamiyakokoro.box.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

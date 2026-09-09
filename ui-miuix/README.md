@@ -1,6 +1,6 @@
-# YumeBox Miuix compatibility library
+# KokoroBox Miuix compatibility library
 
-This module is the dedicated legacy Miuix boundary for YumeBox UI code.
+This module is the dedicated legacy Miuix boundary for KokoroBox UI code.
 
 Goals:
 

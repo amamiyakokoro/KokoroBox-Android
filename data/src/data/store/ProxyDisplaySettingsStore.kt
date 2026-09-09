@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.data.store
+package com.amamiyakokoro.box.data.store
 
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.data.model.PROXY_SHEET_HEIGHT_FRACTION_DEFAULT
-import com.github.yumelira.yumebox.data.model.ProxyDisplayMode
-import com.github.yumelira.yumebox.data.model.ProxySortMode
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.data.model.PROXY_SHEET_HEIGHT_FRACTION_DEFAULT
+import com.amamiyakokoro.box.data.model.ProxyDisplayMode
+import com.amamiyakokoro.box.data.model.ProxySortMode
 import com.tencent.mmkv.MMKV
 
 class ProxyDisplaySettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = externalMmkv) {

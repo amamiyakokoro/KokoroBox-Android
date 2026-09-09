@@ -1,20 +1,20 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.data.integration.kokoro
+package com.amamiyakokoro.box.data.integration.kokoro
 
 import android.content.Context
 import android.net.Uri
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
+import com.amamiyakokoro.box.data.gateway.SharedOkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
@@ -481,7 +481,7 @@ private class KokoroKeystoreTokenStore(context: Context, private val json: Json)
         val storeLock = Any()
         const val PREFERENCES_NAME = "amamiya_keystore_credentials"
         const val ENCRYPTED_DATA_KEY = "encrypted_auth_data"
-        const val KEY_ALIAS = "yumebox_amamiya_oauth_aes"
+        const val KEY_ALIAS = "kokorobox_amamiya_oauth_aes"
         const val TRANSFORMATION = "AES/GCM/NoPadding"
         const val IV_LENGTH_BYTES = 12
     }

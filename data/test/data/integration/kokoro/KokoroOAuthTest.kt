@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.integration.kokoro
+package com.amamiyakokoro.box.data.integration.kokoro
 
 import org.junit.Assert.*
 import org.junit.Test

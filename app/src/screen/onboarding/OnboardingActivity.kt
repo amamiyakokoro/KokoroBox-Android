@@ -1,7 +1,7 @@
 ﻿/*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.onboarding
+package com.amamiyakokoro.box.screen.onboarding
 
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
@@ -40,13 +40,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.github.yumelira.yumebox.common.util.openUrl
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.colorFromArgb
-import com.github.yumelira.yumebox.presentation.theme.colorToArgbLong
-import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
-import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerSheet
+import com.amamiyakokoro.box.common.util.openUrl
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.colorFromArgb
+import com.amamiyakokoro.box.presentation.theme.colorToArgbLong
+import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
+import com.amamiyakokoro.box.screen.settings.component.ThemeColorPickerSheet
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject

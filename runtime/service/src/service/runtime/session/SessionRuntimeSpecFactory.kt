@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.runtime.session
+package com.amamiyakokoro.box.service.runtime.session
 
 import android.content.Context
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
-import com.github.yumelira.yumebox.service.root.RootTunConfigFactory
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeOwner
-import com.github.yumelira.yumebox.service.runtime.util.directoryLastModified
-import com.github.yumelira.yumebox.service.runtime.util.importedDir
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.service.root.RootTunConfigFactory
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.records.ImportedDao
+import com.amamiyakokoro.box.service.runtime.state.RuntimeOwner
+import com.amamiyakokoro.box.service.runtime.util.directoryLastModified
+import com.amamiyakokoro.box.service.runtime.util.importedDir
 import java.io.File
 import java.security.MessageDigest
 
@@ -85,7 +85,7 @@ class SessionRuntimeSpecFactory(
         )
     }
 
-    private fun requireActiveProfile(): com.github.yumelira.yumebox.service.runtime.entity.Imported {
+    private fun requireActiveProfile(): com.amamiyakokoro.box.service.runtime.entity.Imported {
         val profileId = store.activeProfile ?: error("No active profile selected")
         return ImportedDao.queryByUUID(profileId) ?: error("Active profile metadata not found: $profileId")
     }

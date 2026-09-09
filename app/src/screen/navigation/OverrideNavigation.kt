@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.navigation
+package com.amamiyakokoro.box.screen.navigation
 
 import androidx.compose.runtime.Composable
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
-import com.github.yumelira.yumebox.feature.editor.presentation.screen.ConfigPreviewScreen
-import com.github.yumelira.yumebox.presentation.screen.*
-import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
-import com.github.yumelira.yumebox.presentation.viewmodel.OverrideConfigViewModel
+import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
+import com.amamiyakokoro.box.feature.editor.presentation.screen.ConfigPreviewScreen
+import com.amamiyakokoro.box.presentation.screen.*
+import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
+import com.amamiyakokoro.box.presentation.viewmodel.OverrideConfigViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
@@ -80,21 +80,21 @@ fun OverrideEditRoute(
         navigator = navigator,
         configId = configId,
         onOpenStringListEditor = { title, placeholder, replaceValue, startValue, endValue, onReplaceChange, onStartChange, onEndChange ->
-            val values = com.github.yumelira.yumebox.presentation.util.OverrideListModeValues(
+            val values = com.amamiyakokoro.box.presentation.util.OverrideListModeValues(
                 replaceValue = replaceValue,
                 startValue = startValue,
                 endValue = endValue,
             )
             val availableModes = listOf(
-                com.github.yumelira.yumebox.presentation.util.OverrideListEditorMode.Replace,
-                com.github.yumelira.yumebox.presentation.util.OverrideListEditorMode.Start,
-                com.github.yumelira.yumebox.presentation.util.OverrideListEditorMode.End,
+                com.amamiyakokoro.box.presentation.util.OverrideListEditorMode.Replace,
+                com.amamiyakokoro.box.presentation.util.OverrideListEditorMode.Start,
+                com.amamiyakokoro.box.presentation.util.OverrideListEditorMode.End,
             )
             OverrideStructuredEditorStore.setupStringListEditor(
                 title = title,
                 placeholder = placeholder,
                 availableModes = availableModes,
-                selectedMode = com.github.yumelira.yumebox.presentation.util.resolveInitialEditorMode(
+                selectedMode = com.amamiyakokoro.box.presentation.util.resolveInitialEditorMode(
                     availableModes = availableModes,
                     values = values,
                 ),

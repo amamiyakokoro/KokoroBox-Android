@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.app.*
 import android.content.Context
@@ -28,10 +28,10 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.github.yumelira.yumebox.core.model.LogMessage
-import com.github.yumelira.yumebox.runtime.service.R
-import com.github.yumelira.yumebox.service.common.constants.Components
-import com.github.yumelira.yumebox.service.remote.ILogObserver
+import com.amamiyakokoro.box.core.model.LogMessage
+import com.amamiyakokoro.box.runtime.service.R
+import com.amamiyakokoro.box.service.common.constants.Components
+import com.amamiyakokoro.box.service.remote.ILogObserver
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.BufferedWriter
@@ -48,8 +48,8 @@ class LogRecordService : Service() {
         private const val CHANNEL_ID = "log_record_channel"
         private const val CHANNEL_NAME = "日志记录"
 
-        private const val ACTION_START = "com.github.yumelira.yumebox.LOG_START"
-        private const val ACTION_STOP = "com.github.yumelira.yumebox.LOG_STOP"
+        private const val ACTION_START = "com.amamiyakokoro.box.LOG_START"
+        private const val ACTION_STOP = "com.amamiyakokoro.box.LOG_STOP"
 
         const val LOG_DIR = "logs"
         const val LOG_PREFIX = ""

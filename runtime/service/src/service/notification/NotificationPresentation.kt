@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.service.notification
+package com.amamiyakokoro.box.service.notification
 
-import com.github.yumelira.yumebox.common.util.formatBytes
-import com.github.yumelira.yumebox.common.util.formatSpeed
-import com.github.yumelira.yumebox.core.model.ProxyGroup
+import com.amamiyakokoro.box.common.util.formatBytes
+import com.amamiyakokoro.box.common.util.formatSpeed
+import com.amamiyakokoro.box.core.model.ProxyGroup
 import dev.oom_wg.purejoy.mlang.MLang
 
 internal data class NotificationPresentation(

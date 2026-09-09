@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
@@ -29,9 +29,9 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.service.common.util.Global
-import com.github.yumelira.yumebox.service.common.util.initializeServiceGlobal
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.service.common.util.Global
+import com.amamiyakokoro.box.service.common.util.initializeServiceGlobal
 import com.tencent.mmkv.MMKV
 
 enum class LocalRuntimePhase {

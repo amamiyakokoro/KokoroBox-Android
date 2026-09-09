@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.gateway
+package com.amamiyakokoro.box.data.gateway
 
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient

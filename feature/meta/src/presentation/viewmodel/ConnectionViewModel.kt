@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.feature.meta.presentation.viewmodel
+package com.amamiyakokoro.box.feature.meta.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.core.domain.ConnectionHistoryManager
-import com.github.yumelira.yumebox.core.model.ConnectionInfo
-import com.github.yumelira.yumebox.core.model.ConnectionSnapshot
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.remote.ServiceClient
+import com.amamiyakokoro.box.core.domain.ConnectionHistoryManager
+import com.amamiyakokoro.box.core.model.ConnectionInfo
+import com.amamiyakokoro.box.core.model.ConnectionSnapshot
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.remote.ServiceClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

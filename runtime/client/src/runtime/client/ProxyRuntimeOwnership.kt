@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.runtime.client
+package com.amamiyakokoro.box.runtime.client
 
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.service.LocalRuntimePhase
-import com.github.yumelira.yumebox.service.root.RootTunState
-import com.github.yumelira.yumebox.service.root.RootTunStatus
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeOwner
-import com.github.yumelira.yumebox.service.runtime.state.RuntimePhase
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeSnapshot
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.service.LocalRuntimePhase
+import com.amamiyakokoro.box.service.root.RootTunState
+import com.amamiyakokoro.box.service.root.RootTunStatus
+import com.amamiyakokoro.box.service.runtime.entity.Profile
+import com.amamiyakokoro.box.service.runtime.state.RuntimeOwner
+import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
+import com.amamiyakokoro.box.service.runtime.state.RuntimeSnapshot
 
 internal object ProxyRuntimeOwnership {
     fun detectOwner(

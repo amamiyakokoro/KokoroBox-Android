@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.root
+package com.amamiyakokoro.box.service.root
 
-import com.github.yumelira.yumebox.core.model.Provider
-import com.github.yumelira.yumebox.core.model.ProxyGroup
-import com.github.yumelira.yumebox.core.model.UiConfiguration
-import com.github.yumelira.yumebox.service.runtime.session.RuntimeLogChunk
+import com.amamiyakokoro.box.core.model.Provider
+import com.amamiyakokoro.box.core.model.ProxyGroup
+import com.amamiyakokoro.box.core.model.UiConfiguration
+import com.amamiyakokoro.box.service.runtime.session.RuntimeLogChunk
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 

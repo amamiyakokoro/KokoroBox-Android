@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color as AndroidColor
@@ -58,9 +58,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.core.net.toUri
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
-import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.presentation.component.calculateWallpaperViewportLayout
+import com.amamiyakokoro.box.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.resize.Precision

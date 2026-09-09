@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
@@ -39,25 +39,25 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.yumelira.yumebox.common.util.VpnUtils
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.core.model.RootTunDnsMode
-import com.github.yumelira.yumebox.data.model.AccessControlMode
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.model.TunStack
-import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.TextEditBottomSheet
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.service.root.RootAccessSupport
+import com.amamiyakokoro.box.common.util.VpnUtils
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.model.RootTunDnsMode
+import com.amamiyakokoro.box.data.model.AccessControlMode
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.model.TunStack
+import com.amamiyakokoro.box.presentation.component.AppTextFieldDialog
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.PreferenceArrowItem
+import com.amamiyakokoro.box.presentation.component.PreferenceEnumItem
+import com.amamiyakokoro.box.presentation.component.PreferenceSwitchItem
+import com.amamiyakokoro.box.presentation.component.PreferenceValueItem
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.TextEditBottomSheet
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.service.root.RootAccessSupport
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AccessControlScreenDestination

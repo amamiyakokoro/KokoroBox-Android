@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,15 +40,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.core.model.GeoFileType
-import com.github.yumelira.yumebox.core.model.GeoXItem
-import com.github.yumelira.yumebox.core.model.geoXItems
-import com.github.yumelira.yumebox.core.util.runtimeHomeDir
-import com.github.yumelira.yumebox.data.controller.GeoXDataController
-import com.github.yumelira.yumebox.data.controller.GeoXUpdateRecord
-import com.github.yumelira.yumebox.presentation.component.*
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.model.GeoFileType
+import com.amamiyakokoro.box.core.model.GeoXItem
+import com.amamiyakokoro.box.core.model.geoXItems
+import com.amamiyakokoro.box.core.util.runtimeHomeDir
+import com.amamiyakokoro.box.data.controller.GeoXDataController
+import com.amamiyakokoro.box.data.controller.GeoXUpdateRecord
+import com.amamiyakokoro.box.presentation.component.*
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
@@ -478,7 +478,7 @@ private fun GeoXItem.lastUpdateSummary(record: GeoXUpdateRecord?): String {
     )
 }
 
-private val com.github.yumelira.yumebox.data.controller.GeoXUpdateSource.displayName: String
+private val com.amamiyakokoro.box.data.controller.GeoXUpdateSource.displayName: String
     get() = when (name) {
         "Local" -> MLang.MetaFeature.Download.LastUpdateSourceLocal
         else -> MLang.MetaFeature.Download.LastUpdateSourceOnline
@@ -504,7 +504,7 @@ private fun ResourceDownloadProgress.toGeoXProgressState(
 
 @Composable
 private fun GeoXDownloadInlineProgress(item: GeoXDownloadProgressState) {
-    val spacing = com.github.yumelira.yumebox.presentation.theme.AppTheme.spacing
+    val spacing = com.amamiyakokoro.box.presentation.theme.AppTheme.spacing
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.space4),
@@ -569,12 +569,12 @@ private fun GeoXDownloadProgressState.detailText(): String {
         status == GeoXDownloadStatus.Success -> MLang.MetaFeature.Download.ProgressSuccess
         status == GeoXDownloadStatus.Failed -> MLang.MetaFeature.Download.ProgressFailed
         totalSize > 0L -> MLang.MetaFeature.Download.ProgressDetail.format(
-            com.github.yumelira.yumebox.common.util.formatBytes(currentSize),
-            com.github.yumelira.yumebox.common.util.formatBytes(totalSize),
+            com.amamiyakokoro.box.common.util.formatBytes(currentSize),
+            com.amamiyakokoro.box.common.util.formatBytes(totalSize),
             speed,
         )
         currentSize > 0L -> MLang.MetaFeature.Download.ProgressDetailUnknownTotal.format(
-            com.github.yumelira.yumebox.common.util.formatBytes(currentSize),
+            com.amamiyakokoro.box.common.util.formatBytes(currentSize),
             speed,
         )
         else -> MLang.MetaFeature.Download.ProgressWaiting

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.common.log
+package com.amamiyakokoro.box.service.common.log
 
 import timber.log.Timber
 
 object Log {
-    private const val TAG = "YumeBox"
+    private const val TAG = "KokoroBox"
 
     fun d(message: String, throwable: Throwable? = null) = Timber.tag(TAG).d(throwable, message)
     fun i(message: String, throwable: Throwable? = null) = Timber.tag(TAG).i(throwable, message)

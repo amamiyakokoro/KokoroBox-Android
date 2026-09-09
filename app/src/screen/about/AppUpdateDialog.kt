@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.screen.about
+package com.amamiyakokoro.box.screen.about
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -16,12 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.common.util.openUrl
-import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
-import com.github.yumelira.yumebox.data.integration.update.ReleaseVersion
-import com.github.yumelira.yumebox.data.integration.update.isNewerThan
-import com.github.yumelira.yumebox.integration.update.AppUpdateInstallState
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.common.util.openUrl
+import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
+import com.amamiyakokoro.box.data.integration.update.ReleaseVersion
+import com.amamiyakokoro.box.data.integration.update.isNewerThan
+import com.amamiyakokoro.box.integration.update.AppUpdateInstallState
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable

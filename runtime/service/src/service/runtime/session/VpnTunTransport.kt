@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.runtime.session
+package com.amamiyakokoro.box.service.runtime.session
 
 import android.annotation.TargetApi
 import android.app.PendingIntent
@@ -29,15 +29,15 @@ import android.net.IpPrefix
 import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
-import com.github.yumelira.yumebox.core.util.parseInetSocketAddress
-import com.github.yumelira.yumebox.runtime.service.R
-import com.github.yumelira.yumebox.service.common.compat.pendingIntentFlags
-import com.github.yumelira.yumebox.service.common.constants.Components
-import com.github.yumelira.yumebox.service.common.util.SocketOwnerResolver
-import com.github.yumelira.yumebox.service.runtime.config.AccessControlMode
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.util.buildIncludedRoutesFromExcludedCidrs
-import com.github.yumelira.yumebox.service.runtime.util.parseCIDR
+import com.amamiyakokoro.box.core.util.parseInetSocketAddress
+import com.amamiyakokoro.box.runtime.service.R
+import com.amamiyakokoro.box.service.common.compat.pendingIntentFlags
+import com.amamiyakokoro.box.service.common.constants.Components
+import com.amamiyakokoro.box.service.common.util.SocketOwnerResolver
+import com.amamiyakokoro.box.service.runtime.config.AccessControlMode
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.util.buildIncludedRoutesFromExcludedCidrs
+import com.amamiyakokoro.box.service.runtime.util.parseCIDR
 import java.net.InetAddress
 import java.security.SecureRandom
 
@@ -184,7 +184,7 @@ class VpnTunTransport(
             )
         }
 
-        com.github.yumelira.yumebox.core.Clash.startTun(
+        com.amamiyakokoro.box.core.Clash.startTun(
             fd = device.fd,
             stack = device.stack,
             gateway = device.gateway,
@@ -197,8 +197,8 @@ class VpnTunTransport(
     }
 
     override fun stop() {
-        com.github.yumelira.yumebox.core.Clash.stopHttp()
-        com.github.yumelira.yumebox.core.Clash.stopTun()
+        com.amamiyakokoro.box.core.Clash.stopHttp()
+        com.amamiyakokoro.box.core.Clash.stopTun()
     }
 
     override fun onNetworkChanged() {
@@ -212,7 +212,7 @@ class VpnTunTransport(
     private fun listenHttp(): java.net.InetSocketAddress? {
         val r = { 1 + random.nextInt(199) }
         val listenAt = "127.${r()}.${r()}.${r()}:0"
-        val address = com.github.yumelira.yumebox.core.Clash.startHttp(listenAt)
+        val address = com.amamiyakokoro.box.core.Clash.startHttp(listenAt)
         return address?.let(::parseInetSocketAddress)
     }
 

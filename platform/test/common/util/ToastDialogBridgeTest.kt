@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.common.util
+package com.amamiyakokoro.box.common.util
 
 import org.junit.After
 import org.junit.Assert.*

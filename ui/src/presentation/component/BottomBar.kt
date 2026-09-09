@@ -1,8 +1,8 @@
 
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.presentation.component
+package com.amamiyakokoro.box.presentation.component
 
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -60,9 +60,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AppMotion
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppMotion
+import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.kyant.shapes.Capsule
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang

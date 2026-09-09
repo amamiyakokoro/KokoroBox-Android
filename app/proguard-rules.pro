@@ -15,8 +15,8 @@
 }
 
 # JNI bridge entry points
--keep class com.github.yumelira.yumebox.core.bridge.** { *; }
--keep class com.github.yumelira.yumebox.core.Global { *; }
+-keep class com.amamiyakokoro.box.core.bridge.** { *; }
+-keep class com.amamiyakokoro.box.core.Global { *; }
 
 # Parcelable CREATOR
 -keepclassmembers class * implements android.os.Parcelable {

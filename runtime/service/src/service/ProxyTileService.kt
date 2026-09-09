@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -30,19 +30,19 @@ import android.net.VpnService
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.store.MMKVProvider
-import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
-import com.github.yumelira.yumebox.runtime.service.R
-import com.github.yumelira.yumebox.service.common.constants.Components
-import com.github.yumelira.yumebox.service.root.RootTunServiceBridge
-import com.github.yumelira.yumebox.service.root.RootTunStateStore
-import com.github.yumelira.yumebox.service.runtime.session.RuntimeServiceLauncher
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeOwner
-import com.github.yumelira.yumebox.service.runtime.state.RuntimePhase
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeSnapshot
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.store.MMKVProvider
+import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.runtime.service.R
+import com.amamiyakokoro.box.service.common.constants.Components
+import com.amamiyakokoro.box.service.root.RootTunServiceBridge
+import com.amamiyakokoro.box.service.root.RootTunStateStore
+import com.amamiyakokoro.box.service.runtime.session.RuntimeServiceLauncher
+import com.amamiyakokoro.box.service.runtime.state.RuntimeOwner
+import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
+import com.amamiyakokoro.box.service.runtime.state.RuntimeSnapshot
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +62,7 @@ class ProxyTileService : TileService() {
     }
     private val rootTunStateStore by lazy { RootTunStateStore(applicationContext) }
     private val tileLabelText: String by lazy {
-        applicationInfo.loadLabel(packageManager).toString().ifBlank { "YumeBox" }
+        applicationInfo.loadLabel(packageManager).toString().ifBlank { "KokoroBox" }
     }
 
     private val scope = CoroutineScope(Dispatchers.Main + Job())
@@ -204,11 +204,11 @@ class ProxyTileService : TileService() {
                 owner = owner,
                 phase = when (owner) {
                     RuntimeOwner.RootTun -> when (rootStatus.state) {
-                        com.github.yumelira.yumebox.service.root.RootTunState.Idle -> RuntimePhase.Idle
-                        com.github.yumelira.yumebox.service.root.RootTunState.Starting -> RuntimePhase.Starting
-                        com.github.yumelira.yumebox.service.root.RootTunState.Running -> RuntimePhase.Running
-                        com.github.yumelira.yumebox.service.root.RootTunState.Stopping -> RuntimePhase.Stopping
-                        com.github.yumelira.yumebox.service.root.RootTunState.Failed -> RuntimePhase.Failed
+                        com.amamiyakokoro.box.service.root.RootTunState.Idle -> RuntimePhase.Idle
+                        com.amamiyakokoro.box.service.root.RootTunState.Starting -> RuntimePhase.Starting
+                        com.amamiyakokoro.box.service.root.RootTunState.Running -> RuntimePhase.Running
+                        com.amamiyakokoro.box.service.root.RootTunState.Stopping -> RuntimePhase.Stopping
+                        com.amamiyakokoro.box.service.root.RootTunState.Failed -> RuntimePhase.Failed
                     }
                     RuntimeOwner.LocalTun -> tunPhase
                     RuntimeOwner.LocalHttp -> httpPhase

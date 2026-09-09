@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.runtime.session
+package com.amamiyakokoro.box.service.runtime.session
 
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.service.StatusProvider
-import com.github.yumelira.yumebox.service.ClashService
-import com.github.yumelira.yumebox.service.TunService
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.service.StatusProvider
+import com.amamiyakokoro.box.service.ClashService
+import com.amamiyakokoro.box.service.TunService
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
 
 object RuntimeServiceLauncher {
     const val EXTRA_REQUEST_SOURCE = "runtime_request_source"

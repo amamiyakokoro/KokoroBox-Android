@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,26 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.presentation.viewmodel
+package com.amamiyakokoro.box.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.core.model.Proxy
-import com.github.yumelira.yumebox.core.presentation.ContractStateViewModel
-import com.github.yumelira.yumebox.core.presentation.LoadableState
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.data.controller.RuntimeOverrideController
-import com.github.yumelira.yumebox.data.model.ProxySortMode
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
-import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
-import com.github.yumelira.yumebox.runtime.client.ProxyFacade
-import com.github.yumelira.yumebox.runtime.client.ProxyGroupSyncPriority
+import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.presentation.ContractStateViewModel
+import com.amamiyakokoro.box.core.presentation.LoadableState
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.data.controller.RuntimeOverrideController
+import com.amamiyakokoro.box.data.model.ProxySortMode
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.data.store.ProxyDisplaySettingsStore
+import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
+import com.amamiyakokoro.box.runtime.client.ProxyFacade
+import com.amamiyakokoro.box.runtime.client.ProxyGroupSyncPriority
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job

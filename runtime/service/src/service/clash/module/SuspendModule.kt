@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.clash.module
+package com.amamiyakokoro.box.service.clash.module
 
 import android.app.Service
 import android.content.Intent
 import android.os.PowerManager
 import androidx.core.content.getSystemService
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.service.common.util.ticker
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.service.common.util.ticker
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select

@@ -1,6 +1,6 @@
-package com.github.yumelira.yumebox.integration.update
+package com.amamiyakokoro.box.integration.update
 
-import com.github.yumelira.yumebox.service.root.RootPackageShell
+import com.amamiyakokoro.box.service.root.RootPackageShell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,28 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.runtime.session
+package com.amamiyakokoro.box.service.runtime.session
 
 import android.content.Context
 import android.util.Log
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
-import com.github.yumelira.yumebox.core.model.CompileRequest
-import com.github.yumelira.yumebox.core.model.CompileResult
-import com.github.yumelira.yumebox.core.model.ConfigurationOverride
-import com.github.yumelira.yumebox.core.model.ProxyGroup
-import com.github.yumelira.yumebox.core.model.buildOfficialMrsConfigurationOverride
-import com.github.yumelira.yumebox.core.model.defaultSystemOfficialMrsPresetSelection
-import com.github.yumelira.yumebox.core.model.encodeConfigurationOverride
-import com.github.yumelira.yumebox.core.util.PROXY_PROVIDER_SCOPE
-import com.github.yumelira.yumebox.core.util.RULE_PROVIDER_SCOPE
-import com.github.yumelira.yumebox.core.util.profileProviderScopeDir
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
+import com.amamiyakokoro.box.core.model.CompileRequest
+import com.amamiyakokoro.box.core.model.CompileResult
+import com.amamiyakokoro.box.core.model.ConfigurationOverride
+import com.amamiyakokoro.box.core.model.ProxyGroup
+import com.amamiyakokoro.box.core.model.buildOfficialMrsConfigurationOverride
+import com.amamiyakokoro.box.core.model.defaultSystemOfficialMrsPresetSelection
+import com.amamiyakokoro.box.core.model.encodeConfigurationOverride
+import com.amamiyakokoro.box.core.util.PROXY_PROVIDER_SCOPE
+import com.amamiyakokoro.box.core.util.RULE_PROVIDER_SCOPE
+import com.amamiyakokoro.box.core.util.profileProviderScopeDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.data.gateway
+package com.amamiyakokoro.box.data.gateway
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import com.github.yumelira.yumebox.core.util.NetworkInterfaces
+import com.amamiyakokoro.box.core.util.NetworkInterfaces
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -103,7 +103,7 @@ class NetworkInfoService(
             val request = Request.Builder()
                 .url(endpoint)
                 .header("Accept", "application/json")
-                .header("User-Agent", "YumeBox/${System.getProperty("http.agent").orEmpty()}")
+                .header("User-Agent", "KokoroBox/${System.getProperty("http.agent").orEmpty()}")
                 .build()
             val info = httpClient.newCall(request).execute().use { response ->
                 json.decodeFromString<IpInfo>(response.body.string()).normalized()

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.presentation.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+package com.amamiyakokoro.box.presentation.component
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -32,15 +32,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.github.yumelira.yumebox.core.model.officialMrsPresetIconUrl
-import com.github.yumelira.yumebox.data.util.OverridePresetItem
-import com.github.yumelira.yumebox.data.util.OverridePresetRegion
-import com.github.yumelira.yumebox.data.util.OverridePresetTemplateSelection
-import com.github.yumelira.yumebox.data.util.orderedBasePresetItems
-import com.github.yumelira.yumebox.data.util.orderedPresetRegions
-import com.github.yumelira.yumebox.data.util.orderedServicePresetItems
-import com.github.yumelira.yumebox.data.util.sortPresetItems
-import com.github.yumelira.yumebox.data.util.sortPresetRegions
+import com.amamiyakokoro.box.core.model.officialMrsPresetIconUrl
+import com.amamiyakokoro.box.data.util.OverridePresetItem
+import com.amamiyakokoro.box.data.util.OverridePresetRegion
+import com.amamiyakokoro.box.data.util.OverridePresetTemplateSelection
+import com.amamiyakokoro.box.data.util.orderedBasePresetItems
+import com.amamiyakokoro.box.data.util.orderedPresetRegions
+import com.amamiyakokoro.box.data.util.orderedServicePresetItems
+import com.amamiyakokoro.box.data.util.sortPresetItems
+import com.amamiyakokoro.box.data.util.sortPresetRegions
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable

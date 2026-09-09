@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.profiles
+package com.amamiyakokoro.box.screen.profiles
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,17 +44,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import com.github.yumelira.yumebox.data.store.LinkOpenMode
-import com.github.yumelira.yumebox.data.store.ProfileLink
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.AppFormDialog
-import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
-import com.github.yumelira.yumebox.presentation.component.SectionCard
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3TextButton
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.data.store.LinkOpenMode
+import com.amamiyakokoro.box.data.store.ProfileLink
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppFormDialog
+import com.amamiyakokoro.box.presentation.component.PreferenceEnumItem
+import com.amamiyakokoro.box.presentation.component.SectionCard
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3TextButton
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppTheme
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable

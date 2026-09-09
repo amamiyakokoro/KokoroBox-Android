@@ -1,8 +1,8 @@
-HSPLcom/github/yumelira/yumebox/App;->**(**)**
-HSPLcom/github/yumelira/yumebox/MainActivity;->**(**)**
-HSPLcom/github/yumelira/yumebox/MainScreenKt;->**(**)**
-HSPLcom/github/yumelira/yumebox/screen/home/**;->**(**)**
-HSPLcom/github/yumelira/yumebox/screen/acg/**;->**(**)**
-HSPLcom/github/yumelira/yumebox/presentation/component/**;->**(**)**
+HSPLcom/amamiyakokoro/box/App;->**(**)**
+HSPLcom/amamiyakokoro/box/MainActivity;->**(**)**
+HSPLcom/amamiyakokoro/box/MainScreenKt;->**(**)**
+HSPLcom/amamiyakokoro/box/screen/home/**;->**(**)**
+HSPLcom/amamiyakokoro/box/screen/acg/**;->**(**)**
+HSPLcom/amamiyakokoro/box/presentation/component/**;->**(**)**
 HSPLandroidx/compose/**;->**(**)**
 HSPLtop/yukonga/miuix/**;->**(**)**

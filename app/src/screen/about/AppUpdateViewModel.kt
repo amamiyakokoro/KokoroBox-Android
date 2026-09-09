@@ -1,11 +1,11 @@
-package com.github.yumelira.yumebox.screen.about
+package com.amamiyakokoro.box.screen.about
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
-import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.integration.update.AppUpdateManager
+import com.amamiyakokoro.box.data.integration.update.GitHubReleaseClient
+import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.integration.update.AppUpdateManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

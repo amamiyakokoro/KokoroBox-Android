@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.service.root;
+package com.amamiyakokoro.box.service.root;
 
 interface IRootTunService {
     String startRootTun(String requestJson);

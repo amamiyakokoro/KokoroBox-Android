@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.profiles
+package com.amamiyakokoro.box.screen.profiles
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -32,21 +32,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.data.model.OverrideConfig
-import com.github.yumelira.yumebox.data.model.ProfileBinding
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
-import com.github.yumelira.yumebox.presentation.component.AppDialog
-import com.github.yumelira.yumebox.presentation.component.AppDialogDefaults
-import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
-import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
+import com.amamiyakokoro.box.data.model.OverrideConfig
+import com.amamiyakokoro.box.data.model.ProfileBinding
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetConfirmAction
+import com.amamiyakokoro.box.presentation.component.AppDialog
+import com.amamiyakokoro.box.presentation.component.AppDialogDefaults
+import com.amamiyakokoro.box.presentation.component.AppTextFieldDialog
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.DialogButtonRow
+import com.amamiyakokoro.box.presentation.component.PreferenceListItem
+import com.amamiyakokoro.box.presentation.component.PreferenceSwitchItem
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
+import com.amamiyakokoro.box.presentation.theme.AppTheme
+import com.amamiyakokoro.box.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
 
 private const val PROFILE_SETTINGS_MIN_HEIGHT_FRACTION = 0.5f

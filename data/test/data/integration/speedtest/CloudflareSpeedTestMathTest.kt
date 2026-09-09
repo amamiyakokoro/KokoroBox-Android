@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.integration.speedtest
+package com.amamiyakokoro.box.data.integration.speedtest
 
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

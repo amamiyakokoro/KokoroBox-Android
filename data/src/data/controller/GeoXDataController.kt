@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,28 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 @file:Suppress("SpellCheckingInspection")
 
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.data.controller
+package com.amamiyakokoro.box.data.controller
 
 import android.content.Context
 import android.net.Uri
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.core.model.GeoFileType
-import com.github.yumelira.yumebox.core.util.runtimeHomeDir
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.model.GeoFileType
+import com.amamiyakokoro.box.core.util.runtimeHomeDir
 import timber.log.Timber
 import java.io.File
 import java.io.IOException

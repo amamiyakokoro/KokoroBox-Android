@@ -1,6 +1,6 @@
-package com.github.yumelira.yumebox.data.integration.update
+package com.amamiyakokoro.box.data.integration.update
 
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
+import com.amamiyakokoro.box.data.store.AppSettingsStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

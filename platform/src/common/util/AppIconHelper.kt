@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.common.util
+package com.amamiyakokoro.box.common.util
 
 import android.content.ComponentName
 import android.content.Context
@@ -28,7 +28,7 @@ import android.content.pm.PackageManager
 import timber.log.Timber
 
 object AppIconHelper {
-    private const val MAIN_ACTIVITY_ALIAS = "com.github.yumelira.yumebox.MainActivityAlias"
+    private const val MAIN_ACTIVITY_ALIAS = "com.amamiyakokoro.box.MainActivityAlias"
 
     fun hideIcon(context: Context) {
         setIconState(context, hide = true)
@@ -53,7 +53,7 @@ object AppIconHelper {
             }
 
             val mainActivityComponent =
-                ComponentName(context.packageName, "com.github.yumelira.yumebox.MainActivity")
+                ComponentName(context.packageName, "com.amamiyakokoro.box.MainActivity")
             context.packageManager.setComponentEnabledSetting(
                 mainActivityComponent,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,

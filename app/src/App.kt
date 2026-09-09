@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,28 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox
+package com.amamiyakokoro.box
 
 import android.app.Application
 import android.content.res.Configuration
-import com.github.yumelira.yumebox.common.runtime.StartupGate
-import com.github.yumelira.yumebox.common.util.AppLanguageManager
-import com.github.yumelira.yumebox.common.util.PlatformIdentifier
-import com.github.yumelira.yumebox.core.Global
-import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
-import com.github.yumelira.yumebox.data.controller.AppTrafficStatisticsCollector
-import com.github.yumelira.yumebox.data.controller.GeoXDataController
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.di.appModule
-import com.github.yumelira.yumebox.integration.update.AppUpdateWorkScheduler
-import com.github.yumelira.yumebox.runtime.client.ProxyFacade
+import com.amamiyakokoro.box.common.runtime.StartupGate
+import com.amamiyakokoro.box.common.util.AppLanguageManager
+import com.amamiyakokoro.box.common.util.PlatformIdentifier
+import com.amamiyakokoro.box.core.Global
+import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
+import com.amamiyakokoro.box.data.controller.AppTrafficStatisticsCollector
+import com.amamiyakokoro.box.data.controller.GeoXDataController
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroPreloadCoordinator
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.di.appModule
+import com.amamiyakokoro.box.integration.update.AppUpdateWorkScheduler
+import com.amamiyakokoro.box.runtime.client.ProxyFacade
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +43,7 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.Koin
-import com.github.yumelira.yumebox.service.ProfileUpdateJobService
+import com.amamiyakokoro.box.service.ProfileUpdateJobService
 import timber.log.Timber
 
 class App : Application() {

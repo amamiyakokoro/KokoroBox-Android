@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.home
+package com.amamiyakokoro.box.screen.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -49,14 +49,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.common.AppConstants
-import com.github.yumelira.yumebox.common.util.formatBytesForDisplay
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.domain.model.TrafficData
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AppMotion
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.amamiyakokoro.box.common.AppConstants
+import com.amamiyakokoro.box.common.util.formatBytesForDisplay
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.domain.model.TrafficData
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppMotion
+import com.amamiyakokoro.box.presentation.theme.AppTheme
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable

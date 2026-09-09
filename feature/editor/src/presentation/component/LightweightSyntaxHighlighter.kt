@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.feature.editor.presentation.component
+package com.amamiyakokoro.box.feature.editor.presentation.component
 
 import android.text.Editable
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
+import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
 
 internal data class SyntaxHighlightColors(
     val key: Int,

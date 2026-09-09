@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.common.runtime
+package com.amamiyakokoro.box.common.runtime
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
@@ -41,9 +41,9 @@ import kotlin.system.exitProcess
 
 object StartupGate {
     private const val maskBase = 0x39
-    private const val metaEnabled = "com.github.yumelira.yumebox.startup_gate.ENABLED"
-    private const val metaEnforceSigner = "com.github.yumelira.yumebox.startup_gate.ENFORCE_SIGNER"
-    private const val metaExpectedSignerSha256 = "com.github.yumelira.yumebox.startup_gate.EXPECTED_SIGNER_SHA256"
+    private const val metaEnabled = "com.amamiyakokoro.box.startup_gate.ENABLED"
+    private const val metaEnforceSigner = "com.amamiyakokoro.box.startup_gate.ENFORCE_SIGNER"
+    private const val metaExpectedSignerSha256 = "com.amamiyakokoro.box.startup_gate.EXPECTED_SIGNER_SHA256"
 
     @Volatile
     private var primaryLoaded = false

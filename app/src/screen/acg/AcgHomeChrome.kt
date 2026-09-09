@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.acg
+package com.amamiyakokoro.box.screen.acg
 
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
@@ -57,27 +57,27 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.common.util.LocaleUtil
-import com.github.yumelira.yumebox.common.util.formatBytesForDisplay
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.icon.ShellIcons
-import com.github.yumelira.yumebox.presentation.theme.AppMotion
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.util.extractFlaggedName
-import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
-import com.github.yumelira.yumebox.screen.home.displayableExternalIp
-import com.github.yumelira.yumebox.miuix.YumeMiuixBlendColorEntry as BlendColorEntry
-import com.github.yumelira.yumebox.miuix.YumeMiuixBlurBlendMode as BlurBlendMode
-import com.github.yumelira.yumebox.miuix.YumeMiuixBlurDefaults as BlurDefaults
-import com.github.yumelira.yumebox.miuix.YumeMiuixIcon as Icon
-import com.github.yumelira.yumebox.miuix.YumeMiuixLayerBackdrop as LayerBackdrop
-import com.github.yumelira.yumebox.miuix.YumeMiuixText as Text
-import com.github.yumelira.yumebox.miuix.YumeMiuixTheme as MiuixTheme
-import com.github.yumelira.yumebox.miuix.yumeMiuixTextureBlur as textureBlur
+import com.amamiyakokoro.box.common.util.LocaleUtil
+import com.amamiyakokoro.box.common.util.formatBytesForDisplay
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.data.gateway.IpMonitoringState
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.icon.ShellIcons
+import com.amamiyakokoro.box.presentation.theme.AppMotion
+import com.amamiyakokoro.box.presentation.theme.AppTheme
+import com.amamiyakokoro.box.presentation.util.extractFlaggedName
+import com.amamiyakokoro.box.screen.home.HomeProxyControlState
+import com.amamiyakokoro.box.screen.home.displayableExternalIp
+import com.amamiyakokoro.box.miuix.YumeMiuixBlendColorEntry as BlendColorEntry
+import com.amamiyakokoro.box.miuix.YumeMiuixBlurBlendMode as BlurBlendMode
+import com.amamiyakokoro.box.miuix.YumeMiuixBlurDefaults as BlurDefaults
+import com.amamiyakokoro.box.miuix.YumeMiuixIcon as Icon
+import com.amamiyakokoro.box.miuix.YumeMiuixLayerBackdrop as LayerBackdrop
+import com.amamiyakokoro.box.miuix.YumeMiuixText as Text
+import com.amamiyakokoro.box.miuix.YumeMiuixTheme as MiuixTheme
+import com.amamiyakokoro.box.miuix.yumeMiuixTextureBlur as textureBlur
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable

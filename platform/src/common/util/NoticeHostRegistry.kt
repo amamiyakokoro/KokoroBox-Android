@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.common.util
+package com.amamiyakokoro.box.common.util
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

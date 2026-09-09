@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -28,21 +28,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.VpnService
-import com.github.yumelira.yumebox.core.model.LogMessage
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.service.common.constants.Intents
-import com.github.yumelira.yumebox.service.common.log.Log
-import com.github.yumelira.yumebox.service.common.util.CoreRuntimeConfig
-import com.github.yumelira.yumebox.service.common.util.ServiceLanguageRuntime
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
-import com.github.yumelira.yumebox.service.common.util.initializeServiceGlobal
-import com.github.yumelira.yumebox.service.notification.ServiceNotificationManager
-import com.github.yumelira.yumebox.service.runtime.session.*
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeSnapshot
-import com.github.yumelira.yumebox.service.runtime.util.cancelAndJoinBlocking
-import com.github.yumelira.yumebox.service.runtime.util.sendClashStarted
-import com.github.yumelira.yumebox.service.runtime.util.sendClashStopped
-import com.github.yumelira.yumebox.service.runtime.util.sendProfileLoaded
+import com.amamiyakokoro.box.core.model.LogMessage
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.service.common.constants.Intents
+import com.amamiyakokoro.box.service.common.log.Log
+import com.amamiyakokoro.box.service.common.util.CoreRuntimeConfig
+import com.amamiyakokoro.box.service.common.util.ServiceLanguageRuntime
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.service.common.util.initializeServiceGlobal
+import com.amamiyakokoro.box.service.notification.ServiceNotificationManager
+import com.amamiyakokoro.box.service.runtime.session.*
+import com.amamiyakokoro.box.service.runtime.state.RuntimeSnapshot
+import com.amamiyakokoro.box.service.runtime.util.cancelAndJoinBlocking
+import com.amamiyakokoro.box.service.runtime.util.sendClashStarted
+import com.amamiyakokoro.box.service.runtime.util.sendClashStopped
+import com.amamiyakokoro.box.service.runtime.util.sendProfileLoaded
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -195,7 +195,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        com.github.yumelira.yumebox.core.Clash.forceGc()
+        com.amamiyakokoro.box.core.Clash.forceGc()
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")

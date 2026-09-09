@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -34,18 +34,18 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
-import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.MMKVProvider
-import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
-import com.github.yumelira.yumebox.runtime.service.R
-import com.github.yumelira.yumebox.service.common.util.AutoStartExecutionGate
-import com.github.yumelira.yumebox.service.common.util.AutoStartUpdatePolicy
-import com.github.yumelira.yumebox.service.root.RootTunServiceBridge
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
-import com.github.yumelira.yumebox.service.runtime.session.RuntimeServiceLauncher
+import com.amamiyakokoro.box.core.util.AutoStartSessionGate
+import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.data.store.MMKVProvider
+import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.runtime.service.R
+import com.amamiyakokoro.box.service.common.util.AutoStartExecutionGate
+import com.amamiyakokoro.box.service.common.util.AutoStartUpdatePolicy
+import com.amamiyakokoro.box.service.root.RootTunServiceBridge
+import com.amamiyakokoro.box.service.runtime.entity.Profile
+import com.amamiyakokoro.box.service.runtime.session.RuntimeServiceLauncher
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -223,7 +223,7 @@ class AutoRestartService : Service() {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("YumeBox")
+            .setContentTitle("KokoroBox")
             .setContentText("Checking auto-start...")
             .setSmallIcon(R.drawable.ic_notification_furin)
             .setOngoing(true)

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,33 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.content.Context
 import android.net.Uri
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
-import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
-import com.github.yumelira.yumebox.service.common.log.Log
-import com.github.yumelira.yumebox.service.remote.IFetchObserver
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.entity.Imported
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
-import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
-import com.github.yumelira.yumebox.service.runtime.records.SelectionDao
-import com.github.yumelira.yumebox.service.runtime.util.directoryLastModified
-import com.github.yumelira.yumebox.service.runtime.util.importedDir
-import com.github.yumelira.yumebox.service.runtime.util.sendProfileChanged
-import com.github.yumelira.yumebox.core.util.ProfileUpdatePolicy
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroApi
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroAuthenticationRequiredException
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroSession
+import com.amamiyakokoro.box.data.gateway.SharedOkHttpClient
+import com.amamiyakokoro.box.service.common.log.Log
+import com.amamiyakokoro.box.service.remote.IFetchObserver
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.entity.Imported
+import com.amamiyakokoro.box.service.runtime.entity.Profile
+import com.amamiyakokoro.box.service.runtime.records.ImportedDao
+import com.amamiyakokoro.box.service.runtime.records.SelectionDao
+import com.amamiyakokoro.box.service.runtime.util.directoryLastModified
+import com.amamiyakokoro.box.service.runtime.util.importedDir
+import com.amamiyakokoro.box.service.runtime.util.sendProfileChanged
+import com.amamiyakokoro.box.core.util.ProfileUpdatePolicy
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -486,8 +486,8 @@ object ProfileProcessor {
                         ) { progress ->
                             try {
                                 cb?.updateStatus(
-                                    com.github.yumelira.yumebox.core.model.FetchStatus(
-                                        action = com.github.yumelira.yumebox.core.model.FetchStatus.Action.FetchConfiguration,
+                                    com.amamiyakokoro.box.core.model.FetchStatus(
+                                        action = com.amamiyakokoro.box.core.model.FetchStatus.Action.FetchConfiguration,
                                         args = emptyList(),
                                         progress = progress,
                                         max = 100

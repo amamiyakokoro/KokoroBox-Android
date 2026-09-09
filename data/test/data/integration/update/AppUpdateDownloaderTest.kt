@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.integration.update
+package com.amamiyakokoro.box.data.integration.update
 
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient

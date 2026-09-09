@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.feature.meta.presentation.viewmodel
+package com.amamiyakokoro.box.feature.meta.presentation.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.data.model.AppTrafficUsage
-import com.github.yumelira.yumebox.data.model.DailyTrafficSummary
-import com.github.yumelira.yumebox.data.model.StatisticsTimeRange
-import com.github.yumelira.yumebox.data.model.TrafficStatisticsBuckets
-import com.github.yumelira.yumebox.data.store.TrafficStatisticsStore
-import com.github.yumelira.yumebox.data.controller.AppIdentityResolver
-import com.github.yumelira.yumebox.presentation.component.TrafficDonutSlice
-import com.github.yumelira.yumebox.presentation.theme.AppColors
+import com.amamiyakokoro.box.data.model.AppTrafficUsage
+import com.amamiyakokoro.box.data.model.DailyTrafficSummary
+import com.amamiyakokoro.box.data.model.StatisticsTimeRange
+import com.amamiyakokoro.box.data.model.TrafficStatisticsBuckets
+import com.amamiyakokoro.box.data.store.TrafficStatisticsStore
+import com.amamiyakokoro.box.data.controller.AppIdentityResolver
+import com.amamiyakokoro.box.presentation.component.TrafficDonutSlice
+import com.amamiyakokoro.box.presentation.theme.AppColors
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

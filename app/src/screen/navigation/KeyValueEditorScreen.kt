@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.navigation
+package com.amamiyakokoro.box.screen.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,22 +35,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.github.yumelira.yumebox.presentation.component.AppConfirmDialog
-import com.github.yumelira.yumebox.presentation.component.AppFormDialog
-import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
-import com.github.yumelira.yumebox.presentation.component.EditorAction
-import com.github.yumelira.yumebox.presentation.component.EditorEmptyState
-import com.github.yumelira.yumebox.presentation.component.EditorListItem
-import com.github.yumelira.yumebox.presentation.component.EditorScaffold
-import com.github.yumelira.yumebox.presentation.component.HapticSwitch
-import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.component.AppConfirmDialog
+import com.amamiyakokoro.box.presentation.component.AppFormDialog
+import com.amamiyakokoro.box.presentation.component.AppTextFieldDialog
+import com.amamiyakokoro.box.presentation.component.EditorAction
+import com.amamiyakokoro.box.presentation.component.EditorEmptyState
+import com.amamiyakokoro.box.presentation.component.EditorListItem
+import com.amamiyakokoro.box.presentation.component.EditorScaffold
+import com.amamiyakokoro.box.presentation.component.HapticSwitch
+import com.amamiyakokoro.box.presentation.component.PreferenceValueItem
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.presentation.screen
+package com.amamiyakokoro.box.presentation.screen
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -71,23 +71,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.data.model.ProxySortMode
-import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.CenteredText
-import com.github.yumelira.yumebox.presentation.component.Md3ELoading
-import com.github.yumelira.yumebox.presentation.component.LocalBottomBarScrollBehavior
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.rememberRetainedLazyGridState
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.screen.node.NodeCard
-import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupCard
-import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
-import com.github.yumelira.yumebox.presentation.theme.AppMotion
-import com.github.yumelira.yumebox.presentation.theme.LocalSpacing
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.presentation.viewmodel.ProxyViewModel
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.data.model.ProxySortMode
+import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.CenteredText
+import com.amamiyakokoro.box.presentation.component.Md3ELoading
+import com.amamiyakokoro.box.presentation.component.LocalBottomBarScrollBehavior
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.rememberRetainedLazyGridState
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.screen.node.NodeCard
+import com.amamiyakokoro.box.presentation.screen.node.NodeGroupCard
+import com.amamiyakokoro.box.presentation.screen.node.NodeSortPopup
+import com.amamiyakokoro.box.presentation.theme.AppMotion
+import com.amamiyakokoro.box.presentation.theme.LocalSpacing
+import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -433,7 +433,7 @@ private fun ProxySurfboardContent(
                             proxy = proxy,
                             isSelected = proxy.name == effectiveNow,
                             onClick = { proxyName ->
-                                if (selectedGroup.type == com.github.yumelira.yumebox.core.model.Proxy.Type.Selector) {
+                                if (selectedGroup.type == com.amamiyakokoro.box.core.model.Proxy.Type.Selector) {
                                     optimisticSelectedProxyName = proxyName
                                     onSelectProxy(
                                         selectedGroup.name,

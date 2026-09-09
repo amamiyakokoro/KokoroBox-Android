@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.settings
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+package com.amamiyakokoro.box.screen.settings
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
@@ -44,27 +44,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import com.github.yumelira.yumebox.common.util.AppIconHelper
-import com.github.yumelira.yumebox.common.util.BiometricHelper
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.data.model.AppColorTheme
-import com.github.yumelira.yumebox.data.model.AppLanguage
-import com.github.yumelira.yumebox.data.model.AppUpdateChannel
-import com.github.yumelira.yumebox.data.model.AppUpdateInstallMethod
-import com.github.yumelira.yumebox.data.model.ThemeMode
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.AppTextFieldDialog
-import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceEnumItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceSwitchItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceValueItem
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.WarningBottomSheet
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
+import com.amamiyakokoro.box.common.util.AppIconHelper
+import com.amamiyakokoro.box.common.util.BiometricHelper
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.data.model.AppColorTheme
+import com.amamiyakokoro.box.data.model.AppLanguage
+import com.amamiyakokoro.box.data.model.AppUpdateChannel
+import com.amamiyakokoro.box.data.model.AppUpdateInstallMethod
+import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.AppTextFieldDialog
+import com.amamiyakokoro.box.presentation.component.PreferenceArrowItem
+import com.amamiyakokoro.box.presentation.component.PreferenceEnumItem
+import com.amamiyakokoro.box.presentation.component.PreferenceSwitchItem
+import com.amamiyakokoro.box.presentation.component.PreferenceValueItem
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.WarningBottomSheet
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.screen.settings.component.ThemeColorPickerItem
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AcgWallpaperCropScreenDestination

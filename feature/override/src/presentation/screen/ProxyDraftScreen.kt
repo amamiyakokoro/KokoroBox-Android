@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,25 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.presentation.screen
+package com.amamiyakokoro.box.presentation.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.github.yumelira.yumebox.presentation.component.*
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.util.OverrideExtraFieldDraft
-import com.github.yumelira.yumebox.presentation.util.OverrideProxyDraft
-import com.github.yumelira.yumebox.presentation.util.OverrideProxyTypePresets
-import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
+import com.amamiyakokoro.box.presentation.component.*
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.util.OverrideExtraFieldDraft
+import com.amamiyakokoro.box.presentation.util.OverrideProxyDraft
+import com.amamiyakokoro.box.presentation.util.OverrideProxyTypePresets
+import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Scaffold

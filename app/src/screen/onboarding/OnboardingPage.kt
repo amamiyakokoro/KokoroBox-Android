@@ -1,7 +1,7 @@
 ﻿/*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.onboarding
+package com.amamiyakokoro.box.screen.onboarding
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -48,13 +48,13 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.data.model.ThemeMode
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.icon.Yume
-import com.github.yumelira.yumebox.presentation.icon.yume.Github
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.screen.settings.component.ThemeColorPickerItem
-import com.github.yumelira.yumebox.screen.settings.component.ThemeModeSelectorItem
+import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.icon.Yume
+import com.amamiyakokoro.box.presentation.icon.yume.Github
+import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.screen.settings.component.ThemeColorPickerItem
+import com.amamiyakokoro.box.screen.settings.component.ThemeModeSelectorItem
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
 

@@ -1,6 +1,6 @@
-package com.github.yumelira.yumebox.data.integration.update
+package com.amamiyakokoro.box.data.integration.update
 
-import com.github.yumelira.yumebox.data.model.AppUpdateChannel
+import com.amamiyakokoro.box.data.model.AppUpdateChannel
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.async

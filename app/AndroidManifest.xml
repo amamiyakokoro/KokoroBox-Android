@@ -38,7 +38,7 @@
             android:label="${appName}"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/Theme.YumeBox"
+            android:theme="@style/Theme.KokoroBox"
             android:usesCleartextTraffic="true">
         <activity
                 android:name=".MainActivity"
@@ -76,7 +76,7 @@
                 android:name=".screen.onboarding.OnboardingActivity"
                 android:exported="false"
                 android:windowSoftInputMode="adjustResize"
-                android:theme="@style/Theme.YumeBox"/>
+                android:theme="@style/Theme.KokoroBox"/>
 
         <activity
                 android:name=".ProxySheetActivity"
@@ -85,7 +85,7 @@
                 android:finishOnTaskLaunch="true"
                 android:launchMode="singleInstance"
                 android:taskAffinity=""
-                android:theme="@style/Theme.YumeBox.Translucent.Popup"/>
+                android:theme="@style/Theme.KokoroBox.Translucent.Popup"/>
 
         <activity
             android:name=".WebViewActivity"
@@ -104,13 +104,13 @@
         </activity-alias>
 
         <meta-data
-                android:name="com.github.yumelira.yumebox.startup_gate.ENABLED"
+                android:name="com.amamiyakokoro.box.startup_gate.ENABLED"
                 android:value="${startupGateEnabled}"/>
         <meta-data
-                android:name="com.github.yumelira.yumebox.startup_gate.ENFORCE_SIGNER"
+                android:name="com.amamiyakokoro.box.startup_gate.ENFORCE_SIGNER"
                 android:value="${startupGateEnforceSigner}"/>
         <meta-data
-                android:name="com.github.yumelira.yumebox.startup_gate.EXPECTED_SIGNER_SHA256"
+                android:name="com.amamiyakokoro.box.startup_gate.EXPECTED_SIGNER_SHA256"
                 android:value="${startupGateExpectedSignerSha256}"/>
 
         <meta-data

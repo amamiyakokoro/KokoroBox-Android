@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.connection
+package com.amamiyakokoro.box.screen.connection
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -48,17 +48,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.feature.meta.presentation.component.ConnectionCard
-import com.github.yumelira.yumebox.feature.meta.presentation.component.ConnectionDetailSheet
-import com.github.yumelira.yumebox.feature.meta.presentation.component.TabRowWithContour
-import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.ConnectionSort
-import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.ConnectionTab
-import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.ConnectionViewModel
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.amamiyakokoro.box.feature.meta.presentation.component.ConnectionCard
+import com.amamiyakokoro.box.feature.meta.presentation.component.ConnectionDetailSheet
+import com.amamiyakokoro.box.feature.meta.presentation.component.TabRowWithContour
+import com.amamiyakokoro.box.feature.meta.presentation.viewmodel.ConnectionSort
+import com.amamiyakokoro.box.feature.meta.presentation.viewmodel.ConnectionTab
+import com.amamiyakokoro.box.feature.meta.presentation.viewmodel.ConnectionViewModel
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -93,7 +93,7 @@ fun ConnectionScreen(
     var searchText by remember { mutableStateOf(state.searchQuery) }
     var showSortPopup by remember { mutableStateOf(false) }
 
-    var selectedConnection by remember { mutableStateOf<com.github.yumelira.yumebox.core.model.ConnectionInfo?>(null) }
+    var selectedConnection by remember { mutableStateOf<com.amamiyakokoro.box.core.model.ConnectionInfo?>(null) }
     var showDetailSheet by remember { mutableStateOf(false) }
 
     val tabs = listOf(MLang.Connection.Tab.Active, MLang.Connection.Tab.Closed)

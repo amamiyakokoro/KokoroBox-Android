@@ -1,4 +1,4 @@
-// Copyright (c) YumeYuka 2025.
+// Copyright (c) AmamiyaKokoro 2025 - Present
 //
 // This work is free. You can redistribute it and/or modify it under the
 // terms of the Do What The Fuck You Want To Public License, Version 2,
@@ -11,7 +11,7 @@
 #include <malloc.h>
 #include <android/log.h>
 
-#define TAG "YumeBox"
+#define TAG "KokoroBox"
 
 typedef const char *c_string;
 

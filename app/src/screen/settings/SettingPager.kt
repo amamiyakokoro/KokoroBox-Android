@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -48,12 +48,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.presentation.component.*
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.presentation.component.*
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.generated.destinations.AboutScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppDataManagementScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppSettingsScreenDestination
@@ -238,7 +238,7 @@ fun SettingPager(
                         summary = MLang.Settings.DataSettings.ExportBackupSummary,
                         imageVector = AppMd3Icons.Settings.ExportBackup,
                         enabled = !backupInProgress,
-                        onClick = { exportBackupLauncher.launch("yumebox-settings-backup.json") },
+                        onClick = { exportBackupLauncher.launch("kokorobox-settings-backup.json") },
                     )
                     SettingsEntryItem(
                         title = MLang.Settings.DataSettings.ImportBackup,

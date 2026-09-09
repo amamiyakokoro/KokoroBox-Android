@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.controller
+package com.amamiyakokoro.box.data.controller
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -51,7 +51,7 @@ class BackupStreamsTest {
     @Test
     fun streamingJsonPreservesExistingBackupShapeAndUnicode() {
         val json = Json { prettyPrint = true }
-        val backup = json.parseToJsonElement("""{"format":"YumeBoxUserSettingsBackup","version":3,"stores":{"app":{"customUserAgent":"測試"}},"assets":{"acgWallpaper":{"encoding":"base64","data":"AQID"}}}""")
+        val backup = json.parseToJsonElement("""{"format":"KokoroBoxUserSettingsBackup","version":3,"stores":{"app":{"customUserAgent":"測試"}},"assets":{"acgWallpaper":{"encoding":"base64","data":"AQID"}}}""")
         val destination = ByteArrayOutputStream()
         json.encodeToStream(JsonElement.serializer(), backup, SizeLimitedOutputStream(destination, 1024))
         val restored = json.decodeFromStream(

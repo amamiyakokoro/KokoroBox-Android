@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,21 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.root
+package com.amamiyakokoro.box.service.root
 
 import android.content.Context
-import com.github.yumelira.yumebox.core.model.RootTunConfig
-import com.github.yumelira.yumebox.core.model.RootTunDnsMode
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
-import com.github.yumelira.yumebox.service.runtime.util.directoryLastModified
-import com.github.yumelira.yumebox.service.runtime.util.importedDir
+import com.amamiyakokoro.box.core.model.RootTunConfig
+import com.amamiyakokoro.box.core.model.RootTunDnsMode
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.records.ImportedDao
+import com.amamiyakokoro.box.service.runtime.util.directoryLastModified
+import com.amamiyakokoro.box.service.runtime.util.importedDir
 import java.io.File
 import java.util.*
 
@@ -266,9 +266,9 @@ class RootTunConfigFactory(
         if (!store.bypassPrivateNetwork) return emptyList()
 
         val values = buildList {
-            addAll(context.resources.getStringArray(com.github.yumelira.yumebox.runtime.service.R.array.bypass_private_route))
+            addAll(context.resources.getStringArray(com.amamiyakokoro.box.runtime.service.R.array.bypass_private_route))
             if (allowIpv6) {
-                addAll(context.resources.getStringArray(com.github.yumelira.yumebox.runtime.service.R.array.bypass_private_route6))
+                addAll(context.resources.getStringArray(com.amamiyakokoro.box.runtime.service.R.array.bypass_private_route6))
             }
         }
 

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox
+package com.amamiyakokoro.box
 
 import android.app.Activity
 import android.content.Context
@@ -36,8 +36,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
-import com.github.yumelira.yumebox.common.util.AppLanguageManager
-import com.github.yumelira.yumebox.presentation.webview.WebViewScreen
+import com.amamiyakokoro.box.common.util.AppLanguageManager
+import com.amamiyakokoro.box.presentation.webview.WebViewScreen
 
 class WebViewActivity : ComponentActivity() {
 

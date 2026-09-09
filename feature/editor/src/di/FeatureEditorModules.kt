@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.feature.editor.di
+package com.amamiyakokoro.box.feature.editor.di
 
-import com.github.yumelira.yumebox.feature.editor.presentation.viewmodel.ConfigEditorViewModel
+import com.amamiyakokoro.box.feature.editor.presentation.viewmodel.ConfigEditorViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

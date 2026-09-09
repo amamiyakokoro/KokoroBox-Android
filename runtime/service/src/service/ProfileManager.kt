@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,26 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.content.Context
-import com.github.yumelira.yumebox.service.remote.IFetchObserver
-import com.github.yumelira.yumebox.service.remote.IProfileManager
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.entity.Imported
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
-import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
-import com.github.yumelira.yumebox.service.runtime.records.ProfileStore
-import com.github.yumelira.yumebox.service.runtime.util.directoryLastModified
-import com.github.yumelira.yumebox.service.runtime.util.generateProfileUUID
-import com.github.yumelira.yumebox.service.runtime.util.importedDir
-import com.github.yumelira.yumebox.service.runtime.util.sendProfileChanged
+import com.amamiyakokoro.box.service.remote.IFetchObserver
+import com.amamiyakokoro.box.service.remote.IProfileManager
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.entity.Imported
+import com.amamiyakokoro.box.service.runtime.entity.Profile
+import com.amamiyakokoro.box.service.runtime.records.ImportedDao
+import com.amamiyakokoro.box.service.runtime.records.ProfileStore
+import com.amamiyakokoro.box.service.runtime.util.directoryLastModified
+import com.amamiyakokoro.box.service.runtime.util.generateProfileUUID
+import com.amamiyakokoro.box.service.runtime.util.importedDir
+import com.amamiyakokoro.box.service.runtime.util.sendProfileChanged
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

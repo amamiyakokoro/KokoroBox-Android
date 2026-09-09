@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.data.controller
+package com.amamiyakokoro.box.data.controller
 
-import com.github.yumelira.yumebox.core.model.ConnectionInfo
-import com.github.yumelira.yumebox.core.model.ConnectionSnapshot
-import com.github.yumelira.yumebox.core.domain.ConnectionHistoryManager
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.model.AppTrafficDeltaRecord
-import com.github.yumelira.yumebox.data.model.ConnectionTrafficBaseline
-import com.github.yumelira.yumebox.data.model.TrafficStatisticsBuckets
-import com.github.yumelira.yumebox.data.store.TrafficStatisticsStore
-import com.github.yumelira.yumebox.domain.model.TrafficData
+import com.amamiyakokoro.box.core.model.ConnectionInfo
+import com.amamiyakokoro.box.core.model.ConnectionSnapshot
+import com.amamiyakokoro.box.core.domain.ConnectionHistoryManager
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.data.model.AppTrafficDeltaRecord
+import com.amamiyakokoro.box.data.model.ConnectionTrafficBaseline
+import com.amamiyakokoro.box.data.model.TrafficStatisticsBuckets
+import com.amamiyakokoro.box.data.store.TrafficStatisticsStore
+import com.amamiyakokoro.box.domain.model.TrafficData
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

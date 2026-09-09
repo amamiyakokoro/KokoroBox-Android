@@ -1,19 +1,19 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.data.integration.speedtest.CloudflareSpeedTestClient
-import com.github.yumelira.yumebox.data.integration.speedtest.CloudflareSpeedTestResult
-import com.github.yumelira.yumebox.data.integration.speedtest.CloudflareSpeedTestStage
+import com.amamiyakokoro.box.data.integration.speedtest.CloudflareSpeedTestClient
+import com.amamiyakokoro.box.data.integration.speedtest.CloudflareSpeedTestResult
+import com.amamiyakokoro.box.data.integration.speedtest.CloudflareSpeedTestStage
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

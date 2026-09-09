@@ -1,7 +1,7 @@
-package com.github.yumelira.yumebox.data.integration.update
+package com.amamiyakokoro.box.data.integration.update
 
 import android.content.Context
-import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
+import com.amamiyakokoro.box.data.gateway.SharedOkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.presentation.webview
+package com.amamiyakokoro.box.presentation.webview
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -39,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.WebViewActivity
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.WebViewActivity
 import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Text
 

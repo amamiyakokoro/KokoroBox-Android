@@ -1,20 +1,20 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.data.integration.kokoro
+package com.amamiyakokoro.box.data.integration.kokoro
 
 import android.net.Uri
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccount
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccountClient
-import com.github.yumelira.yumebox.screen.profiles.KokoroSubscriptionOptions
-import com.github.yumelira.yumebox.screen.profiles.MihomoSubscriptionSettings
-import com.github.yumelira.yumebox.screen.profiles.ResolvedSubscription
+import com.amamiyakokoro.box.screen.profiles.KokoroAccount
+import com.amamiyakokoro.box.screen.profiles.KokoroAccountClient
+import com.amamiyakokoro.box.screen.profiles.KokoroSubscriptionOptions
+import com.amamiyakokoro.box.screen.profiles.MihomoSubscriptionSettings
+import com.amamiyakokoro.box.screen.profiles.ResolvedSubscription
 
 /** Shared process-memory Kokoro read cache and session invalidation boundary. */
 class KokoroRepository(

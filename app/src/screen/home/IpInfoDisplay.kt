@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.home
+package com.amamiyakokoro.box.screen.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,11 +46,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.common.util.LocaleUtil
-import com.github.yumelira.yumebox.data.gateway.IpInfo
-import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
-import com.github.yumelira.yumebox.presentation.component.CountryFlagCircle
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.common.util.LocaleUtil
+import com.amamiyakokoro.box.data.gateway.IpInfo
+import com.amamiyakokoro.box.data.gateway.IpMonitoringState
+import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import dev.oom_wg.purejoy.mlang.MLang
 
 private val INFO_VALUE_CORNER_RADIUS = RoundedCornerShape(UiDp.dp10)

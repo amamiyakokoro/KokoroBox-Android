@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,21 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.runtime.client.root
+package com.amamiyakokoro.box.runtime.client.root
 
 import android.content.Context
 import android.content.Intent
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.service.common.constants.Intents
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
-import com.github.yumelira.yumebox.service.root.RootTunStateStore
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.service.common.constants.Intents
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.service.root.RootTunStateStore
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -109,14 +109,14 @@ object RootTunReloadScheduler {
     private suspend fun syncAndReload(
         context: Context,
         reasons: Set<Reason>,
-    ): com.github.yumelira.yumebox.service.root.RootTunOperationResult {
+    ): com.amamiyakokoro.box.service.root.RootTunOperationResult {
         Timber.i("RootTun reload: reasons=%s", reasons.joinToString(","))
         return retryReload(context)
     }
 
-    private suspend fun retryReload(context: Context): com.github.yumelira.yumebox.service.root.RootTunOperationResult {
+    private suspend fun retryReload(context: Context): com.amamiyakokoro.box.service.root.RootTunOperationResult {
         val delays = longArrayOf(0L, 250L, 500L, 1000L)
-        var lastResult = com.github.yumelira.yumebox.service.root.RootTunOperationResult(success = true)
+        var lastResult = com.amamiyakokoro.box.service.root.RootTunOperationResult(success = true)
         for (index in delays.indices) {
             if (delays[index] > 0L) {
                 PollingTimers.awaitTick(

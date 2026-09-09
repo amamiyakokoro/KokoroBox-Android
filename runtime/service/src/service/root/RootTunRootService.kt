@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.root
+package com.amamiyakokoro.box.service.root
 
 import android.content.Intent
 import android.os.IBinder
-import com.github.yumelira.yumebox.core.Global
-import com.github.yumelira.yumebox.service.common.util.ServiceLanguageRuntime
-import com.github.yumelira.yumebox.service.common.util.initializeServiceGlobal
-import com.github.yumelira.yumebox.service.runtime.session.RootTunTransport
-import com.github.yumelira.yumebox.service.runtime.session.RuntimeSpec
-import com.github.yumelira.yumebox.service.runtime.session.SessionRuntime
-import com.github.yumelira.yumebox.service.runtime.session.SessionRuntimeSpecFactory
+import com.amamiyakokoro.box.core.Global
+import com.amamiyakokoro.box.service.common.util.ServiceLanguageRuntime
+import com.amamiyakokoro.box.service.common.util.initializeServiceGlobal
+import com.amamiyakokoro.box.service.runtime.session.RootTunTransport
+import com.amamiyakokoro.box.service.runtime.session.RuntimeSpec
+import com.amamiyakokoro.box.service.runtime.session.SessionRuntime
+import com.amamiyakokoro.box.service.runtime.session.SessionRuntimeSpecFactory
 import com.tencent.mmkv.MMKV
 import com.topjohnwu.superuser.ipc.RootService
 import kotlinx.coroutines.runBlocking
@@ -107,7 +107,7 @@ class RootTunRootService : RootService() {
 
         override fun queryTunnelStateJson(): String {
             return RootTunJson.Default.encodeToString(
-                com.github.yumelira.yumebox.core.model.TunnelState.serializer(),
+                com.amamiyakokoro.box.core.model.TunnelState.serializer(),
                 runtime.queryTunnelState(),
             )
         }
@@ -115,7 +115,7 @@ class RootTunRootService : RootService() {
         override fun setTunnelMode(mode: String): Boolean {
             val parsed = runCatching {
                 RootTunJson.Default.decodeFromString(
-                    com.github.yumelira.yumebox.core.model.TunnelState.Mode.serializer(),
+                    com.amamiyakokoro.box.core.model.TunnelState.Mode.serializer(),
                     "\"$mode\"",
                 )
             }.getOrNull() ?: return false
@@ -128,14 +128,14 @@ class RootTunRootService : RootService() {
 
         override fun queryConnectionsJson(): String {
             return RootTunJson.Default.encodeToString(
-                com.github.yumelira.yumebox.core.model.ConnectionSnapshot.serializer(),
+                com.amamiyakokoro.box.core.model.ConnectionSnapshot.serializer(),
                 runtime.queryConnections(),
             )
         }
 
         override fun queryAllProxyGroupsJson(excludeNotSelectable: Boolean): String {
             return RootTunJson.Default.encodeToString(
-                ListSerializer(com.github.yumelira.yumebox.core.model.ProxyGroup.serializer()),
+                ListSerializer(com.amamiyakokoro.box.core.model.ProxyGroup.serializer()),
                 runtime.queryAllProxyGroups(excludeNotSelectable),
             )
         }
@@ -149,20 +149,20 @@ class RootTunRootService : RootService() {
 
         override fun queryProxyGroupJson(name: String, sort: String): String {
             return RootTunJson.Default.encodeToString(
-                com.github.yumelira.yumebox.core.model.ProxyGroup.serializer(),
-                runtime.queryProxyGroup(name, com.github.yumelira.yumebox.core.model.ProxySort.valueOf(sort)),
+                com.amamiyakokoro.box.core.model.ProxyGroup.serializer(),
+                runtime.queryProxyGroup(name, com.amamiyakokoro.box.core.model.ProxySort.valueOf(sort)),
             )
         }
 
         override fun queryConfigurationJson(): String =
             RootTunJson.Default.encodeToString(
-                com.github.yumelira.yumebox.core.model.UiConfiguration.serializer(),
+                com.amamiyakokoro.box.core.model.UiConfiguration.serializer(),
                 runtime.queryConfiguration(),
             )
 
         override fun queryProvidersJson(): String =
             RootTunJson.Default.encodeToString(
-                ListSerializer(com.github.yumelira.yumebox.core.model.Provider.serializer()),
+                ListSerializer(com.amamiyakokoro.box.core.model.Provider.serializer()),
                 runtime.queryProviders(),
             )
 
@@ -250,7 +250,7 @@ class RootTunRootService : RootService() {
         return spec
     }
 
-    private fun encodeResult(result: com.github.yumelira.yumebox.service.runtime.session.RuntimeOperationResult): String {
+    private fun encodeResult(result: com.amamiyakokoro.box.service.runtime.session.RuntimeOperationResult): String {
         return RootTunJson.Default.encodeToString(
             RootTunOperationResult.serializer(),
             RootTunOperationResult(success = result.success, error = result.error),

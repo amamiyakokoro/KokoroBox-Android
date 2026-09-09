@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox
+package com.amamiyakokoro.box
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -38,18 +38,18 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.core.model.Proxy
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetAction
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetIconAction
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.screen.node.NodeGroupSheetContent
-import com.github.yumelira.yumebox.presentation.screen.node.NodeSheetContent
-import com.github.yumelira.yumebox.presentation.screen.node.NodeSortPopup
-import com.github.yumelira.yumebox.presentation.screen.rememberProxyGroupSelectionState
-import com.github.yumelira.yumebox.presentation.theme.AppMotion
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.presentation.viewmodel.ProxyViewModel
+import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetAction
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetIconAction
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.screen.node.NodeGroupSheetContent
+import com.amamiyakokoro.box.presentation.screen.node.NodeSheetContent
+import com.amamiyakokoro.box.presentation.screen.node.NodeSortPopup
+import com.amamiyakokoro.box.presentation.screen.rememberProxyGroupSelectionState
+import com.amamiyakokoro.box.presentation.theme.AppMotion
+import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
@@ -258,7 +258,7 @@ fun ProxySheetContent(
 @Composable
 private fun ProxySheetNodeContent(
     proxyViewModel: ProxyViewModel,
-    group: com.github.yumelira.yumebox.domain.model.ProxyGroupInfo,
+    group: com.amamiyakokoro.box.domain.model.ProxyGroupInfo,
     onTestDelay: () -> Unit,
     sheetHeightFraction: Float,
     listState: LazyListState,

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.feature.editor.presentation.editor
+package com.amamiyakokoro.box.feature.editor.presentation.editor
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -28,9 +28,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
-import com.github.yumelira.yumebox.feature.editor.presentation.language.TextMateInitializer
-import com.github.yumelira.yumebox.feature.editor.presentation.theme.EditorThemeManager
+import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
+import com.amamiyakokoro.box.feature.editor.presentation.language.TextMateInitializer
+import com.amamiyakokoro.box.feature.editor.presentation.theme.EditorThemeManager
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.subscribeAlways
@@ -117,7 +117,7 @@ fun CodeEditor(
 private fun createCodeEditor(
     context: android.content.Context,
     state: CodeEditorState,
-    theme: com.github.yumelira.yumebox.feature.editor.presentation.theme.EditorThemeState,
+    theme: com.amamiyakokoro.box.feature.editor.presentation.theme.EditorThemeState,
     onTextChange: ((String) -> Unit)?
 ): CodeEditor {
 

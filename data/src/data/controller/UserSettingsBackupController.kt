@@ -1,9 +1,9 @@
 @file:Suppress("SpellCheckingInspection")
 
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.data.controller
+package com.amamiyakokoro.box.data.controller
 
 import android.util.Base64
 import java.io.InputStream
@@ -30,27 +30,27 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
-import com.github.yumelira.yumebox.core.model.RootTunDnsMode
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.data.model.AccessControlMode
-import com.github.yumelira.yumebox.data.model.AppColorTheme
-import com.github.yumelira.yumebox.data.model.AppLanguage
-import com.github.yumelira.yumebox.data.model.AppUpdateChannel
-import com.github.yumelira.yumebox.data.model.MonetContrast
-import com.github.yumelira.yumebox.data.model.MonetStyle
-import com.github.yumelira.yumebox.data.model.ProxyDisplayMode
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.model.ProxySortMode
-import com.github.yumelira.yumebox.data.model.ThemeMode
-import com.github.yumelira.yumebox.data.model.TunStack
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
-import com.github.yumelira.yumebox.data.store.LinkOpenMode
-import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
-import com.github.yumelira.yumebox.data.store.ProfileLink
-import com.github.yumelira.yumebox.data.store.ProfileLinksStore
-import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
-import com.github.yumelira.yumebox.data.store.OverrideConfigBackupEntry
-import com.github.yumelira.yumebox.data.store.OverrideConfigStore
+import com.amamiyakokoro.box.core.model.RootTunDnsMode
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.data.model.AccessControlMode
+import com.amamiyakokoro.box.data.model.AppColorTheme
+import com.amamiyakokoro.box.data.model.AppLanguage
+import com.amamiyakokoro.box.data.model.AppUpdateChannel
+import com.amamiyakokoro.box.data.model.MonetContrast
+import com.amamiyakokoro.box.data.model.MonetStyle
+import com.amamiyakokoro.box.data.model.ProxyDisplayMode
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.model.ProxySortMode
+import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.data.model.TunStack
+import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.data.store.LinkOpenMode
+import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.data.store.ProfileLink
+import com.amamiyakokoro.box.data.store.ProfileLinksStore
+import com.amamiyakokoro.box.data.store.ProxyDisplaySettingsStore
+import com.amamiyakokoro.box.data.store.OverrideConfigBackupEntry
+import com.amamiyakokoro.box.data.store.OverrideConfigStore
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -88,7 +88,7 @@ class UserSettingsBackupController(
     private val overrideConfigStore: OverrideConfigStore,
 ) {
     companion object {
-        const val BACKUP_FORMAT = "YumeBoxUserSettingsBackup"
+        const val BACKUP_FORMAT = "KokoroBoxUserSettingsBackup"
         const val BACKUP_VERSION = 3
         private const val MAX_BACKUP_BYTES = 32L * 1024 * 1024
     }

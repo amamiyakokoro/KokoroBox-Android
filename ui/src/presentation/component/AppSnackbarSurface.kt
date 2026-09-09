@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.presentation.component
+package com.amamiyakokoro.box.presentation.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -27,10 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.github.yumelira.yumebox.common.util.NoticeHostRegistry
-import com.github.yumelira.yumebox.common.util.NoticePresentation
-import com.github.yumelira.yumebox.common.util.ToastDialogBridge
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.common.util.NoticeHostRegistry
+import com.amamiyakokoro.box.common.util.NoticePresentation
+import com.amamiyakokoro.box.common.util.ToastDialogBridge
+import com.amamiyakokoro.box.presentation.theme.UiDp
 
 private val hosts = NoticeHostRegistry()
 private val LocalNoticeDepth = staticCompositionLocalOf { -1 }

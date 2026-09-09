@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.about
+package com.amamiyakokoro.box.screen.about
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -48,15 +48,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.common.util.openUrl
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3PreferenceItem
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.common.util.openUrl
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3PreferenceItem
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.OpenSourceLicensesScreenDestination
@@ -153,7 +153,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 Card {
                     YumeMd3PreferenceItem(
                         title = "KokoroBox",
-                        summary = "A Material Design 3 / Material You fork of YumeBox, an open-source Android client based on Mihomo",
+                        summary = "A Material Design 3 / Material You fork of KokoroBox, an open-source Android client based on Mihomo",
                     )
                     YumeMd3PreferenceItem(
                         title = MLang.About.License.CheckUpdate,

@@ -1,20 +1,20 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.screen.profiles
+package com.amamiyakokoro.box.screen.profiles
 
 import android.content.Context
 import android.net.Uri
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi as KokoroBackendApi
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroApi as KokoroBackendApi
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroAuthenticationRequiredException
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName

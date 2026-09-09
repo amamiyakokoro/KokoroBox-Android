@@ -1,13 +1,13 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -36,26 +36,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
-import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
-import com.github.yumelira.yumebox.presentation.component.AppDialog
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
-import com.github.yumelira.yumebox.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3DropdownPreference
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRuleInput
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRulesOptions
+import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
+import com.amamiyakokoro.box.presentation.component.AppDialog
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetConfirmAction
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.DialogButtonRow
+import com.amamiyakokoro.box.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

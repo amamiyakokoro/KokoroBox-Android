@@ -1,16 +1,16 @@
-package com.github.yumelira.yumebox.integration.update
+package com.amamiyakokoro.box.integration.update
 
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Build
-import com.github.yumelira.yumebox.common.update.ApkUpdateVerifier
-import com.github.yumelira.yumebox.common.update.PackageUpdateInstaller
-import com.github.yumelira.yumebox.common.update.VerifiedUpdateApk
-import com.github.yumelira.yumebox.data.integration.update.AppUpdateDownloader
-import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
-import com.github.yumelira.yumebox.data.model.AppUpdateInstallMethod
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
+import com.amamiyakokoro.box.common.update.ApkUpdateVerifier
+import com.amamiyakokoro.box.common.update.PackageUpdateInstaller
+import com.amamiyakokoro.box.common.update.VerifiedUpdateApk
+import com.amamiyakokoro.box.data.integration.update.AppUpdateDownloader
+import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
+import com.amamiyakokoro.box.data.model.AppUpdateInstallMethod
+import com.amamiyakokoro.box.data.store.AppSettingsStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

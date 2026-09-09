@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.integration.update;
+package com.amamiyakokoro.box.integration.update;
 
 import android.os.ParcelFileDescriptor;
 

@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.controller
+package com.amamiyakokoro.box.data.controller
 
 import java.io.IOException
 import java.io.InputStream

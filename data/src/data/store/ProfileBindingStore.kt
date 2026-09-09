@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.data.store
+package com.amamiyakokoro.box.data.store
 
 import android.content.Context
-import com.github.yumelira.yumebox.core.model.ConfigurationOverride
-import com.github.yumelira.yumebox.data.model.MetadataIndex
-import com.github.yumelira.yumebox.data.model.OverrideMetadata
-import com.github.yumelira.yumebox.data.model.ProfileBinding
+import com.amamiyakokoro.box.core.model.ConfigurationOverride
+import com.amamiyakokoro.box.data.model.MetadataIndex
+import com.amamiyakokoro.box.data.model.OverrideMetadata
+import com.amamiyakokoro.box.data.model.ProfileBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.presentation.theme
+package com.amamiyakokoro.box.presentation.theme
 
 import android.content.res.Configuration
 import android.os.Build
@@ -40,10 +40,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.data.model.AppColorTheme
-import com.github.yumelira.yumebox.data.model.MonetContrast
-import com.github.yumelira.yumebox.data.model.MonetStyle
-import com.github.yumelira.yumebox.data.model.ThemeMode
+import com.amamiyakokoro.box.data.model.AppColorTheme
+import com.amamiyakokoro.box.data.model.MonetContrast
+import com.amamiyakokoro.box.data.model.MonetStyle
+import com.amamiyakokoro.box.data.model.ThemeMode
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 internal val LocalPlatformSystemUiEffect = compositionLocalOf<@Composable () -> Unit> { {} }

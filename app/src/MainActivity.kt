@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox
+package com.amamiyakokoro.box
 
 import android.app.ActivityManager
 import android.content.Context
@@ -45,30 +45,30 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.lifecycleScope
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
-import com.github.yumelira.yumebox.common.runtime.StartupGate
-import com.github.yumelira.yumebox.common.util.AppLanguageManager
-import com.github.yumelira.yumebox.common.util.ProxyAutoStartHelper
-import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
-import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
-import com.github.yumelira.yumebox.di.APPLICATION_SCOPE_NAME
-import com.github.yumelira.yumebox.data.model.AppColorTheme
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
-import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
-import com.github.yumelira.yumebox.integration.update.AppUpdateManager
-import com.github.yumelira.yumebox.integration.update.AppUpdateWorkScheduler
-import com.github.yumelira.yumebox.presentation.component.StartupBiometricContent
-import com.github.yumelira.yumebox.presentation.component.ToastDialogHost
-import com.github.yumelira.yumebox.presentation.component.AppSnackbarSurface
-import com.github.yumelira.yumebox.presentation.component.rememberStartupBiometricGateState
-import com.github.yumelira.yumebox.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
-import com.github.yumelira.yumebox.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
-import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
-import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
-import com.github.yumelira.yumebox.presentation.theme.YumeTheme
-import com.github.yumelira.yumebox.screen.onboarding.OnboardingLauncher
-import com.github.yumelira.yumebox.screen.about.AppUpdateDialog
-import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
+import com.amamiyakokoro.box.common.runtime.StartupGate
+import com.amamiyakokoro.box.common.util.AppLanguageManager
+import com.amamiyakokoro.box.common.util.ProxyAutoStartHelper
+import com.amamiyakokoro.box.core.util.AutoStartSessionGate
+import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
+import com.amamiyakokoro.box.di.APPLICATION_SCOPE_NAME
+import com.amamiyakokoro.box.data.model.AppColorTheme
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroPreloadCoordinator
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
+import com.amamiyakokoro.box.data.integration.update.AutomaticAppUpdateChecker
+import com.amamiyakokoro.box.integration.update.AppUpdateManager
+import com.amamiyakokoro.box.integration.update.AppUpdateWorkScheduler
+import com.amamiyakokoro.box.presentation.component.StartupBiometricContent
+import com.amamiyakokoro.box.presentation.component.ToastDialogHost
+import com.amamiyakokoro.box.presentation.component.AppSnackbarSurface
+import com.amamiyakokoro.box.presentation.component.rememberStartupBiometricGateState
+import com.amamiyakokoro.box.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
+import com.amamiyakokoro.box.presentation.theme.DEFAULT_CUSTOM_THEME_SEED_ARGB
+import com.amamiyakokoro.box.presentation.theme.NavigationTransitions
+import com.amamiyakokoro.box.presentation.theme.ProvideAndroidPlatformTheme
+import com.amamiyakokoro.box.presentation.theme.YumeTheme
+import com.amamiyakokoro.box.screen.onboarding.OnboardingLauncher
+import com.amamiyakokoro.box.screen.about.AppUpdateDialog
+import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.tencent.mmkv.MMKV
@@ -99,10 +99,10 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private val appSettingsStorage: com.github.yumelira.yumebox.data.store.AppSettingsStore by inject()
-    private val networkSettingsStorage: com.github.yumelira.yumebox.data.store.NetworkSettingsStore by inject()
-    private val profilesRepository: com.github.yumelira.yumebox.runtime.client.ProfilesRepository by inject()
-    private val proxyFacade: com.github.yumelira.yumebox.runtime.client.ProxyFacade by inject()
+    private val appSettingsStorage: com.amamiyakokoro.box.data.store.AppSettingsStore by inject()
+    private val networkSettingsStorage: com.amamiyakokoro.box.data.store.NetworkSettingsStore by inject()
+    private val profilesRepository: com.amamiyakokoro.box.runtime.client.ProfilesRepository by inject()
+    private val proxyFacade: com.amamiyakokoro.box.runtime.client.ProxyFacade by inject()
     private val serviceCache: MMKV by inject(qualifier = named("service_cache"))
     private val applicationScope: CoroutineScope by inject(qualifier = named(APPLICATION_SCOPE_NAME))
     private val kokoroRepository: KokoroRepository by inject()

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.acg
+package com.amamiyakokoro.box.screen.acg
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,16 +48,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
-import com.github.yumelira.yumebox.presentation.theme.Sizes
-import com.github.yumelira.yumebox.presentation.theme.Opacity
-import com.github.yumelira.yumebox.presentation.theme.Radii
-import com.github.yumelira.yumebox.presentation.theme.Spacing
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.miuix.YumeMiuixIcon as Icon
-import com.github.yumelira.yumebox.miuix.YumeMiuixText as Text
-import com.github.yumelira.yumebox.miuix.YumeMiuixTheme as MiuixTheme
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.presentation.theme.AppTheme
+import com.amamiyakokoro.box.presentation.theme.Sizes
+import com.amamiyakokoro.box.presentation.theme.Opacity
+import com.amamiyakokoro.box.presentation.theme.Radii
+import com.amamiyakokoro.box.presentation.theme.Spacing
+import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.miuix.YumeMiuixIcon as Icon
+import com.amamiyakokoro.box.miuix.YumeMiuixText as Text
+import com.amamiyakokoro.box.miuix.YumeMiuixTheme as MiuixTheme
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlin.math.abs
 

@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.acg
+package com.amamiyakokoro.box.screen.acg
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -63,28 +63,28 @@ import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.resize.Precision
 import com.github.panpf.sketch.resize.Scale
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.model.ThemeMode
-import com.github.yumelira.yumebox.domain.model.TrafficData
-import com.github.yumelira.yumebox.presentation.component.LocalHandlePageChange
-import com.github.yumelira.yumebox.presentation.component.calculateWallpaperViewportLayout
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.icon.ShellIcons
-import com.github.yumelira.yumebox.presentation.theme.AppMotion
-import com.github.yumelira.yumebox.screen.home.HomeProxyControlState
-import com.github.yumelira.yumebox.screen.home.HomeViewModel
-import com.github.yumelira.yumebox.screen.home.displayableExternalIp
-import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.domain.model.TrafficData
+import com.amamiyakokoro.box.presentation.component.LocalHandlePageChange
+import com.amamiyakokoro.box.presentation.component.calculateWallpaperViewportLayout
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.icon.ShellIcons
+import com.amamiyakokoro.box.presentation.theme.AppMotion
+import com.amamiyakokoro.box.screen.home.HomeProxyControlState
+import com.amamiyakokoro.box.screen.home.HomeViewModel
+import com.amamiyakokoro.box.screen.home.displayableExternalIp
+import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.github.yumelira.yumebox.miuix.YumeMiuixTheme
-import com.github.yumelira.yumebox.miuix.rememberYumeMiuixLayerBackdrop
-import com.github.yumelira.yumebox.miuix.yumeMiuixLayerBackdrop
+import com.amamiyakokoro.box.miuix.YumeMiuixTheme
+import com.amamiyakokoro.box.miuix.rememberYumeMiuixLayerBackdrop
+import com.amamiyakokoro.box.miuix.yumeMiuixLayerBackdrop
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.core
+package com.amamiyakokoro.box.core
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

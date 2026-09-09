@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.data.integration.update
+package com.amamiyakokoro.box.data.integration.update
 
 object AutomaticUpdateCheckPolicy {
     const val INTERVAL_MILLIS: Long = 24L * 60L * 60L * 1_000L

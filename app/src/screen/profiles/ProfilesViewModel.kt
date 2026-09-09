@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,28 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.profiles
+package com.amamiyakokoro.box.screen.profiles
 
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.core.model.FetchStatus
-import com.github.yumelira.yumebox.core.presentation.AndroidContractStateViewModel
-import com.github.yumelira.yumebox.core.presentation.LoadableState
-import com.github.yumelira.yumebox.data.store.LinkOpenMode
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
-import com.github.yumelira.yumebox.data.store.Preference
-import com.github.yumelira.yumebox.data.store.ProfileLink
-import com.github.yumelira.yumebox.data.store.ProfileLinksStore
-import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
-import com.github.yumelira.yumebox.service.remote.IFetchObserver
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
+import com.amamiyakokoro.box.core.model.FetchStatus
+import com.amamiyakokoro.box.core.presentation.AndroidContractStateViewModel
+import com.amamiyakokoro.box.core.presentation.LoadableState
+import com.amamiyakokoro.box.data.store.LinkOpenMode
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
+import com.amamiyakokoro.box.data.store.Preference
+import com.amamiyakokoro.box.data.store.ProfileLink
+import com.amamiyakokoro.box.data.store.ProfileLinksStore
+import com.amamiyakokoro.box.runtime.client.ProfilesRepository
+import com.amamiyakokoro.box.service.remote.IFetchObserver
+import com.amamiyakokoro.box.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

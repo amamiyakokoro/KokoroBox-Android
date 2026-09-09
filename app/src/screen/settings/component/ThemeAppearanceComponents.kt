@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.settings.component
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+package com.amamiyakokoro.box.screen.settings.component
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.OutlinedTextField
@@ -32,17 +32,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.yumelira.yumebox.data.model.ThemeMode
-import com.github.yumelira.yumebox.miuix.YumeMiuixColorPicker
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetConfirmAction
-import com.github.yumelira.yumebox.presentation.component.EnumSelector
-import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
+import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.miuix.YumeMiuixColorPicker
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetConfirmAction
+import com.amamiyakokoro.box.presentation.component.EnumSelector
+import com.amamiyakokoro.box.presentation.component.PreferenceListItem
 import androidx.compose.material3.Icon as MaterialIcon
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.colorFromArgb
-import com.github.yumelira.yumebox.presentation.theme.colorToArgbLong
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.colorFromArgb
+import com.amamiyakokoro.box.presentation.theme.colorToArgbLong
 import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable

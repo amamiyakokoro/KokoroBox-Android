@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,36 +14,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service
+package com.amamiyakokoro.box.service
 
 import android.content.Context
 import android.content.Intent
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.core.model.ConnectionSnapshot
-import com.github.yumelira.yumebox.core.model.LogMessage
-import com.github.yumelira.yumebox.core.model.Proxy
-import com.github.yumelira.yumebox.core.model.Provider
-import com.github.yumelira.yumebox.core.model.ProviderList
-import com.github.yumelira.yumebox.core.model.ProxyGroup
-import com.github.yumelira.yumebox.core.model.ProxySort
-import com.github.yumelira.yumebox.core.model.TunnelState
-import com.github.yumelira.yumebox.core.model.UiConfiguration
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.service.common.constants.Intents
-import com.github.yumelira.yumebox.service.common.log.Log
-import com.github.yumelira.yumebox.service.remote.IClashManager
-import com.github.yumelira.yumebox.service.remote.ILogObserver
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.records.SelectionDao
-import com.github.yumelira.yumebox.service.runtime.session.CompiledConfigPipeline
-import com.github.yumelira.yumebox.service.runtime.session.SessionRuntimeSpecFactory
-import com.github.yumelira.yumebox.service.runtime.util.sendBroadcastSelf
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.model.ConnectionSnapshot
+import com.amamiyakokoro.box.core.model.LogMessage
+import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.model.Provider
+import com.amamiyakokoro.box.core.model.ProviderList
+import com.amamiyakokoro.box.core.model.ProxyGroup
+import com.amamiyakokoro.box.core.model.ProxySort
+import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.core.model.UiConfiguration
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.service.common.constants.Intents
+import com.amamiyakokoro.box.service.common.log.Log
+import com.amamiyakokoro.box.service.remote.IClashManager
+import com.amamiyakokoro.box.service.remote.ILogObserver
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.records.SelectionDao
+import com.amamiyakokoro.box.service.runtime.session.CompiledConfigPipeline
+import com.amamiyakokoro.box.service.runtime.session.SessionRuntimeSpecFactory
+import com.amamiyakokoro.box.service.runtime.util.sendBroadcastSelf
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope

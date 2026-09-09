@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.presentation.theme
+package com.amamiyakokoro.box.presentation.theme
 
 import android.content.Context
 import android.graphics.Color as AndroidColor
@@ -31,8 +31,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme as materialDarkColorScheme
 import androidx.compose.material3.lightColorScheme as materialLightColorScheme
-import com.github.yumelira.yumebox.data.model.MonetContrast
-import com.github.yumelira.yumebox.data.model.MonetStyle
+import com.amamiyakokoro.box.data.model.MonetContrast
+import com.amamiyakokoro.box.data.model.MonetStyle
 import top.yukonga.miuix.kmp.theme.darkColorScheme
 import top.yukonga.miuix.kmp.theme.lightColorScheme
 

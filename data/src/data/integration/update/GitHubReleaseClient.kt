@@ -1,7 +1,7 @@
-package com.github.yumelira.yumebox.data.integration.update
+package com.amamiyakokoro.box.data.integration.update
 
-import com.github.yumelira.yumebox.data.model.AppUpdateChannel
-import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
+import com.amamiyakokoro.box.data.model.AppUpdateChannel
+import com.amamiyakokoro.box.data.gateway.SharedOkHttpClient
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume

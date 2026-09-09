@@ -1,26 +1,26 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
  */
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRuleInput
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesOptions
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRuleSet
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesApiException
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesSaveOutcomeUnknownException
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationException
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRulesValidationReason
-import com.github.yumelira.yumebox.screen.profiles.KokoroAuthState
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroAuthenticationRequiredException
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRuleInput
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRulesOptions
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRuleSet
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesApiException
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesSaveOutcomeUnknownException
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesValidationException
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesValidationReason
+import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow

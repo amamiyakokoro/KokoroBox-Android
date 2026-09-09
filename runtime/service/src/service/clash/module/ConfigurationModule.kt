@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,27 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.service.clash.module
+package com.amamiyakokoro.box.service.clash.module
 
 import android.app.Service
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.service.StatusProvider
-import com.github.yumelira.yumebox.service.common.constants.Intents
-import com.github.yumelira.yumebox.core.model.ProxySort
-import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
-import com.github.yumelira.yumebox.service.runtime.records.ImportedDao
-import com.github.yumelira.yumebox.service.runtime.records.SelectionDao
-import com.github.yumelira.yumebox.service.runtime.records.SelectionRestoreExecutor
-import com.github.yumelira.yumebox.service.runtime.session.CompiledConfigPipeline
-import com.github.yumelira.yumebox.service.runtime.session.SessionRuntimeSpecFactory
-import com.github.yumelira.yumebox.service.runtime.util.importedDir
-import com.github.yumelira.yumebox.service.runtime.util.sendProfileLoaded
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.service.StatusProvider
+import com.amamiyakokoro.box.service.common.constants.Intents
+import com.amamiyakokoro.box.core.model.ProxySort
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
+import com.amamiyakokoro.box.service.runtime.records.ImportedDao
+import com.amamiyakokoro.box.service.runtime.records.SelectionDao
+import com.amamiyakokoro.box.service.runtime.records.SelectionRestoreExecutor
+import com.amamiyakokoro.box.service.runtime.session.CompiledConfigPipeline
+import com.amamiyakokoro.box.service.runtime.session.SessionRuntimeSpecFactory
+import com.amamiyakokoro.box.service.runtime.util.importedDir
+import com.amamiyakokoro.box.service.runtime.util.sendProfileLoaded
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
 import java.util.*

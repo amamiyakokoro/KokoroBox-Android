@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.runtime.client.root
+package com.amamiyakokoro.box.runtime.client.root
 
 import android.content.ComponentName
 import android.content.Context
@@ -29,10 +29,10 @@ import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import com.github.yumelira.yumebox.core.model.*
-import com.github.yumelira.yumebox.service.RootTunService
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
-import com.github.yumelira.yumebox.service.root.*
+import com.amamiyakokoro.box.core.model.*
+import com.amamiyakokoro.box.service.RootTunService
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.service.root.*
 import com.topjohnwu.superuser.ipc.RootService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -71,7 +71,7 @@ object RootTunController {
     }
 
     suspend fun start(context: Context): RootTunOperationResult {
-        com.github.yumelira.yumebox.core.util.StartupTaskCoordinator.awaitGeoInitialization()
+        com.amamiyakokoro.box.core.util.StartupTaskCoordinator.awaitGeoInitialization()
         val appContext = context.appContextOrSelf
         val startupLogStore = RootTunStartupLogStore(appContext)
         val stateStore = RootTunStateStore(appContext)

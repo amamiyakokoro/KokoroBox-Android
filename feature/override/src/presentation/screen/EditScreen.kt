@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.presentation.screen
+package com.amamiyakokoro.box.presentation.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -33,25 +33,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import com.github.yumelira.yumebox.presentation.component.AppDialog
-import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
-import com.github.yumelira.yumebox.presentation.component.JsonTextEditorDialog
-import com.github.yumelira.yumebox.presentation.component.OpenObjectMapEditor
-import com.github.yumelira.yumebox.presentation.component.OpenRuleListEditor
-import com.github.yumelira.yumebox.presentation.component.OpenStringListModifiersEditor
-import com.github.yumelira.yumebox.presentation.component.OpenStringMapEditor
-import com.github.yumelira.yumebox.presentation.component.OpenStructuredObjectListEditor
-import com.github.yumelira.yumebox.presentation.component.OpenSubRulesEditor
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.StringMapEditorDialog
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.OverrideEditContent
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.util.OverrideSaveEvent
-import com.github.yumelira.yumebox.presentation.util.OverrideSaveState
-import com.github.yumelira.yumebox.presentation.util.rememberOverrideReferenceCatalog
-import com.github.yumelira.yumebox.presentation.viewmodel.OverrideConfigViewModel
+import com.amamiyakokoro.box.presentation.component.AppDialog
+import com.amamiyakokoro.box.presentation.component.DialogButtonRow
+import com.amamiyakokoro.box.presentation.component.JsonTextEditorDialog
+import com.amamiyakokoro.box.presentation.component.OpenObjectMapEditor
+import com.amamiyakokoro.box.presentation.component.OpenRuleListEditor
+import com.amamiyakokoro.box.presentation.component.OpenStringListModifiersEditor
+import com.amamiyakokoro.box.presentation.component.OpenStringMapEditor
+import com.amamiyakokoro.box.presentation.component.OpenStructuredObjectListEditor
+import com.amamiyakokoro.box.presentation.component.OpenSubRulesEditor
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.StringMapEditorDialog
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.OverrideEditContent
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.util.OverrideSaveEvent
+import com.amamiyakokoro.box.presentation.util.OverrideSaveState
+import com.amamiyakokoro.box.presentation.util.rememberOverrideReferenceCatalog
+import com.amamiyakokoro.box.presentation.viewmodel.OverrideConfigViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel

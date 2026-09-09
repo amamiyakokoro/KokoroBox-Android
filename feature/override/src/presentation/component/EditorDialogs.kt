@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.presentation.component
+package com.amamiyakokoro.box.presentation.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,13 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.yumelira.yumebox.presentation.component.md3.YumeMd3OutlinedTextField
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.presentation.theme.yumeDestructiveActionColors
-import com.github.yumelira.yumebox.presentation.util.decodeObjectFields
-import com.github.yumelira.yumebox.presentation.util.encodeObjectFields
-import com.github.yumelira.yumebox.presentation.util.jsonElementToEditorValue
-import com.github.yumelira.yumebox.presentation.util.toOrderedJsonElementMap
+import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
+import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
+import com.amamiyakokoro.box.presentation.util.decodeObjectFields
+import com.amamiyakokoro.box.presentation.util.encodeObjectFields
+import com.amamiyakokoro.box.presentation.util.jsonElementToEditorValue
+import com.amamiyakokoro.box.presentation.util.toOrderedJsonElementMap
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
 import java.util.UUID
@@ -82,7 +82,7 @@ fun JsonTextEditorDialog(
     onDismiss: () -> Unit,
 ) {
 
-    com.github.yumelira.yumebox.feature.editor.presentation.component.JsonEditorDialog(
+    com.amamiyakokoro.box.feature.editor.presentation.component.JsonEditorDialog(
         show = show,
         title = title,
         subtitle = MLang.Override.Editor.JsonBlockSubtitle,

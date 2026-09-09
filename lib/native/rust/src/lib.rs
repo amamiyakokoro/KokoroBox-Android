@@ -1449,7 +1449,7 @@ fn result_to_jstring(env: &mut JNIEnv<'_>, payload: String) -> jstring {
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeCompilePreview(
+pub extern "system" fn Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeCompilePreview(
     mut env: JNIEnv<'_>,
     _thiz: JObject<'_>,
     request_json: JString<'_>,
@@ -1466,7 +1466,7 @@ pub extern "system" fn Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativ
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_com_github_yumelira_yumebox_core_bridge_Bridge_nativeCompileToFile(
+pub extern "system" fn Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeCompileToFile(
     mut env: JNIEnv<'_>,
     _thiz: JObject<'_>,
     request_json: JString<'_>,

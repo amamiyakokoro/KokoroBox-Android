@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox
+package com.amamiyakokoro.box
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 
 
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -47,16 +47,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.presentation.component.*
-import com.github.yumelira.yumebox.presentation.screen.ProxyPager
-import com.github.yumelira.yumebox.presentation.theme.NavigationTransitions
-import com.github.yumelira.yumebox.screen.acg.AcgHomePage
-import com.github.yumelira.yumebox.screen.acg.calculateHomeVisibility
-import com.github.yumelira.yumebox.screen.home.HomeViewModel
-import com.github.yumelira.yumebox.screen.home.HomePager
-import com.github.yumelira.yumebox.screen.profiles.ProfilesPager
-import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
-import com.github.yumelira.yumebox.screen.settings.SettingPager
+import com.amamiyakokoro.box.presentation.component.*
+import com.amamiyakokoro.box.presentation.screen.ProxyPager
+import com.amamiyakokoro.box.presentation.theme.NavigationTransitions
+import com.amamiyakokoro.box.screen.acg.AcgHomePage
+import com.amamiyakokoro.box.screen.acg.calculateHomeVisibility
+import com.amamiyakokoro.box.screen.home.HomeViewModel
+import com.amamiyakokoro.box.screen.home.HomePager
+import com.amamiyakokoro.box.screen.profiles.ProfilesPager
+import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
+import com.amamiyakokoro.box.screen.settings.SettingPager
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ProvidersScreenDestination

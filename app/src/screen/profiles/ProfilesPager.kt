@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.screen.profiles
+package com.amamiyakokoro.box.screen.profiles
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.yumelira.yumebox.presentation.theme.UiDp
-import com.github.yumelira.yumebox.presentation.theme.appPressSink
+import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.appPressSink
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,20 +39,20 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import com.github.yumelira.yumebox.App
-import com.github.yumelira.yumebox.MainActivity
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.data.controller.OverrideService
-import com.github.yumelira.yumebox.data.store.ProfileBindingProvider
-import com.github.yumelira.yumebox.data.model.ProfileBinding
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
-import com.github.yumelira.yumebox.presentation.component.*
-import com.github.yumelira.yumebox.presentation.icon.ShellIcons
-import com.github.yumelira.yumebox.presentation.component.LocalNavigator
-import com.github.yumelira.yumebox.presentation.util.OverrideStructuredEditorStore
-import com.github.yumelira.yumebox.presentation.viewmodel.OverrideConfigViewModel
-import com.github.yumelira.yumebox.screen.home.HomeViewModel
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
+import com.amamiyakokoro.box.App
+import com.amamiyakokoro.box.MainActivity
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.data.controller.OverrideService
+import com.amamiyakokoro.box.data.store.ProfileBindingProvider
+import com.amamiyakokoro.box.data.model.ProfileBinding
+import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
+import com.amamiyakokoro.box.presentation.component.*
+import com.amamiyakokoro.box.presentation.icon.ShellIcons
+import com.amamiyakokoro.box.presentation.component.LocalNavigator
+import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
+import com.amamiyakokoro.box.presentation.viewmodel.OverrideConfigViewModel
+import com.amamiyakokoro.box.screen.home.HomeViewModel
+import com.amamiyakokoro.box.service.runtime.entity.Profile
 import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch

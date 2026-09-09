@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.traffic
+package com.amamiyakokoro.box.screen.traffic
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,23 +44,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.github.yumelira.yumebox.common.util.formatBytes
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.data.model.AppTrafficUsage
-import com.github.yumelira.yumebox.data.model.StatisticsTimeRange
-import com.github.yumelira.yumebox.data.model.TrafficStatisticsBuckets
-import com.github.yumelira.yumebox.feature.meta.presentation.component.TabRowWithContour
-import com.github.yumelira.yumebox.feature.meta.presentation.viewmodel.TrafficStatisticsViewModel
-import com.github.yumelira.yumebox.presentation.component.AppConfirmDialog
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.TrafficDonutChart
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.component.rememberInstalledAppIcon
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.AppTheme
+import com.amamiyakokoro.box.common.util.formatBytes
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.data.model.AppTrafficUsage
+import com.amamiyakokoro.box.data.model.StatisticsTimeRange
+import com.amamiyakokoro.box.data.model.TrafficStatisticsBuckets
+import com.amamiyakokoro.box.feature.meta.presentation.component.TabRowWithContour
+import com.amamiyakokoro.box.feature.meta.presentation.viewmodel.TrafficStatisticsViewModel
+import com.amamiyakokoro.box.presentation.component.AppConfirmDialog
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.TrafficDonutChart
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.component.rememberInstalledAppIcon
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import dev.oom_wg.purejoy.mlang.MLang

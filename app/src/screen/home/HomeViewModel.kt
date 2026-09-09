@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,36 +14,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.home
+package com.amamiyakokoro.box.screen.home
 
 import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.viewModelScope
-import com.github.yumelira.yumebox.core.presentation.AndroidContractStateViewModel
-import com.github.yumelira.yumebox.core.presentation.LoadableState
-import com.github.yumelira.yumebox.core.util.AutoStartSessionGate
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.gateway.IpMonitoringState
-import com.github.yumelira.yumebox.data.gateway.NetworkInfoService
-import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
-import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
-import com.github.yumelira.yumebox.domain.model.TrafficData
-import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
-import com.github.yumelira.yumebox.runtime.client.ProxyFacade
-import com.github.yumelira.yumebox.runtime.client.ProxyGroupSyncPriority
-import com.github.yumelira.yumebox.runtime.client.TrafficPollingPriority
-import com.github.yumelira.yumebox.runtime.client.RuntimeStateMapper
-import com.github.yumelira.yumebox.service.root.RootAccessSupport
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
-import com.github.yumelira.yumebox.service.runtime.state.RuntimePhase
+import com.amamiyakokoro.box.core.presentation.AndroidContractStateViewModel
+import com.amamiyakokoro.box.core.presentation.LoadableState
+import com.amamiyakokoro.box.core.util.AutoStartSessionGate
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.gateway.IpMonitoringState
+import com.amamiyakokoro.box.data.gateway.NetworkInfoService
+import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.data.store.ProxyDisplaySettingsStore
+import com.amamiyakokoro.box.domain.model.TrafficData
+import com.amamiyakokoro.box.runtime.client.ProfilesRepository
+import com.amamiyakokoro.box.runtime.client.ProxyFacade
+import com.amamiyakokoro.box.runtime.client.ProxyGroupSyncPriority
+import com.amamiyakokoro.box.runtime.client.TrafficPollingPriority
+import com.amamiyakokoro.box.runtime.client.RuntimeStateMapper
+import com.amamiyakokoro.box.service.root.RootAccessSupport
+import com.amamiyakokoro.box.service.runtime.entity.Profile
+import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -97,7 +97,7 @@ class HomeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RuntimeStateMapper.isActuallyRunning(runtimeSnapshot.value))
     val currentProfile = proxyFacade.currentProfile
     val trafficNow = proxyFacade.trafficNow
-    val tunnelMode: StateFlow<com.github.yumelira.yumebox.core.model.TunnelState.Mode> = proxyFacade.preferredTunnelMode
+    val tunnelMode: StateFlow<com.amamiyakokoro.box.core.model.TunnelState.Mode> = proxyFacade.preferredTunnelMode
 
     private val _proxyMode = MutableStateFlow(ProxyMode.Tun)
     val proxyMode: StateFlow<ProxyMode> = _proxyMode.asStateFlow()
@@ -128,7 +128,7 @@ class HomeViewModel(
     private var speedSamplingJob: Job? = null
     private val homeScreenActive = MutableStateFlow(false)
 
-    private val mainProxyNode: StateFlow<com.github.yumelira.yumebox.core.model.Proxy?> =
+    private val mainProxyNode: StateFlow<com.amamiyakokoro.box.core.model.Proxy?> =
         proxyFacade.resolvedPrimaryNode
 
     val selectedServerName: StateFlow<String?> =
@@ -472,7 +472,7 @@ class HomeViewModel(
             }
 
             Timber.i("Home startProxy completed in ${System.currentTimeMillis() - startedAt}ms, mode=${request.mode}")
-        } catch (e: com.github.yumelira.yumebox.remote.VpnPermissionRequired) {
+        } catch (e: com.amamiyakokoro.box.remote.VpnPermissionRequired) {
             _pendingTransition.value = PendingTransition.AwaitingPermission
             _vpnPrepareIntent.emit(e.intent)
             Timber.i("VPN permission required")

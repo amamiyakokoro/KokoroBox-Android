@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,44 +14,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.di
+package com.amamiyakokoro.box.di
 
-import com.github.yumelira.yumebox.data.gateway.LogRecordGateway
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroCustomRulesClient
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroPreloadCoordinator
-import com.github.yumelira.yumebox.data.integration.kokoro.KokoroRepository
-import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
-import com.github.yumelira.yumebox.data.integration.update.AutomaticAppUpdateChecker
-import com.github.yumelira.yumebox.data.integration.update.AppUpdateDownloader
-import com.github.yumelira.yumebox.data.integration.speedtest.CloudflareSpeedTestClient
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.common.update.ApkUpdateVerifier
-import com.github.yumelira.yumebox.common.update.PackageUpdateInstaller
-import com.github.yumelira.yumebox.integration.update.AppUpdateManager
-import com.github.yumelira.yumebox.integration.update.AppForegroundTracker
-import com.github.yumelira.yumebox.integration.update.AppUpdateInstallNotifier
-import com.github.yumelira.yumebox.integration.update.RootUpdateInstaller
-import com.github.yumelira.yumebox.integration.update.ShizukuUpdateInstaller
-import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
-import com.github.yumelira.yumebox.screen.home.HomeViewModel
-import com.github.yumelira.yumebox.screen.log.LogViewModel
-import com.github.yumelira.yumebox.screen.profiles.ProfilesViewModel
-import com.github.yumelira.yumebox.screen.profiles.KokoroAccountClient
-import com.github.yumelira.yumebox.screen.settings.AccessControlViewModel
-import com.github.yumelira.yumebox.screen.settings.AppDataManagementViewModel
-import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
-import com.github.yumelira.yumebox.screen.settings.KokoroCustomRulesViewModel
-import com.github.yumelira.yumebox.screen.settings.KokoroSettingsViewModel
-import com.github.yumelira.yumebox.screen.settings.NetworkSettingsViewModel
-import com.github.yumelira.yumebox.screen.settings.ResourceDownloadClient
-import com.github.yumelira.yumebox.screen.settings.CloudflareSpeedTestViewModel
-import com.github.yumelira.yumebox.service.LogRecordServiceGateway
+import com.amamiyakokoro.box.data.gateway.LogRecordGateway
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRulesClient
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroPreloadCoordinator
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
+import com.amamiyakokoro.box.data.integration.update.GitHubReleaseClient
+import com.amamiyakokoro.box.data.integration.update.AutomaticAppUpdateChecker
+import com.amamiyakokoro.box.data.integration.update.AppUpdateDownloader
+import com.amamiyakokoro.box.data.integration.speedtest.CloudflareSpeedTestClient
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.common.update.ApkUpdateVerifier
+import com.amamiyakokoro.box.common.update.PackageUpdateInstaller
+import com.amamiyakokoro.box.integration.update.AppUpdateManager
+import com.amamiyakokoro.box.integration.update.AppForegroundTracker
+import com.amamiyakokoro.box.integration.update.AppUpdateInstallNotifier
+import com.amamiyakokoro.box.integration.update.RootUpdateInstaller
+import com.amamiyakokoro.box.integration.update.ShizukuUpdateInstaller
+import com.amamiyakokoro.box.screen.about.AppUpdateViewModel
+import com.amamiyakokoro.box.screen.home.HomeViewModel
+import com.amamiyakokoro.box.screen.log.LogViewModel
+import com.amamiyakokoro.box.screen.profiles.ProfilesViewModel
+import com.amamiyakokoro.box.screen.profiles.KokoroAccountClient
+import com.amamiyakokoro.box.screen.settings.AccessControlViewModel
+import com.amamiyakokoro.box.screen.settings.AppDataManagementViewModel
+import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
+import com.amamiyakokoro.box.screen.settings.KokoroCustomRulesViewModel
+import com.amamiyakokoro.box.screen.settings.KokoroSettingsViewModel
+import com.amamiyakokoro.box.screen.settings.NetworkSettingsViewModel
+import com.amamiyakokoro.box.screen.settings.ResourceDownloadClient
+import com.amamiyakokoro.box.screen.settings.CloudflareSpeedTestViewModel
+import com.amamiyakokoro.box.service.LogRecordServiceGateway
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.qualifier.named
 import org.koin.core.module.Module

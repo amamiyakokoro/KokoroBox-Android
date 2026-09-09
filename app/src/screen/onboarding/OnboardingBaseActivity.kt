@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.screen.onboarding
+package com.amamiyakokoro.box.screen.onboarding
 
 import android.content.Context
 import android.content.Intent
@@ -42,12 +42,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
-import com.github.yumelira.yumebox.MainActivity
-import com.github.yumelira.yumebox.common.runtime.StartupGate
-import com.github.yumelira.yumebox.common.util.AppLanguageManager
-import com.github.yumelira.yumebox.presentation.theme.ProvideAndroidPlatformTheme
-import com.github.yumelira.yumebox.presentation.theme.YumeTheme
-import com.github.yumelira.yumebox.screen.settings.AppSettingsViewModel
+import com.amamiyakokoro.box.MainActivity
+import com.amamiyakokoro.box.common.runtime.StartupGate
+import com.amamiyakokoro.box.common.util.AppLanguageManager
+import com.amamiyakokoro.box.presentation.theme.ProvideAndroidPlatformTheme
+import com.amamiyakokoro.box.presentation.theme.YumeTheme
+import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 

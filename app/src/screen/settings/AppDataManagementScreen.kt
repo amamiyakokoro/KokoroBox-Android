@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  */
 
-package com.github.yumelira.yumebox.screen.settings
+package com.amamiyakokoro.box.screen.settings
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -47,24 +47,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.github.yumelira.yumebox.common.util.formatBytes
-import com.github.yumelira.yumebox.data.controller.GeoXCacheEntry
-import com.github.yumelira.yumebox.data.store.LogStore
-import com.github.yumelira.yumebox.feature.editor.presentation.editor.CodeEditor
-import com.github.yumelira.yumebox.feature.editor.presentation.editor.rememberConfiguredCodeEditorState
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
-import com.github.yumelira.yumebox.presentation.component.AppActionBottomSheet
-import com.github.yumelira.yumebox.presentation.component.AppBottomSheetCloseAction
-import com.github.yumelira.yumebox.presentation.component.AppConfirmDialog
-import com.github.yumelira.yumebox.presentation.component.Card
-import com.github.yumelira.yumebox.presentation.component.PreferenceArrowItem
-import com.github.yumelira.yumebox.presentation.component.PreferenceListItem
-import com.github.yumelira.yumebox.presentation.component.ScreenLazyColumn
-import com.github.yumelira.yumebox.presentation.component.Title
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.component.combinePaddingValues
-import com.github.yumelira.yumebox.presentation.component.rememberStandalonePageMainPadding
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.common.util.formatBytes
+import com.amamiyakokoro.box.data.controller.GeoXCacheEntry
+import com.amamiyakokoro.box.data.store.LogStore
+import com.amamiyakokoro.box.feature.editor.presentation.editor.CodeEditor
+import com.amamiyakokoro.box.feature.editor.presentation.editor.rememberConfiguredCodeEditorState
+import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
+import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
+import com.amamiyakokoro.box.presentation.component.AppConfirmDialog
+import com.amamiyakokoro.box.presentation.component.Card
+import com.amamiyakokoro.box.presentation.component.PreferenceArrowItem
+import com.amamiyakokoro.box.presentation.component.PreferenceListItem
+import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
+import com.amamiyakokoro.box.presentation.component.Title
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import dev.oom_wg.purejoy.mlang.MLang

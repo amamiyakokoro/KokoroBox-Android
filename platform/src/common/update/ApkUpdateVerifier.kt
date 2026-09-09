@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.common.update
+package com.amamiyakokoro.box.common.update
 
 import android.content.Context
 import android.content.pm.PackageInfo

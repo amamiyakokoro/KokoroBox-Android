@@ -1,4 +1,4 @@
-package com.github.yumelira.yumebox.integration.update
+package com.amamiyakokoro.box.integration.update
 
 import android.content.Context
 import androidx.work.Constraints
@@ -8,12 +8,12 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.github.yumelira.yumebox.BuildConfig
-import com.github.yumelira.yumebox.data.integration.update.AutomaticUpdateCheckPolicy
-import com.github.yumelira.yumebox.data.integration.update.GitHubReleaseClient
-import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
-import com.github.yumelira.yumebox.data.integration.update.isNewerThan
-import com.github.yumelira.yumebox.data.store.AppSettingsStore
+import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.data.integration.update.AutomaticUpdateCheckPolicy
+import com.amamiyakokoro.box.data.integration.update.GitHubReleaseClient
+import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
+import com.amamiyakokoro.box.data.integration.update.isNewerThan
+import com.amamiyakokoro.box.data.store.AppSettingsStore
 import org.koin.core.context.GlobalContext
 import java.util.concurrent.TimeUnit
 

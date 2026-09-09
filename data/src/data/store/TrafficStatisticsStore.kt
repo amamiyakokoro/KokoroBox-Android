@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.data.store
+package com.amamiyakokoro.box.data.store
 
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.model.AppTrafficDeltaRecord
-import com.github.yumelira.yumebox.data.model.AppRouteTrafficUsage
-import com.github.yumelira.yumebox.data.model.AppTrafficUsage
-import com.github.yumelira.yumebox.data.model.DailyAppTrafficSummary
-import com.github.yumelira.yumebox.data.model.DailyRouteTrafficSummary
-import com.github.yumelira.yumebox.data.model.DailyTrafficSummary
-import com.github.yumelira.yumebox.data.model.StatisticsTimeRange
-import com.github.yumelira.yumebox.data.model.TrafficStatisticsBuckets
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.data.model.AppTrafficDeltaRecord
+import com.amamiyakokoro.box.data.model.AppRouteTrafficUsage
+import com.amamiyakokoro.box.data.model.AppTrafficUsage
+import com.amamiyakokoro.box.data.model.DailyAppTrafficSummary
+import com.amamiyakokoro.box.data.model.DailyRouteTrafficSummary
+import com.amamiyakokoro.box.data.model.DailyTrafficSummary
+import com.amamiyakokoro.box.data.model.StatisticsTimeRange
+import com.amamiyakokoro.box.data.model.TrafficStatisticsBuckets
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

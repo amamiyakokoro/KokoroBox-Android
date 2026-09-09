@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
-package com.github.yumelira.yumebox.screen.profiles
+package com.amamiyakokoro.box.screen.profiles
 
 
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,9 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.yumelira.yumebox.App
-import com.github.yumelira.yumebox.presentation.component.AppDialog
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
+import com.amamiyakokoro.box.App
+import com.amamiyakokoro.box.presentation.component.AppDialog
+import com.amamiyakokoro.box.service.runtime.entity.Profile
 import dev.oom_wg.purejoy.mlang.MLang
 import java.io.File
 

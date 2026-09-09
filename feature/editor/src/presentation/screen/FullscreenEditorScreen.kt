@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
-package com.github.yumelira.yumebox.feature.editor.presentation.screen
+package com.amamiyakokoro.box.feature.editor.presentation.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -37,15 +37,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.github.yumelira.yumebox.common.util.toast
-import com.github.yumelira.yumebox.feature.editor.presentation.component.NativeTextEditor
-import com.github.yumelira.yumebox.feature.editor.presentation.format.CodeFormatter
-import com.github.yumelira.yumebox.feature.editor.presentation.language.LanguageScope
-import com.github.yumelira.yumebox.presentation.component.AppDialog
-import com.github.yumelira.yumebox.presentation.component.DialogButtonRow
-import com.github.yumelira.yumebox.presentation.component.TopBar
-import com.github.yumelira.yumebox.presentation.icon.AppMd3Icons
-import com.github.yumelira.yumebox.presentation.theme.UiDp
+import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.feature.editor.presentation.component.NativeTextEditor
+import com.amamiyakokoro.box.feature.editor.presentation.format.CodeFormatter
+import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
+import com.amamiyakokoro.box.presentation.component.AppDialog
+import com.amamiyakokoro.box.presentation.component.DialogButtonRow
+import com.amamiyakokoro.box.presentation.component.TopBar
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 

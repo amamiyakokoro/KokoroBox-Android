@@ -1,7 +1,7 @@
 /*
- * This file is part of YumeBox.
+ * This file is part of KokoroBox.
  *
- * YumeBox is free software: you can redistribute it and/or modify
+ * KokoroBox is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License.
@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (c)  YumeLira 2025 - Present
+ * Copyright (c)  AmamiyaKokoro 2025 - Present
  *
  */
 
 
 
-package com.github.yumelira.yumebox.runtime.client
+package com.amamiyakokoro.box.runtime.client
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -29,31 +29,31 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.VpnService
 import android.os.Build
-import com.github.yumelira.yumebox.core.Clash
-import com.github.yumelira.yumebox.core.model.*
-import com.github.yumelira.yumebox.core.util.PollingTimerSpec
-import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
-import com.github.yumelira.yumebox.core.util.PollingTimers
-import com.github.yumelira.yumebox.data.model.ProxyMode
-import com.github.yumelira.yumebox.data.store.MMKVProvider
-import com.github.yumelira.yumebox.data.store.NetworkSettingsStore
-import com.github.yumelira.yumebox.data.store.ProxyDisplaySettingsStore
-import com.github.yumelira.yumebox.domain.model.ProxyGroupInfo
-import com.github.yumelira.yumebox.remote.ServiceClient
-import com.github.yumelira.yumebox.remote.VpnPermissionRequired
-import com.github.yumelira.yumebox.runtime.client.root.RootTunController
-import com.github.yumelira.yumebox.service.LocalRuntimePhase
-import com.github.yumelira.yumebox.service.RootTunService
-import com.github.yumelira.yumebox.service.StatusProvider
-import com.github.yumelira.yumebox.service.common.constants.Intents
-import com.github.yumelira.yumebox.service.common.util.appContextOrSelf
-import com.github.yumelira.yumebox.service.root.RootTunStateStore
-import com.github.yumelira.yumebox.service.root.RootTunStatus
-import com.github.yumelira.yumebox.service.runtime.entity.Profile
-import com.github.yumelira.yumebox.service.runtime.records.SelectionDao
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeOwner
-import com.github.yumelira.yumebox.service.runtime.state.RuntimePhase
-import com.github.yumelira.yumebox.service.runtime.state.RuntimeSnapshot
+import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.model.*
+import com.amamiyakokoro.box.core.util.PollingTimerSpec
+import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.data.store.MMKVProvider
+import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.data.store.ProxyDisplaySettingsStore
+import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
+import com.amamiyakokoro.box.remote.ServiceClient
+import com.amamiyakokoro.box.remote.VpnPermissionRequired
+import com.amamiyakokoro.box.runtime.client.root.RootTunController
+import com.amamiyakokoro.box.service.LocalRuntimePhase
+import com.amamiyakokoro.box.service.RootTunService
+import com.amamiyakokoro.box.service.StatusProvider
+import com.amamiyakokoro.box.service.common.constants.Intents
+import com.amamiyakokoro.box.service.common.util.appContextOrSelf
+import com.amamiyakokoro.box.service.root.RootTunStateStore
+import com.amamiyakokoro.box.service.root.RootTunStatus
+import com.amamiyakokoro.box.service.runtime.entity.Profile
+import com.amamiyakokoro.box.service.runtime.records.SelectionDao
+import com.amamiyakokoro.box.service.runtime.state.RuntimeOwner
+import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
+import com.amamiyakokoro.box.service.runtime.state.RuntimeSnapshot
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -350,7 +350,7 @@ class ProxyFacade(
                 throw error
             }
             if (targetOwner == RuntimeOwner.RootTun) {
-                applyRootTunStatus(RootTunStatus(state = com.github.yumelira.yumebox.service.root.RootTunState.Starting))
+                applyRootTunStatus(RootTunStatus(state = com.amamiyakokoro.box.service.root.RootTunState.Starting))
                 scheduleRootTunBootstrap()
                 handleRuntimeStarted(forceOwner = RuntimeOwner.RootTun)
             }
@@ -743,7 +743,7 @@ class ProxyFacade(
         }
         if (owner == RuntimeOwner.RootTun) {
             stopRootTunBootstrap()
-            applyRootTunStatus(RootTunStatus(state = com.github.yumelira.yumebox.service.root.RootTunState.Stopping))
+            applyRootTunStatus(RootTunStatus(state = com.amamiyakokoro.box.service.root.RootTunState.Stopping))
         }
 
         stopTrafficPolling()
@@ -1184,7 +1184,7 @@ class ProxyFacade(
                     localPhase = LocalRuntimePhase.Idle,
                 ),
             )
-            if (status.state == com.github.yumelira.yumebox.service.root.RootTunState.Running) {
+            if (status.state == com.amamiyakokoro.box.service.root.RootTunState.Running) {
                 applyPreferredTunnelModeSafely()
                 startTrafficPolling()
                 refreshAllSafely()
@@ -1228,7 +1228,7 @@ class ProxyFacade(
                             localPhase = LocalRuntimePhase.Idle,
                         ),
                     )
-                    if (status.state == com.github.yumelira.yumebox.service.root.RootTunState.Running) {
+                    if (status.state == com.amamiyakokoro.box.service.root.RootTunState.Running) {
                         applyPreferredTunnelModeSafely()
                         startTrafficPolling()
                         refreshAllSafely()
