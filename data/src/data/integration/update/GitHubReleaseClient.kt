@@ -41,7 +41,10 @@ sealed interface ReleaseCheck {
         val version: ReleaseVersion,
         val notes: String,
         val releaseUrl: String,
+        val apkName: String?,
         val apkUrl: String?,
+        val apkSizeBytes: Long?,
+        val checksumUrl: String?,
         /** Present for nightly builds so builds sharing a version name remain ordered. */
         val versionCode: Int? = null,
     ) : ReleaseCheck
@@ -191,12 +194,22 @@ class GitHubReleaseClient(
                     (it["size"]?.jsonPrimitive?.long ?: 0) > 0 &&
                     it["browser_download_url"]?.jsonPrimitive?.content == expectedApk
             }
+            val expectedChecksum = "$REPOSITORY_URL/releases/download/$tag/$CHECKSUM_FILENAME"
+            val checksum = assets.filterIsInstance<JsonObject>().singleOrNull {
+                it["name"]?.jsonPrimitive?.content == CHECKSUM_FILENAME &&
+                    it["state"]?.jsonPrimitive?.content == "uploaded" &&
+                    (it["size"]?.jsonPrimitive?.long ?: 0) in 1..MAX_CHECKSUM_BYTES &&
+                    it["browser_download_url"]?.jsonPrimitive?.content == expectedChecksum
+            }
             return ReleaseCheck.Published(
                 tag = tag,
                 version = version,
                 notes = obj["body"]?.jsonPrimitive?.contentOrNull?.take(12_000).orEmpty(),
                 releaseUrl = releaseUrl,
+                apkName = filename.takeIf { apk != null },
                 apkUrl = expectedApk.takeIf { apk != null },
+                apkSizeBytes = apk?.get("size")?.jsonPrimitive?.long,
+                checksumUrl = expectedChecksum.takeIf { checksum != null },
                 versionCode = versionCode,
             )
         }
@@ -204,6 +217,8 @@ class GitHubReleaseClient(
         private val NIGHTLY_APK_FILE = Regex(
             "KokoroBox-v((?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*))-nightly-code([1-9][0-9]*)-arm64-v8a-release\\.apk",
         )
+        private const val CHECKSUM_FILENAME = "SHA256SUMS"
+        private const val MAX_CHECKSUM_BYTES = 64L * 1024L
     }
 }
 

@@ -18,7 +18,9 @@ class GitHubReleaseClientTest {
     private fun release(tag: String = "v0.5.7"): String = """
         {"tag_name":"$tag","draft":false,"prerelease":false,"body":"Release notes",
          "assets":[{"name":"KokoroBox-$tag-arm64-v8a-release.apk","state":"uploaded","size":1024,
-         "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/$tag/KokoroBox-$tag-arm64-v8a-release.apk"}]}
+         "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/$tag/KokoroBox-$tag-arm64-v8a-release.apk"},
+         {"name":"SHA256SUMS","state":"uploaded","size":128,
+         "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/$tag/SHA256SUMS"}]}
     """.trimIndent()
 
     private fun nightlyRelease(version: String = "0.5.8", versionCode: Int = 5801): String {
@@ -26,7 +28,9 @@ class GitHubReleaseClientTest {
         return """
             {"tag_name":"nightly","draft":false,"prerelease":true,"body":"Nightly notes",
              "assets":[{"name":"$filename","state":"uploaded","size":1024,
-             "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/nightly/$filename"}]}
+             "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/nightly/$filename"},
+             {"name":"SHA256SUMS","state":"uploaded","size":128,
+             "browser_download_url":"${GitHubReleaseClient.REPOSITORY_URL}/releases/download/nightly/SHA256SUMS"}]}
         """.trimIndent()
     }
 
@@ -44,6 +48,12 @@ class GitHubReleaseClientTest {
         assertEquals("v0.5.7", result.tag)
         assertEquals("Release notes", result.notes)
         assertTrue(result.apkUrl!!.endsWith("/KokoroBox-v0.5.7-arm64-v8a-release.apk"))
+        assertEquals("KokoroBox-v0.5.7-arm64-v8a-release.apk", result.apkName)
+        assertEquals(1024L, result.apkSizeBytes)
+        assertEquals(
+            "${GitHubReleaseClient.REPOSITORY_URL}/releases/download/v0.5.7/SHA256SUMS",
+            result.checksumUrl,
+        )
         assertEquals("${GitHubReleaseClient.REPOSITORY_URL}/releases/tag/v0.5.7", result.releaseUrl)
     }
 
@@ -66,6 +76,13 @@ class GitHubReleaseClientTest {
             release().replace("\"uploaded\"", "\"new\""),
             release().replace("\"size\":1024", "\"size\":0"),
         ).forEach { assertNull((GitHubReleaseClient.parseRelease(it) as ReleaseCheck.Published).apkUrl) }
+    }
+
+    @Test fun missingOrUntrustedChecksumDisablesInAppVerification() {
+        val missing = release().replace("\"SHA256SUMS\"", "\"MISSING\"")
+        assertNull((GitHubReleaseClient.parseRelease(missing) as ReleaseCheck.Published).checksumUrl)
+        val wrongUrl = release().replace("/SHA256SUMS\"}", "/unexpected\"}")
+        assertNull((GitHubReleaseClient.parseRelease(wrongUrl) as ReleaseCheck.Published).checksumUrl)
     }
 
     @Test fun rejectsDraftPrereleaseAndMalformedResponses() {
