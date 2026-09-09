@@ -316,7 +316,6 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:${gropify.dep.version.camera}")
     implementation("androidx.camera:camera-view:${gropify.dep.version.camera}")
     implementation("androidx.camera:camera-core:${gropify.dep.version.camera}")
-    implementation("androidx.camera:camera-video:${gropify.dep.version.camera}")
 
     implementation("io.github.panpf.sketch4:sketch-compose:${gropify.dep.version.sketch4}")
     implementation("io.github.panpf.sketch4:sketch-http:${gropify.dep.version.sketch4}")
