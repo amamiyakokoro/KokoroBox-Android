@@ -106,7 +106,7 @@ Component = {
     BottomBar = {
         Home = "首頁"
         Proxy = "代理"
-        Config = "設定"
+        Config = "設定檔"
         Setting = "設定"
     }
 
