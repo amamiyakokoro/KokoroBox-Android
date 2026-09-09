@@ -23,8 +23,8 @@ class ApkUpdateVerificationException(message: String, cause: Throwable? = null) 
 /**
  * Verifies a downloaded APK against the installed KokoroBox package.
  *
- * The installed app's signing certificate is the trust anchor. Release metadata and checksums
- * detect transport corruption, but cannot authorize an APK signed by someone else.
+ * The installed app's signing certificate lineage is the trust anchor. Release metadata and
+ * checksums detect transport corruption, but cannot authorize an APK signed by someone else.
  */
 class ApkUpdateVerifier(
     private val context: Context,
@@ -67,9 +67,21 @@ class ApkUpdateVerifier(
                 throw ApkUpdateVerificationException("Downloaded update is not newer than the installed app")
             }
 
-            val archiveSigners = archive.signerSha256()
-            val installedSigners = installed.signerSha256()
-            if (archiveSigners.isEmpty() || installedSigners.isEmpty() || archiveSigners != installedSigners) {
+            val archiveSignerCertificates = archive.signerCertificatesRaw()
+            val archiveSigners = archiveSignerCertificates.signerSha256()
+            val signerMatchesInstalledLineage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                archiveSignerCertificates.isNotEmpty() && archiveSignerCertificates.all { certificate ->
+                    packageManager.hasSigningCertificate(
+                        context.packageName,
+                        certificate,
+                        PackageManager.CERT_INPUT_RAW_X509,
+                    )
+                }
+            } else {
+                val installedSigners = installed.signerCertificatesRaw().signerSha256()
+                archiveSigners.isNotEmpty() && archiveSigners == installedSigners
+            }
+            if (!signerMatchesInstalledLineage) {
                 throw ApkUpdateVerificationException("Downloaded update signer does not match this app")
             }
 
@@ -120,17 +132,18 @@ class ApkUpdateVerifier(
             versionCode.toLong()
         }
 
-    private fun PackageInfo.signerSha256(): Set<String> {
-        val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    private fun PackageInfo.signerCertificatesRaw(): List<ByteArray> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             signingInfo?.apkContentsSigners?.map { it.toByteArray() }.orEmpty()
         } else {
             @Suppress("DEPRECATION")
             signatures?.map { it.toByteArray() }.orEmpty()
         }
-        return signatures.mapTo(linkedSetOf()) { signature ->
+
+    private fun List<ByteArray>.signerSha256(): Set<String> =
+        mapTo(linkedSetOf()) { signature ->
             MessageDigest.getInstance("SHA-256").digest(signature).toHexString()
         }
-    }
 }
 
 private fun ByteArray.toHexString(): String = joinToString(separator = "") { byte ->
