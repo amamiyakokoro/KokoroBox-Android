@@ -42,12 +42,9 @@ import com.github.yumelira.yumebox.service.runtime.util.importedDir
 import com.github.yumelira.yumebox.service.runtime.util.sendProfileChanged
 import com.github.yumelira.yumebox.core.util.ProfileUpdatePolicy
 import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -72,7 +69,6 @@ object ProfileProcessor {
 
     private val profileLock = Mutex()
     private val processLock = Mutex()
-    private val providerPrefetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val httpClient = SharedOkHttpClient.newBuilder()
         .connectTimeout(15, TimeUnit.SECONDS)
@@ -111,12 +107,13 @@ object ProfileProcessor {
      * configuration is already present at this point, so native validation will not try to fetch
      * the bearer-token-protected subscription URL again.
      */
-    private fun prefetchKokoroProviders(context: Context, uuid: UUID) {
+    suspend fun prefetchKokoroProviders(context: Context, uuid: UUID) {
         val appContext = context.applicationContext
-        providerPrefetchScope.launch {
-            try {
+        withContext(Dispatchers.IO) {
+            processLock.withLock {
+                if (!ImportedDao.exists(uuid)) return@withLock
                 val profileDir = appContext.importedDir.resolve(uuid.toString())
-                if (!profileDir.resolve("config.yaml").isFile) return@launch
+                if (!profileDir.resolve("config.yaml").isFile) return@withLock
 
                 Clash.fetchAndValid(
                     path = profileDir,
@@ -127,11 +124,6 @@ object ProfileProcessor {
                     downloadProviders = true,
                     reportStatus = {},
                 ).await()
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
-                // Provider downloads are an optimization after a successful import. A later
-                // profile update or Mihomo itself can retry missing providers.
-                Log.w("Kokoro provider prefetch failed", e)
             }
         }
     }
@@ -563,7 +555,9 @@ object ProfileProcessor {
                         }
                     }
                     if (committed && deferKokoroProviderDownloads) {
-                        prefetchKokoroProviders(context, snapshot.imported.uuid)
+                        KokoroProviderPrefetchJobService.schedule(context, snapshot.imported.uuid)
+                    } else if (committed) {
+                        KokoroProviderPrefetchJobService.cancel(context, snapshot.imported.uuid)
                     }
                 } catch (e: Exception) {
                     profileLock.withLock {
@@ -593,6 +587,7 @@ object ProfileProcessor {
             profileLock.withLock {
                 ImportedDao.remove(uuid)
                 SelectionDao.clear(uuid)
+                KokoroProviderPrefetchJobService.cancel(context, uuid)
 
                 val imported = context.importedDir.resolve(uuid.toString())
                 imported.deleteRecursively()

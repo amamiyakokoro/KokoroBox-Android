@@ -10,6 +10,10 @@
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
+            android:name="com.github.yumelira.yumebox.service.KokoroProviderPrefetchJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
             android:name="com.github.yumelira.yumebox.service.TunService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
