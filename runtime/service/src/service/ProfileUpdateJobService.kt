@@ -90,10 +90,12 @@ class ProfileUpdateJobService : JobService() {
 
         fun ensureScheduled(context: Context) {
             val scheduler = context.getSystemService(JobScheduler::class.java)
-            // Do not reset the pending run every time the app process starts.
-            if (scheduler.getPendingJob(JOB_ID) != null) return
+            // Do not reset the pending run every time the app process starts, but replace the
+            // pre-optimization job once so installed users also receive the battery constraint.
+            if (scheduler.getPendingJob(JOB_ID)?.isRequireBatteryNotLow == true) return
             val job = JobInfo.Builder(JOB_ID, ComponentName(context, ProfileUpdateJobService::class.java))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setRequiresBatteryNotLow(true)
                 .setPeriodic(CHECK_INTERVAL_MILLIS)
                 .setPersisted(true)
                 .build()
