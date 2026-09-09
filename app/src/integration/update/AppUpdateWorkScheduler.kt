@@ -57,7 +57,7 @@ class AppUpdateCheckWorker(
             koin.get<GitHubReleaseClient>().check(settings.appUpdateChannel.value) as? ReleaseCheck.Published
         }.getOrNull() ?: return Result.success()
         if (release.isNewerThan(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)) {
-            koin.get<AppUpdateInstallNotifier>().showAvailableUpdate(release.tag)
+            koin.get<AppUpdateInstallNotifier>().showAvailableUpdate(release.tag, release.releaseUrl)
         }
         return Result.success()
     }

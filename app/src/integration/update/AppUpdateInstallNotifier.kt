@@ -10,7 +10,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.github.yumelira.yumebox.MainActivity
 import dev.oom_wg.purejoy.mlang.MLang
 
 /** Delivers a deferred PackageInstaller confirmation through an explicit user notification. */
@@ -43,13 +42,13 @@ class AppUpdateInstallNotifier(
         return true
     }
 
-    fun showAvailableUpdate(tag: String): Boolean {
+    fun showAvailableUpdate(tag: String, releaseUrl: String): Boolean {
         if (!canPostNotifications()) return false
         createChannel()
         val contentIntent = PendingIntent.getActivity(
             context,
             NOTIFICATION_ID + 1,
-            Intent(context, MainActivity::class.java),
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse(releaseUrl)),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         NotificationManagerCompat.from(context).notify(
