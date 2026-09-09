@@ -13,6 +13,7 @@ Home = {
     }
 
     Control = {
+        HintProfilesLoading = "配置文件仍在加载，请稍候。"
         HintAddProfile = "请先添加配置文件"
         HintEnableProfile = "请先在「配置」页面启用一个配置"
     }

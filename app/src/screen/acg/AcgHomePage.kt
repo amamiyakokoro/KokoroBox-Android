@@ -109,10 +109,6 @@ fun AcgHomePage(
 
     val controlState by homeViewModel.controlState.collectAsStateWithLifecycle()
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-    val profiles by homeViewModel.profiles.collectAsStateWithLifecycle()
-    val profilesLoaded by homeViewModel.profilesLoaded.collectAsStateWithLifecycle()
-    val recommendedProfile by homeViewModel.recommendedProfile.collectAsStateWithLifecycle()
-    val hasEnabledProfile by homeViewModel.hasEnabledProfile.collectAsStateWithLifecycle(initialValue = false)
     val currentProfile by homeViewModel.currentProfile.collectAsStateWithLifecycle()
     val selectedServerName by homeViewModel.selectedServerName.collectAsStateWithLifecycle()
     val selectedServerPing by homeViewModel.selectedServerPing.collectAsStateWithLifecycle()
@@ -218,13 +214,9 @@ fun AcgHomePage(
     )
 
     val handleProxyAction: () -> Unit = {
-        if (!hasEnabledProfile || recommendedProfile == null) {
-            context.toast(MLang.ProfilesVM.Error.ProfileNotExist, Toast.LENGTH_SHORT)
-        } else if (visualControlState == HomeProxyControlState.Idle) {
-            recommendedProfile?.let { profile ->
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                homeViewModel.startProxy(profileId = profile.uuid.toString(), mode = null)
-            }
+        if (visualControlState == HomeProxyControlState.Idle) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            homeViewModel.startCurrentOrRecommendedProxy()
         } else if (visualControlState == HomeProxyControlState.Running) {
             hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
             scope.launch {
@@ -428,7 +420,7 @@ fun AcgHomePage(
             ) {
                 AcgLaunchButton(
                     controlState = visualControlState,
-                    enabled = profilesLoaded && profiles.isNotEmpty() && visualControlState.canInteract,
+                    enabled = visualControlState.canInteract,
                     onClick = handleProxyAction,
                 )
             }

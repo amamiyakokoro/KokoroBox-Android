@@ -370,15 +370,27 @@ class HomeViewModel(
     }
 
     fun startCurrentOrRecommendedProxy() {
-        val targetProfile = currentProfile.value ?: recommendedProfile.value
-        val targetProfileId = targetProfile?.uuid?.toString()
-
-        if (targetProfileId.isNullOrBlank()) {
-            showError(MLang.ProfilesVM.Error.ProfileNotExist)
+        if (!profilesLoaded.value) {
+            showMessage(MLang.Home.Control.HintProfilesLoading)
             return
         }
 
-        startProxy(profileId = targetProfileId)
+        val targetProfile = recommendedProfile.value
+        when {
+            profiles.value.isEmpty() -> {
+                showMessage(MLang.Home.Control.HintAddProfile)
+                return
+            }
+
+            targetProfile == null || profiles.value.none { profile ->
+                profile.uuid == targetProfile.uuid && profile.active
+            } -> {
+                showMessage(MLang.Home.Control.HintEnableProfile)
+                return
+            }
+        }
+
+        startProxy(profileId = targetProfile.uuid.toString())
     }
 
     fun onVpnPermissionResult(granted: Boolean) {

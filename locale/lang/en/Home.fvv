@@ -13,6 +13,7 @@ Home = {
     }
 
     Control = {
+        HintProfilesLoading = "Profiles are still loading. Please wait."
         HintAddProfile = "Please add a profile first"
         HintEnableProfile = "Please enable a profile in Config page first"
     }

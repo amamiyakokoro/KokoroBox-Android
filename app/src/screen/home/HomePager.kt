@@ -67,7 +67,6 @@ fun HomePager(
     val controlState by homeViewModel.controlState.collectAsStateWithLifecycle()
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val trafficNow by homeViewModel.trafficNow.collectAsStateWithLifecycle()
-    val profiles by homeViewModel.profiles.collectAsStateWithLifecycle()
     val profilesLoaded by homeViewModel.profilesLoaded.collectAsStateWithLifecycle()
     val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsStateWithLifecycle()
     val recommendedProfile by homeViewModel.recommendedProfile.collectAsStateWithLifecycle()
@@ -112,25 +111,13 @@ fun HomePager(
 
 
     val isRunning = controlState == HomeProxyControlState.Running
-    val isProxyEnabled = profilesLoaded && profiles.isNotEmpty() && controlState.canInteract
+    val isProxyEnabled = profilesLoaded && hasEnabledProfile && recommendedProfile != null && controlState.canInteract
     val onProxyToggle: () -> Unit = {
-        if (!hasEnabledProfile || recommendedProfile == null) {
-            context.toast(MLang.ProfilesVM.Error.ProfileNotExist)
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+        if (isRunning) {
+            coroutineScope.launch { homeViewModel.stopProxy() }
         } else {
-            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-            handleProxyToggle(
-                isRunning = isRunning,
-                recommendedProfile = recommendedProfile,
-                onStart = { profile ->
-                    homeViewModel.startProxy(
-                        profileId = profile.uuid.toString(),
-                        mode = null,
-                    )
-                },
-                onStop = {
-                    coroutineScope.launch { homeViewModel.stopProxy() }
-                },
-            )
+            homeViewModel.startCurrentOrRecommendedProxy()
         }
     }
     val destructiveActionColors = yumeDestructiveActionColors()
@@ -159,7 +146,7 @@ fun HomePager(
                         end = spacing.space20,
                         bottom = componentSizes.floatingActionButtonBottomInset,
                     ),
-                    onClick = { if (isProxyEnabled) onProxyToggle() },
+                    onClick = onProxyToggle,
                     containerColor = fabContainerColor,
                     contentColor = fabContentColor,
                 ) {
@@ -201,7 +188,7 @@ fun HomePager(
                         tunnelMode = tunnelMode.takeIf { isRunning },
                         controlState = controlState,
                         proxyMode = proxyMode,
-                        isEnabled = isProxyEnabled && !useFabProxyControl,
+                        isEnabled = controlState.canInteract && !useFabProxyControl,
                         showIdleStatus = !useFabProxyControl,
                         onClick = onProxyToggle,
                     )
@@ -231,18 +218,5 @@ fun HomePager(
 
             item { Spacer(modifier = Modifier.height(UiDp.dp32)) }
         }
-    }
-}
-
-private fun handleProxyToggle(
-    isRunning: Boolean,
-    recommendedProfile: com.amamiyakokoro.box.service.runtime.entity.Profile?,
-    onStart: (com.amamiyakokoro.box.service.runtime.entity.Profile) -> Unit,
-    onStop: () -> Unit
-) {
-    if (!isRunning) {
-        recommendedProfile?.let { profile -> onStart(profile) }
-    } else {
-        onStop()
     }
 }
