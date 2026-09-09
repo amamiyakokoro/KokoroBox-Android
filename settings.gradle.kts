@@ -32,7 +32,11 @@ pluginManagement {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
-        maven("https://jitpack.io")
+        maven("https://jitpack.io") {
+            content {
+                includeGroupAndSubgroups("com.github.topjohnwu.libsu")
+            }
+        }
         maven("https://maven.aliyun.com/nexus/content/repositories/releases/")
 
         maven("https://oom-maven.sawahara.host") {
@@ -52,7 +56,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven("https://jitpack.io")
+        maven("https://jitpack.io") {
+            content {
+                includeGroupAndSubgroups("com.github.topjohnwu.libsu")
+            }
+        }
         maven("https://raw.githubusercontent.com/MetaCubeX/maven-backup/main/releases")
         maven ("https://maven.aliyun.com/nexus/content/repositories/releases/")
 
