@@ -335,7 +335,7 @@ class RootTunService : BaseService() {
         private const val NOTIFICATION_ID = 1003
         private const val CHANNEL_ID = "clash_root_tun_service"
         private const val CHANNEL_NAME = "Clash RootTun Service"
-        private const val TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS = 5_000L
+        private const val TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS = 10_000L
         private const val TRAFFIC_NOTIFICATION_SCREEN_OFF_REFRESH_INTERVAL_MS = 30_000L
         private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 30_000L
 

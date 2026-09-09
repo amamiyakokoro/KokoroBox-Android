@@ -56,7 +56,8 @@ object PollingTimerSpecs {
     val RuntimeTrafficPollingForeground =
         PollingTimerSpec("runtime_traffic_polling_foreground", 3_000L, 3_000L)
     val RuntimeTrafficPollingScreenOff = PollingTimerSpec("runtime_traffic_polling_screen_off", 30_000L, 30_000L)
-    val ForegroundNotificationRefresh = PollingTimerSpec("foreground_notification_refresh", 5_000L, 5_000L)
+    // Notification traffic is informational; keep it fresh without duplicating the UI's live polling.
+    val ForegroundNotificationRefresh = PollingTimerSpec("foreground_notification_refresh", 10_000L, 10_000L)
     val ForegroundNotificationRefreshScreenOff =
         PollingTimerSpec("foreground_notification_refresh_screen_off", 30_000L, 30_000L)
     val RootTunStatusPolling = PollingTimerSpec("root_tun_status_polling", 2_000L, 0L)
