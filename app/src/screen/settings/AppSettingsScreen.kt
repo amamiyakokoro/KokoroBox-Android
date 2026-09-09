@@ -155,6 +155,7 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
     val invertOnPrimaryColors by viewModel.invertOnPrimaryColors.state.collectAsStateWithLifecycle()
     val bottomBarAutoHide by viewModel.bottomBarAutoHide.state.collectAsStateWithLifecycle()
     val bottomBarUseLegacyStyle by viewModel.bottomBarUseLegacyStyle.state.collectAsStateWithLifecycle()
+    val homeUseFabProxyControl by viewModel.homeUseFabProxyControl.state.collectAsStateWithLifecycle()
     val pageScale by viewModel.pageScale.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Interface.ColorThemeTitle)
@@ -238,6 +239,12 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             summary = MLang.AppSettings.Interface.LegacyNavbarStyleSummary,
             checked = bottomBarUseLegacyStyle,
             onCheckedChange = viewModel::onBottomBarUseLegacyStyleChange,
+        )
+        PreferenceSwitchItem(
+            title = MLang.AppSettings.Interface.HomeControlFabTitle,
+            summary = MLang.AppSettings.Interface.HomeControlFabSummary,
+            checked = homeUseFabProxyControl,
+            onCheckedChange = viewModel::onHomeUseFabProxyControlChange,
         )
         PageScalePreferenceItem(
             pageScale = pageScale,

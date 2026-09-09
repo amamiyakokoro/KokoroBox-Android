@@ -59,6 +59,8 @@ AppSettings = {
         AutoHideNavbarSummary = "向下滑動時自動隱藏底欄，向上滑動時顯示"
         LegacyNavbarStyleTitle = "浮動導航欄"
         LegacyNavbarStyleSummary = "懸浮導航欄樣式"
+        HomeControlFabTitle = "首頁控制浮動按鈕"
+        HomeControlFabSummary = "使用浮動按鈕啟動或停止代理，不再透過點選流量面板控制"
 
         PageScaleTitle = "頁面縮放"
         PageScaleSummary = "調整應用程式介面的整體縮放比例"

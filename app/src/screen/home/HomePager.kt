@@ -25,6 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -38,15 +40,20 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
 import com.amamiyakokoro.box.common.AppConstants
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.data.store.AppSettingsStore
 import com.amamiyakokoro.box.domain.model.TrafficData
 import com.amamiyakokoro.box.presentation.component.LocalNavigator
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
 import com.amamiyakokoro.box.presentation.component.TopBar
 import com.amamiyakokoro.box.presentation.component.combinePaddingValues
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppTheme
+import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun HomePager(
@@ -54,6 +61,7 @@ fun HomePager(
     isActive: Boolean,
 ) {
     val homeViewModel = koinViewModel<HomeViewModel>()
+    val appSettings: AppSettingsStore = koinInject()
     val navigator = LocalNavigator.current
 
     val controlState by homeViewModel.controlState.collectAsStateWithLifecycle()
@@ -70,6 +78,7 @@ fun HomePager(
     val speedHistory by homeViewModel.speedHistory.collectAsStateWithLifecycle()
     val proxyMode by homeViewModel.proxyMode.collectAsStateWithLifecycle()
     val tunnelMode by homeViewModel.tunnelMode.collectAsStateWithLifecycle()
+    val useFabProxyControl by appSettings.homeUseFabProxyControl.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
@@ -104,11 +113,70 @@ fun HomePager(
 
     val isRunning = controlState == HomeProxyControlState.Running
     val isProxyEnabled = profilesLoaded && profiles.isNotEmpty() && controlState.canInteract
+    val onProxyToggle: () -> Unit = {
+        if (!hasEnabledProfile || recommendedProfile == null) {
+            context.toast(MLang.ProfilesVM.Error.ProfileNotExist)
+        } else {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            handleProxyToggle(
+                isRunning = isRunning,
+                recommendedProfile = recommendedProfile,
+                onStart = { profile ->
+                    homeViewModel.startProxy(
+                        profileId = profile.uuid.toString(),
+                        mode = null,
+                    )
+                },
+                onStop = {
+                    coroutineScope.launch { homeViewModel.stopProxy() }
+                },
+            )
+        }
+    }
+    val destructiveActionColors = yumeDestructiveActionColors()
+    val spacing = AppTheme.spacing
+    val componentSizes = AppTheme.sizes
+    val fabContainerColor = when {
+        !isProxyEnabled -> MaterialTheme.colorScheme.surfaceVariant
+        isRunning -> destructiveActionColors.containerColor
+        else -> MaterialTheme.colorScheme.primaryContainer
+    }
+    val fabContentColor = when {
+        !isProxyEnabled -> MaterialTheme.colorScheme.onSurfaceVariant
+        isRunning -> destructiveActionColors.contentColor
+        else -> MaterialTheme.colorScheme.onPrimaryContainer
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(title = MLang.Home.Title)
+        },
+        floatingActionButton = {
+            if (useFabProxyControl) {
+                FloatingActionButton(
+                    modifier = Modifier.padding(
+                        end = spacing.space20,
+                        bottom = componentSizes.floatingActionButtonBottomInset,
+                    ),
+                    onClick = { if (isProxyEnabled) onProxyToggle() },
+                    containerColor = fabContainerColor,
+                    contentColor = fabContentColor,
+                ) {
+                    Icon(
+                        imageVector = if (isRunning) {
+                            AppMd3Icons.Shell.StopProxy
+                        } else {
+                            AppMd3Icons.Shell.StartProxy
+                        },
+                        contentDescription = if (isRunning) {
+                            MLang.Home.Control.Stop
+                        } else {
+                            MLang.Home.Control.Start
+                        },
+                    )
+                }
+            }
         },
     ) { innerPadding ->
         ScreenLazyColumn(
@@ -133,27 +201,8 @@ fun HomePager(
                         tunnelMode = tunnelMode.takeIf { isRunning },
                         controlState = controlState,
                         proxyMode = proxyMode,
-                        isEnabled = isProxyEnabled,
-                        onClick = {
-                            if (!hasEnabledProfile || recommendedProfile == null) {
-                                context.toast(MLang.ProfilesVM.Error.ProfileNotExist)
-                                return@TrafficDisplay
-                            }
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                            handleProxyToggle(
-                                isRunning = isRunning,
-                                recommendedProfile = recommendedProfile,
-                                onStart = { profile ->
-                                    homeViewModel.startProxy(
-                                        profileId = profile.uuid.toString(),
-                                        mode = null
-                                    )
-                                },
-                                onStop = {
-                                    coroutineScope.launch { homeViewModel.stopProxy() }
-                                }
-                            )
-                        }
+                        isEnabled = isProxyEnabled && !useFabProxyControl,
+                        onClick = onProxyToggle,
                     )
 
                     Column(verticalArrangement = Arrangement.spacedBy(UiDp.dp16)) {

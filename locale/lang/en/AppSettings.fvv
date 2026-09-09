@@ -59,6 +59,8 @@ AppSettings = {
         AutoHideNavbarSummary = "Hide navbar on scroll down and show on scroll up"
         LegacyNavbarStyleTitle = "Floating Navigation Bar"
         LegacyNavbarStyleSummary = "Floating Navigation Bar Style"
+        HomeControlFabTitle = "Home Control FAB"
+        HomeControlFabSummary = "Use a floating action button instead of tapping the traffic panel to start or stop the proxy"
 
         PageScaleTitle = "Page Scale"
         PageScaleSummary = "Adjust the overall UI scaling ratio of the app"

@@ -74,6 +74,7 @@ class AppSettingsViewModel(
     val showTrafficNotification: Preference<Boolean> = settings.showTrafficNotification
     val bottomBarAutoHide: Preference<Boolean> = settings.bottomBarAutoHide
     val bottomBarUseLegacyStyle: Preference<Boolean> = settings.bottomBarUseLegacyStyle
+    val homeUseFabProxyControl: Preference<Boolean> = settings.homeUseFabProxyControl
     val acgMainUiEnabled: Preference<Boolean> = settings.acgMainUiEnabled
     val acgWallpaperUri: Preference<String> = settings.acgWallpaperUri
     val acgWallpaperZoom: Preference<Float> = settings.acgWallpaperZoom
@@ -103,6 +104,7 @@ class AppSettingsViewModel(
     }
     fun onBottomBarAutoHideChange(enabled: Boolean) = bottomBarAutoHide.set(enabled)
     fun onBottomBarUseLegacyStyleChange(enabled: Boolean) = bottomBarUseLegacyStyle.set(enabled)
+    fun onHomeUseFabProxyControlChange(enabled: Boolean) = homeUseFabProxyControl.set(enabled)
     fun onAcgMainUiEnabledChange(enabled: Boolean) = acgMainUiEnabled.set(enabled)
     fun onAcgWallpaperUriChange(uri: String) = acgWallpaperUri.set(uri)
     fun applyAcgWallpaper(sourceUri: String): String {
