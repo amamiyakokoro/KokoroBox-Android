@@ -111,7 +111,6 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
     val autoUpdateCurrentProfileOnStart by viewModel.autoUpdateCurrentProfileOnStart.state.collectAsStateWithLifecycle()
     val automaticUpdateCheckEnabled by viewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
     val appUpdateChannel by viewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
-    val appUpdateInstallMethod by viewModel.appUpdateInstallMethod.state.collectAsStateWithLifecycle()
 
     Title(MLang.AppSettings.Section.Behavior)
     Card {
@@ -143,18 +142,6 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
             ),
             values = AppUpdateChannel.entries,
             onValueChange = viewModel::onAppUpdateChannelChange,
-        )
-        PreferenceEnumItem(
-            title = MLang.AppSettings.Behavior.UpdateInstallMethodTitle,
-            summary = MLang.AppSettings.Behavior.UpdateInstallMethodSummary,
-            currentValue = appUpdateInstallMethod,
-            items = listOf(
-                MLang.AppSettings.Behavior.UpdateInstallMethodSystem,
-                MLang.AppSettings.Behavior.UpdateInstallMethodShizuku,
-                MLang.AppSettings.Behavior.UpdateInstallMethodRoot,
-            ),
-            values = AppUpdateInstallMethod.entries,
-            onValueChange = viewModel::onAppUpdateInstallMethodChange,
         )
     }
 }
@@ -345,9 +332,22 @@ private fun AppExperimentalSettingsSection(
     val acgWallpaperZoom by viewModel.acgWallpaperZoom.state.collectAsStateWithLifecycle()
     val acgWallpaperBiasX by viewModel.acgWallpaperBiasX.state.collectAsStateWithLifecycle()
     val acgWallpaperBiasY by viewModel.acgWallpaperBiasY.state.collectAsStateWithLifecycle()
+    val appUpdateInstallMethod by viewModel.appUpdateInstallMethod.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     Title(MLang.AppSettings.Section.Experimental)
     Card {
+        PreferenceEnumItem(
+            title = MLang.AppSettings.Behavior.UpdateInstallMethodTitle,
+            summary = MLang.AppSettings.Behavior.UpdateInstallMethodSummary,
+            currentValue = appUpdateInstallMethod,
+            items = listOf(
+                MLang.AppSettings.Behavior.UpdateInstallMethodSystem,
+                MLang.AppSettings.Behavior.UpdateInstallMethodShizuku,
+                MLang.AppSettings.Behavior.UpdateInstallMethodRoot,
+            ),
+            values = AppUpdateInstallMethod.entries,
+            onValueChange = viewModel::onAppUpdateInstallMethodChange,
+        )
         PreferenceSwitchItem(
             title = MLang.AppSettings.Experimental.AcgHomeTitle,
             summary = MLang.AppSettings.Experimental.AcgHomeSummary,
