@@ -22,6 +22,11 @@ AppSettings = {
         UpdateChannelSummary = "Choose stable releases or development nightly builds"
         UpdateChannelStable = "Stable"
         UpdateChannelNightly = "Nightly"
+        UpdateInstallMethodTitle = "Update Installation Method"
+        UpdateInstallMethodSummary = "Advanced: System is recommended. Shizuku and Root bypass Android's install confirmation."
+        UpdateInstallMethodSystem = "System"
+        UpdateInstallMethodShizuku = "Shizuku"
+        UpdateInstallMethodRoot = "Root"
     }
 
     Interface = {

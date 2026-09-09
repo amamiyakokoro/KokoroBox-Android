@@ -22,6 +22,11 @@ AppSettings = {
         UpdateChannelSummary = "選擇正式版或開發中的 nightly 測試版"
         UpdateChannelStable = "正式版"
         UpdateChannelNightly = "測試版（nightly）"
+        UpdateInstallMethodTitle = "更新安裝方式"
+        UpdateInstallMethodSummary = "進階設定：建議使用系統安裝。Shizuku 和 Root 會略過 Android 安裝確認。"
+        UpdateInstallMethodSystem = "系統"
+        UpdateInstallMethodShizuku = "Shizuku"
+        UpdateInstallMethodRoot = "Root"
     }
 
     Interface = {

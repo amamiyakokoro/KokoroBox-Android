@@ -145,10 +145,14 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
             onValueChange = viewModel::onAppUpdateChannelChange,
         )
         PreferenceEnumItem(
-            title = "Update installation method",
-            summary = "Advanced: System is recommended. Shizuku and Root bypass Android's install confirmation.",
+            title = MLang.AppSettings.Behavior.UpdateInstallMethodTitle,
+            summary = MLang.AppSettings.Behavior.UpdateInstallMethodSummary,
             currentValue = appUpdateInstallMethod,
-            items = listOf("System", "Shizuku", "Root"),
+            items = listOf(
+                MLang.AppSettings.Behavior.UpdateInstallMethodSystem,
+                MLang.AppSettings.Behavior.UpdateInstallMethodShizuku,
+                MLang.AppSettings.Behavior.UpdateInstallMethodRoot,
+            ),
             values = AppUpdateInstallMethod.entries,
             onValueChange = viewModel::onAppUpdateInstallMethodChange,
         )

@@ -9,6 +9,8 @@ import com.github.yumelira.yumebox.common.update.PackageUpdateInstaller
 import com.github.yumelira.yumebox.common.update.VerifiedUpdateApk
 import com.github.yumelira.yumebox.data.integration.update.AppUpdateDownloader
 import com.github.yumelira.yumebox.data.integration.update.ReleaseCheck
+import com.github.yumelira.yumebox.data.model.AppUpdateInstallMethod
+import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +44,9 @@ class AppUpdateManager(
     private val downloader: AppUpdateDownloader,
     private val verifier: ApkUpdateVerifier,
     private val installer: PackageUpdateInstaller,
+    private val shizukuInstaller: ShizukuUpdateInstaller,
+    private val rootInstaller: RootUpdateInstaller,
+    private val settings: AppSettingsStore,
     private val foregroundTracker: AppForegroundTracker,
     private val installNotifier: AppUpdateInstallNotifier,
     private val applicationScope: CoroutineScope,
@@ -82,6 +87,21 @@ class AppUpdateManager(
     fun installPreparedUpdate() {
         val update = verifiedUpdate ?: return
         val release = state.value.releaseOrNull() ?: return
+        when (settings.appUpdateInstallMethod.value) {
+            AppUpdateInstallMethod.System -> installWithSystemInstaller(update, release)
+            AppUpdateInstallMethod.Shizuku -> installPrivileged(release) {
+                shizukuInstaller.install(update.file)
+            }
+            AppUpdateInstallMethod.Root -> installPrivileged(release) {
+                rootInstaller.install(update.file)
+            }
+        }
+    }
+
+    private fun installWithSystemInstaller(
+        update: VerifiedUpdateApk,
+        release: ReleaseCheck.Published,
+    ) {
         if (!installer.canRequestInstallPackages()) {
             mutableState.value = AppUpdateInstallState.InstallPermissionRequired(release)
             return
@@ -96,6 +116,26 @@ class AppUpdateManager(
             mutableState.value = AppUpdateInstallState.Failed(
                 error.message ?: "Unable to start app update installation",
             )
+        }
+    }
+
+    private fun installPrivileged(
+        release: ReleaseCheck.Published,
+        install: suspend () -> String,
+    ) {
+        mutableState.value = AppUpdateInstallState.Installing(release)
+        applicationScope.launch {
+            try {
+                install()
+                verifiedUpdate = null
+                mutableState.value = AppUpdateInstallState.Installed
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                mutableState.value = AppUpdateInstallState.Failed(
+                    error.message ?: "Privileged app update installation failed",
+                )
+            }
         }
     }
 
