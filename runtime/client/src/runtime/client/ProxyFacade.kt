@@ -31,6 +31,7 @@ import android.net.VpnService
 import android.os.Build
 import com.github.yumelira.yumebox.core.Clash
 import com.github.yumelira.yumebox.core.model.*
+import com.github.yumelira.yumebox.core.util.PollingTimerSpec
 import com.github.yumelira.yumebox.core.util.PollingTimerSpecs
 import com.github.yumelira.yumebox.core.util.PollingTimers
 import com.github.yumelira.yumebox.data.model.ProxyMode
@@ -66,6 +67,11 @@ enum class ProxyGroupSyncPriority {
     FAST,
 }
 
+enum class TrafficPollingPriority {
+    OFF,
+    FAST,
+}
+
 class ProxyFacade(
     private val context: Context,
     private val screenOnFlow: StateFlow<Boolean>,
@@ -74,6 +80,7 @@ class ProxyFacade(
         const val TRAFFIC_TOTAL_POLL_TICKS = 10
         const val RUNTIME_PAYLOAD_REFRESH_TICKS = 15
         const val DEFAULT_SYNC_PRIORITY_SOURCE = "default"
+        const val DEFAULT_TRAFFIC_PRIORITY_SOURCE = "default"
         const val PROXY_SELECT_FULL_REFRESH_DELAY_MS = 400L
         const val ROOT_TUN_BOOTSTRAP_ATTEMPTS = 20
         const val ROOT_TUN_BOOTSTRAP_DELAY_MS = 300L
@@ -133,6 +140,7 @@ class ProxyFacade(
     private val refreshProxyGroupsMutex = Mutex()
     private val operationMutex = Mutex()
     private val syncPriorityRequests = MutableStateFlow<Map<String, ProxyGroupSyncPriority>>(emptyMap())
+    private val trafficPriorityRequests = MutableStateFlow<Map<String, TrafficPollingPriority>>(emptyMap())
     private var activeProxyGroupSyncPriority = ProxyGroupSyncPriority.OFF
     private var lastProxyGroupsSummary: String? = null
     private var generationCounter = 0L
@@ -176,6 +184,24 @@ class ProxyFacade(
     ) {
         syncPriorityRequests.update { current ->
             if (priority == ProxyGroupSyncPriority.OFF) {
+                current - source
+            } else {
+                current + (source to priority)
+            }
+        }
+    }
+
+    /**
+     * Requests one-second traffic updates while a visible surface needs a live speed display.
+     * Without a request, foreground polling uses a lower-frequency interval to keep state fresh
+     * without continuously waking the service client.
+     */
+    fun setTrafficPollingPriority(
+        priority: TrafficPollingPriority,
+        source: String = DEFAULT_TRAFFIC_PRIORITY_SOURCE,
+    ) {
+        trafficPriorityRequests.update { current ->
+            if (priority == TrafficPollingPriority.OFF) {
                 current - source
             } else {
                 current + (source to priority)
@@ -734,13 +760,10 @@ class ProxyFacade(
         if (trafficPollingJob?.isActive == true) return
         trafficPollingJob = scope.launch {
             var tick = 0
-            screenOnFlow
-                .collectLatest { screenOn ->
-                    val timer = if (screenOn) {
-                        PollingTimerSpecs.RuntimeTrafficPolling
-                    } else {
-                        PollingTimerSpecs.RuntimeTrafficPollingScreenOff
-                    }
+            combine(screenOnFlow, trafficPriorityRequests) { screenOn, requests ->
+                resolveTrafficPollingTimer(screenOn, requests)
+            }.distinctUntilChanged()
+                .collectLatest { timer ->
                     PollingTimers.ticks(timer).collect {
                         val snapshot = _runtimeSnapshot.value
                         if (!snapshot.running) {
@@ -762,6 +785,19 @@ class ProxyFacade(
                         }
                     }
                 }
+        }
+    }
+
+    private fun resolveTrafficPollingTimer(
+        screenOn: Boolean,
+        requests: Map<String, TrafficPollingPriority>,
+    ): PollingTimerSpec {
+        if (!screenOn) {
+            return PollingTimerSpecs.RuntimeTrafficPollingScreenOff
+        }
+        return when (requests.values.maxByOrNull { it.ordinal } ?: TrafficPollingPriority.OFF) {
+            TrafficPollingPriority.FAST -> PollingTimerSpecs.RuntimeTrafficPollingFast
+            TrafficPollingPriority.OFF -> PollingTimerSpecs.RuntimeTrafficPollingForeground
         }
     }
 

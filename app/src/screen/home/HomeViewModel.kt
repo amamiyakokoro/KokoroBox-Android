@@ -39,6 +39,7 @@ import com.github.yumelira.yumebox.domain.model.TrafficData
 import com.github.yumelira.yumebox.runtime.client.ProfilesRepository
 import com.github.yumelira.yumebox.runtime.client.ProxyFacade
 import com.github.yumelira.yumebox.runtime.client.ProxyGroupSyncPriority
+import com.github.yumelira.yumebox.runtime.client.TrafficPollingPriority
 import com.github.yumelira.yumebox.runtime.client.RuntimeStateMapper
 import com.github.yumelira.yumebox.service.root.RootAccessSupport
 import com.github.yumelira.yumebox.service.runtime.entity.Profile
@@ -292,6 +293,10 @@ class HomeViewModel(
         homeScreenActive.value = isActive
         proxyFacade.setProxyGroupSyncPriority(
             priority = if (isActive) ProxyGroupSyncPriority.FAST else ProxyGroupSyncPriority.OFF,
+            source = "home",
+        )
+        proxyFacade.setTrafficPollingPriority(
+            priority = if (isActive) TrafficPollingPriority.FAST else TrafficPollingPriority.OFF,
             source = "home",
         )
         if (isActive) {

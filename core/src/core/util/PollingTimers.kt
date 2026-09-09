@@ -52,7 +52,9 @@ object PollingTimerSpecs {
     val HomeSpeedSampling = PollingTimerSpec("home_speed_sampling", 1_000L, 0L)
     val LogScreenRefresh = PollingTimerSpec("log_screen_refresh", 500L, 0L)
     val ConnectionsPolling = PollingTimerSpec("connections_polling", 1_000L, 0L)
-    val RuntimeTrafficPolling = PollingTimerSpec("runtime_traffic_polling", 1_000L, 0L)
+    val RuntimeTrafficPollingFast = PollingTimerSpec("runtime_traffic_polling_fast", 1_000L, 0L)
+    val RuntimeTrafficPollingForeground =
+        PollingTimerSpec("runtime_traffic_polling_foreground", 3_000L, 3_000L)
     val RuntimeTrafficPollingScreenOff = PollingTimerSpec("runtime_traffic_polling_screen_off", 30_000L, 30_000L)
     val ForegroundNotificationRefresh = PollingTimerSpec("foreground_notification_refresh", 5_000L, 5_000L)
     val ForegroundNotificationRefreshScreenOff =
