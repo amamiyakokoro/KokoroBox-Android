@@ -11,6 +11,7 @@ package com.github.yumelira.yumebox.screen.settings
 
 import android.app.Application
 import com.github.yumelira.yumebox.common.util.ByteFormatter.formatSpeed
+import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
 import com.github.yumelira.yumebox.data.store.AppSettingsStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +48,7 @@ class ResourceDownloadClient(
     }
 
     private val client: OkHttpClient by lazy {
-        OkHttpClient.Builder()
+        SharedOkHttpClient.newBuilder()
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .followRedirects(true)

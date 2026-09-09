@@ -14,6 +14,7 @@ import android.net.Uri
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
@@ -391,7 +392,7 @@ class KokoroSession internal constructor(
         val refreshMutex = Mutex()
         const val ACCESS_TOKEN_REFRESH_MARGIN_MS = 60_000L
 
-        fun defaultHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        fun defaultHttpClient(): OkHttpClient = SharedOkHttpClient.newBuilder()
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)

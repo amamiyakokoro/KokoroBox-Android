@@ -9,6 +9,7 @@
 
 package com.github.yumelira.yumebox.data.integration.speedtest
 
+import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -31,7 +32,7 @@ import kotlin.math.abs
 
 /** A bounded, native implementation of Cloudflare's public edge speed test. */
 class CloudflareSpeedTestClient(
-    private val httpClient: OkHttpClient = OkHttpClient.Builder()
+    private val httpClient: OkHttpClient = SharedOkHttpClient.newBuilder()
         .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .callTimeout(CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)

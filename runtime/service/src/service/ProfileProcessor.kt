@@ -29,6 +29,7 @@ import com.github.yumelira.yumebox.core.util.StartupTaskCoordinator
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroApi
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.github.yumelira.yumebox.data.integration.kokoro.KokoroSession
+import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
 import com.github.yumelira.yumebox.service.common.log.Log
 import com.github.yumelira.yumebox.service.remote.IFetchObserver
 import com.github.yumelira.yumebox.service.runtime.config.ServiceStore
@@ -73,7 +74,7 @@ object ProfileProcessor {
     private val processLock = Mutex()
     private val providerPrefetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val httpClient = OkHttpClient.Builder()
+    private val httpClient = SharedOkHttpClient.newBuilder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .followRedirects(true)

@@ -1,6 +1,7 @@
 package com.github.yumelira.yumebox.data.integration.update
 
 import com.github.yumelira.yumebox.data.model.AppUpdateChannel
+import com.github.yumelira.yumebox.data.gateway.SharedOkHttpClient
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -49,7 +50,7 @@ sealed interface ReleaseCheck {
 
 /** Public metadata only: deliberately separate from authenticated Kokoro API clients. */
 class GitHubReleaseClient(
-    private val client: OkHttpClient = OkHttpClient.Builder()
+    private val client: OkHttpClient = SharedOkHttpClient.newBuilder()
         .callTimeout(20, TimeUnit.SECONDS)
         .connectTimeout(10, TimeUnit.SECONDS)
         .followRedirects(false)
