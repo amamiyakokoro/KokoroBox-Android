@@ -54,4 +54,4 @@ Never commit a keystore or `signing.properties`.
 
 KokoroBox is based on [YumeBox Material Design](https://github.com/Yizuka17/YumeBox-MaterialDesign), which continues [YumeBox](https://github.com/YumeLira/YumeBox).
 
-Contributions are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. The project is licensed under [GNU AGPL v3](LICENSE) with the additional terms in [LICENSE-F2DLPRL](LICENSE-F2DLPRL). See the [privacy policy](PRIVACY_POLICY.md).
+The project is licensed under [GNU AGPL v3](LICENSE) with the additional terms in [LICENSE-F2DLPRL](LICENSE-F2DLPRL). See the [privacy policy](PRIVACY_POLICY.md).
