@@ -34,6 +34,8 @@ import com.github.yumelira.yumebox.BuildConfig
 import com.github.yumelira.yumebox.common.update.ApkUpdateVerifier
 import com.github.yumelira.yumebox.common.update.PackageUpdateInstaller
 import com.github.yumelira.yumebox.integration.update.AppUpdateManager
+import com.github.yumelira.yumebox.integration.update.AppForegroundTracker
+import com.github.yumelira.yumebox.integration.update.AppUpdateInstallNotifier
 import com.github.yumelira.yumebox.screen.about.AppUpdateViewModel
 import com.github.yumelira.yumebox.screen.home.HomeViewModel
 import com.github.yumelira.yumebox.screen.log.LogViewModel
@@ -59,12 +61,16 @@ val appIntegrationModule = module {
     single { AppUpdateDownloader(androidApplication()) }
     single { ApkUpdateVerifier(androidApplication()) }
     single { PackageUpdateInstaller(androidApplication()) }
+    single { AppForegroundTracker(androidApplication()) }
+    single { AppUpdateInstallNotifier(androidApplication()) }
     single {
         AppUpdateManager(
             context = androidApplication(),
             downloader = get(),
             verifier = get(),
             installer = get(),
+            foregroundTracker = get(),
+            installNotifier = get(),
             applicationScope = get(named(APPLICATION_SCOPE_NAME)),
         )
     }

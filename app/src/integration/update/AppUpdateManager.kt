@@ -42,6 +42,8 @@ class AppUpdateManager(
     private val downloader: AppUpdateDownloader,
     private val verifier: ApkUpdateVerifier,
     private val installer: PackageUpdateInstaller,
+    private val foregroundTracker: AppForegroundTracker,
+    private val installNotifier: AppUpdateInstallNotifier,
     private val applicationScope: CoroutineScope,
 ) {
     private val mutableState = MutableStateFlow<AppUpdateInstallState>(AppUpdateInstallState.Idle)
@@ -109,8 +111,14 @@ class AppUpdateManager(
                 if (release != null) {
                     mutableState.value = AppUpdateInstallState.WaitingForUserConfirmation(release)
                 }
-                confirmationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(confirmationIntent)
+                if (foregroundTracker.isForeground) {
+                    confirmationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(confirmationIntent)
+                } else if (!installNotifier.showConfirmation(confirmationIntent)) {
+                    mutableState.value = AppUpdateInstallState.Failed(
+                        "Open KokoroBox to continue the Android installation confirmation",
+                    )
+                }
             }
 
             PackageInstaller.STATUS_SUCCESS -> {
