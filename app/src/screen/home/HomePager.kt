@@ -202,6 +202,7 @@ fun HomePager(
                         controlState = controlState,
                         proxyMode = proxyMode,
                         isEnabled = isProxyEnabled && !useFabProxyControl,
+                        showIdleStatus = !useFabProxyControl,
                         onClick = onProxyToggle,
                     )
 

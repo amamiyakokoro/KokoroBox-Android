@@ -67,6 +67,7 @@ fun TrafficDisplay(
     controlState: HomeProxyControlState,
     proxyMode: ProxyMode,
     isEnabled: Boolean,
+    showIdleStatus: Boolean = true,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -97,6 +98,7 @@ fun TrafficDisplay(
             uploadSpeed = trafficNow.upload,
             controlState = controlState,
             proxyMode = proxyMode,
+            showIdleStatus = showIdleStatus,
         )
     }
 }
@@ -211,6 +213,7 @@ private fun UploadSection(
     uploadSpeed: Long,
     controlState: HomeProxyControlState,
     proxyMode: ProxyMode,
+    showIdleStatus: Boolean,
 ) {
     val spacing = AppTheme.spacing
 
@@ -241,7 +244,13 @@ private fun UploadSection(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.animateContentSize(tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate))
         ) {
-            ProxyStatusCapsule(controlState = controlState)
+            AnimatedVisibility(
+                visible = showIdleStatus || controlState != HomeProxyControlState.Idle,
+                enter = fadeIn(tween(AppMotion.DURATION_FAST, easing = AppMotion.EnterEasing)),
+                exit = fadeOut(tween(AppMotion.DURATION_INSTANT, easing = AppMotion.ExitEasing)),
+            ) {
+                ProxyStatusCapsule(controlState = controlState)
+            }
             AnimatedVisibility(
                 visible = isRunning,
                 enter = slideInHorizontally(
