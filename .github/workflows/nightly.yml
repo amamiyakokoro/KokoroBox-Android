@@ -44,14 +44,20 @@ jobs:
           version="${base_version}-nightly"
           base_code="$(sed -n 's/^project\.version\.code=//p' gradle.properties)"
           release_tag="v${base_version}"
-          if ! git rev-parse --verify --quiet "${release_tag}^{commit}" >/dev/null; then
-            echo "Missing base release tag ${release_tag}" >&2
-            exit 1
+          if git rev-parse --verify --quiet "${release_tag}^{commit}" >/dev/null; then
+            nightly_base="${release_tag}"
+          else
+            version_anchor="$(git log -1 --format=%H -G "^project\\.version\\.name=${base_version}$" -- gradle.properties)"
+            if [[ -z "$version_anchor" ]]; then
+              echo "Unable to find the version bump commit for ${base_version}" >&2
+              exit 1
+            fi
+            nightly_base="$version_anchor"
           fi
-          nightly_offset="$(git rev-list --count "${release_tag}..HEAD")"
+          nightly_offset="$(git rev-list --count "${nightly_base}..HEAD")"
           nightly_offset="$((nightly_offset > 0 ? nightly_offset : 1))"
           if (( nightly_offset > 99 )); then
-            echo "More than 99 commits since ${release_tag}; bump the release version before publishing another nightly" >&2
+            echo "More than 99 commits since ${nightly_base}; bump the release version before publishing another nightly" >&2
             exit 1
           fi
           version_code="$((base_code + nightly_offset))"
