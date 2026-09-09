@@ -23,8 +23,15 @@
 package com.github.yumelira.yumebox.service.root
 
 import com.topjohnwu.superuser.Shell
+import java.io.File
+import java.util.UUID
 
 object RootPackageShell {
+    data class ApkInstallResult(
+        val isSuccess: Boolean,
+        val output: String,
+    )
+
     private data class CacheEntry<T>(
         val value: T,
         val cachedAt: Long,
@@ -138,6 +145,38 @@ object RootPackageShell {
     fun invalidateCaches() {
         packageUidCache = null
         packageNameCache = null
+    }
+
+    /**
+     * Installs an already verified APK through root. Package Manager runs outside this app's
+     * sandbox, so copy the file to a shell-readable temporary location first and always remove it.
+     */
+    fun installApk(apk: File): ApkInstallResult {
+        require(apk.isFile && apk.length() > 0L) { "Verified update APK is unavailable" }
+        if (!hasRootAccess()) {
+            return ApkInstallResult(
+                isSuccess = false,
+                output = "Root access is unavailable",
+            )
+        }
+
+        val temporaryApk = "/data/local/tmp/kokorobox-update-${UUID.randomUUID()}.apk"
+        val source = escapeShellArg(apk.absolutePath)
+        val target = escapeShellArg(temporaryApk)
+        val command = """
+            rm -f $target
+            cat $source > $target && chmod 0644 $target && pm install -r --user 0 $target
+            result=${'$'}?
+            rm -f $target
+            exit ${'$'}result
+        """.trimIndent().replace('\n', ';')
+        val output = mutableListOf<String>()
+        val result = Shell.cmd(command).to(output).exec()
+
+        return ApkInstallResult(
+            isSuccess = result.isSuccess && output.any { it.trim().equals("Success", ignoreCase = true) },
+            output = output.joinToString("\n").ifBlank { "Root package installation failed" },
+        )
     }
 
     private fun buildUidQueryCommand(packages: Set<String>?): String {
