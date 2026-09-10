@@ -42,8 +42,16 @@ def output(name, value):
 def metadata(tag):
     validate_tag(tag)
     config = properties("gradle.properties")
-    if config["project.version.name"] != tag[1:]:
+    version_name = config["project.version.name"]
+    if version_name != tag[1:]:
         raise ValueError("Tag does not match project.version.name in the selected source")
+    major, minor, patch = (int(part) for part in version_name.split("."))
+    expected_version_code = major * 10_000 + minor * 1_000 + patch * 100
+    if int(config["project.version.code"]) != expected_version_code:
+        raise ValueError(
+            "project.version.code must be MAJOR*10000 + MINOR*1000 + PATCH*100 "
+            f"({expected_version_code} for {version_name})"
+        )
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     tagged = subprocess.check_output(["git", "rev-parse", f"refs/tags/{tag}^{{commit}}"], text=True).strip()
     if head != tagged:
