@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import zipfile
 
 
@@ -102,6 +103,14 @@ def signing_environment(env, store):
 
 
 def build_unsigned():
+    command = ["./gradlew", "--version"]
+    for attempt in range(1, 4):
+        result = subprocess.run(command, check=False)
+        if result.returncode == 0:
+            break
+        if attempt == 3:
+            raise subprocess.CalledProcessError(result.returncode, command)
+        time.sleep(attempt * 5)
     subprocess.run([
         "./gradlew", "--no-daemon", "--no-configuration-cache", "--no-build-cache",
         "--console=plain", "assembleReleaseArm64V8a",
