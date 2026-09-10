@@ -189,7 +189,11 @@ fun HomePager(
                         controlState = controlState,
                         proxyMode = proxyMode,
                         isEnabled = controlState.canInteract && !useFabProxyControl,
-                        showIdleStatus = !useFabProxyControl,
+                        idleStatusText = if (useFabProxyControl) {
+                            MLang.Home.Status.TapFabToStart
+                        } else {
+                            MLang.Home.Status.TapToStart
+                        },
                         onClick = onProxyToggle,
                     )
 

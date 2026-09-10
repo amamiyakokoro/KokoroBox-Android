@@ -67,7 +67,7 @@ fun TrafficDisplay(
     controlState: HomeProxyControlState,
     proxyMode: ProxyMode,
     isEnabled: Boolean,
-    showIdleStatus: Boolean = true,
+    idleStatusText: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -98,7 +98,7 @@ fun TrafficDisplay(
             uploadSpeed = trafficNow.upload,
             controlState = controlState,
             proxyMode = proxyMode,
-            showIdleStatus = showIdleStatus,
+            idleStatusText = idleStatusText,
         )
     }
 }
@@ -213,7 +213,7 @@ private fun UploadSection(
     uploadSpeed: Long,
     controlState: HomeProxyControlState,
     proxyMode: ProxyMode,
-    showIdleStatus: Boolean,
+    idleStatusText: String,
 ) {
     val spacing = AppTheme.spacing
 
@@ -244,13 +244,10 @@ private fun UploadSection(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.animateContentSize(tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate))
         ) {
-            AnimatedVisibility(
-                visible = showIdleStatus || controlState != HomeProxyControlState.Idle,
-                enter = fadeIn(tween(AppMotion.DURATION_FAST, easing = AppMotion.EnterEasing)),
-                exit = fadeOut(tween(AppMotion.DURATION_INSTANT, easing = AppMotion.ExitEasing)),
-            ) {
-                ProxyStatusCapsule(controlState = controlState)
-            }
+            ProxyStatusCapsule(
+                controlState = controlState,
+                idleStatusText = idleStatusText,
+            )
             AnimatedVisibility(
                 visible = isRunning,
                 enter = slideInHorizontally(
@@ -312,7 +309,10 @@ private fun ProxyTypeCapsule(proxyMode: ProxyMode) {
 }
 
 @Composable
-private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
+private fun ProxyStatusCapsule(
+    controlState: HomeProxyControlState,
+    idleStatusText: String,
+) {
     val spacing = AppTheme.spacing
     val componentSizes = AppTheme.sizes
     val opacity = AppTheme.opacity
@@ -326,7 +326,7 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
             .animateContentSize(tween(AppMotion.DURATION_FAST, easing = AppMotion.EmphasizedDecelerate))
     ) {
         AnimatedContent(
-            targetState = controlState,
+            targetState = controlState to idleStatusText,
             transitionSpec = {
                 (slideInHorizontally(
                     initialOffsetX = { it / 2 },
@@ -340,7 +340,7 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
                 )
             },
             label = "CapsuleStateTransition"
-        ) { state ->
+        ) { (state, idleText) ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = spacing.space12),
@@ -360,7 +360,7 @@ private fun ProxyStatusCapsule(controlState: HomeProxyControlState) {
                 )
                 Text(
                     text = when (state) {
-                        HomeProxyControlState.Idle -> MLang.Home.Status.TapToStart
+                        HomeProxyControlState.Idle -> idleText
                         HomeProxyControlState.Connecting -> MLang.Home.Status.Connecting
                         HomeProxyControlState.Running -> MLang.Home.Status.Running
                         HomeProxyControlState.Disconnecting -> MLang.Home.Status.Disconnecting

@@ -40,6 +40,7 @@ Home = {
         Disconnecting = "Disconnecting"
         Running = "Running"
         TapToStart = "Tap to start"
+        TapFabToStart = "Tap the floating button to start"
     }
 
     Control = {

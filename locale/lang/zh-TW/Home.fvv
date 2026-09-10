@@ -40,6 +40,7 @@ Home = {
         Disconnecting = "斷開中"
         Running = "執行中"
         TapToStart = "輕觸啟動"
+        TapFabToStart = "點選懸浮按鈕啟動"
     }
 
     Control = {
