@@ -55,6 +55,34 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dev.oom_wg.purejoy.mlang.MLang
 
+private data class LibraryDisplayGroup(
+    val primary: Library,
+    val libraries: List<Library>,
+) {
+    val key: String = libraries.joinToString(separator = ":") { it.uniqueId }
+    val licenses = libraries
+        .flatMap { it.licenses }
+        .distinctBy { it.name }
+    val licenseContent = libraries
+        .map { it.strippedLicenseContent }
+        .filter { it.isNotEmpty() }
+        .distinct()
+        .joinToString(separator = "\n\n")
+        .takeIf { it.isNotEmpty() }
+}
+
+private fun List<Library>.groupForDisplay(): List<LibraryDisplayGroup> =
+    groupBy { library ->
+        "${library.uniqueId.substringBefore(':')}:${library.name}"
+    }.values.map { group ->
+        LibraryDisplayGroup(
+            primary = group.minWithOrNull(
+                compareBy<Library>({ it.name.length }, { it.uniqueId.length }),
+            ) ?: error("Library group must not be empty"),
+            libraries = group,
+        )
+    }.sortedBy { it.primary.name.lowercase() }
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 @Destination<RootGraph>
@@ -62,14 +90,14 @@ fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
     val spacing = AppTheme.spacing
 
     var showLicenseSheet by remember { mutableStateOf(false) }
-    var selectedLibrary by remember { mutableStateOf<Library?>(null) }
+    var selectedLibraryGroup by remember { mutableStateOf<LibraryDisplayGroup?>(null) }
 
     BackHandler {
         navigator.popBackStack()
     }
 
     val libraries by produceLibraries(R.raw.aboutlibraries)
-    val libraryItems = remember(libraries) { libraries?.libraries.orEmpty() }
+    val libraryItems = remember(libraries) { libraries?.libraries.orEmpty().groupForDisplay() }
 
     Scaffold(
         topBar = {
@@ -86,12 +114,12 @@ fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
                 if (libraryItems.isNotEmpty()) {
                     items(
                         items = libraryItems,
-                        key = { library -> "${library.uniqueId}:${library.artifactId}:${library.name}" },
-                    ) { library ->
+                        key = { group -> group.key },
+                    ) { group ->
                         LibraryItem(
-                            library = library,
+                            group = group,
                             onClick = {
-                                selectedLibrary = library
+                                selectedLibraryGroup = group
                                 showLicenseSheet = true
                             },
                         )
@@ -103,11 +131,14 @@ fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            selectedLibrary?.let { library ->
+            selectedLibraryGroup?.let { group ->
                 LicenseBottomSheet(
                     show = showLicenseSheet,
-                    library = library,
-                    onDismiss = { showLicenseSheet = false },
+                    group = group,
+                    onDismiss = {
+                        showLicenseSheet = false
+                        selectedLibraryGroup = null
+                    },
                 )
             }
         }
@@ -117,10 +148,11 @@ fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LibraryItem(
-    library: Library,
+    group: LibraryDisplayGroup,
     onClick: () -> Unit,
 ) {
     val spacing = AppTheme.spacing
+    val library = group.primary
 
     Card(
         modifier = Modifier.padding(bottom = spacing.space12),
@@ -164,12 +196,12 @@ private fun LibraryItem(
                 )
             }
 
-            if (library.licenses.isNotEmpty()) {
+            if (group.licenses.isNotEmpty()) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(spacing.space6),
                     verticalArrangement = Arrangement.spacedBy(spacing.space6),
                 ) {
-                    library.licenses.forEach { license ->
+                    group.licenses.forEach { license ->
                         LicenseChip(licenseName = license.name)
                     }
                 }
@@ -201,18 +233,18 @@ private fun LicenseChip(licenseName: String) {
 @Composable
 private fun LicenseBottomSheet(
     show: Boolean,
-    library: Library,
+    group: LibraryDisplayGroup,
     onDismiss: () -> Unit,
 ) {
     val spacing = AppTheme.spacing
     val componentSizes = AppTheme.sizes
 
     val scrollState = rememberScrollState()
-    val licenseContent = remember(library) { library.strippedLicenseContent.takeIf { it.isNotEmpty() } }
+    val licenseContent = remember(group) { group.licenseContent }
 
     AppActionBottomSheet(
         show = show,
-        title = library.name,
+        title = group.primary.name,
         onDismissRequest = onDismiss,
         content = {
             Column(modifier = Modifier
