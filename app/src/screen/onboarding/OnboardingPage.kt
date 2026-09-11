@@ -50,8 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.data.model.ThemeMode
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
-import com.amamiyakokoro.box.presentation.icon.Yume
-import com.amamiyakokoro.box.presentation.icon.yume.Github
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.screen.settings.component.ThemeColorPickerItem
 import com.amamiyakokoro.box.screen.settings.component.ThemeModeSelectorItem
@@ -338,7 +336,6 @@ internal fun PersonalizeContent(
 internal fun FinishHeroShell(
     enabled: Boolean,
     onPrimaryClick: () -> Unit,
-    onGithubClick: () -> Unit,
 ) {
     OnboardingPageFrame {
         Spacer(modifier = Modifier.height(UiDp.dp88))
@@ -357,27 +354,10 @@ internal fun FinishHeroShell(
             subtitle = MLang.Onboarding.Finish.Subtitle,
         )
 
-        Spacer(modifier = Modifier.height(UiDp.dp40))
-
-        DetailScrollableContent(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(UiDp.dp18),
-        ) {
-            RevealBlock(delayMillis = 160) {
-                DetailGroup {
-                    ProjectLinkRow(
-                        icon = Yume.Github,
-                        title = MLang.Onboarding.Project.Github.Title,
-                        summary = MLang.Onboarding.Project.Github.Summary,
-                        onClick = onGithubClick,
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(UiDp.dp20))
-        }
+        Spacer(modifier = Modifier.weight(1f))
 
         DetailFooter(
-            delayMillis = 220,
+            delayMillis = 160,
             offsetY = (-36).dp,
         ) {
             PrimaryFooterAction(

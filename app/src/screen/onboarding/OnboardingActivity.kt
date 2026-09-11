@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.amamiyakokoro.box.common.util.openUrl
 import com.amamiyakokoro.box.data.store.AppSettingsStore
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.colorFromArgb
@@ -72,9 +71,6 @@ internal class OnboardingActivity : OnboardingBaseActivity() {
                     }
                     finishOnboarding()
                 },
-                onGithubClick = {
-                    openUrl(this, "https://github.com/amamiyakokoro/KokoroBox-Android")
-                },
             )
         }
     }
@@ -92,7 +88,6 @@ private enum class OnboardingStep {
 private fun OnboardingPagerScreen(
     activity: OnboardingActivity,
     onFinish: () -> Unit,
-    onGithubClick: () -> Unit,
 ) {
     val steps = remember { OnboardingStep.entries }
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { steps.size })
@@ -237,7 +232,6 @@ private fun OnboardingPagerScreen(
                 FinishHeroShell(
                     enabled = true,
                     onPrimaryClick = onFinish,
-                    onGithubClick = onGithubClick,
                 )
             }
         }

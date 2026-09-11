@@ -52,13 +52,6 @@ Onboarding = {
         Subtitle = "Setup complete, entering the main app"
     }
 
-    Project = {
-        Github = {
-            Title = "GitHub Repo"
-            Summary = "github.com/amamiyakokoro/KokoroBox-Android"
-        }
-    }
-
     Sheet = {
         PrivacyPolicyTitle = "Privacy Policy"
         LoadFailed = "Failed to load policy content"

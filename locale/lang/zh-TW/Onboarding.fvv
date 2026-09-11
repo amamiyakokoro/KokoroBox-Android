@@ -52,13 +52,6 @@ Onboarding = {
         Subtitle = "基礎設定已就緒即將進入主頁"
     }
 
-    Project = {
-        Github = {
-            Title = "GitHub 倉庫"
-            Summary = "github.com/amamiyakokoro/KokoroBox-Android"
-        }
-    }
-
     Sheet = {
         PrivacyPolicyTitle = "隱私政策"
         LoadFailed = "無法載入協議內容"

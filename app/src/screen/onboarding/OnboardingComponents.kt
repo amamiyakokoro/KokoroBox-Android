@@ -282,56 +282,6 @@ internal fun PermissionRow(
 }
 
 @Composable
-internal fun ProjectLinkRow(
-    icon: ImageVector,
-    title: String,
-    summary: String,
-    onClick: () -> Unit,
-) {
-    val spacing = AppTheme.spacing
-    val componentSizes = AppTheme.sizes
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = spacing.space18, vertical = spacing.space16),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(spacing.space14),
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(componentSizes.settingsIconGlyphSize),
-        )
-
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(spacing.space4),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = summary,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        Icon(
-            imageVector = ShellIcons.NavigateForward,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(spacing.space18),
-        )
-    }
-}
-
-@Composable
 internal fun PrimaryFooterAction(
     text: String,
     enabled: Boolean,
