@@ -38,7 +38,6 @@ dependencies {
     implementation(project(":locale"))
     implementation(project(":data"))
     implementation(project(":runtime:api"))
-    api(project(":ui-miuix"))
 
     val composeBom = platform("androidx.compose:compose-bom:${gropify.dep.version.composeBom}")
     implementation(composeBom)
@@ -59,4 +58,9 @@ dependencies {
     implementation("io.github.panpf.sketch4:sketch-compose-resources:${gropify.dep.version.sketch4}")
     implementation("dev.chrisbanes.haze:haze:${gropify.dep.version.haze}")
     implementation("io.github.kyant0:shapes:1.2.1")
+
+    api("top.yukonga.miuix.kmp:miuix-ui:${gropify.dep.version.miuix}")
+    api("top.yukonga.miuix.kmp:miuix-preference:${gropify.dep.version.miuix}")
+    api("top.yukonga.miuix.kmp:miuix-icons:${gropify.dep.version.miuix}")
+    api("top.yukonga.miuix.kmp:miuix-blur-android:${gropify.dep.version.miuix}")
 }

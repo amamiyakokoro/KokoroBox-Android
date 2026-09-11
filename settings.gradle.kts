@@ -113,7 +113,6 @@ include(
     ":platform",
     ":locale",
     ":ui",
-    ":ui-miuix",
     ":data",
     ":app",
     ":feature:proxy",
