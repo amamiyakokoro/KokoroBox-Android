@@ -135,11 +135,11 @@ fun AppUpdateDialog(
                     TextButton(onClick = onContinueInstall) { Text(MLang.About.Update.ContinueInstall) }
                 }
                 is AppUpdateInstallState.ReadyToInstall,
-                is AppUpdateInstallState.Failed,
-                AppUpdateInstallState.Installed,
-                AppUpdateInstallState.Idle, -> {
+                is AppUpdateInstallState.Failed, -> {
                     if (!busy) TextButton(onClick = onDismiss) { Text(MLang.About.Update.Ok) }
                 }
+                AppUpdateInstallState.Installed,
+                AppUpdateInstallState.Idle, -> Unit
                 else -> Unit
             }
         },
