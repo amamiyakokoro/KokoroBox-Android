@@ -37,8 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.presentation.icon.ShellIcons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
@@ -87,34 +90,61 @@ internal fun StartupTypewriterWord(
         currentText.take(visibleLength)
     }
     val showCursor = visibleLength < currentText.length || deleting
+    val baseFontSize = 54.sp
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = displayText,
-            style = MaterialTheme.typography.displayLarge.copy(
-                fontSize = 54.sp,
-                fontWeight = FontWeight.Normal,
-                letterSpacing = 0.2.sp,
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val baseStyle = MaterialTheme.typography.displayLarge.copy(
+            fontSize = baseFontSize,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.2.sp,
         )
+        val measuredWidth = remember(currentText, baseStyle, textMeasurer) {
+            textMeasurer.measure(
+                text = currentText,
+                style = baseStyle,
+                maxLines = 1,
+                softWrap = false,
+            ).size.width
+        }
+        val reservedWidth = spacing.space4 + UiDp.dp1_2
+        val availableWidth = with(density) {
+            (maxWidth - reservedWidth).coerceAtLeast(UiDp.dp1_2).toPx()
+        }
+        val fontScale = if (measuredWidth > 0) {
+            (availableWidth / measuredWidth).coerceAtMost(1f)
+        } else {
+            1f
+        }
 
-        if (showCursor) {
-            Box(
-                modifier = Modifier
-                    .padding(start = spacing.space4, top = AppTheme.sizes.textLineCompactSpacing)
-                    .width(UiDp.dp1_2)
-                    .height(UiDp.dp46)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = opacity.high),
-                        shape = RoundedCornerShape(50),
-                    ),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = displayText,
+                style = baseStyle.copy(fontSize = (baseFontSize.value * fontScale).sp),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Clip,
             )
+
+            if (showCursor) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = spacing.space4, top = AppTheme.sizes.textLineCompactSpacing)
+                        .width(UiDp.dp1_2)
+                        .height(UiDp.dp46)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = opacity.high),
+                            shape = RoundedCornerShape(50),
+                        ),
+                )
+            }
         }
     }
 }
