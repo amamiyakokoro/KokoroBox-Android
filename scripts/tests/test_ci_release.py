@@ -77,7 +77,9 @@ class ReleaseTests(unittest.TestCase):
                 patch.object(ci.subprocess, "run", side_effect=run_command) as run:
             ci.restore_keystore(self.env, ci.keystore_path())
             ci.build("apksigner")
-        gradle_call, signer_call = run.call_args_list
+        bootstrap_call, gradle_call, signer_call = run.call_args_list
+        self.assertEqual(bootstrap_call.args[0], ["./gradlew", "--version"])
+        self.assertFalse(bootstrap_call.kwargs["check"])
         self.assertIn("--no-configuration-cache", gradle_call.args[0])
         self.assertIn("assembleReleaseArm64V8a", gradle_call.args[0])
         self.assertFalse(any("android.injected" in argument for argument in gradle_call.args[0]))
@@ -125,14 +127,12 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("sha=" + "a" * 40, Path("outputs").read_text())
         self.assertIn("sdk=37.0\n", Path("outputs").read_text())
 
-    def test_metadata_sdk_package_includes_required_minor_version(self):
+    def test_metadata_sdk_package_uses_api_37_dotted_name(self):
         original = Path("gradle.properties").read_text()
-        for major, minor, expected in ((36, 0, "36"), (36, 1, "36.1"),
-                                       (37, 0, "37.0"), (37, 2, "37.2")):
-            with self.subTest(major=major, minor=minor):
+        for major, expected in ((36, "36"), (37, "37.0"), (38, "38.0")):
+            with self.subTest(major=major):
                 Path("gradle.properties").write_text(
                     original.replace("android.compileSdk=37", f"android.compileSdk={major}")
-                    + f"android.compileSdkMinor={minor}\n"
                 )
                 with patch.object(ci.subprocess, "check_output", return_value="a" * 40), \
                         patch.object(ci, "output") as output:

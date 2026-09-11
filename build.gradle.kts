@@ -33,7 +33,6 @@ plugins {
 }
 
 val androidCompileSdk = providers.gradleProperty("android.compileSdk").map(String::toInt).get()
-val androidCompileSdkMinor = providers.gradleProperty("android.compileSdkMinor").map(String::toInt).orElse(0).get()
 val androidMinSdk = providers.gradleProperty("android.minSdk").map(String::toInt).get()
 val androidJvm = providers.gradleProperty("android.jvm")
     .orElse(providers.gradleProperty("project.jvm"))
@@ -73,7 +72,6 @@ subprojects {
     pluginManager.withPlugin("com.android.application") {
         extensions.configure<ApplicationExtension>("android") {
             compileSdk = androidCompileSdk
-            compileSdkMinor = androidCompileSdkMinor
 
             if (androidNdkVersion.isNotBlank()) {
                 ndkVersion = androidNdkVersion
@@ -121,7 +119,6 @@ subprojects {
     pluginManager.withPlugin("com.android.library") {
         extensions.configure<LibraryExtension>("android") {
             compileSdk = androidCompileSdk
-            compileSdkMinor = androidCompileSdkMinor
 
             if (androidNdkVersion.isNotBlank()) {
                 ndkVersion = androidNdkVersion

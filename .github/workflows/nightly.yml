@@ -62,9 +62,8 @@ jobs:
           fi
           version_code="$((base_code + nightly_offset))"
           sdk_major="$(sed -n 's/^android\.compileSdk=//p' gradle.properties)"
-          sdk_minor="$(sed -n 's/^android\.compileSdkMinor=//p' gradle.properties)"
-          if [[ "$sdk_major" -ge 37 || "$sdk_minor" != "0" ]]; then
-            sdk="${sdk_major}.${sdk_minor}"
+          if [[ "$sdk_major" -ge 37 ]]; then
+            sdk="${sdk_major}.0"
           else
             sdk="$sdk_major"
           fi
