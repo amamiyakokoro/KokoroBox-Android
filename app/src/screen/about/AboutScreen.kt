@@ -153,7 +153,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 Card {
                     YumeMd3PreferenceItem(
                         title = "KokoroBox",
-                        summary = "A Material Design 3 / Material You fork of KokoroBox, an open-source Android client based on Mihomo",
+                        summary = MLang.About.App.Description,
                     )
                     YumeMd3PreferenceItem(
                         title = MLang.About.License.CheckUpdate,

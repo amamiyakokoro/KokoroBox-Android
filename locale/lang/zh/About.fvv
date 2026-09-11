@@ -3,7 +3,7 @@ About = {
     Title = "关于"
 
     App = {
-        Description = "一个普通的盒子，尽可能普通"
+        Description = "基于 Mihomo 的 Material You Android 代理客户端"
         VersionLoading = "Loading..."
         VersionFailed = "Failed to load"
     }
