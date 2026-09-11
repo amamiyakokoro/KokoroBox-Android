@@ -28,13 +28,11 @@ Onboarding = {
     }
 
     Privacy = {
-        Title = "確認隱私與協議"
-        Subtitle = "閱讀並同意協議後方可繼續"
-        RichTextLead = "在開始使用前需要同意隱私協議，才能繼續使用 KokoroBox。"
-        RichTextPrefix = "繼續前請先閱讀並同意 "
-        RichTextConnector = " 與 "
+        Title = "確認隱私政策"
+        Subtitle = "閱讀並同意隱私政策後方可繼續"
+        RichTextLead = "在開始使用前需要同意隱私政策，才能繼續使用 KokoroBox。"
+        RichTextPrefix = "繼續前請先閱讀並同意"
         RichTextSuffix = "。"
-        TermsLink = "《使用條款》"
         PolicyLink = "《隱私政策》"
         Privacy = {
             Title = "隱私政策"

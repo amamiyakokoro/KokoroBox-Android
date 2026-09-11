@@ -54,7 +54,6 @@ internal val PagePadding = AppConstants.UI.DEFAULT_HORIZONTAL_PADDING
 internal val DetailWidth = UiDp.dp560
 internal val SectionShape = RoundedCornerShape(UiDp.dp36)
 internal const val RevealDurationMs = 420
-internal const val LinkTermsTag = "terms"
 internal const val LinkPolicyTag = "policy"
 internal val DetailPreviewBadgeSize = UiDp.dp108
 internal val DetailPreviewIconSize = UiDp.dp68
