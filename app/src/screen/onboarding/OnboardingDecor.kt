@@ -60,7 +60,7 @@ internal val DetailPreviewBadgeSize = UiDp.dp108
 internal val DetailPreviewIconSize = UiDp.dp68
 internal val StartupTypewriterPhrases = listOf(
     "KokoroBox",
-    "Hello Word",
+    "いつもこころ",
 )
 
 @Composable
