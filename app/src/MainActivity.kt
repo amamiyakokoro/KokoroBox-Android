@@ -25,7 +25,6 @@ package com.amamiyakokoro.box
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.lifecycleScope
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
-import com.amamiyakokoro.box.common.runtime.StartupGate
 import com.amamiyakokoro.box.common.util.AppLanguageManager
 import com.amamiyakokoro.box.common.util.ProxyAutoStartHelper
 import com.amamiyakokoro.box.core.util.AutoStartSessionGate
@@ -121,7 +119,6 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        loadStartupGate()
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -269,20 +266,6 @@ class MainActivity : FragmentActivity() {
             } finally {
                 AutoStartSessionGate.finishForegroundAutoActions(markHandled = handled)
             }
-        }
-    }
-
-    private fun loadStartupGate() {
-        val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        if (!isDebuggable) {
-            StartupGate.loadPrimary()
-            return
-        }
-
-        runCatching {
-            StartupGate.loadPrimary()
-        }.onFailure { throwable ->
-            Timber.w(throwable, "Skip startup gate native library in debug build")
         }
     }
 

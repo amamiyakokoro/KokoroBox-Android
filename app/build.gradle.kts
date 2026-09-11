@@ -85,27 +85,45 @@ val projectApplicationId = providers.gradleProperty("project.applicationId")
     .orElse(gropify.project.namespace.base)
     .get()
 
-val bridgeJniClass = "${gropify.project.namespace.base.replace('.', '/')}/core/bridge/TunInterface"
+val bridgeJniPackage = "${gropify.project.namespace.base.replace('.', '/')}/core/bridge"
+val bridgeJniClass = "$bridgeJniPackage/Bridge"
+val bridgeCallbackJniClass = "$bridgeJniPackage/TunInterface"
 val nativeBridgeSource = rootProject.file("lib/native/cpp/main.cpp")
+val nativeCompilerSource = rootProject.file("lib/native/rust/src/lib.rs")
 val nativeBridgeLibraries = appAbiList.map { abi ->
     rootProject.file("jniLibs/$abi/libbridge.so")
+}
+val nativeOverrideLibraries = appAbiList.map { abi ->
+    rootProject.file("jniLibs/$abi/liboverride.so")
+}
+val nativeClashLibraries = appAbiList.map { abi ->
+    rootProject.file("jniLibs/$abi/libclash.so")
 }
 
 val verifyBridgeJniNamespace = tasks.register<Exec>("verifyBridgeJniNamespace") {
     group = "verification"
-    description = "Verifies that packaged bridge libraries match the Kotlin JNI namespace."
+    description = "Verifies that packaged native libraries match the Kotlin JNI namespace."
 
     commandLine(
         listOf(
             "python3",
             rootProject.file("scripts/verify-native-bridge.py").absolutePath,
-            "--source",
+            "--cpp-source",
             nativeBridgeSource.absolutePath,
-            "--class-name",
+            "--rust-source",
+            nativeCompilerSource.absolutePath,
+            "--bridge-class-name",
             bridgeJniClass,
+            "--callback-class-name",
+            bridgeCallbackJniClass,
             "--root",
             rootProject.projectDir.absolutePath,
-        ) + nativeBridgeLibraries.map { it.absolutePath },
+            "--bridge-libraries",
+        ) + nativeBridgeLibraries.map { it.absolutePath } + listOf(
+            "--override-libraries",
+        ) + nativeOverrideLibraries.map { it.absolutePath } + listOf(
+            "--other-libraries",
+        ) + nativeClashLibraries.map { it.absolutePath },
     )
 }
 

@@ -24,7 +24,6 @@ package com.amamiyakokoro.box.screen.onboarding
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -43,13 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import com.amamiyakokoro.box.MainActivity
-import com.amamiyakokoro.box.common.runtime.StartupGate
 import com.amamiyakokoro.box.common.util.AppLanguageManager
 import com.amamiyakokoro.box.presentation.theme.ProvideAndroidPlatformTheme
 import com.amamiyakokoro.box.presentation.theme.YumeTheme
 import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 internal abstract class OnboardingBaseActivity : ComponentActivity() {
 
@@ -61,26 +58,11 @@ internal abstract class OnboardingBaseActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        loadStartupGate()
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
         super.onCreate(savedInstanceState)
-    }
-
-    private fun loadStartupGate() {
-        val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        if (!isDebuggable) {
-            StartupGate.loadPrimary()
-            return
-        }
-
-        runCatching {
-            StartupGate.loadPrimary()
-        }.onFailure { throwable ->
-            Timber.w(throwable, "Skip startup gate native library in debug build")
-        }
     }
 
     protected fun setOnboardingContent(

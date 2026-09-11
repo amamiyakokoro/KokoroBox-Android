@@ -36,7 +36,6 @@ import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.util.*
-import java.util.zip.ZipFile
 import kotlin.system.exitProcess
 
 object StartupGate {
@@ -44,9 +43,6 @@ object StartupGate {
     private const val metaEnabled = "com.amamiyakokoro.box.startup_gate.ENABLED"
     private const val metaEnforceSigner = "com.amamiyakokoro.box.startup_gate.ENFORCE_SIGNER"
     private const val metaExpectedSignerSha256 = "com.amamiyakokoro.box.startup_gate.EXPECTED_SIGNER_SHA256"
-
-    @Volatile
-    private var primaryLoaded = false
 
     fun verify(application: Application) {
         val isDebuggable =
@@ -60,25 +56,11 @@ object StartupGate {
             if (!checkSigner(application.packageManager, ctx.packageName)) die()
             if (!checkAppClass(ctx::class.java.name)) die()
             if (!checkAppParent(ctx::class.java.superclass?.name)) die()
-            if (!checkPackagedPrimary(application)) die()
         }.getOrElse { throwable ->
             if (isDebuggable) {
                 Timber.e(throwable, "startup gate failed")
             }
             die()
-        }
-    }
-
-    fun loadPrimary() {
-        if (primaryLoaded) return
-        synchronized(this) {
-            if (primaryLoaded) return
-            runCatching {
-                System.loadLibrary(unmask(intArrayOf(64, 79, 86, 89)))
-                primaryLoaded = true
-            }.onFailure { throwable ->
-                Timber.w(throwable, "Skip startup gate native library")
-            }
         }
     }
 
@@ -206,26 +188,6 @@ object StartupGate {
             73, 74, 87, 85, 94, 95, 75, 41, 46, 44,
         )
     )
-
-    private fun checkPackagedPrimary(application: Application): Boolean {
-        val soName = System.mapLibraryName(unmask(intArrayOf(64, 79, 86, 89)))
-        val apkPaths = buildList {
-            add(application.applicationInfo.sourceDir)
-            application.applicationInfo.splitSourceDirs?.let(::addAll)
-        }.filter { !it.isNullOrBlank() }
-
-        return apkPaths.any { apkPath ->
-            runCatching {
-                ZipFile(apkPath).use { zip ->
-                    zip.entries().asSequence().any { entry ->
-                        !entry.isDirectory &&
-                            entry.name.startsWith("lib/") &&
-                            entry.name.endsWith("/$soName")
-                    }
-                }
-            }.getOrDefault(false)
-        }
-    }
 
     private fun queryPmPath(packageName: String): String? = runCatching {
         val process = ProcessBuilder("sh", "-c", "pm path $packageName")
