@@ -8,15 +8,25 @@ namespace {
     jmethodID m_get_bytes = nullptr;
 }
 
-void initialize_jni(JavaVM* vm, JNIEnv* env) {
+bool initialize_jni(JavaVM* vm, JNIEnv* env) {
+    if (!vm || !env) return false;
+
     jni::initialize_global_vm(vm);
 
     jclass cls = env->FindClass("java/lang/String");
+    if (!cls || jni_catch_exception(env)) return false;
+
     c_string = (jclass)env->NewGlobalRef(cls);
     env->DeleteLocalRef(cls);
+    if (!c_string || jni_catch_exception(env)) return false;
 
     m_new_string = env->GetMethodID(c_string, "<init>", "([B)V");
+    if (!m_new_string || jni_catch_exception(env)) return false;
+
     m_get_bytes = env->GetMethodID(c_string, "getBytes", "()[B");
+    if (!m_get_bytes || jni_catch_exception(env)) return false;
+
+    return true;
 }
 
 char* jni_get_string(JNIEnv* env, jstring str) {

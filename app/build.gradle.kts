@@ -21,6 +21,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import java.util.*
+import org.gradle.api.tasks.Exec
 
 plugins {
     id("com.android.application")
@@ -83,6 +84,36 @@ val startupGateExpectedSignerSha256 = providers.gradleProperty("startupGate.expe
 val projectApplicationId = providers.gradleProperty("project.applicationId")
     .orElse(gropify.project.namespace.base)
     .get()
+
+val bridgeJniClass = "${gropify.project.namespace.base.replace('.', '/')}/core/bridge/TunInterface"
+val nativeBridgeSource = rootProject.file("lib/native/cpp/main.cpp")
+val nativeBridgeLibraries = appAbiList.map { abi ->
+    rootProject.file("jniLibs/$abi/libbridge.so")
+}
+
+val verifyBridgeJniNamespace = tasks.register<Exec>("verifyBridgeJniNamespace") {
+    group = "verification"
+    description = "Verifies that packaged bridge libraries match the Kotlin JNI namespace."
+
+    commandLine(
+        listOf(
+            "python3",
+            rootProject.file("scripts/verify-native-bridge.py").absolutePath,
+            "--source",
+            nativeBridgeSource.absolutePath,
+            "--class-name",
+            bridgeJniClass,
+            "--root",
+            rootProject.projectDir.absolutePath,
+        ) + nativeBridgeLibraries.map { it.absolutePath },
+    )
+}
+
+tasks.configureEach {
+    if (name.startsWith("merge") && name.endsWith("NativeLibs")) {
+        dependsOn(verifyBridgeJniNamespace)
+    }
+}
 
 // The JNI bridge reports this project's Git revision, not the upstream Mihomo release.
 // Keep the About screen aligned with the core revision selected by the build configuration.

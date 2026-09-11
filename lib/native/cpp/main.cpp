@@ -688,6 +688,18 @@ static void release_jni_object_impl(void *obj) {
     del_global((jobject) obj);
 }
 
+static bool jni_on_load_failed(JNIEnv *env, const void *value) {
+    if (value != NULL && !env->ExceptionCheck()) return false;
+
+    jni_catch_exception(env);
+    return true;
+}
+
+#define REQUIRE_JNI_ON_LOAD(value) \
+    do { \
+        if (jni_on_load_failed(env, value)) return JNI_ERR; \
+    } while (false)
+
 JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *vm, void *reserved) {
     TRACE_METHOD();
@@ -697,45 +709,68 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK)
         return JNI_ERR;
 
-    initialize_jni(vm, env);
+    if (!initialize_jni(vm, env))
+        return JNI_ERR;
 
     jclass c_tun_interface = find_class("com/amamiyakokoro/box/core/bridge/TunInterface");
+    REQUIRE_JNI_ON_LOAD(c_tun_interface);
     jclass c_completable = find_class("kotlinx/coroutines/CompletableDeferred");
+    REQUIRE_JNI_ON_LOAD(c_completable);
     jclass c_fetch_callback = find_class("com/amamiyakokoro/box/core/bridge/FetchCallback");
+    REQUIRE_JNI_ON_LOAD(c_fetch_callback);
     jclass c_logcat_interface = find_class("com/amamiyakokoro/box/core/bridge/LogcatInterface");
+    REQUIRE_JNI_ON_LOAD(c_logcat_interface);
     jclass _c_clash_exception = find_class("com/amamiyakokoro/box/core/bridge/ClashException");
+    REQUIRE_JNI_ON_LOAD(_c_clash_exception);
     jclass _c_content = find_class("com/amamiyakokoro/box/core/bridge/Content");
+    REQUIRE_JNI_ON_LOAD(_c_content);
     jclass c_throwable = find_class("java/lang/Throwable");
+    REQUIRE_JNI_ON_LOAD(c_throwable);
     jclass c_unit = find_class("kotlin/Unit");
+    REQUIRE_JNI_ON_LOAD(c_unit);
 
     m_tun_interface_mark_socket = find_method(c_tun_interface, "markSocket",
                                               "(I)V");
+    REQUIRE_JNI_ON_LOAD(m_tun_interface_mark_socket);
     m_tun_interface_query_socket_owner = find_method(c_tun_interface, "querySocketOwner",
                                                      "(ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+    REQUIRE_JNI_ON_LOAD(m_tun_interface_query_socket_owner);
     m_completable_complete = find_method(c_completable, "complete",
                                          "(Ljava/lang/Object;)Z");
+    REQUIRE_JNI_ON_LOAD(m_completable_complete);
     m_fetch_callback_report = find_method(c_fetch_callback, "report",
                                           "(Ljava/lang/String;)V");
+    REQUIRE_JNI_ON_LOAD(m_fetch_callback_report);
     m_fetch_callback_complete = find_method(c_fetch_callback, "complete",
                                             "(Ljava/lang/String;)V");
+    REQUIRE_JNI_ON_LOAD(m_fetch_callback_complete);
     m_completable_complete_exceptionally = find_method(c_completable, "completeExceptionally",
                                                        "(Ljava/lang/Throwable;)Z");
+    REQUIRE_JNI_ON_LOAD(m_completable_complete_exceptionally);
     m_logcat_interface_received = find_method(c_logcat_interface, "received",
                                               "(Ljava/lang/String;)V");
+    REQUIRE_JNI_ON_LOAD(m_logcat_interface_received);
     m_clash_exception = find_method(_c_clash_exception, "<init>",
                                     "(Ljava/lang/String;)V");
+    REQUIRE_JNI_ON_LOAD(m_clash_exception);
     m_get_message = find_method(c_throwable, "getMessage",
                                 "()Ljava/lang/String;");
+    REQUIRE_JNI_ON_LOAD(m_get_message);
     m_open = env->GetStaticMethodID(_c_content, "open",
                                     "(Ljava/lang/String;)I");
+    REQUIRE_JNI_ON_LOAD(m_open);
 
-    o_unit = env->GetStaticObjectField(c_unit,
-                                       env->GetStaticFieldID(c_unit, "INSTANCE",
-                                                             "Lkotlin/Unit;"));
+    jfieldID f_unit_instance = env->GetStaticFieldID(c_unit, "INSTANCE", "Lkotlin/Unit;");
+    REQUIRE_JNI_ON_LOAD(f_unit_instance);
+    o_unit = env->GetStaticObjectField(c_unit, f_unit_instance);
+    REQUIRE_JNI_ON_LOAD(o_unit);
 
     c_clash_exception = (jclass) new_global(_c_clash_exception);
+    REQUIRE_JNI_ON_LOAD(c_clash_exception);
     c_content = (jclass) new_global(_c_content);
+    REQUIRE_JNI_ON_LOAD(c_content);
     o_unit = new_global(o_unit);
+    REQUIRE_JNI_ON_LOAD(o_unit);
 
     mark_socket_func = &call_tun_interface_mark_socket_impl;
     query_socket_owner_func = &call_tun_interface_query_socket_owner_impl;
@@ -749,6 +784,8 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     return JNI_VERSION_1_6;
 }
+
+#undef REQUIRE_JNI_ON_LOAD
 
 JNIEXPORT jstring JNICALL
 Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeCoreVersion(JNIEnv *env, jobject thiz) {
