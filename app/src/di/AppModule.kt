@@ -48,6 +48,7 @@ import com.amamiyakokoro.box.screen.settings.AppDataManagementViewModel
 import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import com.amamiyakokoro.box.screen.settings.KokoroCustomRulesViewModel
 import com.amamiyakokoro.box.screen.settings.KokoroSettingsViewModel
+import com.amamiyakokoro.box.screen.settings.LabViewModel
 import com.amamiyakokoro.box.screen.settings.NetworkSettingsViewModel
 import com.amamiyakokoro.box.screen.settings.ResourceDownloadClient
 import com.amamiyakokoro.box.screen.settings.CloudflareSpeedTestViewModel
@@ -107,6 +108,7 @@ val appViewModelModule = module {
     viewModel { NetworkSettingsViewModel(androidApplication(), get(), get(), get(), get(), get()) }
     viewModel { AccessControlViewModel(androidApplication(), get(), get()) }
     viewModel { AppDataManagementViewModel(get(), get()) }
+    viewModel { LabViewModel(androidApplication(), get()) }
     viewModel { LogViewModel(get()) }
     viewModel { KokoroCustomRulesViewModel(get()) }
     viewModel { KokoroSettingsViewModel(get()) }

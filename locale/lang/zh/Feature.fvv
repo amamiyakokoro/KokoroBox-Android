@@ -8,6 +8,19 @@ Feature = {
         HealthCheckConcurrencySummary = "当前选项：%s"
     }
 
+    RuntimeConfig = {
+        Section = "诊断"
+        Title = "查看运行时配置"
+        Summary = "查看 Mihomo 当前实际加载的只读 YAML；内容可能包含敏感数据"
+        PreviewTitle = "运行时配置 · %s"
+        UnknownProfile = "未知配置"
+        NotRunning = "请先启动代理，再查看运行时配置"
+        NotReady = "运行时配置尚未准备完成"
+        Unavailable = "找不到当前的运行时配置文件"
+        Empty = "运行时配置文件没有内容"
+        RuntimeChanged = "运行中的配置已变更，请重新打开"
+    }
+
     SpeedTest = {
         Section = "网络测试"
         Title = "Cloudflare 速度测试"

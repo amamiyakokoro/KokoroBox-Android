@@ -8,6 +8,19 @@ Feature = {
         HealthCheckConcurrencySummary = "Current option: %s"
     }
 
+    RuntimeConfig = {
+        Section = "Diagnostics"
+        Title = "View Runtime Configuration"
+        Summary = "Inspect the final read-only YAML currently loaded by Mihomo; it may contain sensitive data"
+        PreviewTitle = "Runtime Configuration · %s"
+        UnknownProfile = "Unknown profile"
+        NotRunning = "Start the proxy before viewing its runtime configuration"
+        NotReady = "The runtime configuration is not ready yet"
+        Unavailable = "The runtime configuration file is unavailable"
+        Empty = "The runtime configuration file is empty"
+        RuntimeChanged = "The running profile changed; open the configuration again"
+    }
+
     SpeedTest = {
         Section = "Network Test"
         Title = "Cloudflare Speed Test"
