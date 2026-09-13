@@ -34,6 +34,7 @@ class NetworkSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = e
 
     val bypassPrivateNetwork by boolFlow(true)
     val dnsHijack by boolFlow(true)
+    val antiPollutionDns by boolFlow(false)
     val allowBypass by boolFlow(true)
     val enableIPv6 by boolFlow(false)
     val systemProxy by boolFlow(true)

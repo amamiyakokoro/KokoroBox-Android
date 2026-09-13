@@ -36,6 +36,7 @@ import com.amamiyakokoro.box.core.model.encodeConfigurationOverride
 import com.amamiyakokoro.box.core.util.PROXY_PROVIDER_SCOPE
 import com.amamiyakokoro.box.core.util.RULE_PROVIDER_SCOPE
 import com.amamiyakokoro.box.core.util.profileProviderScopeDir
+import com.amamiyakokoro.box.service.runtime.config.ServiceStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -49,6 +50,7 @@ class CompiledConfigPipeline(
     private val context: Context,
 ) {
     private val overrideEnabled = !context.packageName.endsWith(".lite")
+    private val serviceStore = ServiceStore()
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -82,6 +84,7 @@ class CompiledConfigPipeline(
                 userOverridePaths = emptyList(),
                 builtinPresetPath = null,
                 runtimeInternalOverridePath = null,
+                antiPollutionDnsPresetPath = null,
                 paths = emptyList(),
             )
         }
@@ -124,10 +127,15 @@ class CompiledConfigPipeline(
             ?.also { file -> logger?.invoke(describeOverrideFile(file, "__runtime__")) }
             ?.absolutePath
 
+        val antiPollutionDnsPresetPath = resolveAntiPollutionDnsPresetFile(overridesDir)
+            ?.also { file -> logger?.invoke(describeOverrideFile(file, ANTI_POLLUTION_DNS_PRESET_ID)) }
+            ?.absolutePath
+
         val paths = mutableListOf<String>()
         builtinPresetPath?.let(paths::add)
         paths += userOverridePaths
         runtimeInternalOverridePath?.let(paths::add)
+        antiPollutionDnsPresetPath?.let(paths::add)
 
         logger?.invoke(
             "override resolve: profile=$profileUuid resolved=${paths.size} " +
@@ -139,6 +147,7 @@ class CompiledConfigPipeline(
             userOverridePaths = userOverridePaths,
             builtinPresetPath = builtinPresetPath,
             runtimeInternalOverridePath = runtimeInternalOverridePath,
+            antiPollutionDnsPresetPath = antiPollutionDnsPresetPath,
             paths = paths,
         )
     }
@@ -286,6 +295,20 @@ class CompiledConfigPipeline(
         return file
     }
 
+    private fun resolveAntiPollutionDnsPresetFile(overridesDir: File): File? {
+        val file = overridesDir.resolve("$INTERNAL_OVERRIDE_DIR_NAME/$ANTI_POLLUTION_DNS_PRESET_FILE_NAME")
+        if (!serviceStore.antiPollutionDns) {
+            runCatching { file.delete() }
+            return null
+        }
+
+        file.parentFile?.mkdirs()
+        if (!file.exists() || file.readText() != ANTI_POLLUTION_DNS_OVERRIDE) {
+            file.writeText(ANTI_POLLUTION_DNS_OVERRIDE)
+        }
+        return file
+    }
+
     private fun resolveBuiltinPresetFile(overridesDir: File): File? {
         val content = runCatching {
             encodeConfigurationOverride(
@@ -355,6 +378,7 @@ class CompiledConfigPipeline(
         val userOverridePaths: List<String>,
         val builtinPresetPath: String?,
         val runtimeInternalOverridePath: String?,
+        val antiPollutionDnsPresetPath: String?,
         val paths: List<String>,
     )
 
@@ -377,7 +401,62 @@ class CompiledConfigPipeline(
         const val BUILTIN_PRESET_PREFIX = "preset-"
         const val BUILTIN_PRESET_FILE_ID = "__builtin__"
         const val BUILTIN_PRESET_FILE_NAME = "builtin-preset.json"
+        const val ANTI_POLLUTION_DNS_PRESET_ID = "__anti_pollution_dns__"
+        const val ANTI_POLLUTION_DNS_PRESET_FILE_NAME = "anti-pollution-dns.json"
         const val INTERNAL_OVERRIDE_DIR_NAME = "internal"
         const val OBSOLETE_STANDALONE_ROUTING_ID = "__custom_routing__"
+
+        val ANTI_POLLUTION_DNS_OVERRIDE = """
+            {
+              "dns-force": {
+                "enable": true,
+                "ipv6": true,
+                "respect-rules": true,
+                "enhanced-mode": "fake-ip",
+                "fake-ip-range": "198.18.0.1/16",
+                "fake-ip-filter": [
+                  "+.lan",
+                  "+.local",
+                  "time.*.com",
+                  "ntp.*.com",
+                  "+.market.xiaomi.com"
+                ],
+                "fake-ip-filter-mode": "blacklist",
+                "use-hosts": false,
+                "use-system-hosts": false,
+                "default-nameserver": [
+                  "tls://223.5.5.5",
+                  "tls://119.29.29.29"
+                ],
+                "nameserver": [
+                  "https://1.1.1.1/dns-query",
+                  "https://8.8.8.8/dns-query"
+                ],
+                "nameserver-policy": {
+                  "+.arpa": ["system"],
+                  "geosite:cn": [
+                    "https://doh.pub/dns-query",
+                    "https://dns.alidns.com/dns-query"
+                  ],
+                  "geosite:geolocation-!cn": [
+                    "https://1.1.1.1/dns-query",
+                    "https://8.8.8.8/dns-query"
+                  ]
+                },
+                "proxy-server-nameserver": [
+                  "https://doh.pub/dns-query",
+                  "https://dns.alidns.com/dns-query"
+                ],
+                "direct-nameserver": [
+                  "https://doh.pub/dns-query",
+                  "https://dns.alidns.com/dns-query"
+                ],
+                "direct-nameserver-follow-policy": true
+              },
+              "clash-for-android": {
+                "append-system-dns": false
+              }
+            }
+        """.trimIndent()
     }
 }

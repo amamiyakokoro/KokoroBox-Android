@@ -151,6 +151,17 @@ class ServiceStore {
             store.provider.setBoolean("dns_hijacking", value)
         }
 
+    var antiPollutionDns: Boolean
+        get() = readBoolean(
+            newKey = "antiPollutionDns",
+            legacyKey = "anti_pollution_dns",
+            defaultValue = false,
+        )
+        set(value) {
+            networkSettings.encode("antiPollutionDns", value)
+            store.provider.setBoolean("anti_pollution_dns", value)
+        }
+
     var systemProxy: Boolean
         get() = readBoolean(
             newKey = "systemProxy",

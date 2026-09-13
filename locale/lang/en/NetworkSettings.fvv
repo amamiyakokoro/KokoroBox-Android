@@ -7,6 +7,7 @@ NetworkSettings = {
         VpnOptions = "Service Options"
         ProxyOptions = "Access Control"
         Network = "Network"
+        Experimental = "Experimental"
     }
 
     VpnService = {
@@ -44,6 +45,11 @@ NetworkSettings = {
         CustomUserAgentTitle = "Custom User-Agent"
         CustomUserAgentSummaryDefault = "Not set, using default"
         UserAgentDialogTitle = "Edit User-Agent"
+    }
+
+    Experimental = {
+        AntiPollutionDnsTitle = "DNS Pollution Protection"
+        AntiPollutionDnsSummary = "Override profile DNS with encrypted regional and global resolvers; requires GeoSite data"
     }
 
     RootTun = {

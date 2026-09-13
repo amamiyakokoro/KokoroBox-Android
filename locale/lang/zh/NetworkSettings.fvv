@@ -7,6 +7,7 @@ NetworkSettings = {
         VpnOptions = "服务配置"
         ProxyOptions = "访问控制"
         Network = "网络"
+        Experimental = "实验性功能"
     }
 
     VpnService = {
@@ -44,6 +45,11 @@ NetworkSettings = {
         CustomUserAgentTitle = "自定义 User-Agent"
         CustomUserAgentSummaryDefault = "未设置，使用默认值"
         UserAgentDialogTitle = "编辑 User-Agent"
+    }
+
+    Experimental = {
+        AntiPollutionDnsTitle = "抗污染 DNS"
+        AntiPollutionDnsSummary = "使用加密的境内外 DNS 与分流策略覆盖订阅配置；需要 GeoSite 数据"
     }
 
     RootTun = {

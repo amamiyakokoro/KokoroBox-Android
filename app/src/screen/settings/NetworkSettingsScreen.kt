@@ -131,6 +131,7 @@ fun NetworkSettingsScreen(
                 )
             }
             item { NetworkHttpSettingsSection(viewModel) }
+            item { NetworkExperimentalSettingsSection(viewModel) }
         }
     }
 }
@@ -311,6 +312,21 @@ private fun NetworkHttpSettingsSection(viewModel: NetworkSettingsViewModel) {
         textFieldValue = userAgentTextField,
         onConfirm = viewModel::applyCustomUserAgent,
     )
+}
+
+@Composable
+private fun NetworkExperimentalSettingsSection(viewModel: NetworkSettingsViewModel) {
+    val antiPollutionDns by viewModel.antiPollutionDns.state.collectAsStateWithLifecycle()
+
+    Title(MLang.NetworkSettings.Section.Experimental)
+    Card {
+        PreferenceSwitchItem(
+            title = MLang.NetworkSettings.Experimental.AntiPollutionDnsTitle,
+            summary = MLang.NetworkSettings.Experimental.AntiPollutionDnsSummary,
+            checked = antiPollutionDns,
+            onCheckedChange = viewModel::onAntiPollutionDnsChange,
+        )
+    }
 }
 
 @Composable
