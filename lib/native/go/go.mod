@@ -5,9 +5,9 @@ go 1.26.0
 require (
 	github.com/dlclark/regexp2 v1.12.0
 	github.com/metacubex/mihomo v1.19.30
-	github.com/oschwald/maxminddb-golang v1.12.0
-	golang.org/x/sync v0.11.0
-	google.golang.org/protobuf v1.34.2
+	github.com/oschwald/maxminddb-golang v1.13.1
+	golang.org/x/sync v0.23.0
+	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -39,7 +39,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20240727154555-813a5fbdbec8 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20250109001534-8abf58130905 // indirect
