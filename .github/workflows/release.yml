@@ -33,7 +33,7 @@ jobs:
     steps:
       # Keep current automation when manually rebuilding an older source tag.
       - name: Checkout workflow tools
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -54,7 +54,7 @@ jobs:
         run: python3 "$RUNNER_TEMP/kokoro-release.py" check-secrets
 
       - name: Checkout exact release source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ steps.tag.outputs.tag }}
           fetch-depth: 0
