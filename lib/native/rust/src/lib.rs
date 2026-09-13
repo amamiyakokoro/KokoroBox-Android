@@ -1,6 +1,6 @@
 use jni::objects::{JObject, JString};
 use jni::sys::jstring;
-use jni::JNIEnv;
+use jni::{Env, EnvUnowned};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map as JsonMap, Value as JsonValue};
 use serde_yaml::{Mapping as YamlMapping, Value as YamlValue};
@@ -316,7 +316,11 @@ fn compile_request(request_json: &str, write_output: bool) -> Result<CompileResu
         let mut hasher = Sha256::new();
         hasher.update(request.profile_uuid.as_bytes());
         hasher.update(final_yaml.as_bytes());
-        format!("{:x}", hasher.finalize())
+        hasher
+            .finalize()
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect()
     };
 
     if write_output {
@@ -516,7 +520,11 @@ fn patch_providers(object: &mut JsonMap<String, JsonValue>, profile_dir: &Path) 
             };
             let mut hasher = Sha256::new();
             hasher.update(url.as_bytes());
-            let hash = format!("{:x}", hasher.finalize());
+            let hash: String = hasher
+                .finalize()
+                .iter()
+                .map(|byte| format!("{byte:02x}"))
+                .collect();
             provider_object.insert(
                 "path".to_string(),
                 JsonValue::String(profile_provider_path(
@@ -1436,13 +1444,11 @@ fn has_non_empty_string(value: Option<&JsonValue>) -> bool {
         .unwrap_or(false)
 }
 
-fn jstring_to_string(env: &mut JNIEnv<'_>, input: JString<'_>) -> Result<String, String> {
-    env.get_string(&input)
-        .map(|value| value.into())
-        .map_err(|err| err.to_string())
+fn jstring_to_string(env: &Env<'_>, input: JString<'_>) -> Result<String, String> {
+    input.try_to_string(env).map_err(|err| err.to_string())
 }
 
-fn result_to_jstring(env: &mut JNIEnv<'_>, payload: String) -> jstring {
+fn result_to_jstring(env: &mut Env<'_>, payload: String) -> jstring {
     env.new_string(payload)
         .map(|value| value.into_raw())
         .unwrap_or(std::ptr::null_mut())
@@ -1450,34 +1456,40 @@ fn result_to_jstring(env: &mut JNIEnv<'_>, payload: String) -> jstring {
 
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeCompilePreview(
-    mut env: JNIEnv<'_>,
+    mut env: EnvUnowned<'_>,
     _thiz: JObject<'_>,
     request_json: JString<'_>,
 ) -> jstring {
-    let payload = match jstring_to_string(&mut env, request_json) {
-        Ok(value) => match compile_request(&value, false) {
-            Ok(result) => success_result(result.fingerprint, result.final_yaml),
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let payload = match jstring_to_string(env, request_json) {
+            Ok(value) => match compile_request(&value, false) {
+                Ok(result) => success_result(result.fingerprint, result.final_yaml),
+                Err(err) => error_result(err),
+            },
             Err(err) => error_result(err),
-        },
-        Err(err) => error_result(err),
-    };
+        };
 
-    result_to_jstring(&mut env, payload)
+        Ok(result_to_jstring(env, payload))
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeCompileToFile(
-    mut env: JNIEnv<'_>,
+    mut env: EnvUnowned<'_>,
     _thiz: JObject<'_>,
     request_json: JString<'_>,
 ) -> jstring {
-    let payload = match jstring_to_string(&mut env, request_json) {
-        Ok(value) => match compile_request(&value, true) {
-            Ok(result) => success_result(result.fingerprint, result.final_yaml),
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        let payload = match jstring_to_string(env, request_json) {
+            Ok(value) => match compile_request(&value, true) {
+                Ok(result) => success_result(result.fingerprint, result.final_yaml),
+                Err(err) => error_result(err),
+            },
             Err(err) => error_result(err),
-        },
-        Err(err) => error_result(err),
-    };
+        };
 
-    result_to_jstring(&mut env, payload)
+        Ok(result_to_jstring(env, payload))
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
