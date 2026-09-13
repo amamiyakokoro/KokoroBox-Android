@@ -37,5 +37,5 @@ var (
 		// Windows Default LAN WorkGroup
 		"WORKGROUP",
 	}
-	defaultFakeIPRange = "28.0.0.0/8"
+	defaultFakeIPRange = "198.18.0.0/16"
 )

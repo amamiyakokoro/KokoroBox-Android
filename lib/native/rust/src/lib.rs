@@ -24,7 +24,7 @@ const DEFAULT_FAKE_IP_FILTER: &[&str] = &[
     "*.mcdn.bilivideo.cn",
     "WORKGROUP",
 ];
-const DEFAULT_FAKE_IP_RANGE: &str = "28.0.0.0/8";
+const DEFAULT_FAKE_IP_RANGE: &str = "198.18.0.0/16";
 
 const ROOT_ORDER: &[&str] = &[
     "mode",
