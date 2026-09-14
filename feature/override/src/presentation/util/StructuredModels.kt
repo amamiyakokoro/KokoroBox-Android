@@ -22,60 +22,51 @@
 
 package com.amamiyakokoro.box.presentation.util
 
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.annotation.StringRes
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import kotlinx.serialization.json.*
 import java.util.*
 
-enum class OverrideStructuredObjectType {
-    Proxies {
-        override val title: String get() = MLang.Override.Structured.Proxies.Title
-        override val itemLabel: String get() = MLang.Override.Structured.Proxies.ItemLabel
-        override val emptyHint: String get() = MLang.Override.Structured.Proxies.EmptyHint
-    },
-    ProxyGroups {
-        override val title: String get() = MLang.Override.Structured.ProxyGroups.Title
-        override val itemLabel: String get() = MLang.Override.Structured.ProxyGroups.ItemLabel
-        override val emptyHint: String get() = MLang.Override.Structured.ProxyGroups.EmptyHint
-    };
-
-    abstract val title: String
-    abstract val itemLabel: String
-    abstract val emptyHint: String
+enum class OverrideStructuredObjectType(
+    @StringRes val titleRes: Int,
+    @StringRes val itemLabelRes: Int,
+    @StringRes val emptyHintRes: Int,
+) {
+    Proxies(
+        LocaleR.string.override_structured_proxies_title,
+        LocaleR.string.override_structured_proxies_item_label,
+        LocaleR.string.override_structured_proxies_empty_hint,
+    ),
+    ProxyGroups(
+        LocaleR.string.override_structured_proxy_groups_title,
+        LocaleR.string.override_structured_proxy_groups_item_label,
+        LocaleR.string.override_structured_proxy_groups_empty_hint,
+    ),
 }
 
-enum class OverrideStructuredMapType {
-    RuleProviders {
-        override val title: String get() = MLang.Override.Structured.RuleProviders.Title
-        override val itemLabel: String get() = MLang.Override.Structured.RuleProviders.ItemLabel
-    },
-    ProxyProviders {
-        override val title: String get() = MLang.Override.Structured.ProxyProviders.Title
-        override val itemLabel: String get() = MLang.Override.Structured.ProxyProviders.ItemLabel
-    },
-    SubRules {
-        override val title: String get() = MLang.Override.Structured.SubRules.Title
-        override val itemLabel: String get() = MLang.Override.Structured.SubRules.ItemLabel
-    };
-
-    abstract val title: String
-    abstract val itemLabel: String
+enum class OverrideStructuredMapType(
+    @StringRes val titleRes: Int,
+    @StringRes val itemLabelRes: Int,
+) {
+    RuleProviders(
+        LocaleR.string.override_structured_rule_providers_title,
+        LocaleR.string.override_structured_rule_providers_item_label,
+    ),
+    ProxyProviders(
+        LocaleR.string.override_structured_proxy_providers_title,
+        LocaleR.string.override_structured_proxy_providers_item_label,
+    ),
+    SubRules(
+        LocaleR.string.override_structured_sub_rules_title,
+        LocaleR.string.override_structured_sub_rules_item_label,
+    ),
 }
 
-enum class OverrideListEditorMode {
-    Replace {
-        override val label: String get() = MLang.Override.Modifier.Replace
-    },
-    Merge {
-        override val label: String get() = MLang.Override.Modifier.Merge
-    },
-    Start {
-        override val label: String get() = MLang.Override.Modifier.Start
-    },
-    End {
-        override val label: String get() = MLang.Override.Modifier.End
-    };
-
-    abstract val label: String
+enum class OverrideListEditorMode(@StringRes val labelRes: Int) {
+    Replace(LocaleR.string.override_modifier_replace),
+    Merge(LocaleR.string.override_modifier_merge),
+    Start(LocaleR.string.override_modifier_start),
+    End(LocaleR.string.override_modifier_end),
 }
 
 data class OverrideListModeValues<T>(

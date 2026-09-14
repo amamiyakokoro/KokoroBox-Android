@@ -56,9 +56,11 @@ fun OverrideKeyedObjectMapEditorScreen(
 ) {
     val listState = rememberLazyListState()
     val editorType = OverrideStructuredEditorStore.keyedObjectMapEditorType
-    val title = OverrideStructuredEditorStore.keyedObjectMapEditorTitle.ifBlank { editorType.title }
-    val newItemTitle = stringResource(LocaleR.string.override_editor_new) + editorType.itemLabel
-    val editItemTitle = stringResource(LocaleR.string.override_editor_edit) + editorType.itemLabel
+    val editorTypeTitle = stringResource(editorType.titleRes)
+    val editorTypeItemLabel = stringResource(editorType.itemLabelRes)
+    val title = OverrideStructuredEditorStore.keyedObjectMapEditorTitle.ifBlank { editorTypeTitle }
+    val newItemTitle = stringResource(LocaleR.string.override_editor_new) + editorTypeItemLabel
+    val editItemTitle = stringResource(LocaleR.string.override_editor_edit) + editorTypeItemLabel
     val availableModes = OverrideStructuredEditorStore.keyedObjectMapEditorAvailableModes
     var showResetDialog by remember { mutableStateOf(false) }
     val addFabController = rememberOverrideFabController()
@@ -67,7 +69,7 @@ fun OverrideKeyedObjectMapEditorScreen(
     val selectedMode = OverrideStructuredEditorStore.keyedObjectMapEditorSelectedMode
     val editorValues = OverrideStructuredEditorStore.keyedObjectMapEditorDraftValues
 
-    val modeLabels = remember(availableModes) { availableModes.map(OverrideListEditorMode::label) }
+    val modeLabels = availableModes.map { stringResource(it.labelRes) }
     val selectedModeIndex = availableModes.indexOf(selectedMode).coerceAtLeast(0)
     val currentDrafts = editorValues.valueFor(selectedMode).orEmpty()
 
@@ -217,7 +219,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                     ) { isDragging ->
                         KeyedObjectCard(
                             title = draft.key.ifBlank {
-                                stringResource(LocaleR.string.override_editor_unnamed).format(editorType.itemLabel)
+                                stringResource(LocaleR.string.override_editor_unnamed).format(editorTypeItemLabel)
                             },
                             isDragging = isDragging,
                             isDeleteMode = isDeleteMode,
@@ -272,8 +274,8 @@ fun OverrideKeyedObjectMapEditorScreen(
 
     AppDialog(
             show = showResetDialog,
-            title = stringResource(LocaleR.string.override_editor_clear_dialog_title).format(editorType.title),
-            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(editorType.itemLabel),
+            title = stringResource(LocaleR.string.override_editor_clear_dialog_title).format(editorTypeTitle),
+            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(editorTypeItemLabel),
             onDismissRequest = { showResetDialog = false },
         ) {
             DialogButtonRow(

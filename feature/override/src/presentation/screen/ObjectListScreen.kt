@@ -30,13 +30,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -60,7 +61,13 @@ fun OverrideObjectListEditorScreen(
 ) {
     val listState = rememberLazyListState()
     val editorType = OverrideStructuredEditorStore.objectEditorType
-    val title = OverrideStructuredEditorStore.objectEditorTitle.ifBlank { editorType.title }
+    val editorTypeTitle = stringResource(editorType.titleRes)
+    val editorTypeItemLabel = stringResource(editorType.itemLabelRes)
+    val title = OverrideStructuredEditorStore.objectEditorTitle.ifBlank { editorTypeTitle }
+    val newProxyNodeLabel = stringResource(LocaleR.string.override_editor_new_proxy_node)
+    val newProxyGroupLabel = stringResource(LocaleR.string.override_editor_new_proxy_group)
+    val editProxyNodeLabel = stringResource(LocaleR.string.override_editor_edit_proxy_node)
+    val editProxyGroupLabel = stringResource(LocaleR.string.override_editor_edit_proxy_group)
     val availableModes = OverrideStructuredEditorStore.objectEditorAvailableModes
     var showResetDialog by remember { mutableStateOf(false) }
     val addFabController = rememberOverrideFabController()
@@ -71,7 +78,7 @@ fun OverrideObjectListEditorScreen(
     val proxyModeValues = OverrideStructuredEditorStore.objectEditorProxyDraftValues
     val proxyGroupModeValues = OverrideStructuredEditorStore.objectEditorProxyGroupDraftValues
 
-    val modeLabels = remember(availableModes) { availableModes.map(OverrideListEditorMode::label) }
+    val modeLabels = availableModes.map { stringResource(it.labelRes) }
     val selectedModeIndex = remember(availableModes, selectedMode) {
         availableModes.indexOf(selectedMode).coerceAtLeast(0)
     }
@@ -144,11 +151,11 @@ fun OverrideObjectListEditorScreen(
                 controller = addFabController,
                 visible = showAddFab,
                 imageVector = AppMd3Icons.Action.Add,
-                contentDescription = MLang.Override.Editor.New + editorType.itemLabel,
+                contentDescription = stringResource(LocaleR.string.override_editor_new) + editorTypeItemLabel,
                 onClick = {
                     when (editorType) {
                         OverrideStructuredObjectType.Proxies -> {
-                            onOpenProxyDraftEditor(MLang.Override.Editor.NewProxyNode, null) { createdDraft ->
+                            onOpenProxyDraftEditor(newProxyNodeLabel, null) { createdDraft ->
                                 val mode = OverrideStructuredEditorStore.objectEditorSelectedMode
                                 applyProxyModeValue(
                                     mode,
@@ -161,7 +168,7 @@ fun OverrideObjectListEditorScreen(
                         }
 
                         OverrideStructuredObjectType.ProxyGroups -> {
-                            onOpenProxyGroupDraftEditor(MLang.Override.Editor.NewProxyGroup, null) { createdDraft ->
+                            onOpenProxyGroupDraftEditor(newProxyGroupLabel, null) { createdDraft ->
                                 val mode = OverrideStructuredEditorStore.objectEditorSelectedMode
                                 applyProxyGroupModeValue(
                                     mode,
@@ -183,7 +190,7 @@ fun OverrideObjectListEditorScreen(
                     if (isDeleteMode) {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Cancel,
-                            contentDescription = MLang.Override.Editor.CancelDelete,
+                            contentDescription = stringResource(LocaleR.string.override_editor_cancel_delete),
                             spacedFromNext = true,
                             onClick = {
                                 isDeleteMode = false
@@ -192,7 +199,7 @@ fun OverrideObjectListEditorScreen(
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.DeleteSelected,
+                            contentDescription = stringResource(LocaleR.string.override_editor_delete_selected),
                             destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
@@ -225,14 +232,14 @@ fun OverrideObjectListEditorScreen(
                     } else {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Undo,
-                            contentDescription = MLang.Override.Editor.ClearCurrentMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_clear_current_mode),
                             spacedFromNext = true,
                             destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_enter_delete_mode),
                             destructive = true,
                             onClick = {
                                 isDeleteMode = true
@@ -255,7 +262,7 @@ fun OverrideObjectListEditorScreen(
             item(key = "modifier-card") {
                 Card {
                     YumeMd3DropdownPreference(
-                        title = MLang.Override.Editor.Mode.Title,
+                        title = stringResource(LocaleR.string.override_editor_mode_title),
                         items = modeLabels,
                         selectedIndex = selectedModeIndex,
                         onSelectedIndexChange = { index ->
@@ -285,7 +292,9 @@ fun OverrideObjectListEditorScreen(
                                 key = draft.uiId,
                             ) { isDragging ->
                                 StructuredObjectCard(
-                                    title = draft.name.ifBlank { MLang.Override.Editor.UnnamedProxyNode },
+                                    title = draft.name.ifBlank {
+                                        stringResource(LocaleR.string.override_editor_unnamed_proxy_node)
+                                    },
                                     isDragging = isDragging,
                                     isDeleteMode = isDeleteMode,
                                     isSelected = selectedUiIds[draft.uiId] == true,
@@ -299,7 +308,7 @@ fun OverrideObjectListEditorScreen(
                                         } else {
                                             val draftUiId = draft.uiId
                                             val editMode = selectedMode
-                                            onOpenProxyDraftEditor(MLang.Override.Editor.EditProxyNode, draft) { updatedDraft ->
+                                            onOpenProxyDraftEditor(editProxyNodeLabel, draft) { updatedDraft ->
                                                 applyProxyModeValue(
                                                     editMode,
                                                     OverrideStructuredEditorStore.objectEditorProxyDraftValues
@@ -339,7 +348,9 @@ fun OverrideObjectListEditorScreen(
                                 key = draft.uiId,
                             ) { isDragging ->
                                 StructuredObjectCard(
-                                    title = draft.name.ifBlank { MLang.Override.Editor.UnnamedProxyGroup },
+                                    title = draft.name.ifBlank {
+                                        stringResource(LocaleR.string.override_editor_unnamed_proxy_group)
+                                    },
                                     isDragging = isDragging,
                                     isDeleteMode = isDeleteMode,
                                     isSelected = selectedUiIds[draft.uiId] == true,
@@ -353,7 +364,7 @@ fun OverrideObjectListEditorScreen(
                                         } else {
                                             val draftUiId = draft.uiId
                                             val editMode = selectedMode
-                                            onOpenProxyGroupDraftEditor(MLang.Override.Editor.EditProxyGroup, draft) { updatedDraft ->
+                                            onOpenProxyGroupDraftEditor(editProxyGroupLabel, draft) { updatedDraft ->
                                                 applyProxyGroupModeValue(
                                                     editMode,
                                                     OverrideStructuredEditorStore.objectEditorProxyGroupDraftValues
@@ -391,8 +402,8 @@ fun OverrideObjectListEditorScreen(
 
     AppDialog(
             show = showResetDialog,
-            title = MLang.Override.Editor.ClearDialog.Title.format(editorType.itemLabel),
-            summary = MLang.Override.Editor.ClearDialog.Summary.format(editorType.itemLabel),
+            title = stringResource(LocaleR.string.override_editor_clear_dialog_title).format(editorTypeItemLabel),
+            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(editorTypeItemLabel),
             onDismissRequest = { showResetDialog = false },
         ) {
             DialogButtonRow(
@@ -413,8 +424,8 @@ fun OverrideObjectListEditorScreen(
                         }
                     }
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Clear,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_clear),
                 confirmDestructive = true,
             )
         }
@@ -446,7 +457,7 @@ private fun ReorderableCollectionItemScope.StructuredObjectCard(
             ) {
                 AppIcon(
                     imageVector = AppMd3Icons.Action.List,
-                    contentDescription = MLang.Override.Editor.DragToSort,
+                    contentDescription = stringResource(LocaleR.string.override_editor_drag_to_sort),
                     
                 )
                 Column(
@@ -469,7 +480,7 @@ private fun ReorderableCollectionItemScope.StructuredObjectCard(
                     } else {
                         AppIcon(
                             imageVector = AppMd3Icons.Navigation.Forward,
-                            contentDescription = MLang.Override.Editor.Edit,
+                            contentDescription = stringResource(LocaleR.string.override_editor_edit),
                             
                         )
                     }

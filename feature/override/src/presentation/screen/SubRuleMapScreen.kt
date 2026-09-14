@@ -175,7 +175,7 @@ fun OverrideSubRuleMapEditorScreen(
                 Card {
                     YumeMd3DropdownPreference(
                         title = stringResource(LocaleR.string.override_editor_mode_title),
-                        items = availableModes.map(OverrideListEditorMode::label),
+                        items = availableModes.map { stringResource(it.labelRes) },
                         selectedIndex = selectedModeIndex,
                         onSelectedIndexChange = { index ->
                             val newMode = availableModes.getOrElse(index) { selectedMode }

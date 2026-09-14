@@ -26,7 +26,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
@@ -83,10 +85,11 @@ fun OverrideKeyedObjectDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
     val listState = rememberLazyListState()
-    val title = remember {
-        OverrideStructuredEditorStore.keyedObjectDraftEditorTitle.ifBlank { MLang.Override.Draft.Object }
-    }
     val editorType = remember { OverrideStructuredEditorStore.keyedObjectDraftEditorType }
+    val title = OverrideStructuredEditorStore.keyedObjectDraftEditorTitle.ifBlank {
+        stringResource(LocaleR.string.override_draft_object)
+    }
+    val editorTypeItemLabel = stringResource(editorType.itemLabelRes)
     val initialValue = remember { OverrideStructuredEditorStore.keyedObjectDraftEditorValue }
     val saveFabController = rememberOverrideFabController()
     val initialFields = initialValue?.fields.orEmpty()
@@ -154,7 +157,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                 controller = saveFabController,
                 visible = true,
                 imageVector = AppMd3Icons.Action.Save,
-                contentDescription = MLang.Override.Draft.Save + editorType.itemLabel,
+                contentDescription = MLang.Override.Draft.Save + editorTypeItemLabel,
                 onClick = {
                     if (key.trim().isBlank()) {
                         errorText = MLang.Override.Draft.NameRequired
