@@ -54,12 +54,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetConfirmAction
@@ -70,7 +72,6 @@ import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreferenc
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.service.runtime.entity.Profile
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
@@ -98,6 +99,18 @@ internal fun AddProfileSheet(
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val needCamera = stringResource(LocaleR.string.profiles_page_qr_scanner_need_camera)
+    val unknownFile = stringResource(LocaleR.string.profiles_page_message_unknown_file)
+    val yamlOnly = stringResource(LocaleR.string.profiles_page_validation_yaml_only)
+    val newProfile = stringResource(LocaleR.string.profiles_page_input_new_profile)
+    val recognizeSuccess = stringResource(LocaleR.string.profiles_page_qr_scanner_recognize_success)
+    val recognizeFailed = stringResource(LocaleR.string.profiles_page_qr_scanner_recognize_failed)
+    val recognizeError = stringResource(LocaleR.string.profiles_page_qr_scanner_recognize_error)
+    val enterUrl = stringResource(LocaleR.string.profiles_page_validation_enter_url)
+    val selectFile = stringResource(LocaleR.string.profiles_page_validation_select_file)
+    val loginRequired = stringResource(LocaleR.string.profiles_page_kokoro_login_required)
+    val defaultProfileName = stringResource(LocaleR.string.profiles_page_kokoro_default_profile_name)
+    val checkFailedDetail = stringResource(LocaleR.string.profiles_page_kokoro_check_failed_detail)
     var selectedTypeIndex by remember { mutableIntStateOf(PROFILE_TYPE_KOKORO) }
     var name by remember { mutableStateOf("") }
     var url by remember { mutableStateOf("") }
@@ -195,7 +208,7 @@ internal fun AddProfileSheet(
     ) { isGranted ->
         hasCameraPermission = isGranted
         if (!isGranted) {
-            context.toast(MLang.ProfilesPage.QrScanner.NeedCamera, Toast.LENGTH_LONG)
+            context.toast(needCamera, Toast.LENGTH_LONG)
             selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
         }
     }
@@ -296,14 +309,14 @@ internal fun AddProfileSheet(
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 cursor.moveToFirst()
                 cursor.getString(nameIndex)
-            } ?: MLang.ProfilesPage.Message.UnknownFile
+            } ?: unknownFile
 
             val extension = actualFileName.substringAfterLast(".", "")
             if (!extension.equals("yaml", ignoreCase = true) && !extension.equals(
                     "yml", ignoreCase = true
                 )
             ) {
-                error = MLang.ProfilesPage.Validation.YamlOnly
+                error = yamlOnly
                 return@let
             }
 
@@ -313,7 +326,7 @@ internal fun AddProfileSheet(
 
             val fileNameWithoutExt = actualFileName.substringBeforeLast(".")
             if (name.isBlank() || name == actualFileName) {
-                name = fileNameWithoutExt.ifBlank { MLang.ProfilesPage.Input.NewProfile }
+                name = fileNameWithoutExt.ifBlank { newProfile }
             }
         }
     }
@@ -327,12 +340,12 @@ internal fun AddProfileSheet(
                         if (result != null) {
                             url = result
                             selectedTypeIndex = PROFILE_TYPE_SUBSCRIPTION
-                            context.toast(MLang.ProfilesPage.QrScanner.RecognizeSuccess)
+                            context.toast(recognizeSuccess)
                         } else {
-                            context.toast(MLang.ProfilesPage.QrScanner.RecognizeFailed)
+                            context.toast(recognizeFailed)
                         }
                     } catch (e: Exception) {
-                        context.toast(MLang.ProfilesPage.QrScanner.RecognizeError.format(e.message ?: ""))
+                        context.toast(recognizeError.format(e.message ?: ""))
                     }
                 }
             }
@@ -354,11 +367,11 @@ internal fun AddProfileSheet(
             return
         }
         if (selectedTypeIndex == PROFILE_TYPE_SUBSCRIPTION && url.isBlank()) {
-            error = MLang.ProfilesPage.Validation.EnterUrl
+            error = enterUrl
             return
         }
         if (selectedTypeIndex == PROFILE_TYPE_LOCAL_FILE && filePath.isBlank()) {
-            error = MLang.ProfilesPage.Validation.SelectFile
+            error = selectFile
             return
         }
         val kokoroAccount = (kokoroAuthState as? KokoroAuthState.Authenticated)?.account
@@ -371,7 +384,7 @@ internal fun AddProfileSheet(
         if (selectedTypeIndex == PROFILE_TYPE_KOKORO &&
             (kokoroAccount == null || normalizedKokoroSettings.plan.isBlank())
         ) {
-            error = MLang.ProfilesPage.Kokoro.LoginRequired
+            error = loginRequired
             return
         }
 
@@ -391,7 +404,7 @@ internal fun AddProfileSheet(
                 )
             } else {
                 onAddProfile(
-                    name.ifBlank { MLang.ProfilesPage.Input.NewProfile },
+                    name.ifBlank { newProfile },
                     url,
                     Profile.Type.Url,
                     0L,
@@ -401,7 +414,7 @@ internal fun AddProfileSheet(
             }
         } else if (selectedTypeIndex == PROFILE_TYPE_KOKORO && kokoroAccount != null) {
             val fallbackName = buildString {
-                append(MLang.ProfilesPage.Kokoro.DefaultProfileName)
+                append(defaultProfileName)
                 normalizedKokoroSettings.plan.takeIf(String::isNotBlank)?.let {
                     append(" · ")
                     append(it)
@@ -421,7 +434,7 @@ internal fun AddProfileSheet(
                 } catch (e: Exception) {
                     if (e is kotlinx.coroutines.CancellationException) throw e
                     isDownloading = false
-                    error = e.message ?: MLang.ProfilesPage.Kokoro.CheckFailedDetail
+                    error = e.message ?: checkFailedDetail
                 }
             }
         } else {
@@ -435,7 +448,7 @@ internal fun AddProfileSheet(
                 )
             } else {
                 onAddProfile(
-                    name.ifBlank { MLang.ProfilesPage.Input.NewProfile },
+                    name.ifBlank { newProfile },
                     filePath,
                     Profile.Type.File,
                     0L,
@@ -449,14 +462,14 @@ internal fun AddProfileSheet(
     AppActionBottomSheet(
         show = show.value,
         title = when {
-            profileToEdit != null -> MLang.ProfilesPage.Sheet.EditTitle
-            selectedTypeIndex == PROFILE_TYPE_KOKORO -> MLang.ProfilesPage.Type.Kokoro
-            else -> MLang.ProfilesPage.Sheet.AddTitle
+            profileToEdit != null -> stringResource(LocaleR.string.profiles_page_sheet_edit_title)
+            selectedTypeIndex == PROFILE_TYPE_KOKORO -> stringResource(LocaleR.string.profiles_page_type_kokoro)
+            else -> stringResource(LocaleR.string.profiles_page_sheet_add_title)
         },
         startAction = {
             if (!isDownloading) {
                 AppBottomSheetCloseAction(
-                    contentDescription = "Cancel",
+                    contentDescription = stringResource(LocaleR.string.profiles_page_button_cancel),
                     onClick = dismissSheet,
                 )
             }
@@ -464,7 +477,7 @@ internal fun AddProfileSheet(
         endAction = {
             if (!isDownloading && selectedTypeIndex != PROFILE_TYPE_QR_SCAN) {
                 AppBottomSheetConfirmAction(
-                    contentDescription = "Confirm",
+                    contentDescription = stringResource(LocaleR.string.profiles_page_button_confirm),
                     onClick = { submitProfile() },
                 )
             }
@@ -698,7 +711,7 @@ private fun ProfileFormContent(
             YumeMd3OutlinedTextField(
                 value = userAgent,
                 onValueChange = onUserAgentChange,
-                label = MLang.ProfilesPage.Input.SubscriptionUserAgent,
+                label = stringResource(LocaleR.string.profiles_page_input_subscription_user_agent),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -717,12 +730,12 @@ private fun ProfileTypeSelectorCard(
             modifier = Modifier.alpha(if (profileLocked) 0.5f else 1f),
         ) {
             YumeMd3DropdownPreference(
-                title = MLang.ProfilesPage.Type.Title,
+                title = stringResource(LocaleR.string.profiles_page_type_title),
                 items = listOf(
-                    MLang.ProfilesPage.Type.Kokoro,
-                    MLang.ProfilesPage.Type.Subscription,
-                    MLang.ProfilesPage.Type.LocalFile,
-                    MLang.ProfilesPage.Type.QrScan,
+                    stringResource(LocaleR.string.profiles_page_type_kokoro),
+                    stringResource(LocaleR.string.profiles_page_type_subscription),
+                    stringResource(LocaleR.string.profiles_page_type_local_file),
+                    stringResource(LocaleR.string.profiles_page_type_qr_scan),
                 ),
                 selectedIndex = selectedTypeIndex,
                 onSelectedIndexChange = onTypeSelected,
@@ -758,7 +771,7 @@ private fun QrScannerContent(
                     StableQrScanner(onScanned = onQrScanned)
                 }
             } else if (!hasCameraPermission) {
-                Text(text = MLang.ProfilesPage.QrScanner.NeedPermission)
+                Text(text = stringResource(LocaleR.string.profiles_page_qr_scanner_need_permission))
             } else {
                 Md3ELoading(modifier = Modifier.size(UiDp.dp48))
             }
@@ -768,7 +781,7 @@ private fun QrScannerContent(
             onClick = onSelectQrImage,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = MLang.ProfilesPage.QrScanner.SelectFromAlbum)
+            Text(text = stringResource(LocaleR.string.profiles_page_qr_scanner_select_from_album))
         }
     }
 }
@@ -792,7 +805,7 @@ private fun ManualProfileContent(
         YumeMd3OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = MLang.ProfilesPage.Input.ProfileName,
+            label = stringResource(LocaleR.string.profiles_page_input_profile_name),
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -800,7 +813,7 @@ private fun ManualProfileContent(
             YumeMd3OutlinedTextField(
                 value = url,
                 onValueChange = onUrlChange,
-                label = MLang.ProfilesPage.Input.SubscriptionUrl,
+                label = stringResource(LocaleR.string.profiles_page_input_subscription_url),
                 maxLines = 2,
                 readOnly = profileLocked,
                 enabled = !profileLocked,
@@ -810,7 +823,7 @@ private fun ManualProfileContent(
             YumeMd3OutlinedTextField(
                 value = fileName,
                 onValueChange = {},
-                label = MLang.ProfilesPage.Input.SelectFile,
+                label = stringResource(LocaleR.string.profiles_page_input_select_file),
                 readOnly = true,
                 enabled = false,
                 modifier = Modifier
