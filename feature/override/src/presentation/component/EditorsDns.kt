@@ -23,8 +23,9 @@ package com.amamiyakokoro.box.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun DnsEditor(
@@ -36,14 +37,14 @@ fun DnsEditor(
     Column(
         verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
     ) {
-        OverrideCardSection(MLang.Override.Form.DnsBasicSwitch) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_dns_basic_switch)) {
             NullableEnumSelector(
-                title = MLang.Override.Dns.Policy,
+                title = stringResource(LocaleR.string.override_dns_policy),
                 value = config.dns.enable,
                 items = listOf(
-                    MLang.Override.Dns.PolicyNotModify,
-                    MLang.Override.Dns.PolicyForceEnable,
-                    MLang.Override.Dns.PolicyUseBuiltin,
+                    stringResource(LocaleR.string.override_dns_policy_not_modify),
+                    stringResource(LocaleR.string.override_dns_policy_force_enable),
+                    stringResource(LocaleR.string.override_dns_policy_use_builtin),
                 ),
                 values = listOf(null, true, false),
                 onValueChange = {
@@ -51,55 +52,55 @@ fun DnsEditor(
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Dns.PreferH3,
+                title = stringResource(LocaleR.string.override_dns_prefer_h3),
                 value = config.dns.preferH3,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(preferH3 = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Dns.Ipv6,
+                title = stringResource(LocaleR.string.override_dns_ipv6),
                 value = config.dns.ipv6,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(ipv6 = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Dns.UseHosts,
+                title = stringResource(LocaleR.string.override_dns_use_hosts),
                 value = config.dns.useHosts,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(useHosts = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.UseSystemHosts,
+                title = stringResource(LocaleR.string.override_label_use_system_hosts),
                 value = config.dns.useSystemHosts,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(useSystemHosts = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Dns.AppendSystem,
+                title = stringResource(LocaleR.string.override_dns_append_system),
                 value = config.app.appendSystemDns,
                 onValueChange = {
                     onConfigChange(config.copy(app = config.app.copy(appendSystemDns = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.RespectRules,
+                title = stringResource(LocaleR.string.override_label_respect_rules),
                 value = config.dns.respectRules,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(respectRules = it)))
                 },
             )
             NullableEnumSelector(
-                title = MLang.Override.Dns.EnhancedMode,
+                title = stringResource(LocaleR.string.override_dns_enhanced_mode),
                 value = config.dns.enhancedMode,
                 items = listOf(
-                    MLang.Override.Dns.EnhancedNotModify,
-                    MLang.Override.Dns.EnhancedDisable,
-                    MLang.Override.Dns.EnhancedFakeip,
-                    MLang.Override.Dns.EnhancedMapping,
+                    stringResource(LocaleR.string.override_dns_enhanced_not_modify),
+                    stringResource(LocaleR.string.override_dns_enhanced_disable),
+                    stringResource(LocaleR.string.override_dns_enhanced_fakeip),
+                    stringResource(LocaleR.string.override_dns_enhanced_mapping),
                 ),
                 values = listOf(
                     null,
@@ -112,7 +113,7 @@ fun DnsEditor(
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Form.DirectFollowPolicy,
+                title = stringResource(LocaleR.string.override_form_direct_follow_policy),
                 value = config.dns.directFollowPolicy,
                 onValueChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(directFollowPolicy = it)))
@@ -120,15 +121,15 @@ fun DnsEditor(
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.DnsBasicParams) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_dns_basic_params)) {
             OverrideTextInputContent(
-                title = MLang.Override.Dns.Listen,
+                title = stringResource(LocaleR.string.override_dns_listen),
                 value = config.dns.listen,
-                placeholder = MLang.Override.Dns.ListenHint,
+                placeholder = stringResource(LocaleR.string.override_dns_listen_hint),
                 onValueChange = { onConfigChange(config.copy(dns = config.dns.copy(listen = it))) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Label.CacheAlgorithm,
+                title = stringResource(LocaleR.string.override_label_cache_algorithm),
                 value = config.dns.cacheAlgorithm,
                 placeholder = "lru / arc",
                 onValueChange = {
@@ -136,7 +137,7 @@ fun DnsEditor(
                 },
             )
             OverrideIntInputContent(
-                title = MLang.Override.Form.Ipv6Timeout,
+                title = stringResource(LocaleR.string.override_form_ipv6_timeout),
                 value = config.dns.ipv6Timeout,
                 placeholder = "100",
                 onValueChange = {
@@ -144,7 +145,7 @@ fun DnsEditor(
                 },
             )
             OverrideIntInputContent(
-                title = MLang.Override.Form.CacheLimit,
+                title = stringResource(LocaleR.string.override_form_cache_limit),
                 value = config.dns.cacheMaxSize,
                 placeholder = "4096",
                 onValueChange = {
@@ -153,14 +154,14 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.FakeIpMode) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_fake_ip_mode)) {
             NullableEnumSelector(
-                title = MLang.Override.Dns.FakeipFilterMode,
+                title = stringResource(LocaleR.string.override_dns_fakeip_filter_mode),
                 value = config.dns.fakeIPFilterMode,
                 items = listOf(
-                    MLang.Override.Dns.EnhancedNotModify,
-                    MLang.Override.Dns.FakeipBlacklist,
-                    MLang.Override.Dns.FakeipWhitelist,
+                    stringResource(LocaleR.string.override_dns_enhanced_not_modify),
+                    stringResource(LocaleR.string.override_dns_fakeip_blacklist),
+                    stringResource(LocaleR.string.override_dns_fakeip_whitelist),
                     "Rule",
                 ),
                 values = listOf(
@@ -175,9 +176,9 @@ fun DnsEditor(
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.FakeIpParams) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_fake_ip_params)) {
             OverrideTextInputContent(
-                title = MLang.Override.Label.FakeIpRange,
+                title = stringResource(LocaleR.string.override_label_fake_ip_range),
                 value = config.dns.fakeIpRange,
                 placeholder = "198.18.0.1/16",
                 onValueChange = {
@@ -185,7 +186,7 @@ fun DnsEditor(
                 },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.FakeIpIpv6Range,
+                title = stringResource(LocaleR.string.override_form_fake_ip_ipv6_range),
                 value = config.dns.fakeIpRange6,
                 placeholder = "fdfe:dcba:9876::1/64",
                 onValueChange = {
@@ -202,13 +203,13 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.DnsUpstream) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_dns_upstream)) {
             StringListWithModifiersInput(
-                title = MLang.Override.Dns.Servers,
+                title = stringResource(LocaleR.string.override_dns_servers),
                 replaceValue = config.dns.nameServer,
                 startValue = config.dns.nameServerStart,
                 endValue = config.dns.nameServerEnd,
-                placeholder = MLang.Override.Dns.ServersHint,
+                placeholder = stringResource(LocaleR.string.override_dns_servers_hint),
                 onReplaceChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(nameServer = it)))
                 },
@@ -221,11 +222,11 @@ fun DnsEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Dns.Fallback,
+                title = stringResource(LocaleR.string.override_dns_fallback),
                 replaceValue = config.dns.fallback,
                 startValue = config.dns.fallbackStart,
                 endValue = config.dns.fallbackEnd,
-                placeholder = MLang.Override.Dns.FallbackHint,
+                placeholder = stringResource(LocaleR.string.override_dns_fallback_hint),
                 onReplaceChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(fallback = it)))
                 },
@@ -238,11 +239,11 @@ fun DnsEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Dns.Default,
+                title = stringResource(LocaleR.string.override_dns_default),
                 replaceValue = config.dns.defaultServer,
                 startValue = config.dns.defaultServerStart,
                 endValue = config.dns.defaultServerEnd,
-                placeholder = MLang.Override.Dns.DefaultHint,
+                placeholder = stringResource(LocaleR.string.override_dns_default_hint),
                 onReplaceChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(defaultServer = it)))
                 },
@@ -294,13 +295,13 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.NameserverPolicySection) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_nameserver_policy_section)) {
             StringMapWithModifiersInput(
-                title = MLang.Override.Dns.NameserverPolicy,
+                title = stringResource(LocaleR.string.override_dns_nameserver_policy),
                 replaceValue = config.dns.nameserverPolicy,
                 mergeValue = config.dns.nameserverPolicyMerge,
-                keyPlaceholder = MLang.Override.Dns.NameserverPolicyKey,
-                valuePlaceholder = MLang.Override.Dns.NameserverPolicyValue,
+                keyPlaceholder = stringResource(LocaleR.string.override_dns_nameserver_policy_key),
+                valuePlaceholder = stringResource(LocaleR.string.override_dns_nameserver_policy_value),
                 onReplaceChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(nameserverPolicy = it)))
                 },
@@ -312,11 +313,11 @@ fun DnsEditor(
                 },
             )
             StringMapWithModifiersInput(
-                title = MLang.Override.Form.ProxyServerNameserverPolicy,
+                title = stringResource(LocaleR.string.override_form_proxy_server_nameserver_policy),
                 replaceValue = config.dns.proxyServerNameserverPolicy,
                 mergeValue = config.dns.proxyServerNameserverPolicyMerge,
-                keyPlaceholder = MLang.Override.Dns.NameserverPolicyKey,
-                valuePlaceholder = MLang.Override.Dns.NameserverPolicyValue,
+                keyPlaceholder = stringResource(LocaleR.string.override_dns_nameserver_policy_key),
+                valuePlaceholder = stringResource(LocaleR.string.override_dns_nameserver_policy_value),
                 onReplaceChange = {
                     onConfigChange(
                         config.copy(dns = config.dns.copy(proxyServerNameserverPolicy = it)),
@@ -345,13 +346,13 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.FilterList) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_filter_list)) {
             StringListWithModifiersInput(
-                title = MLang.Override.Dns.FakeipFilter,
+                title = stringResource(LocaleR.string.override_dns_fakeip_filter),
                 replaceValue = config.dns.fakeIpFilter,
                 startValue = config.dns.fakeIpFilterStart,
                 endValue = config.dns.fakeIpFilterEnd,
-                placeholder = MLang.Override.Dns.FakeipFilterHint,
+                placeholder = stringResource(LocaleR.string.override_dns_fakeip_filter_hint),
                 onReplaceChange = {
                     onConfigChange(config.copy(dns = config.dns.copy(fakeIpFilter = it)))
                 },
@@ -365,9 +366,9 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.FallbackSwitch) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_fallback_switch)) {
             NullableBooleanSelector(
-                title = MLang.Override.Dns.FallbackGeoip,
+                title = stringResource(LocaleR.string.override_dns_fallback_geoip),
                 value = config.dns.fallbackFilter.geoIp,
                 onValueChange = {
                     onConfigChange(
@@ -381,11 +382,11 @@ fun DnsEditor(
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.FallbackParams) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_fallback_params)) {
             OverrideTextInputContent(
-                title = MLang.Override.Dns.FallbackGeoipCode,
+                title = stringResource(LocaleR.string.override_dns_fallback_geoip_code),
                 value = config.dns.fallbackFilter.geoIpCode,
-                placeholder = MLang.Override.Dns.FallbackGeoipCodeHint,
+                placeholder = stringResource(LocaleR.string.override_dns_fallback_geoip_code_hint),
                 onValueChange = {
                     onConfigChange(
                         config.copy(
@@ -398,13 +399,13 @@ fun DnsEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.FallbackFilter) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_fallback_filter)) {
             StringListWithModifiersInput(
-                title = MLang.Override.Dns.FallbackDomain,
+                title = stringResource(LocaleR.string.override_dns_fallback_domain),
                 replaceValue = config.dns.fallbackFilter.domain,
                 startValue = config.dns.fallbackFilter.domainStart,
                 endValue = config.dns.fallbackFilter.domainEnd,
-                placeholder = MLang.Override.Dns.FallbackDomainHint,
+                placeholder = stringResource(LocaleR.string.override_dns_fallback_domain_hint),
                 onReplaceChange = {
                     onConfigChange(
                         config.copy(
@@ -435,11 +436,11 @@ fun DnsEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Dns.FallbackIpcidr,
+                title = stringResource(LocaleR.string.override_dns_fallback_ipcidr),
                 replaceValue = config.dns.fallbackFilter.ipcidr,
                 startValue = config.dns.fallbackFilter.ipcidrStart,
                 endValue = config.dns.fallbackFilter.ipcidrEnd,
-                placeholder = MLang.Override.Dns.FallbackIpcidrHint,
+                placeholder = stringResource(LocaleR.string.override_dns_fallback_ipcidr_hint),
                 onReplaceChange = {
                     onConfigChange(
                         config.copy(
