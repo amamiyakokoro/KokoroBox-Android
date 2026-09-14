@@ -45,10 +45,12 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.Card
@@ -63,7 +65,6 @@ import com.ramcosta.composedestinations.generated.destinations.LogScreenDestinat
 import com.ramcosta.composedestinations.generated.destinations.MetaFeatureScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.NetworkSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OverrideScreenDestination
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -128,6 +129,11 @@ fun SettingPager(
     val context = LocalContext.current
     val appContext = context.applicationContext
     val backupInProgress by appSettingsViewModel.backupInProgress.collectAsStateWithLifecycle()
+    val exportSuccess = stringResource(LocaleR.string.app_settings_backup_export_success)
+    val exportFailedDetail = stringResource(LocaleR.string.app_settings_backup_export_failed_detail)
+    val importSuccess = stringResource(LocaleR.string.app_settings_backup_import_success)
+    val importFailedDetail = stringResource(LocaleR.string.app_settings_backup_import_failed_detail)
+    val unknownError = stringResource(LocaleR.string.util_error_unknown_error)
 
     val versionInfo = BuildConfig.VERSION_NAME
     val exportBackupLauncher = rememberLauncherForActivityResult(
@@ -136,9 +142,9 @@ fun SettingPager(
         uri ?: return@rememberLauncherForActivityResult
         appSettingsViewModel.exportUserSettingsBackup(appContext.contentResolver, uri) { result ->
             result.onSuccess {
-                appContext.toast(MLang.AppSettings.Backup.ExportSuccess)
+                appContext.toast(exportSuccess)
             }.onFailure { throwable ->
-                appContext.toast(MLang.AppSettings.Backup.ExportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError), copyable = true)
+                appContext.toast(exportFailedDetail.format(throwable.message ?: unknownError), copyable = true)
             }
         }
     }
@@ -148,9 +154,9 @@ fun SettingPager(
         uri ?: return@rememberLauncherForActivityResult
         appSettingsViewModel.importUserSettingsBackup(appContext.contentResolver, uri) { result ->
             result.onSuccess {
-                appContext.toast(MLang.AppSettings.Backup.ImportSuccess)
+                appContext.toast(importSuccess)
             }.onFailure { throwable ->
-                appContext.toast(MLang.AppSettings.Backup.ImportFailedDetail.format(throwable.message ?: MLang.Util.Error.UnknownError), copyable = true)
+                appContext.toast(importFailedDetail.format(throwable.message ?: unknownError), copyable = true)
             }
         }
     }
@@ -158,7 +164,7 @@ fun SettingPager(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.Settings.Title)
+            TopBar(title = stringResource(LocaleR.string.settings_title))
         },
     ) { innerPadding ->
         ScreenLazyColumn(
@@ -167,11 +173,11 @@ fun SettingPager(
         ) {
 
             item {
-                Title(MLang.Settings.Section.Kokoro)
+                Title(stringResource(LocaleR.string.settings_section_kokoro))
                 Card {
                     SettingsEntryItem(
-                        title = MLang.Settings.Kokoro.Title,
-                        summary = MLang.Settings.Kokoro.Summary,
+                        title = stringResource(LocaleR.string.settings_kokoro_title),
+                        summary = stringResource(LocaleR.string.settings_kokoro_summary),
                         imageVector = AppMd3Icons.Settings.Kokoro,
                         onClick = {
                             navigator.navigate(KokoroSettingsScreenDestination) {
@@ -182,34 +188,34 @@ fun SettingPager(
                 }
             }
             item {
-                Title(MLang.Settings.Section.UiSettings)
+                Title(stringResource(LocaleR.string.settings_section_ui_settings))
                 Card {
                     SettingsEntryItem(
-                        title = MLang.Settings.UiSettings.App,
-                        summary = MLang.Settings.UiSettings.AppSummary,
+                        title = stringResource(LocaleR.string.settings_ui_settings_app),
+                        summary = stringResource(LocaleR.string.settings_ui_settings_app_summary),
                         imageVector = AppMd3Icons.Settings.App,
                         onClick = { navigator.navigate(AppSettingsScreenDestination) { launchSingleTop = true } },
                     )
                 }
             }
             item {
-                Title(MLang.Settings.Section.NetworkSettings)
+                Title(stringResource(LocaleR.string.settings_section_network_settings))
                 Card {
                     SettingsEntryItem(
-                        title = MLang.Settings.NetworkSettings.Network,
-                        summary = MLang.Settings.NetworkSettings.NetworkSummary,
+                        title = stringResource(LocaleR.string.settings_network_settings_network),
+                        summary = stringResource(LocaleR.string.settings_network_settings_network_summary),
                         imageVector = AppMd3Icons.Settings.Network,
                         onClick = { navigator.navigate(NetworkSettingsScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.NetworkSettings.Override,
-                        summary = MLang.Settings.NetworkSettings.OverrideSummary,
+                        title = stringResource(LocaleR.string.settings_network_settings_override),
+                        summary = stringResource(LocaleR.string.settings_network_settings_override_summary),
                         imageVector = AppMd3Icons.Settings.Override,
                         onClick = { navigator.navigate(OverrideScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.NetworkSettings.MetaFeatures,
-                        summary = MLang.Settings.NetworkSettings.MetaFeaturesSummary,
+                        title = stringResource(LocaleR.string.settings_network_settings_meta_features),
+                        summary = stringResource(LocaleR.string.settings_network_settings_meta_features_summary),
                         imageVector = AppMd3Icons.Settings.MetaFeatures,
                         onClick = {
                             navigator.navigate(MetaFeatureScreenDestination) {
@@ -218,8 +224,8 @@ fun SettingPager(
                         },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.NetworkSettings.Lab,
-                        summary = MLang.Settings.NetworkSettings.LabSummary,
+                        title = stringResource(LocaleR.string.settings_network_settings_lab),
+                        summary = stringResource(LocaleR.string.settings_network_settings_lab_summary),
                         imageVector = AppMd3Icons.Settings.Lab,
                         onClick = {
                             navigator.navigate(LabScreenDestination) { launchSingleTop = true }
@@ -228,46 +234,46 @@ fun SettingPager(
                 }
             }
             item {
-                Title(MLang.Settings.Section.DataSettings)
+                Title(stringResource(LocaleR.string.settings_section_data_settings))
                 Card {
                     if (backupInProgress) {
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     }
                     SettingsEntryItem(
-                        title = MLang.Settings.DataSettings.ExportBackup,
-                        summary = MLang.Settings.DataSettings.ExportBackupSummary,
+                        title = stringResource(LocaleR.string.settings_data_settings_export_backup),
+                        summary = stringResource(LocaleR.string.settings_data_settings_export_backup_summary),
                         imageVector = AppMd3Icons.Settings.ExportBackup,
                         enabled = !backupInProgress,
                         onClick = { exportBackupLauncher.launch("kokorobox-settings-backup.json") },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.DataSettings.ImportBackup,
-                        summary = MLang.Settings.DataSettings.ImportBackupSummary,
+                        title = stringResource(LocaleR.string.settings_data_settings_import_backup),
+                        summary = stringResource(LocaleR.string.settings_data_settings_import_backup_summary),
                         imageVector = AppMd3Icons.Settings.ImportBackup,
                         enabled = !backupInProgress,
                         onClick = { importBackupLauncher.launch("application/json") },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.DataSettings.AppDataManagement,
-                        summary = MLang.Settings.DataSettings.AppDataManagementSummary,
+                        title = stringResource(LocaleR.string.settings_data_settings_app_data_management),
+                        summary = stringResource(LocaleR.string.settings_data_settings_app_data_management_summary),
                         imageVector = AppMd3Icons.Settings.AppDataManagement,
                         onClick = { navigator.navigate(AppDataManagementScreenDestination) { launchSingleTop = true } },
                     )
                 }
             }
             item {
-                Title(MLang.Settings.Section.More)
+                Title(stringResource(LocaleR.string.settings_section_more))
 
                 Card {
                     SettingsEntryItem(
-                        title = MLang.Settings.More.Logs,
-                        summary = MLang.Settings.More.LogsSummary,
+                        title = stringResource(LocaleR.string.settings_more_logs),
+                        summary = stringResource(LocaleR.string.settings_more_logs_summary),
                         imageVector = AppMd3Icons.Settings.Logs,
                         onClick = { navigator.navigate(LogScreenDestination) { launchSingleTop = true } },
                     )
                     SettingsEntryItem(
-                        title = MLang.Settings.More.About,
-                        summary = MLang.Settings.More.AboutSummary,
+                        title = stringResource(LocaleR.string.settings_more_about),
+                        summary = stringResource(LocaleR.string.settings_more_about_summary),
                         imageVector = AppMd3Icons.Settings.About,
                         onClick = { navigator.navigate(AboutScreenDestination) { launchSingleTop = true } },
                         endActions = {
