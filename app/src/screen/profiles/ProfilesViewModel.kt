@@ -26,6 +26,8 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.model.FetchStatus
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.core.presentation.AndroidContractStateViewModel
 import com.amamiyakokoro.box.core.presentation.LoadableState
 import com.amamiyakokoro.box.data.store.LinkOpenMode
@@ -36,7 +38,6 @@ import com.amamiyakokoro.box.data.store.ProfileLinksStore
 import com.amamiyakokoro.box.runtime.client.ProfilesRepository
 import com.amamiyakokoro.box.service.remote.IFetchObserver
 import com.amamiyakokoro.box.service.runtime.entity.Profile
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -117,7 +118,9 @@ class ProfilesViewModel(
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.w("Failed to refresh amamiyakoko.ro account (%s)", e::class.java.simpleName)
-                KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.CheckFailedDetail)
+                KokoroAuthState.Error(
+                    UiText.Resource(LocaleR.string.profiles_page_kokoro_check_failed_detail),
+                )
             }
         }
     }
@@ -131,7 +134,9 @@ class ProfilesViewModel(
     ): ResolvedSubscription = kokoroRepository.resolveSubscription(settings)
 
     internal fun reportKokoroLoginFailure() {
-        _kokoroAuthState.value = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.LoginFailed)
+        _kokoroAuthState.value = KokoroAuthState.Error(
+            UiText.Resource(LocaleR.string.profiles_page_kokoro_login_failed),
+        )
     }
 
     internal fun logoutKokoroAccount() {
@@ -163,7 +168,7 @@ class ProfilesViewModel(
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to refresh profiles")
-                showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_update_failed, listOf(e.message.orEmpty())))
             } finally {
                 applyLoading(false)
             }
@@ -188,7 +193,7 @@ class ProfilesViewModel(
 
                 _downloadProgress.value = DownloadProgress(
                     percent = 0,
-                    message = MLang.ProfilesVM.Progress.Preparing,
+                    message = UiText.Resource(LocaleR.string.profiles_vm_progress_preparing),
                 )
 
                 val observer = IFetchObserver { status ->
@@ -208,15 +213,15 @@ class ProfilesViewModel(
                 }
                 _downloadProgress.value = DownloadProgress(
                     percent = 100,
-                    message = MLang.ProfilesVM.Progress.ImportComplete,
+                    message = UiText.Resource(LocaleR.string.profiles_vm_progress_import_complete),
                     isCompleted = true,
                 )
 
                 showMessage(
                     if (activateNewKokoroSubscription) {
-                        MLang.ProfilesVM.Message.ProfileAddedAndActivated.format(name)
+                        UiText.Resource(LocaleR.string.profiles_vm_message_profile_added_and_activated, listOf(name))
                     } else {
-                        MLang.ProfilesVM.Message.ProfileAdded.format(name)
+                        UiText.Resource(LocaleR.string.profiles_vm_message_profile_added, listOf(name))
                     },
                 )
                 refreshProfiles()
@@ -231,7 +236,7 @@ class ProfilesViewModel(
                         }
                 }
                 refreshProfiles()
-                showError(MLang.ProfilesVM.Message.AddFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_add_failed, listOf(e.message.orEmpty())))
                 _downloadProgress.value = null
             } finally {
                 applyLoading(false)
@@ -261,13 +266,13 @@ class ProfilesViewModel(
             try {
                 applyLoading(true)
                 val newUuid = profilesRepository.cloneProfile(uuid)
-                showMessage(MLang.ProfilesVM.Message.ProfileAdded.format("Clone"))
+                showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_added, listOf("Clone")))
                 refreshProfiles()
                 Timber.i("Profile cloned: from=$uuid to=$newUuid")
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to clone profile")
-                showError(MLang.ProfilesVM.Message.AddFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_add_failed, listOf(e.message.orEmpty())))
             } finally {
                 applyLoading(false)
             }
@@ -279,13 +284,13 @@ class ProfilesViewModel(
             try {
                 applyLoading(true)
                 profilesRepository.deleteProfile(uuid)
-                showMessage(MLang.ProfilesVM.Message.ProfileDeleted)
+                showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_deleted))
                 refreshProfiles()
                 Timber.i("Profile deleted: $uuid")
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to delete profile")
-                showError(MLang.ProfilesVM.Message.DeleteFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_delete_failed, listOf(e.message.orEmpty())))
             } finally {
                 applyLoading(false)
             }
@@ -297,13 +302,13 @@ class ProfilesViewModel(
             try {
                 applyLoading(true)
                 profilesRepository.setActiveProfile(uuid)
-                showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format("Active"))
+                showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_updated, listOf("Active")))
                 refreshProfiles()
                 Timber.i("Profile activated: $uuid")
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to activate profile")
-                showError(MLang.ProfilesVM.Message.ToggleFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_toggle_failed, listOf(e.message.orEmpty())))
             } finally {
                 applyLoading(false)
             }
@@ -322,7 +327,7 @@ class ProfilesViewModel(
                 applyLoading(true)
                 _downloadProgress.value = DownloadProgress(
                     percent = 0,
-                    message = MLang.ProfilesVM.Progress.Preparing,
+                    message = UiText.Resource(LocaleR.string.profiles_vm_progress_preparing),
                 )
 
                 val observer = IFetchObserver { status ->
@@ -337,10 +342,10 @@ class ProfilesViewModel(
                 if (uuid !in canceledProfileUpdateIds) {
                     _downloadProgress.value = DownloadProgress(
                         percent = 100,
-                        message = MLang.ProfilesVM.Progress.ImportComplete,
+                        message = UiText.Resource(LocaleR.string.profiles_vm_progress_import_complete),
                         isCompleted = true,
                     )
-                    showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(uuid.toString()))
+                    showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_updated, listOf(uuid.toString())))
                     refreshProfiles()
                     Timber.i("Profile updated: $uuid")
                 }
@@ -350,7 +355,7 @@ class ProfilesViewModel(
                     Timber.d("Profile update cancelled: $uuid")
                 } else {
                     Timber.e(e, "Failed to update profile")
-                    showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
+                    showError(UiText.Resource(LocaleR.string.profiles_vm_message_update_failed, listOf(e.message.orEmpty())))
                     _downloadProgress.value = null
                 }
             } finally {
@@ -390,13 +395,13 @@ class ProfilesViewModel(
                     interval,
                     resolveProfileUserAgent(Profile.Type.Url, source, userAgent),
                 )
-                showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(name))
+                showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_updated, listOf(name)))
                 refreshProfiles()
                 Timber.i("Profile patched: $uuid")
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to patch profile")
-                showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_update_failed, listOf(e.message.orEmpty())))
             } finally {
                 applyLoading(false)
             }
@@ -428,7 +433,7 @@ class ProfilesViewModel(
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to patch Kokoro profile settings")
-                showError(MLang.ProfilesVM.Message.UpdateFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_update_failed, listOf(e.message.orEmpty())))
             } finally {
                 applyLoading(false)
             }
@@ -508,17 +513,17 @@ class ProfilesViewModel(
                 if (profile.active) {
                     cancelProfileUpdateAndRestore(uuid)
                     profilesRepository.clearActiveProfile(profile)
-                    showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(profile.name))
+                    showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_updated, listOf(profile.name)))
                 } else {
                     profilesRepository.setActiveProfile(uuid)
-                    showMessage(MLang.ProfilesVM.Message.ProfileUpdated.format(profile.name))
+                    showMessage(UiText.Resource(LocaleR.string.profiles_vm_message_profile_updated, listOf(profile.name)))
                 }
                 refreshProfiles()
                 Timber.d("Profile toggled: $uuid, active=${!profile.active}")
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Timber.e(e, "Failed to toggle profile")
-                showError(MLang.ProfilesVM.Message.ToggleFailed.format(e.message ?: "Unknown"))
+                showError(UiText.Resource(LocaleR.string.profiles_vm_message_toggle_failed, listOf(e.message.orEmpty())))
             }
         }
     }
@@ -528,11 +533,11 @@ class ProfilesViewModel(
     }
 
     fun clearError() {
-        clearErrorState()
+        updateState { it.copy(error = null, errorText = null) }
     }
 
     fun clearMessage() {
-        clearMessageState()
+        updateState { it.copy(message = null, messageText = null) }
     }
 
     private fun applyLoading(loading: Boolean) {
@@ -566,17 +571,19 @@ class ProfilesViewModel(
         return File(getApplication<Application>().filesDir, "imported/${uuid}/config.yaml")
     }
 
-    private fun showError(message: String) {
-        postError(message, ProfilesUiEffect.ShowError(message))
+    private fun showError(message: UiText) {
+        updateState { it.copy(errorText = message, error = null, isLoading = false) }
+        tryEmitEffect(ProfilesUiEffect.ShowError(message))
     }
 
-    private fun showMessage(message: String) {
-        postMessage(message, ProfilesUiEffect.ShowMessage(message))
+    private fun showMessage(message: UiText) {
+        updateState { it.copy(messageText = message, message = null) }
+        tryEmitEffect(ProfilesUiEffect.ShowMessage(message))
     }
 
     sealed interface ProfilesUiEffect {
-        data class ShowMessage(val message: String) : ProfilesUiEffect
-        data class ShowError(val message: String) : ProfilesUiEffect
+        data class ShowMessage(val message: UiText) : ProfilesUiEffect
+        data class ShowError(val message: UiText) : ProfilesUiEffect
     }
 }
 
@@ -588,7 +595,9 @@ private data class ProfileConfigBackup(
 data class ProfilesUiState(
     override val isLoading: Boolean = false,
     override val error: String? = null,
-    override val message: String? = null
+    override val message: String? = null,
+    val errorText: UiText? = null,
+    val messageText: UiText? = null,
 ) : LoadableState<ProfilesUiState> {
     override fun withLoading(loading: Boolean): ProfilesUiState = copy(isLoading = loading)
     override fun withError(error: String?): ProfilesUiState = copy(error = error)
@@ -597,7 +606,7 @@ data class ProfilesUiState(
 
 data class DownloadProgress(
     val percent: Int?,
-    val message: String,
+    val message: UiText,
     val isCompleted: Boolean = false,
 )
 
@@ -605,21 +614,29 @@ private fun FetchStatus.toDownloadProgress(): DownloadProgress {
     val percent = if (max > 0) ((progress * 100) / max).coerceIn(0, 100) else null
     val detail = args.firstOrNull().orEmpty().trim()
 
-    val message = when (action) {
+    val message: UiText = when (action) {
         FetchStatus.Action.FetchConfiguration -> {
             if (percent == null || percent <= 5) {
-                MLang.ProfilesVM.Progress.Preparing
+                UiText.Resource(LocaleR.string.profiles_vm_progress_preparing)
             } else {
-                detail.ifBlank { MLang.ProfilesPage.Progress.Downloading }
+                if (detail.isBlank()) {
+                    UiText.Resource(LocaleR.string.profiles_page_progress_downloading)
+                } else {
+                    UiText.Dynamic(detail)
+                }
             }
         }
 
         FetchStatus.Action.FetchProviders -> {
-            if (detail.isNotBlank()) detail else ""
+            UiText.Dynamic(detail)
         }
 
         FetchStatus.Action.Verifying -> {
-            detail.ifBlank { MLang.ProfilesVM.Progress.Verifying }
+            if (detail.isBlank()) {
+                UiText.Resource(LocaleR.string.profiles_vm_progress_verifying)
+            } else {
+                UiText.Dynamic(detail)
+            }
         }
     }
 

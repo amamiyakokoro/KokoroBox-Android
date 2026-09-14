@@ -11,6 +11,8 @@ package com.amamiyakokoro.box.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroAuthenticationRequiredException
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRuleInput
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRulesOptions
@@ -21,7 +23,6 @@ import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesSaveOutcomeUnkno
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesValidationException
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesValidationReason
 import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -87,7 +88,9 @@ internal class KokoroCustomRulesViewModel(
                 _state.update {
                     it.copy(
                         loading = false,
-                        authState = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.CheckFailedDetail),
+                        authState = KokoroAuthState.Error(
+                            UiText.Resource(LocaleR.string.profiles_page_kokoro_check_failed_detail),
+                        ),
                         status = KokoroRulesStatus.LOAD_FAILED,
                     )
                 }

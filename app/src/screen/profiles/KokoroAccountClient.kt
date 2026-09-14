@@ -11,6 +11,7 @@ package com.amamiyakokoro.box.screen.profiles
 
 import android.content.Context
 import android.net.Uri
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.BuildConfig
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroApi as KokoroBackendApi
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroAuthenticationRequiredException
@@ -229,7 +230,7 @@ internal sealed interface KokoroAuthState {
     data object Checking : KokoroAuthState
     data object LoggedOut : KokoroAuthState
     data class Authenticated(val account: KokoroAccount) : KokoroAuthState
-    data class Error(val message: String) : KokoroAuthState
+    data class Error(val message: UiText) : KokoroAuthState
 }
 
 class KokoroAccountClient(context: Context) {

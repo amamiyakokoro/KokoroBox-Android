@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.amamiyakokoro.box.common.util.ByteFormatter
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.resolve
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
 import com.amamiyakokoro.box.presentation.component.PreferenceSwitchItem
@@ -172,7 +173,7 @@ internal fun KokoroAccountCard(
                 is KokoroAuthState.Error -> {
                     StatusText(
                         title = stringResource(LocaleR.string.profiles_page_kokoro_check_failed),
-                        detail = authState.message,
+                        detail = authState.message.resolve(LocalContext.current.resources),
                         error = true,
                     )
                     Column(

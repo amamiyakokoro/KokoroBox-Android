@@ -62,6 +62,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.resolve
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetConfirmAction
@@ -272,8 +273,8 @@ internal fun AddProfileSheet(
         }
         onDispose { }
     }
-    LaunchedEffect(uiState.error) {
-        val errorMessage = uiState.error
+    LaunchedEffect(uiState.errorText) {
+        val errorMessage = uiState.errorText?.resolve(context.resources)
         if (errorMessage != null) {
             context.toast(errorMessage, Toast.LENGTH_LONG, copyable = true)
             if (isDownloading) {
@@ -291,12 +292,12 @@ internal fun AddProfileSheet(
         }
     }
 
-    LaunchedEffect(uiState.message) {
-        if (uiState.message != null && isDownloading && !hasShownCompleteAnimation) {
+    LaunchedEffect(uiState.messageText) {
+        if (uiState.messageText != null && isDownloading && !hasShownCompleteAnimation) {
             hasShownCompleteAnimation = true
             onDownloadComplete()
         }
-        if (uiState.message != null) {
+        if (uiState.messageText != null) {
             profilesViewModel.clearMessage()
         }
     }
@@ -622,7 +623,7 @@ private fun DownloadProgressContent(
             }
         }
 
-        downloadProgress?.message?.let { message ->
+        downloadProgress?.message?.resolve(LocalContext.current.resources)?.let { message ->
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyLarge,

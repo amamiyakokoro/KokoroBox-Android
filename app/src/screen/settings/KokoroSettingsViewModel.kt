@@ -11,9 +11,10 @@ package com.amamiyakokoro.box.screen.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
 import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +38,9 @@ internal class KokoroSettingsViewModel(
                     ?: KokoroAuthState.LoggedOut
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
-                KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.CheckFailedDetail)
+                KokoroAuthState.Error(
+                    UiText.Resource(LocaleR.string.profiles_page_kokoro_check_failed_detail),
+                )
             }
         }
     }
@@ -47,7 +50,9 @@ internal class KokoroSettingsViewModel(
     suspend fun cancelLogin(loginUrl: String) = repository.cancelLogin(loginUrl)
 
     fun reportLoginFailure() {
-        _authState.value = KokoroAuthState.Error(MLang.ProfilesPage.Kokoro.LoginFailed)
+        _authState.value = KokoroAuthState.Error(
+            UiText.Resource(LocaleR.string.profiles_page_kokoro_login_failed),
+        )
     }
 
     fun logout() {
