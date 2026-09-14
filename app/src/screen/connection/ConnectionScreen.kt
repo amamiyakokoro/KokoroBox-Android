@@ -46,8 +46,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.feature.meta.presentation.component.ConnectionCard
 import com.amamiyakokoro.box.feature.meta.presentation.component.ConnectionDetailSheet
 import com.amamiyakokoro.box.feature.meta.presentation.component.TabRowWithContour
@@ -62,7 +64,6 @@ import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 
 private val SortModes = listOf(
@@ -72,11 +73,12 @@ private val SortModes = listOf(
     ConnectionSort.Host,
 )
 
+@Composable
 private fun ConnectionSort.getDisplayName(): String = when (this) {
-    ConnectionSort.Time -> MLang.Connection.Sort.Time
-    ConnectionSort.Upload -> MLang.Connection.Sort.Upload
-    ConnectionSort.Download -> MLang.Connection.Sort.Download
-    ConnectionSort.Host -> MLang.Connection.Sort.Host
+    ConnectionSort.Time -> stringResource(LocaleR.string.connection_sort_time)
+    ConnectionSort.Upload -> stringResource(LocaleR.string.connection_sort_upload)
+    ConnectionSort.Download -> stringResource(LocaleR.string.connection_sort_download)
+    ConnectionSort.Host -> stringResource(LocaleR.string.connection_sort_host)
 }
 
 @Destination<RootGraph>
@@ -96,7 +98,10 @@ fun ConnectionScreen(
     var selectedConnection by remember { mutableStateOf<com.amamiyakokoro.box.core.model.ConnectionInfo?>(null) }
     var showDetailSheet by remember { mutableStateOf(false) }
 
-    val tabs = listOf(MLang.Connection.Tab.Active, MLang.Connection.Tab.Closed)
+    val tabs = listOf(
+        stringResource(LocaleR.string.connection_tab_active),
+        stringResource(LocaleR.string.connection_tab_closed),
+    )
     var selectedTabIndex by rememberSaveable(state.selectedTab) {
         mutableIntStateOf(
             when (state.selectedTab) {
@@ -110,9 +115,9 @@ fun ConnectionScreen(
     }
     val emptyStateText =
         when {
-            state.isLoading -> MLang.Connection.Loading
-            state.searchQuery.isNotEmpty() -> MLang.Connection.NoResults
-            else -> MLang.Connection.Empty
+            state.isLoading -> stringResource(LocaleR.string.connection_loading)
+            state.searchQuery.isNotEmpty() -> stringResource(LocaleR.string.connection_no_results)
+            else -> stringResource(LocaleR.string.connection_empty)
         }
 
     LaunchedEffect(selectedTabIndex) {
@@ -145,7 +150,7 @@ fun ConnectionScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.Connection.Title,
+                title = stringResource(LocaleR.string.connection_title),
                 actions = {
                     Box {
                         IconButton(
@@ -153,7 +158,7 @@ fun ConnectionScreen(
                             onClick = { showSortPopup = true }) {
                             Icon(
                                 imageVector = AppMd3Icons.Connection.SortBy,
-                                contentDescription = MLang.Connection.SortBy.trimEnd(':', '：'),
+                                contentDescription = stringResource(LocaleR.string.connection_sort_by).trimEnd(':', '：'),
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
@@ -189,7 +194,7 @@ fun ConnectionScreen(
                         onClick = { showSearchBar = !showSearchBar }) {
                         Icon(
                             imageVector = AppMd3Icons.Connection.SearchConnection,
-                            contentDescription = MLang.Connection.Search,
+                            contentDescription = stringResource(LocaleR.string.connection_search),
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -316,7 +321,7 @@ private fun ConnectionSearchField(
             ) {
                 Icon(
                     imageVector = AppMd3Icons.Connection.SearchConnection,
-                    contentDescription = MLang.Component.Editor.Action.Search,
+                    contentDescription = stringResource(LocaleR.string.component_editor_action_search),
                     modifier = Modifier
                         .size(componentSizes.searchIconTouchTarget)
                         .padding(start = spacing.space16, end = spacing.space8),
@@ -325,7 +330,7 @@ private fun ConnectionSearchField(
                 Box(modifier = Modifier.weight(1f)) {
                     if (value.isEmpty()) {
                         Text(
-                            text = MLang.Connection.SearchHint,
+                            text = stringResource(LocaleR.string.connection_search_hint),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

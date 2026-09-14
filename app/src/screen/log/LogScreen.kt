@@ -60,10 +60,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.model.LogMessage
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.data.store.LogStore
@@ -80,7 +82,6 @@ import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -95,6 +96,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
     val spacing = AppTheme.spacing
     val componentSizes = AppTheme.sizes
     val lifecycleOwner = LocalLifecycleOwner.current
+    val unknownError = stringResource(LocaleR.string.util_error_unknown_error)
 
     val isRecording by viewModel.isRecording.collectAsStateWithLifecycle()
     val logEntries by viewModel.tempLogEntries.collectAsStateWithLifecycle()
@@ -110,7 +112,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
             val success = viewModel.saveTempLog(uri)
             if (!success) {
                 launch(Dispatchers.Main) {
-                    context.toast(MLang.Util.Error.UnknownError)
+                    context.toast(unknownError)
                 }
             }
         }
@@ -141,7 +143,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
-                title = MLang.Log.Title,
+                title = stringResource(LocaleR.string.log_title),
                 actions = {
                     if (logEntries.isNotEmpty()) {
                         IconButton(
@@ -149,7 +151,7 @@ fun LogScreen(navigator: DestinationsNavigator) {
                         ) {
                             Icon(
                                 imageVector = AppMd3Icons.Action.Share,
-                                contentDescription = "Save",
+                                contentDescription = stringResource(LocaleR.string.log_action_save),
                             )
                         }
                     }
@@ -209,7 +211,11 @@ fun LogScreen(navigator: DestinationsNavigator) {
                 ) {
                     Icon(
                         imageVector = if (isRecording) AppMd3Icons.Status.RecordingStop else AppMd3Icons.Status.RecordingStart,
-                        contentDescription = if (isRecording) "Stop recording" else "Start recording",
+                        contentDescription = if (isRecording) {
+                            stringResource(LocaleR.string.log_action_stop_recording)
+                        } else {
+                            stringResource(LocaleR.string.log_action_start_recording)
+                        },
                     )
                 }
             }
@@ -217,16 +223,16 @@ fun LogScreen(navigator: DestinationsNavigator) {
     ) { innerPadding ->
         if (logEntries.isEmpty() && isRecording.not()) {
             CenteredText(
-                firstLine = MLang.Log.Empty.NoLogs,
-                secondLine = MLang.Log.Empty.StartRecordingHint,
+                firstLine = stringResource(LocaleR.string.log_empty_no_logs),
+                secondLine = stringResource(LocaleR.string.log_empty_start_recording_hint),
             )
             return@Scaffold
         }
 
         if (logEntries.isEmpty() && isRecording) {
             CenteredText(
-                firstLine = MLang.Log.Detail.WaitingLog,
-                secondLine = MLang.Log.Detail.WillShowWhenGenerated,
+                firstLine = stringResource(LocaleR.string.log_detail_waiting_log),
+                secondLine = stringResource(LocaleR.string.log_detail_will_show_when_generated),
             )
             return@Scaffold
         }

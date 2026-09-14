@@ -35,6 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppConfirmDialog
 import com.amamiyakokoro.box.presentation.component.AppFormDialog
 import com.amamiyakokoro.box.presentation.component.AppTextFieldDialog
@@ -54,7 +56,6 @@ import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import java.util.UUID
 
 object EditorDataHolder {
@@ -145,7 +146,7 @@ fun StringListEditorScreen(
     val items = remember { mutableStateListOf<TextDraftItem>() }
     val title = EditorDataHolder.listEditorTitle
     val placeholder = EditorDataHolder.listEditorPlaceholder
-    val isOverrideRuleEditor = title == MLang.Override.Label.RulesReplace
+    val isOverrideRuleEditor = title == stringResource(LocaleR.string.override_label_rules_replace)
     var dialogState by remember { mutableStateOf<StringListDialogState>(StringListDialogState.None) }
 
     LaunchedEffect(title, placeholder) {
@@ -190,8 +191,8 @@ fun StringListEditorScreen(
         val combinedInnerPadding = combinePaddingValues(innerPadding, mainLikePadding)
         if (items.isEmpty()) {
             EditorEmptyState(
-                title = MLang.Component.Editor.Empty.Title,
-                hint = MLang.Component.Editor.Empty.Hint,
+                title = stringResource(LocaleR.string.component_editor_empty_title),
+                hint = stringResource(LocaleR.string.component_editor_empty_hint),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(combinedInnerPadding),
@@ -203,7 +204,7 @@ fun StringListEditorScreen(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 item {
-                    Title(MLang.Component.Editor.CountItems.format(items.size))
+                    Title(stringResource(LocaleR.string.component_editor_count_items).format(items.size))
                 }
                 items(
                     items = items,
@@ -227,7 +228,7 @@ fun StringListEditorScreen(
         StringListDialogState.None -> Unit
         StringListDialogState.Add -> {
             SimpleTextEditorDialog(
-                title = MLang.Component.Editor.Dialog.AddTitle,
+                title = stringResource(LocaleR.string.component_editor_dialog_add_title),
                 placeholder = placeholder,
                 initialValue = "",
                 onDismiss = { dialogState = StringListDialogState.None },
@@ -242,7 +243,7 @@ fun StringListEditorScreen(
             val currentItem = items.firstOrNull { it.id == state.itemId }
             if (currentItem != null) {
                 SimpleTextEditorDialog(
-                    title = MLang.Component.Editor.Dialog.EditTitle,
+                    title = stringResource(LocaleR.string.component_editor_dialog_edit_title),
                     placeholder = placeholder,
                     initialValue = currentItem.value,
                     onDismiss = { dialogState = StringListDialogState.None },
@@ -262,8 +263,8 @@ fun StringListEditorScreen(
         StringListDialogState.Reset -> {
             AppConfirmDialog(
                 show = true,
-                title = MLang.Component.Editor.Dialog.ResetTitle,
-                message = MLang.Component.Editor.Dialog.ResetMessage,
+                title = stringResource(LocaleR.string.component_editor_dialog_reset_title),
+                message = stringResource(LocaleR.string.component_editor_dialog_reset_message),
                 onDismissRequest = { dialogState = StringListDialogState.None },
                 onConfirm = {
                     dialogState = StringListDialogState.None
@@ -277,7 +278,7 @@ fun StringListEditorScreen(
 
         StringListDialogState.AddRule -> {
             RuleEditorDialog(
-                title = MLang.Component.Editor.Dialog.AddTitle,
+                title = stringResource(LocaleR.string.component_editor_dialog_add_title),
                 onDismiss = { dialogState = StringListDialogState.None },
                 onConfirm = { value ->
                     items.add(TextDraftItem(UUID.randomUUID().toString(), value))
@@ -341,8 +342,8 @@ fun KeyValueEditorScreen(
         val combinedInnerPadding = combinePaddingValues(innerPadding, mainLikePadding)
         if (items.isEmpty()) {
             EditorEmptyState(
-                title = MLang.Component.Editor.Empty.Title,
-                hint = MLang.Component.Editor.Empty.Hint,
+                title = stringResource(LocaleR.string.component_editor_empty_title),
+                hint = stringResource(LocaleR.string.component_editor_empty_hint),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(combinedInnerPadding),
@@ -354,7 +355,7 @@ fun KeyValueEditorScreen(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 item {
-                    Title(MLang.Component.Editor.CountItems.format(items.size))
+                    Title(stringResource(LocaleR.string.component_editor_count_items).format(items.size))
                 }
                 items(
                     items = items,
@@ -379,7 +380,7 @@ fun KeyValueEditorScreen(
         KeyValueDialogState.None -> Unit
         KeyValueDialogState.Add -> {
             KeyValueFormDialog(
-                title = MLang.Component.Editor.Dialog.AddTitle,
+                title = stringResource(LocaleR.string.component_editor_dialog_add_title),
                 keyPlaceholder = keyPlaceholder,
                 valuePlaceholder = valuePlaceholder,
                 existingKeys = items.map(KeyValueDraftItem::key).toSet(),
@@ -397,7 +398,7 @@ fun KeyValueEditorScreen(
             val currentItem = items.firstOrNull { it.id == state.itemId }
             if (currentItem != null) {
                 KeyValueFormDialog(
-                    title = MLang.Component.Editor.Dialog.EditTitle,
+                    title = stringResource(LocaleR.string.component_editor_dialog_edit_title),
                     keyPlaceholder = keyPlaceholder,
                     valuePlaceholder = valuePlaceholder,
                     existingKeys = items.map(KeyValueDraftItem::key).toSet(),
@@ -421,8 +422,8 @@ fun KeyValueEditorScreen(
         KeyValueDialogState.Reset -> {
             AppConfirmDialog(
                 show = true,
-                title = MLang.Component.Editor.Dialog.ResetTitle,
-                message = MLang.Component.Editor.Dialog.ResetMessage,
+                title = stringResource(LocaleR.string.component_editor_dialog_reset_title),
+                message = stringResource(LocaleR.string.component_editor_dialog_reset_message),
                 onDismissRequest = { dialogState = KeyValueDialogState.None },
                 onConfirm = {
                     dialogState = KeyValueDialogState.None
@@ -525,6 +526,8 @@ private fun KeyValueFormDialog(
     var key by remember(initialKey) { mutableStateOf(initialKey) }
     var value by remember(initialValue) { mutableStateOf(initialValue) }
     var error by remember { mutableStateOf<String?>(null) }
+    val keyEmptyError = stringResource(LocaleR.string.component_editor_error_key_empty)
+    val keyExistsError = stringResource(LocaleR.string.component_editor_error_key_exists)
 
     AppFormDialog(
         show = true,
@@ -534,8 +537,8 @@ private fun KeyValueFormDialog(
             val normalizedKey = key.trim()
             val normalizedValue = value.trim()
             error = when {
-                normalizedKey.isBlank() -> MLang.Component.Editor.Error.KeyEmpty
-                normalizedKey != currentEditingKey && normalizedKey in existingKeys -> MLang.Component.Editor.Error.KeyExists
+                normalizedKey.isBlank() -> keyEmptyError
+                normalizedKey != currentEditingKey && normalizedKey in existingKeys -> keyExistsError
                 else -> null
             }
             if (error == null) {
@@ -570,16 +573,20 @@ private fun RuleEditorDialog(
 ) {
     var ruleType by remember { mutableStateOf("DOMAIN-SUFFIX") }
     var payload by remember { mutableStateOf("") }
-    var target by remember { mutableStateOf(MLang.Component.Editor.Rule.TargetReject) }
+    val targetReject = stringResource(LocaleR.string.component_editor_rule_target_reject)
+    val targetDirect = stringResource(LocaleR.string.component_editor_rule_target_direct)
+    val targetMatch = stringResource(LocaleR.string.component_editor_rule_target_match)
+    val contentRequiredError = stringResource(LocaleR.string.component_editor_rule_error_content_required)
+    var target by remember(targetReject) { mutableStateOf(targetReject) }
     var useSrc by remember { mutableStateOf(false) }
     var useNoResolve by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    val targetItems = remember {
+    val targetItems = remember(targetReject, targetDirect, targetMatch) {
         listOf(
-            MLang.Component.Editor.Rule.TargetReject,
-            MLang.Component.Editor.Rule.TargetDirect,
-            MLang.Component.Editor.Rule.TargetMatch,
+            targetReject,
+            targetDirect,
+            targetMatch,
         )
     }
     val selectedRuleTypeIndex = remember(ruleType) {
@@ -597,12 +604,12 @@ private fun RuleEditorDialog(
             val normalizedType = ruleType.trim().uppercase()
             val normalizedPayload = payload.trim()
 
-            if (target != MLang.Component.Editor.Rule.TargetMatch && normalizedPayload.isBlank()) {
-                error = MLang.Component.Editor.Rule.ErrorContentRequired
+            if (target != targetMatch && normalizedPayload.isBlank()) {
+                error = contentRequiredError
                 return@AppFormDialog
             }
 
-            val result = if (target == MLang.Component.Editor.Rule.TargetMatch) {
+            val result = if (target == targetMatch) {
                 "MATCH"
             } else {
                 buildList {
@@ -620,7 +627,7 @@ private fun RuleEditorDialog(
         error = error,
     ) {
         YumeMd3DropdownPreference(
-            title = MLang.Component.Editor.Rule.Type,
+            title = stringResource(LocaleR.string.component_editor_rule_type),
             items = RULE_TYPE_PRESETS,
             selectedIndex = selectedRuleTypeIndex,
             onSelectedIndexChange = { index ->
@@ -629,7 +636,7 @@ private fun RuleEditorDialog(
             },
         )
         YumeMd3DropdownPreference(
-            title = MLang.Component.Editor.Rule.Target,
+            title = stringResource(LocaleR.string.component_editor_rule_target),
             items = targetItems,
             selectedIndex = selectedTargetIndex,
             onSelectedIndexChange = { index ->
@@ -643,12 +650,12 @@ private fun RuleEditorDialog(
                 payload = it
                 error = null
             },
-            label = MLang.Component.Editor.Rule.Content,
+            label = stringResource(LocaleR.string.component_editor_rule_content),
             modifier = Modifier.fillMaxWidth(),
         )
         if (supportsRuleExtra(ruleType)) {
             PreferenceValueItem(
-                title = MLang.Component.Editor.Rule.Src,
+                title = stringResource(LocaleR.string.component_editor_rule_src),
                 summary = null,
                 onClick = { useSrc = !useSrc },
                 endActions = {
@@ -659,7 +666,7 @@ private fun RuleEditorDialog(
                 },
             )
             PreferenceValueItem(
-                title = MLang.Component.Editor.Rule.NoResolve,
+                title = stringResource(LocaleR.string.component_editor_rule_no_resolve),
                 summary = null,
                 onClick = { useNoResolve = !useNoResolve },
                 endActions = {
