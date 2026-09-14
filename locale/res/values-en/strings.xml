@@ -1225,6 +1225,12 @@
     <string name="service_auto_restart_channel_name" formatted="false">Auto Restart Service</string>
     <string name="service_auto_restart_checking" formatted="false">Checking auto-start...</string>
     <string name="service_notification_running" formatted="false">Running</string>
+    <string name="service_notification_starting" formatted="false">Starting…</string>
+    <string name="service_notification_stopping" formatted="false">Stopping…</string>
+    <string name="service_notification_stopped" formatted="false">Stopped</string>
+    <string name="service_notification_failed_format">Failed: %1$s</string>
+    <string name="service_notification_state_unavailable" formatted="false">State unavailable</string>
+    <string name="service_notification_waiting_for_reconnect" formatted="false">Waiting for reconnect</string>
     <string name="service_notification_speed_format" formatted="false">Down %s  Up %s</string>
     <string name="service_notification_today_traffic_format" formatted="false">Today’s traffic: %s</string>
     <string name="service_notification_traffic_format" formatted="false">Total: %s</string>

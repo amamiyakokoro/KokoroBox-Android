@@ -134,11 +134,13 @@ class RootTunService : BaseService() {
                                 val content = if (unreachableCount >= 3) {
                                     describeStatus(
                                         fallbackStatus.copy(
-                                            lastError = fallbackStatus.lastError ?: error?.message ?: "State unavailable",
+                                            lastError = fallbackStatus.lastError ?: error?.message
+                                                ?: getString(LocaleR.string.service_notification_state_unavailable),
                                         ),
                                     )
                                 } else {
-                                    error?.message ?: "Waiting for reconnect"
+                                    error?.message
+                                        ?: getString(LocaleR.string.service_notification_waiting_for_reconnect)
                                 }
                                 notifyIfChanged(
                                     buildNotification(
@@ -357,11 +359,14 @@ class RootTunService : BaseService() {
 
     private fun describeStatus(status: RootTunStatus): String {
         return when (status.state) {
-            RootTunState.Starting -> "Starting..."
+            RootTunState.Starting -> getString(LocaleR.string.service_notification_starting)
             RootTunState.Running -> getString(LocaleR.string.service_notification_running)
-            RootTunState.Stopping -> "Stopping..."
-            RootTunState.Failed -> "Failed: ${status.lastError ?: "unknown error"}"
-            RootTunState.Idle -> "Stopped"
+            RootTunState.Stopping -> getString(LocaleR.string.service_notification_stopping)
+            RootTunState.Failed -> getString(
+                LocaleR.string.service_notification_failed_format,
+                status.lastError ?: getString(LocaleR.string.util_error_unknown_error),
+            )
+            RootTunState.Idle -> getString(LocaleR.string.service_notification_stopped)
         }
     }
 
