@@ -30,9 +30,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
@@ -40,7 +42,6 @@ import com.amamiyakokoro.box.presentation.util.decodeObjectFields
 import com.amamiyakokoro.box.presentation.util.encodeObjectFields
 import com.amamiyakokoro.box.presentation.util.jsonElementToEditorValue
 import com.amamiyakokoro.box.presentation.util.toOrderedJsonElementMap
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
 import java.util.UUID
 
@@ -57,7 +58,7 @@ fun StringListEditorDialog(
     AppTextFieldDialog(
         show = show.value,
         title = title,
-        summary = MLang.Override.Editor.OneItemPerLine,
+        summary = stringResource(LocaleR.string.override_editor_one_item_per_line),
         value = editText,
         onValueChange = { editText = it },
         label = placeholder,
@@ -85,7 +86,7 @@ fun JsonTextEditorDialog(
     com.amamiyakokoro.box.feature.editor.presentation.component.JsonEditorDialog(
         show = show,
         title = title,
-        subtitle = MLang.Override.Editor.JsonBlockSubtitle,
+        subtitle = stringResource(LocaleR.string.override_editor_json_block_subtitle),
         value = value,
         onValueChange = onValueChange,
         onDismiss = onDismiss,
@@ -161,7 +162,7 @@ fun StringMapEditorDialog(
                     itemKeys.add(newEditorItemKey())
                 },
             ) {
-                Text(MLang.Override.Editor.AddItem)
+                Text(stringResource(LocaleR.string.override_editor_add_item))
             }
             Button(
                 modifier = Modifier.weight(1f),
@@ -178,7 +179,7 @@ fun StringMapEditorDialog(
                     contentColor = destructiveActionColors.contentColor,
                 ),
             ) {
-                Text(MLang.Override.Editor.DeleteLastItem)
+                Text(stringResource(LocaleR.string.override_editor_delete_last_item))
             }
         }
     }
@@ -213,7 +214,7 @@ fun JsonObjectListEditorDialog(
             modifier = Modifier.padding(UiDp.dp20),
         ) {
             Text(
-                text = MLang.Override.Editor.ObjectListHint,
+                text = stringResource(LocaleR.string.override_editor_object_list_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline,
             )
@@ -227,12 +228,18 @@ fun JsonObjectListEditorDialog(
                         insideMargin = androidx.compose.foundation.layout.PaddingValues(UiDp.dp12),
                     ) {
                         Text(
-                            text = objectCardTitle(fields, MLang.Override.Editor.ObjectFallbackTitle.format(index + 1)),
+                            text = objectCardTitle(
+                                fields,
+                                stringResource(LocaleR.string.override_editor_object_fallback_title).format(index + 1),
+                            ),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                         )
                         Text(
-                            text = objectCardSubtitle(fields),
+                            text = objectCardSubtitle(
+                                fields,
+                                stringResource(LocaleR.string.override_editor_object_field_count).format(fields.size),
+                            ),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = UiDp.dp4),
@@ -248,7 +255,7 @@ fun JsonObjectListEditorDialog(
                                     showItemEditor.value = true
                                 },
                             ) {
-                                Text(MLang.Override.Editor.Edit)
+                                Text(stringResource(LocaleR.string.override_editor_edit))
                             }
                             Button(
                                 modifier = Modifier.weight(1f),
@@ -257,7 +264,7 @@ fun JsonObjectListEditorDialog(
                                     itemKeys.add(index + 1, newEditorItemKey())
                                 },
                             ) {
-                                Text(MLang.Override.Editor.Copy)
+                                Text(stringResource(LocaleR.string.override_editor_copy))
                             }
                             Button(
                                 modifier = Modifier.weight(1f),
@@ -270,7 +277,7 @@ fun JsonObjectListEditorDialog(
                                     contentColor = destructiveActionColors.contentColor,
                                 ),
                             ) {
-                                Text(MLang.Override.Card.Delete)
+                                Text(stringResource(LocaleR.string.override_card_delete))
                             }
                         }
                         Spacer(modifier = Modifier.height(UiDp.dp8))
@@ -285,7 +292,7 @@ fun JsonObjectListEditorDialog(
                                     moveStringItem(itemKeys, index, index - 1)
                                 },
                             ) {
-                                Text(MLang.Override.Editor.MoveUp)
+                                Text(stringResource(LocaleR.string.override_editor_move_up))
                             }
                             Button(
                                 modifier = Modifier.weight(1f),
@@ -295,7 +302,7 @@ fun JsonObjectListEditorDialog(
                                     moveStringItem(itemKeys, index, index + 1)
                                 },
                             ) {
-                                Text(MLang.Override.Editor.MoveDown)
+                                Text(stringResource(LocaleR.string.override_editor_move_down))
                             }
                         }
                     }
@@ -316,7 +323,7 @@ fun JsonObjectListEditorDialog(
                 ),
             ) {
                 Text(
-                    text = MLang.Override.Editor.AddObject,
+                    text = stringResource(LocaleR.string.override_editor_add_object),
                 )
             }
             Spacer(modifier = Modifier.height(UiDp.dp24))
@@ -326,8 +333,8 @@ fun JsonObjectListEditorDialog(
                     onValueChange(drafts.toList().ifEmpty { null })
                     show.value = false
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Confirm,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_confirm),
             )
         }
     }
@@ -374,7 +381,7 @@ fun JsonObjectMapEditorDialog(
             modifier = Modifier.padding(UiDp.dp20),
         ) {
             Text(
-                text = MLang.Override.Editor.ProviderMapHint,
+                text = stringResource(LocaleR.string.override_editor_provider_map_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline,
             )
@@ -388,12 +395,15 @@ fun JsonObjectMapEditorDialog(
                         insideMargin = androidx.compose.foundation.layout.PaddingValues(UiDp.dp12),
                     ) {
                         Text(
-                            text = draft.first.ifBlank { MLang.Override.Editor.UnnamedProvider },
+                            text = draft.first.ifBlank { stringResource(LocaleR.string.override_editor_unnamed_provider) },
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                         )
                         Text(
-                            text = objectCardSubtitle(draft.second),
+                            text = objectCardSubtitle(
+                                draft.second,
+                                stringResource(LocaleR.string.override_editor_object_field_count).format(draft.second.size),
+                            ),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = UiDp.dp4),
@@ -409,7 +419,7 @@ fun JsonObjectMapEditorDialog(
                                     showItemEditor.value = true
                                 },
                             ) {
-                                Text(MLang.Override.Editor.Edit)
+                                Text(stringResource(LocaleR.string.override_editor_edit))
                             }
                             Button(
                                 modifier = Modifier.weight(1f),
@@ -422,7 +432,7 @@ fun JsonObjectMapEditorDialog(
                                     contentColor = destructiveActionColors.contentColor,
                                 ),
                             ) {
-                                Text(MLang.Override.Card.Delete)
+                                Text(stringResource(LocaleR.string.override_card_delete))
                             }
                         }
                     }
@@ -443,7 +453,7 @@ fun JsonObjectMapEditorDialog(
                 ),
             ) {
                 Text(
-                    text = MLang.Override.Editor.NewProvider,
+                    text = stringResource(LocaleR.string.override_editor_new_provider),
                 )
             }
             Spacer(modifier = Modifier.height(UiDp.dp24))
@@ -456,8 +466,8 @@ fun JsonObjectMapEditorDialog(
                     onValueChange(mappedValue.ifEmpty { null })
                     show.value = false
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Confirm,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_confirm),
             )
         }
     }
@@ -509,7 +519,7 @@ fun SubRulesEditorDialog(
             modifier = Modifier.padding(UiDp.dp20),
         ) {
             Text(
-                text = MLang.Override.Editor.SubRuleGroupHint,
+                text = stringResource(LocaleR.string.override_editor_sub_rule_group_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline,
             )
@@ -551,7 +561,7 @@ fun SubRulesEditorDialog(
                 ),
             ) {
                 Text(
-                    text = MLang.Override.Editor.AddSubRuleGroup,
+                    text = stringResource(LocaleR.string.override_editor_add_sub_rule_group),
                 )
             }
             Spacer(modifier = Modifier.height(UiDp.dp24))
@@ -564,16 +574,18 @@ fun SubRulesEditorDialog(
                     onValueChange(mappedValue.ifEmpty { null })
                     show.value = false
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Confirm,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_confirm),
             )
         }
     }
 
     StringListEditorDialog(
         show = showRulesEditor,
-        title = drafts.getOrNull(editingIndex)?.first?.ifBlank { MLang.Override.Editor.EditSubRule } ?: MLang.Override.Editor.EditSubRule,
-        placeholder = MLang.Override.Editor.RulePlaceholder,
+        title = drafts.getOrNull(editingIndex)?.first?.ifBlank {
+            stringResource(LocaleR.string.override_editor_edit_sub_rule)
+        } ?: stringResource(LocaleR.string.override_editor_edit_sub_rule),
+        placeholder = stringResource(LocaleR.string.override_editor_rule_placeholder),
         value = drafts.getOrNull(editingIndex)?.second,
         onValueChange = { updatedRules ->
             if (editingIndex in drafts.indices) {
@@ -599,7 +611,7 @@ private fun JsonObjectFieldsDialog(
     AppFormDialog(
         show = show.value,
         title = title,
-        summary = MLang.Override.Editor.ObjectFieldHint,
+        summary = stringResource(LocaleR.string.override_editor_object_field_hint),
         onConfirm = {
             val fields = decodeObjectFields(rawJson).orEmpty()
             onConfirm(
@@ -614,14 +626,14 @@ private fun JsonObjectFieldsDialog(
             YumeMd3OutlinedTextField(
                 value = keyText,
                 onValueChange = { keyText = it },
-                label = MLang.Override.Editor.KeyName,
+                label = stringResource(LocaleR.string.override_editor_key_name),
                 modifier = Modifier.fillMaxWidth(),
             )
         }
         YumeMd3OutlinedTextField(
             value = rawJson,
             onValueChange = { rawJson = it },
-            label = MLang.Override.Editor.ObjectJsonPlaceholder,
+            label = stringResource(LocaleR.string.override_editor_object_json_placeholder),
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = UiDp.dp220),
@@ -638,9 +650,11 @@ private fun objectCardTitle(
     return nameField?.takeIf(String::isNotBlank) ?: fallbackTitle
 }
 
-private fun objectCardSubtitle(fields: Map<String, JsonElement>): String {
+private fun objectCardSubtitle(
+    fields: Map<String, JsonElement>,
+    keyCountText: String,
+): String {
     val typeField = fields["type"]?.let(::jsonElementToEditorValue)?.takeIf(String::isNotBlank)
-    val keyCountText = MLang.Override.Editor.ObjectFieldCount.format(fields.size)
     return if (typeField != null) {
         "$typeField · $keyCountText"
     } else {
@@ -725,12 +739,16 @@ private fun SubRuleEntryCard(
                 nameText = it
                 onNameChange(it)
             },
-            label = MLang.Override.Editor.SubRuleName,
+            label = stringResource(LocaleR.string.override_editor_sub_rule_name),
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(UiDp.dp8))
         Text(
-            text = if (rulesCount == 0) MLang.Override.Draft.NoRules else MLang.Override.Editor.RulesConfiguredInline.format(rulesCount),
+            text = if (rulesCount == 0) {
+                stringResource(LocaleR.string.override_draft_no_rules)
+            } else {
+                stringResource(LocaleR.string.override_editor_rules_configured_inline).format(rulesCount)
+            },
             fontSize = 13.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -742,7 +760,7 @@ private fun SubRuleEntryCard(
                 modifier = Modifier.weight(1f),
                 onClick = onEditRules,
             ) {
-                Text(MLang.Override.Editor.EditRule)
+                Text(stringResource(LocaleR.string.override_editor_edit_rule))
             }
             Button(
                 modifier = Modifier.weight(1f),
@@ -752,7 +770,7 @@ private fun SubRuleEntryCard(
                     contentColor = destructiveActionColors.contentColor,
                 ),
             ) {
-                Text(MLang.Override.Card.Delete)
+                Text(stringResource(LocaleR.string.override_card_delete))
             }
         }
     }
