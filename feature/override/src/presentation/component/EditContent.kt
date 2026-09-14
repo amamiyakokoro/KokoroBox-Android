@@ -154,13 +154,15 @@ private fun OverrideSectionEntry(
 ) {
     val directEntry = section.isDirectEntry()
     val expanded = section.name in expandedSectionNames
+    val sectionTitle = stringResource(section.titleRes)
+    val sectionSummary = stringResource(section.summaryRes)
     val directEditorTitle = when (section) {
         OverrideEditorSection.Proxies -> stringResource(LocaleR.string.override_form_proxy_nodes)
         OverrideEditorSection.ProxyGroups -> stringResource(LocaleR.string.override_form_proxy_groups)
         OverrideEditorSection.ProxyProviders -> stringResource(LocaleR.string.override_form_proxy_providers)
         OverrideEditorSection.RuleProviders -> stringResource(LocaleR.string.override_form_rule_providers)
         OverrideEditorSection.SubRules -> stringResource(LocaleR.string.override_form_sub_rules)
-        else -> section.title
+        else -> sectionTitle
     }
 
     Column(
@@ -169,8 +171,8 @@ private fun OverrideSectionEntry(
     ) {
         OverrideSelectorCard {
             OverrideSectionCardHeader(
-                title = section.title,
-                summary = section.summary,
+                title = sectionTitle,
+                summary = sectionSummary,
                 expanded = !directEntry && expanded,
                 onClick = {
                     if (directEntry) {

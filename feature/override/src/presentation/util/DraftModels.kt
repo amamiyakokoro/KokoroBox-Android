@@ -22,73 +22,26 @@
 
 package com.amamiyakokoro.box.presentation.util
 
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.annotation.StringRes
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
-enum class OverrideEditorSection {
-    General {
-        override val title: String get() = MLang.Override.Section.General.Title
-        override val summary: String get() = MLang.Override.Section.General.Summary
-    },
-    Dns {
-        override val title: String get() = MLang.Override.Section.Dns.Title
-        override val summary: String get() = MLang.Override.Section.Dns.Summary
-    },
-    Sniffer {
-        override val title: String get() = MLang.Override.Section.Sniffer.Title
-        override val summary: String get() = MLang.Override.Section.Sniffer.Summary
-    },
-    Inbound {
-        override val title: String get() = MLang.Override.Section.Inbound.Title
-        override val summary: String get() = MLang.Override.Section.Inbound.Summary
-    },
-    Rules {
-        override val title: String get() = MLang.Override.Section.Rules.Title
-        override val summary: String get() = MLang.Override.Section.Rules.Summary
-    },
-    Proxies {
-        override val title: String get() = MLang.Override.Section.Proxies.Title
-        override val summary: String get() = MLang.Override.Section.Proxies.Summary
-    },
-    ProxyProviders {
-        override val title: String get() = MLang.Override.Section.ProxyProviders.Title
-        override val summary: String get() = MLang.Override.Section.ProxyProviders.Summary
-    },
-    ProxyGroups {
-        override val title: String get() = MLang.Override.Section.ProxyGroups.Title
-        override val summary: String get() = MLang.Override.Section.ProxyGroups.Summary
-    },
-    RuleProviders {
-        override val title: String get() = MLang.Override.Section.RuleProviders.Title
-        override val summary: String get() = MLang.Override.Section.RuleProviders.Summary
-    },
-    SubRules {
-        override val title: String get() = MLang.Override.Section.SubRules.Title
-        override val summary: String get() = MLang.Override.Section.SubRules.Summary
-    };
-
-    abstract val title: String
-    abstract val summary: String
+enum class OverrideEditorSection(
+    @StringRes val titleRes: Int,
+    @StringRes val summaryRes: Int,
+) {
+    General(LocaleR.string.override_section_general_title, LocaleR.string.override_section_general_summary),
+    Dns(LocaleR.string.override_section_dns_title, LocaleR.string.override_section_dns_summary),
+    Sniffer(LocaleR.string.override_section_sniffer_title, LocaleR.string.override_section_sniffer_summary),
+    Inbound(LocaleR.string.override_section_inbound_title, LocaleR.string.override_section_inbound_summary),
+    Rules(LocaleR.string.override_section_rules_title, LocaleR.string.override_section_rules_summary),
+    Proxies(LocaleR.string.override_section_proxies_title, LocaleR.string.override_section_proxies_summary),
+    ProxyProviders(LocaleR.string.override_section_proxy_providers_title, LocaleR.string.override_section_proxy_providers_summary),
+    ProxyGroups(LocaleR.string.override_section_proxy_groups_title, LocaleR.string.override_section_proxy_groups_summary),
+    RuleProviders(LocaleR.string.override_section_rule_providers_title, LocaleR.string.override_section_rule_providers_summary),
+    SubRules(LocaleR.string.override_section_sub_rules_title, LocaleR.string.override_section_sub_rules_summary),
 }
 
-enum class OverrideModifierVisualMode {
-    Replace {
-        override val label: String get() = MLang.Override.Modifier.Replace
-    },
-    Start {
-        override val label: String get() = MLang.Override.Modifier.Start
-    },
-    End {
-        override val label: String get() = MLang.Override.Modifier.End
-    },
-    Merge {
-        override val label: String get() = MLang.Override.Modifier.Merge
-    },
-    Force {
-        override val label: String get() = MLang.Override.Modifier.Force
-    };
-
-    abstract val label: String
-}
+enum class OverrideModifierVisualMode { Replace, Start, End, Merge, Force }
 
 sealed interface OverrideSaveState {
     data object Idle : OverrideSaveState
@@ -108,22 +61,7 @@ sealed interface OverrideSaveEvent {
 data class OverrideSectionSummary(
     val modifiedCount: Int,
     val visualModes: Set<OverrideModifierVisualMode>,
-) {
-    val summaryText: String
-        get() {
-            if (modifiedCount == 0) {
-                return MLang.Override.Modifier.NotModified
-            }
-            val modeSummary = visualModes.joinToString(" / ") { it.label }
-            return buildString {
-                append(MLang.Override.Modifier.ItemsCount.format(modifiedCount))
-                if (modeSummary.isNotEmpty()) {
-                    append(" · ")
-                    append(modeSummary)
-                }
-            }
-        }
-}
+)
 
 data class OverrideEditorOverview(
     val changedFieldCount: Int,
@@ -134,20 +72,4 @@ data class OverrideEditorOverview(
     val forceCount: Int,
     val sectionSummaries: Map<OverrideEditorSection, OverrideSectionSummary>,
     val warnings: List<String>,
-) {
-    val modifierSummary: String
-        get() = buildList {
-            if (replaceCount > 0) add("${MLang.Override.Modifier.Replace} $replaceCount")
-            if (appendCount > 0) add("${MLang.Override.Modifier.Start} $appendCount")
-            if (mergeCount > 0) add("${MLang.Override.Modifier.Merge} $mergeCount")
-            if (forceCount > 0) add("${MLang.Override.Modifier.Force} $forceCount")
-        }.joinToString(" · ").ifEmpty { MLang.Override.Modifier.NotModified }
-
-    val sectionSummary: String
-        get() = sectionSummaries
-            .filterValues { it.modifiedCount > 0 }
-            .keys
-            .take(3)
-            .joinToString(" · ") { it.title }
-            .ifEmpty { MLang.Override.Modifier.NoChanges }
-}
+)
