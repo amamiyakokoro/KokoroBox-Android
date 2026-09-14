@@ -22,9 +22,10 @@
 
 package com.amamiyakokoro.box.presentation.util
 
+import android.content.res.Resources
 import com.amamiyakokoro.box.common.util.ByteFormatter
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.service.runtime.entity.Profile
-import dev.oom_wg.purejoy.mlang.MLang
 import java.io.File
 
 val Profile.enabled: Boolean
@@ -45,29 +46,29 @@ val Profile.expireAt: Long?
 val Profile.lastUpdatedAt: Long?
     get() = if (updatedAt > 0) updatedAt else null
 
-fun Profile.getDisplayProvider(): String = when (type) {
-    Profile.Type.Url -> provider ?: MLang.Component.ProfileCard.RemoteSubscription
-    Profile.Type.File -> MLang.Component.ProfileCard.LocalFile
-    Profile.Type.External -> MLang.Component.ProfileCard.LocalConfig
+fun Profile.getDisplayProvider(resources: Resources): String = when (type) {
+    Profile.Type.Url -> provider ?: resources.getString(LocaleR.string.component_profile_card_remote_subscription)
+    Profile.Type.File -> resources.getString(LocaleR.string.component_profile_card_local_file)
+    Profile.Type.External -> resources.getString(LocaleR.string.component_profile_card_local_config)
 }
 
-fun Profile.getInfoText(): String = when (type) {
+fun Profile.getInfoText(resources: Resources): String = when (type) {
     Profile.Type.Url -> {
         buildString {
             val totalBytesValue = totalBytes
             if (totalBytesValue != null && totalBytesValue > 0) {
                 val usedPercent = usedBytes * 100 / totalBytesValue
                 append(
-                    MLang.Component.ProfileCard.Traffic.format(
+                    resources.getString(LocaleR.string.component_profile_card_traffic).format(
                         ByteFormatter.format(usedBytes),
                         ByteFormatter.format(totalBytesValue),
                         usedPercent.toInt()
                     )
                 )
             } else if (usedBytes > 0) {
-                append(MLang.Component.ProfileCard.UsedTraffic.format(ByteFormatter.format(usedBytes)))
+                append(resources.getString(LocaleR.string.component_profile_card_used_traffic).format(ByteFormatter.format(usedBytes)))
             } else {
-                append(MLang.Component.ProfileCard.ClickToUpdate)
+                append(resources.getString(LocaleR.string.component_profile_card_click_to_update))
             }
 
             expireAt?.let { expireTime ->
@@ -80,23 +81,23 @@ fun Profile.getInfoText(): String = when (type) {
                 if (isNotEmpty()) append("\n")
 
                 if (daysLeft > 0) {
-                    append(MLang.Component.ProfileCard.ExpireAt.format(expireDate, daysLeft.toInt()))
+                    append(resources.getString(LocaleR.string.component_profile_card_expire_at).format(expireDate, daysLeft.toInt()))
                 } else if (daysLeft == 0L) {
-                    append(MLang.Component.ProfileCard.ExpireToday)
+                    append(resources.getString(LocaleR.string.component_profile_card_expire_today))
                 } else {
-                    append(MLang.Component.ProfileCard.Expired.format(expireDate))
+                    append(resources.getString(LocaleR.string.component_profile_card_expired).format(expireDate))
                 }
             }
 
             lastUpdatedAt?.let { updated ->
                 if (isNotEmpty()) append(" | ")
-                append(getRelativeTimeString(updated))
+                append(getRelativeTimeString(updated, resources))
             }
         }
     }
 
-    Profile.Type.File -> MLang.Component.ProfileCard.LocalConfig
-    Profile.Type.External -> MLang.Component.ProfileCard.LocalConfig
+    Profile.Type.File -> resources.getString(LocaleR.string.component_profile_card_local_config)
+    Profile.Type.External -> resources.getString(LocaleR.string.component_profile_card_local_config)
 }
 
 fun Profile.shouldShowUpdateButton(): Boolean = type == Profile.Type.Url
@@ -105,19 +106,19 @@ fun Profile.isConfigSaved(workDir: File): Boolean {
     return File(workDir, "${uuid}/config.yaml").exists()
 }
 
-private fun getRelativeTimeString(timestamp: Long): String {
+private fun getRelativeTimeString(timestamp: Long, resources: Resources): String {
     val now = System.currentTimeMillis()
     val diff = now - timestamp
     val minutes = diff / (1000 * 60)
     val hours = diff / (1000 * 60 * 60)
 
     return when {
-        diff < 60 * 1000 -> MLang.Component.ProfileCard.JustNow
-        minutes < 60 -> MLang.Component.ProfileCard.MinutesAgo.format(minutes.toInt())
-        hours < 24 -> MLang.Component.ProfileCard.HoursAgo.format(hours.toInt())
+        diff < 60 * 1000 -> resources.getString(LocaleR.string.component_profile_card_just_now)
+        minutes < 60 -> resources.getString(LocaleR.string.component_profile_card_minutes_ago).format(minutes.toInt())
+        hours < 24 -> resources.getString(LocaleR.string.component_profile_card_hours_ago).format(hours.toInt())
         else -> {
             val days = diff / (1000 * 60 * 60 * 24)
-            MLang.Component.ProfileCard.DaysAgo.format(days.toInt())
+            resources.getString(LocaleR.string.component_profile_card_days_ago).format(days.toInt())
         }
     }
 }

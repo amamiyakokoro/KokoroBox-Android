@@ -56,6 +56,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +90,8 @@ fun ProfileCard(
     val opacity = AppTheme.opacity
     val componentSizes = AppTheme.sizes
     val hapticFeedback = LocalHapticFeedback.current
+    val resources = LocalContext.current.resources
+    val localeTag = LocalConfiguration.current.locales[0].toLanguageTag()
     val density = LocalDensity.current
 
     val colorScheme = MaterialTheme.colorScheme
@@ -136,7 +140,7 @@ fun ProfileCard(
                 )
 
                 Text(
-                    text = profile.getDisplayProvider(),
+                    text = profile.getDisplayProvider(resources),
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = spacing.space2),
                     fontWeight = FontWeight(550),
@@ -167,8 +171,8 @@ fun ProfileCard(
             )
         }
 
-        val infoText = remember(profile) {
-            profile.getInfoText()
+        val infoText = remember(profile, localeTag) {
+            profile.getInfoText(resources)
         }
 
         Column(modifier = Modifier.padding(top = spacing.space8)) {
