@@ -36,7 +36,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRuleInput
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRulesOptions
 import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
@@ -59,7 +61,6 @@ import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 
 private sealed interface PendingRulesAction {
@@ -76,18 +77,25 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     var pendingAction by remember { mutableStateOf<PendingRulesAction?>(null) }
     var editingRuleIndex by remember { mutableIntStateOf(-1) }
     var showRuleSheet by remember { mutableStateOf(false) }
+    val savedMessage = stringResource(LocaleR.string.meta_feature_custom_rules_saved)
+    val validationMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_validation)
+    val validationGeneralMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_validation_general)
+    val notFoundMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_not_found)
+    val rateLimitedMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_rate_limited)
+    val unknownMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_unknown)
+    val requestFailedMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_request)
 
     LaunchedEffect(Unit) { viewModel.load() }
     LaunchedEffect(state.status) {
         val message = when (state.status) {
-            KokoroRulesStatus.SAVED -> MLang.MetaFeature.CustomRules.Saved
+            KokoroRulesStatus.SAVED -> savedMessage
             KokoroRulesStatus.VALIDATION_FAILED -> state.validationRuleIndex?.let {
-                MLang.MetaFeature.CustomRules.ErrorValidation.format(it + 1)
-            } ?: MLang.MetaFeature.CustomRules.ErrorValidationGeneral
-            KokoroRulesStatus.NOT_FOUND -> MLang.MetaFeature.CustomRules.ErrorNotFound
-            KokoroRulesStatus.RATE_LIMITED -> MLang.MetaFeature.CustomRules.ErrorRateLimited
-            KokoroRulesStatus.SAVE_OUTCOME_UNKNOWN -> MLang.MetaFeature.CustomRules.ErrorUnknown
-            KokoroRulesStatus.REQUEST_FAILED -> MLang.MetaFeature.CustomRules.ErrorRequest
+                validationMessage.format(it + 1)
+            } ?: validationGeneralMessage
+            KokoroRulesStatus.NOT_FOUND -> notFoundMessage
+            KokoroRulesStatus.RATE_LIMITED -> rateLimitedMessage
+            KokoroRulesStatus.SAVE_OUTCOME_UNKNOWN -> unknownMessage
+            KokoroRulesStatus.REQUEST_FAILED -> requestFailedMessage
             else -> null
         }
         if (message != null) {
@@ -113,13 +121,16 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.MetaFeature.CustomRules.Title,
+                title = stringResource(LocaleR.string.meta_feature_custom_rules_title),
                 actions = {
                     IconButton(
                         enabled = !state.loading && !state.saving,
                         onClick = { requestAction(PendingRulesAction.Reload) },
                     ) {
-                        Icon(AppMd3Icons.Action.Refresh, MLang.MetaFeature.CustomRules.Refresh)
+                        Icon(
+                            AppMd3Icons.Action.Refresh,
+                            stringResource(LocaleR.string.meta_feature_custom_rules_refresh),
+                        )
                     }
                     IconButton(
                         enabled = state.authState is KokoroAuthState.Authenticated &&
@@ -131,13 +142,19 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             showRuleSheet = true
                         },
                     ) {
-                        Icon(AppMd3Icons.Action.Add, MLang.MetaFeature.CustomRules.AddRule)
+                        Icon(
+                            AppMd3Icons.Action.Add,
+                            stringResource(LocaleR.string.meta_feature_custom_rules_add_rule),
+                        )
                     }
                     IconButton(
                         enabled = state.dirty && !state.saving && state.defaultRuleSet != null,
                         onClick = viewModel::save,
                     ) {
-                        Icon(AppMd3Icons.Action.Save, MLang.MetaFeature.CustomRules.Save)
+                        Icon(
+                            AppMd3Icons.Action.Save,
+                            stringResource(LocaleR.string.meta_feature_custom_rules_save),
+                        )
                     }
                 },
             )
@@ -147,7 +164,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
             innerPadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding()),
         ) {
             if (state.authState is KokoroAuthState.Authenticated) {
-                item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }
+                item("rules-title") { Title(stringResource(LocaleR.string.meta_feature_custom_rules_rules)) }
                 when {
                     state.loading -> item("loading") {
                         Row(
@@ -156,7 +173,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Md3EIndeterminateCircularWavyProgressIndicator()
-                            Text(MLang.MetaFeature.CustomRules.Loading)
+                            Text(stringResource(LocaleR.string.meta_feature_custom_rules_loading))
                         }
                     }
 
@@ -166,9 +183,9 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
                                 verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
                             ) {
-                                Text(MLang.MetaFeature.CustomRules.ErrorLoad)
+                                Text(stringResource(LocaleR.string.meta_feature_custom_rules_error_load))
                                 Button(onClick = viewModel::refresh, modifier = Modifier.fillMaxWidth()) {
-                                    Text(MLang.MetaFeature.CustomRules.Retry)
+                                    Text(stringResource(LocaleR.string.meta_feature_custom_rules_retry))
                                 }
                             }
                         }
@@ -179,7 +196,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             item("empty") {
                                 Card {
                                     Text(
-                                        text = MLang.MetaFeature.CustomRules.Empty,
+                                        text = stringResource(LocaleR.string.meta_feature_custom_rules_empty),
                                         modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -212,9 +229,9 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
                             verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
                         ) {
-                            Text(MLang.ProfilesPage.Kokoro.LoginRequired)
+                            Text(stringResource(LocaleR.string.profiles_page_kokoro_login_required))
                             Button(onClick = navigator::navigateUp, modifier = Modifier.fillMaxWidth()) {
-                                Text(MLang.MetaFeature.CustomRules.BackToKokoroSettings)
+                                Text(stringResource(LocaleR.string.meta_feature_custom_rules_back_to_kokoro_settings))
                             }
                         }
                     }
@@ -237,8 +254,8 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
 
     AppDialog(
         show = pendingAction != null,
-        title = MLang.MetaFeature.CustomRules.DiscardTitle,
-        summary = MLang.MetaFeature.CustomRules.DiscardMessage,
+        title = stringResource(LocaleR.string.meta_feature_custom_rules_discard_title),
+        summary = stringResource(LocaleR.string.meta_feature_custom_rules_discard_message),
         onDismissRequest = { pendingAction = null },
     ) {
         DialogButtonRow(
@@ -247,23 +264,23 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                 pendingAction?.let(::performPendingAction)
                 pendingAction = null
             },
-            cancelText = MLang.MetaFeature.CustomRules.Cancel,
-            confirmText = MLang.MetaFeature.CustomRules.Confirm,
+            cancelText = stringResource(LocaleR.string.meta_feature_custom_rules_cancel),
+            confirmText = stringResource(LocaleR.string.meta_feature_custom_rules_confirm),
             confirmDestructive = true,
         )
     }
 
     AppDialog(
         show = state.conflict != null,
-        title = MLang.MetaFeature.CustomRules.ConflictTitle,
-        summary = MLang.MetaFeature.CustomRules.ConflictMessage,
+        title = stringResource(LocaleR.string.meta_feature_custom_rules_conflict_title),
+        summary = stringResource(LocaleR.string.meta_feature_custom_rules_conflict_message),
         onDismissRequest = {},
     ) {
         DialogButtonRow(
             onCancel = viewModel::useRemoteConflict,
             onConfirm = viewModel::keepLocalConflict,
-            cancelText = MLang.MetaFeature.CustomRules.UseRemote,
-            confirmText = MLang.MetaFeature.CustomRules.KeepLocal,
+            cancelText = stringResource(LocaleR.string.meta_feature_custom_rules_use_remote),
+            confirmText = stringResource(LocaleR.string.meta_feature_custom_rules_keep_local),
         )
     }
 }
@@ -294,19 +311,19 @@ private fun RuleCard(
                 )
                 if (canMoveUp) {
                     IconButton(onClick = onMoveUp) {
-                        Icon(AppMd3Icons.Action.MoveUp, MLang.MetaFeature.CustomRules.MoveUp)
+                        Icon(AppMd3Icons.Action.MoveUp, stringResource(LocaleR.string.meta_feature_custom_rules_move_up))
                     }
                 }
                 if (canMoveDown) {
                     IconButton(onClick = onMoveDown) {
-                        Icon(AppMd3Icons.Action.MoveDown, MLang.MetaFeature.CustomRules.MoveDown)
+                        Icon(AppMd3Icons.Action.MoveDown, stringResource(LocaleR.string.meta_feature_custom_rules_move_down))
                     }
                 }
                 IconButton(onClick = onEdit) {
-                    Icon(AppMd3Icons.Action.Edit, MLang.MetaFeature.CustomRules.EditRule)
+                    Icon(AppMd3Icons.Action.Edit, stringResource(LocaleR.string.meta_feature_custom_rules_edit_rule))
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(AppMd3Icons.Action.Delete, MLang.MetaFeature.CustomRules.DeleteRule)
+                    Icon(AppMd3Icons.Action.Delete, stringResource(LocaleR.string.meta_feature_custom_rules_delete_rule))
                 }
             }
             rule.payload?.takeIf { it.isNotEmpty() }?.let {
@@ -364,19 +381,22 @@ private fun RuleEditorSheet(
 
     AppActionBottomSheet(
         show = show,
-        title = if (initialRule == null) MLang.MetaFeature.CustomRules.AddRule
-        else MLang.MetaFeature.CustomRules.EditRule,
+        title = if (initialRule == null) {
+            stringResource(LocaleR.string.meta_feature_custom_rules_add_rule)
+        } else {
+            stringResource(LocaleR.string.meta_feature_custom_rules_edit_rule)
+        },
         onDismissRequest = onDismiss,
         startAction = {
             AppBottomSheetCloseAction(
                 onClick = onDismiss,
-                contentDescription = MLang.MetaFeature.CustomRules.Cancel,
+                contentDescription = stringResource(LocaleR.string.meta_feature_custom_rules_cancel),
             )
         },
         endAction = {
             AppBottomSheetConfirmAction(
                 enabled = canConfirm,
-                contentDescription = MLang.MetaFeature.CustomRules.Confirm,
+                contentDescription = stringResource(LocaleR.string.meta_feature_custom_rules_confirm),
                 onClick = {
                     onConfirm(
                         KokoroCustomRuleInput(
@@ -391,7 +411,7 @@ private fun RuleEditorSheet(
     ) {
         Card {
             YumeMd3DropdownPreference(
-                title = MLang.MetaFeature.CustomRules.Type,
+                title = stringResource(LocaleR.string.meta_feature_custom_rules_type),
                 items = types,
                 selectedIndex = types.indexOf(type).coerceAtLeast(0),
                 onSelectedIndexChange = { index ->
@@ -406,12 +426,12 @@ private fun RuleEditorSheet(
             )
             when (type) {
                 "MATCH" -> Text(
-                    text = MLang.MetaFeature.CustomRules.MatchPayloadHint,
+                    text = stringResource(LocaleR.string.meta_feature_custom_rules_match_payload_hint),
                     modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 "RULE-SET" -> YumeMd3DropdownPreference(
-                    title = MLang.MetaFeature.CustomRules.Provider,
+                    title = stringResource(LocaleR.string.meta_feature_custom_rules_provider),
                     items = providers,
                     selectedIndex = providers.indexOf(payload).coerceAtLeast(0),
                     onSelectedIndexChange = { index -> payload = providers.getOrNull(index).orEmpty() },
@@ -421,12 +441,12 @@ private fun RuleEditorSheet(
                     modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
                     value = payload,
                     onValueChange = { if (it.length <= options.maxPayloadLength) payload = it },
-                    label = MLang.MetaFeature.CustomRules.Payload,
+                    label = stringResource(LocaleR.string.meta_feature_custom_rules_payload),
                     singleLine = true,
                 )
             }
             YumeMd3DropdownPreference(
-                title = MLang.MetaFeature.CustomRules.Target,
+                title = stringResource(LocaleR.string.meta_feature_custom_rules_target),
                 items = targets,
                 selectedIndex = targets.indexOf(target).coerceAtLeast(0),
                 onSelectedIndexChange = { index -> target = targets.getOrElse(index) { defaultTarget } },
