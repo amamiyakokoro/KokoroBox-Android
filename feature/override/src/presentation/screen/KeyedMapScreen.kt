@@ -29,13 +29,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -56,6 +57,8 @@ fun OverrideKeyedObjectMapEditorScreen(
     val listState = rememberLazyListState()
     val editorType = OverrideStructuredEditorStore.keyedObjectMapEditorType
     val title = OverrideStructuredEditorStore.keyedObjectMapEditorTitle.ifBlank { editorType.title }
+    val newItemTitle = stringResource(LocaleR.string.override_editor_new) + editorType.itemLabel
+    val editItemTitle = stringResource(LocaleR.string.override_editor_edit) + editorType.itemLabel
     val availableModes = OverrideStructuredEditorStore.keyedObjectMapEditorAvailableModes
     var showResetDialog by remember { mutableStateOf(false) }
     val addFabController = rememberOverrideFabController()
@@ -101,11 +104,11 @@ fun OverrideKeyedObjectMapEditorScreen(
                 controller = addFabController,
                 visible = showAddFab,
                 imageVector = AppMd3Icons.Action.Add,
-                contentDescription = MLang.Override.Editor.New + editorType.itemLabel,
+                contentDescription = newItemTitle,
                 onClick = {
                     onOpenDraftEditor(
                         editorType,
-                        MLang.Override.Editor.New + editorType.itemLabel,
+                        newItemTitle,
                         null,
                     ) { createdDraft ->
                         val mode = OverrideStructuredEditorStore.keyedObjectMapEditorSelectedMode
@@ -127,7 +130,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                     if (isDeleteMode) {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Cancel,
-                            contentDescription = MLang.Override.Editor.CancelDelete,
+                            contentDescription = stringResource(LocaleR.string.override_editor_cancel_delete),
                             spacedFromNext = true,
                             onClick = {
                                 isDeleteMode = false
@@ -136,7 +139,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.DeleteSelected,
+                            contentDescription = stringResource(LocaleR.string.override_editor_delete_selected),
                             destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
@@ -155,14 +158,14 @@ fun OverrideKeyedObjectMapEditorScreen(
                     } else {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Undo,
-                            contentDescription = MLang.Override.Editor.ClearMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_clear_mode),
                             spacedFromNext = true,
                             destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_enter_delete_mode),
                             destructive = true,
                             onClick = {
                                 isDeleteMode = true
@@ -185,7 +188,7 @@ fun OverrideKeyedObjectMapEditorScreen(
             item(key = "modifier-card") {
                 Card {
                     YumeMd3DropdownPreference(
-                        title = MLang.Override.Editor.Mode.Title,
+                        title = stringResource(LocaleR.string.override_editor_mode_title),
                         items = modeLabels,
                         selectedIndex = selectedModeIndex,
                         onSelectedIndexChange = { index ->
@@ -213,7 +216,9 @@ fun OverrideKeyedObjectMapEditorScreen(
                         key = draft.uiId,
                     ) { isDragging ->
                         KeyedObjectCard(
-                            title = draft.key.ifBlank { MLang.Override.Editor.Unnamed.format(editorType.itemLabel) },
+                            title = draft.key.ifBlank {
+                                stringResource(LocaleR.string.override_editor_unnamed).format(editorType.itemLabel)
+                            },
                             isDragging = isDragging,
                             isDeleteMode = isDeleteMode,
                             isSelected = selectedUiIds[draft.uiId] == true,
@@ -229,7 +234,7 @@ fun OverrideKeyedObjectMapEditorScreen(
                                     val editMode = selectedMode
                                     onOpenDraftEditor(
                                         editorType,
-                                        MLang.Override.Editor.Edit + editorType.itemLabel,
+                                        editItemTitle,
                                         draft,
                                     ) { updatedDraft ->
                                         applyKeyedModeValue(
@@ -267,8 +272,8 @@ fun OverrideKeyedObjectMapEditorScreen(
 
     AppDialog(
             show = showResetDialog,
-            title = MLang.Override.Editor.ClearDialog.Title.format(editorType.title),
-            summary = MLang.Override.Editor.ClearDialog.Summary.format(editorType.itemLabel),
+            title = stringResource(LocaleR.string.override_editor_clear_dialog_title).format(editorType.title),
+            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(editorType.itemLabel),
             onDismissRequest = { showResetDialog = false },
         ) {
             DialogButtonRow(
@@ -280,8 +285,8 @@ fun OverrideKeyedObjectMapEditorScreen(
                     val mode = OverrideStructuredEditorStore.keyedObjectMapEditorSelectedMode
                     applyKeyedModeValue(mode, emptyList())
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Clear,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_clear),
                 confirmDestructive = true,
             )
         }
@@ -313,7 +318,7 @@ private fun ReorderableCollectionItemScope.KeyedObjectCard(
             ) {
                 AppIcon(
                     imageVector = AppMd3Icons.Action.List,
-                    contentDescription = MLang.Override.Editor.DragToSort,
+                    contentDescription = stringResource(LocaleR.string.override_editor_drag_to_sort),
                     
                 )
                 Column(
@@ -336,7 +341,7 @@ private fun ReorderableCollectionItemScope.KeyedObjectCard(
                     } else {
                         AppIcon(
                             imageVector = AppMd3Icons.Navigation.Forward,
-                            contentDescription = MLang.Override.Editor.Edit,
+                            contentDescription = stringResource(LocaleR.string.override_editor_edit),
                             
                         )
                     }
