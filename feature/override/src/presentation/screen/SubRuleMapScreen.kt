@@ -29,13 +29,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -53,7 +54,12 @@ fun OverrideSubRuleMapEditorScreen(
     ) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val title = OverrideStructuredEditorStore.subRuleGroupEditorTitle.ifBlank { MLang.Override.Structured.SubRules.Title }
+    val subRulesTitle = stringResource(LocaleR.string.override_structured_sub_rules_title)
+    val subRuleItemLabel = stringResource(LocaleR.string.override_structured_sub_rules_item_label)
+    val newSubRuleGroupLabel = stringResource(LocaleR.string.override_editor_new_sub_rule_group)
+    val editSubRuleGroupLabel = stringResource(LocaleR.string.override_editor_edit_sub_rule_group)
+    val unnamedSubRuleGroupLabel = stringResource(LocaleR.string.override_editor_unnamed_sub_rule_group)
+    val title = OverrideStructuredEditorStore.subRuleGroupEditorTitle.ifBlank { subRulesTitle }
     val availableModes = OverrideStructuredEditorStore.subRuleGroupEditorAvailableModes
     var showResetDialog by remember { mutableStateOf(false) }
     val addFabController = rememberOverrideFabController()
@@ -89,9 +95,9 @@ fun OverrideSubRuleMapEditorScreen(
                 controller = addFabController,
                 visible = showAddFab,
                 imageVector = AppMd3Icons.Action.Add,
-                contentDescription = MLang.Override.Editor.NewSubRuleGroup,
+                contentDescription = newSubRuleGroupLabel,
                 onClick = {
-                    onOpenDraftEditor(MLang.Override.Editor.NewSubRuleGroup, null) { createdDraft ->
+                    onOpenDraftEditor(newSubRuleGroupLabel, null) { createdDraft ->
                         val mode = OverrideStructuredEditorStore.subRuleGroupEditorSelectedMode
                         val latestValues = OverrideStructuredEditorStore.subRuleGroupEditorDraftValues
                         val updatedValues = latestValues.update(
@@ -110,7 +116,7 @@ fun OverrideSubRuleMapEditorScreen(
                     if (isDeleteMode) {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Cancel,
-                            contentDescription = MLang.Override.Editor.CancelDelete,
+                            contentDescription = stringResource(LocaleR.string.override_editor_cancel_delete),
                             spacedFromNext = true,
                             onClick = {
                                 isDeleteMode = false
@@ -119,7 +125,7 @@ fun OverrideSubRuleMapEditorScreen(
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.DeleteSelected,
+                            contentDescription = stringResource(LocaleR.string.override_editor_delete_selected),
                             destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
@@ -138,14 +144,14 @@ fun OverrideSubRuleMapEditorScreen(
                     } else {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Undo,
-                            contentDescription = MLang.Override.Editor.ClearMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_clear_mode),
                             spacedFromNext = true,
                             destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_enter_delete_mode),
                             destructive = true,
                             onClick = {
                                 isDeleteMode = true
@@ -168,7 +174,7 @@ fun OverrideSubRuleMapEditorScreen(
             item(key = "modifier-card") {
                 Card {
                     YumeMd3DropdownPreference(
-                        title = MLang.Override.Editor.Mode.Title,
+                        title = stringResource(LocaleR.string.override_editor_mode_title),
                         items = availableModes.map(OverrideListEditorMode::label),
                         selectedIndex = selectedModeIndex,
                         onSelectedIndexChange = { index ->
@@ -196,7 +202,7 @@ fun OverrideSubRuleMapEditorScreen(
                         key = draft.uiId,
                     ) { isDragging ->
                         SubRuleGroupCard(
-                            title = draft.name.ifBlank { MLang.Override.Editor.UnnamedSubRuleGroup },
+                            title = draft.name.ifBlank { unnamedSubRuleGroupLabel },
                             isDragging = isDragging,
                             isDeleteMode = isDeleteMode,
                             isSelected = draft.uiId in selectedUiIds,
@@ -206,7 +212,7 @@ fun OverrideSubRuleMapEditorScreen(
                                 } else {
                                     val draftUiId = draft.uiId
                                     val editMode = selectedMode
-                                    onOpenDraftEditor(MLang.Override.Editor.EditSubRuleGroup, draft) { updatedDraft ->
+                                    onOpenDraftEditor(editSubRuleGroupLabel, draft) { updatedDraft ->
                                         val latestValues = OverrideStructuredEditorStore.subRuleGroupEditorDraftValues
                                         val updatedValues = latestValues.update(
                                             editMode,
@@ -241,8 +247,8 @@ fun OverrideSubRuleMapEditorScreen(
 
     AppDialog(
             show = showResetDialog,
-            title = MLang.Override.Editor.ClearSubRules,
-            summary = MLang.Override.Editor.ClearDialog.Summary.format(MLang.Override.Structured.SubRules.ItemLabel),
+            title = stringResource(LocaleR.string.override_editor_clear_sub_rules),
+            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(subRuleItemLabel),
             onDismissRequest = { showResetDialog = false },
         ) {
             DialogButtonRow(
@@ -254,8 +260,8 @@ fun OverrideSubRuleMapEditorScreen(
                     val mode = OverrideStructuredEditorStore.subRuleGroupEditorSelectedMode
                     applySubRuleValues(OverrideStructuredEditorStore.subRuleGroupEditorDraftValues.update(mode, emptyList()))
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Clear,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_clear),
                 confirmDestructive = true,
             )
         }
@@ -287,7 +293,7 @@ private fun ReorderableCollectionItemScope.SubRuleGroupCard(
             ) {
                 AppIcon(
                     imageVector = AppMd3Icons.Action.List,
-                    contentDescription = MLang.Override.Editor.DragToSort,
+                    contentDescription = stringResource(LocaleR.string.override_editor_drag_to_sort),
                     
                 )
                 Column(
@@ -310,7 +316,7 @@ private fun ReorderableCollectionItemScope.SubRuleGroupCard(
                     } else {
                         AppIcon(
                             imageVector = AppMd3Icons.Navigation.Forward,
-                            contentDescription = MLang.Override.Editor.Edit,
+                            contentDescription = stringResource(LocaleR.string.override_editor_edit),
                             
                         )
                     }
