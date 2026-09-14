@@ -24,10 +24,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
 import com.amamiyakokoro.box.presentation.util.*
-import dev.oom_wg.purejoy.mlang.MLang
 
 private val OverrideEditorSections = OverrideEditorSection.entries.toList()
 
@@ -58,18 +59,18 @@ fun LazyListScope.OverrideEditContent(
             bottomSpacing = OverrideSectionBottomSpacing,
         ) {
             OverrideCardSection(
-                title = MLang.Override.Draft.BasicInfo,
+                title = stringResource(LocaleR.string.override_draft_basic_info),
             ) {
                 StringInputContent(
-                    title = MLang.Override.Draft.ConfigName,
+                    title = stringResource(LocaleR.string.override_draft_config_name),
                     value = name,
-                    placeholder = MLang.Override.Draft.ConfigName,
+                    placeholder = stringResource(LocaleR.string.override_draft_config_name),
                     onValueChange = { onNameChange(it.orEmpty()) },
                 )
                 StringInputContent(
-                    title = MLang.Override.Draft.ConfigDescription,
+                    title = stringResource(LocaleR.string.override_draft_config_description),
                     value = description,
-                    placeholder = MLang.Override.Draft.ConfigDescription,
+                    placeholder = stringResource(LocaleR.string.override_draft_config_description),
                     onValueChange = { onDescriptionChange(it.orEmpty()) },
                 )
             }
@@ -81,7 +82,7 @@ fun LazyListScope.OverrideEditContent(
         contentType = "override-section-title",
     ) {
         OverrideEditorListItem {
-            Title(MLang.Override.Draft.ConfigSections)
+            Title(stringResource(LocaleR.string.override_draft_config_sections))
         }
     }
 
@@ -153,6 +154,14 @@ private fun OverrideSectionEntry(
 ) {
     val directEntry = section.isDirectEntry()
     val expanded = section.name in expandedSectionNames
+    val directEditorTitle = when (section) {
+        OverrideEditorSection.Proxies -> stringResource(LocaleR.string.override_form_proxy_nodes)
+        OverrideEditorSection.ProxyGroups -> stringResource(LocaleR.string.override_form_proxy_groups)
+        OverrideEditorSection.ProxyProviders -> stringResource(LocaleR.string.override_form_proxy_providers)
+        OverrideEditorSection.RuleProviders -> stringResource(LocaleR.string.override_form_rule_providers)
+        OverrideEditorSection.SubRules -> stringResource(LocaleR.string.override_form_sub_rules)
+        else -> section.title
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -167,6 +176,7 @@ private fun OverrideSectionEntry(
                     if (directEntry) {
                         openDirectSectionEditor(
                             section = section,
+                            title = directEditorTitle,
                             referenceCatalog = referenceCatalog,
                             currentConfigProvider = currentConfigProvider,
                             onConfigChange = onConfigChange,
@@ -255,6 +265,7 @@ private fun OverrideEditorSection.isDirectEntry(): Boolean {
 
 private fun openDirectSectionEditor(
     section: OverrideEditorSection,
+    title: String,
     referenceCatalog: OverrideReferenceCatalog,
     currentConfigProvider: () -> ConfigurationOverride,
     onConfigChange: (ConfigurationOverride) -> Unit,
@@ -306,7 +317,7 @@ private fun openDirectSectionEditor(
             )
             onEditObjectList(
                 OverrideStructuredObjectType.Proxies,
-                MLang.Override.Form.ProxyNodes,
+                title,
                 values,
                 availableModes,
                 resolveInitialEditorMode(availableModes, values),
@@ -335,7 +346,7 @@ private fun openDirectSectionEditor(
             )
             onEditObjectList(
                 OverrideStructuredObjectType.ProxyGroups,
-                MLang.Override.Form.ProxyGroups,
+                title,
                 values,
                 availableModes,
                 resolveInitialEditorMode(availableModes, values),
@@ -362,7 +373,7 @@ private fun openDirectSectionEditor(
             )
             onEditObjectMap(
                 OverrideStructuredMapType.ProxyProviders,
-                MLang.Override.Form.ProxyProviders,
+                title,
                 values,
                 availableModes,
                 resolveInitialEditorMode(availableModes, values),
@@ -387,7 +398,7 @@ private fun openDirectSectionEditor(
             )
             onEditObjectMap(
                 OverrideStructuredMapType.RuleProviders,
-                MLang.Override.Form.RuleProviders,
+                title,
                 values,
                 availableModes,
                 resolveInitialEditorMode(availableModes, values),
@@ -411,7 +422,7 @@ private fun openDirectSectionEditor(
                 OverrideListEditorMode.Merge,
             )
             onEditSubRules(
-                MLang.Override.Form.SubRules,
+                title,
                 values,
                 availableModes,
                 resolveInitialEditorMode(availableModes, values),

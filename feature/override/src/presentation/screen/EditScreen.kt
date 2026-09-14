@@ -33,6 +33,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppDialog
 import com.amamiyakokoro.box.presentation.component.DialogButtonRow
 import com.amamiyakokoro.box.presentation.component.JsonTextEditorDialog
@@ -53,7 +55,6 @@ import com.amamiyakokoro.box.presentation.util.OverrideSaveState
 import com.amamiyakokoro.box.presentation.util.rememberOverrideReferenceCatalog
 import com.amamiyakokoro.box.presentation.viewmodel.OverrideConfigViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import androidx.compose.material3.Scaffold
@@ -124,7 +125,10 @@ fun OverrideEditScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = if (isNewConfig) MLang.Override.Edit.TitleNew else MLang.Override.Edit.TitleEdit,
+                title = stringResource(
+                    if (isNewConfig) LocaleR.string.override_edit_title_new
+                    else LocaleR.string.override_edit_title_edit,
+                ),
             )
         },
     ) { paddingValues ->
@@ -224,8 +228,8 @@ fun OverrideEditScreen(
 
         AppDialog(
             show = showDiscardDialog.value,
-            title = MLang.Override.Edit.EmptyName.Title,
-            summary = MLang.Override.Edit.EmptyName.Summary,
+            title = stringResource(LocaleR.string.override_edit_empty_name_title),
+            summary = stringResource(LocaleR.string.override_edit_empty_name_summary),
             onDismissRequest = { showDiscardDialog.value = false },
         ) {
             DialogButtonRow(
@@ -235,8 +239,8 @@ fun OverrideEditScreen(
                     viewModel.clearEditSession()
                     navigator.navigateUp()
                 },
-                cancelText = MLang.Override.Edit.Button.Cancel,
-                confirmText = MLang.Override.Edit.Button.Discard,
+                cancelText = stringResource(LocaleR.string.override_edit_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_edit_button_discard),
             )
         }
 
