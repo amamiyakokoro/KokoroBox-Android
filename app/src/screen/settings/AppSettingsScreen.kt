@@ -44,9 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.common.util.AppIconHelper
 import com.amamiyakokoro.box.common.util.BiometricHelper
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.AppColorTheme
 import com.amamiyakokoro.box.data.model.AppLanguage
 import com.amamiyakokoro.box.data.model.AppUpdateChannel
@@ -69,7 +71,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AcgWallpaperCropScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
 import kotlin.math.abs
@@ -84,7 +85,7 @@ fun AppSettingsScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.AppSettings.Title)
+            TopBar(title = stringResource(LocaleR.string.app_settings_title))
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
@@ -112,33 +113,33 @@ private fun AppBehaviorSettingsSection(viewModel: AppSettingsViewModel) {
     val automaticUpdateCheckEnabled by viewModel.automaticUpdateCheckEnabled.state.collectAsStateWithLifecycle()
     val appUpdateChannel by viewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
 
-    Title(MLang.AppSettings.Section.Behavior)
+    Title(stringResource(LocaleR.string.app_settings_section_behavior))
     Card {
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Behavior.AutoStartTitle,
-            summary = MLang.AppSettings.Behavior.AutoStartSummary,
+            title = stringResource(LocaleR.string.app_settings_behavior_auto_start_title),
+            summary = stringResource(LocaleR.string.app_settings_behavior_auto_start_summary),
             checked = automaticRestart,
             onCheckedChange = viewModel::onAutomaticRestartChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Behavior.AutoUpdateOnStartTitle,
-            summary = MLang.AppSettings.Behavior.AutoUpdateOnStartSummary,
+            title = stringResource(LocaleR.string.app_settings_behavior_auto_update_on_start_title),
+            summary = stringResource(LocaleR.string.app_settings_behavior_auto_update_on_start_summary),
             checked = autoUpdateCurrentProfileOnStart,
             onCheckedChange = viewModel::onAutoUpdateCurrentProfileOnStartChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Behavior.AutomaticUpdateCheckTitle,
-            summary = MLang.AppSettings.Behavior.AutomaticUpdateCheckSummary,
+            title = stringResource(LocaleR.string.app_settings_behavior_automatic_update_check_title),
+            summary = stringResource(LocaleR.string.app_settings_behavior_automatic_update_check_summary),
             checked = automaticUpdateCheckEnabled,
             onCheckedChange = viewModel::onAutomaticUpdateCheckChange,
         )
         PreferenceEnumItem(
-            title = MLang.AppSettings.Behavior.UpdateChannelTitle,
-            summary = MLang.AppSettings.Behavior.UpdateChannelSummary,
+            title = stringResource(LocaleR.string.app_settings_behavior_update_channel_title),
+            summary = stringResource(LocaleR.string.app_settings_behavior_update_channel_summary),
             currentValue = appUpdateChannel,
             items = listOf(
-                MLang.AppSettings.Behavior.UpdateChannelStable,
-                MLang.AppSettings.Behavior.UpdateChannelNightly,
+                stringResource(LocaleR.string.app_settings_behavior_update_channel_stable),
+                stringResource(LocaleR.string.app_settings_behavior_update_channel_nightly),
             ),
             values = AppUpdateChannel.entries,
             onValueChange = viewModel::onAppUpdateChannelChange,
@@ -158,28 +159,28 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
     val homeUseFabProxyControl by viewModel.homeUseFabProxyControl.state.collectAsStateWithLifecycle()
     val pageScale by viewModel.pageScale.state.collectAsStateWithLifecycle()
 
-    Title(MLang.AppSettings.Interface.ColorThemeTitle)
+    Title(stringResource(LocaleR.string.app_settings_interface_color_theme_title))
     Card {
         PreferenceEnumItem(
-            title = MLang.AppSettings.Interface.ThemeModeTitle,
-            summary = MLang.AppSettings.Interface.ThemeModeSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_theme_mode_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_theme_mode_summary),
             currentValue = themeMode,
             items = listOf(
-                MLang.AppSettings.Interface.ThemeModeSystem,
-                MLang.AppSettings.Interface.ThemeModeLight,
-                MLang.AppSettings.Interface.ThemeModeDark,
+                stringResource(LocaleR.string.app_settings_interface_theme_mode_system),
+                stringResource(LocaleR.string.app_settings_interface_theme_mode_light),
+                stringResource(LocaleR.string.app_settings_interface_theme_mode_dark),
             ),
             values = ThemeMode.entries,
             onValueChange = viewModel::onThemeModeChange,
         )
         PreferenceEnumItem(
-            title = MLang.AppSettings.Interface.ColorThemeModeTitle,
-            summary = MLang.AppSettings.Interface.ColorThemeModeSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_color_theme_mode_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_color_theme_mode_summary),
             currentValue = colorTheme,
             items = listOf(
-                MLang.AppSettings.Interface.ColorThemeModeMonet,
-                MLang.AppSettings.Interface.ColorThemeModeCustom,
-                MLang.AppSettings.Interface.ColorThemeModeAcgWallpaper,
+                stringResource(LocaleR.string.app_settings_interface_color_theme_mode_monet),
+                stringResource(LocaleR.string.app_settings_interface_color_theme_mode_custom),
+                stringResource(LocaleR.string.app_settings_interface_color_theme_mode_acg_wallpaper),
             ),
             values = listOf(
                 AppColorTheme.MonetDynamic,
@@ -195,54 +196,54 @@ private fun AppInterfaceSettingsSection(viewModel: AppSettingsViewModel) {
             )
         } else if (colorTheme == AppColorTheme.AcgWallpaper) {
             PreferenceValueItem(
-                title = MLang.AppSettings.Interface.ColorThemePickerTitle,
-                summary = MLang.AppSettings.Interface.ColorThemeAcgWallpaperSummary,
+                title = stringResource(LocaleR.string.app_settings_interface_color_theme_picker_title),
+                summary = stringResource(LocaleR.string.app_settings_interface_color_theme_acg_wallpaper_summary),
                 onClick = { },
             )
         } else {
             PreferenceValueItem(
-                title = MLang.AppSettings.Interface.ColorThemePickerTitle,
-                summary = MLang.AppSettings.Interface.ColorThemeDynamicSummary,
+                title = stringResource(LocaleR.string.app_settings_interface_color_theme_picker_title),
+                summary = stringResource(LocaleR.string.app_settings_interface_color_theme_dynamic_summary),
                 onClick = { },
             )
         }
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Interface.ThemeColorPolarityInvertTitle,
-            summary = MLang.AppSettings.Interface.ThemeColorPolarityInvertSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_theme_color_polarity_invert_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_theme_color_polarity_invert_summary),
             checked = invertOnPrimaryColors,
             onCheckedChange = viewModel::onInvertOnPrimaryColorsChange,
         )
     }
-    Title(MLang.AppSettings.Section.Interface)
+    Title(stringResource(LocaleR.string.app_settings_section_interface))
     Card {
         PreferenceEnumItem(
-            title = MLang.AppSettings.Interface.LanguageTitle,
-            summary = MLang.AppSettings.Interface.LanguageSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_language_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_language_summary),
             currentValue = appLanguage,
             items = listOf(
-                MLang.AppSettings.Interface.LanguageSystem,
-                MLang.AppSettings.Interface.LanguageChinese,
-                MLang.AppSettings.Interface.LanguageTraditionalChinese,
-                MLang.AppSettings.Interface.LanguageEnglish,
+                stringResource(LocaleR.string.app_settings_interface_language_system),
+                stringResource(LocaleR.string.app_settings_interface_language_chinese),
+                stringResource(LocaleR.string.app_settings_interface_language_traditional_chinese),
+                stringResource(LocaleR.string.app_settings_interface_language_english),
             ),
             values = AppLanguage.entries,
             onValueChange = viewModel::onAppLanguageChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Interface.AutoHideNavbarTitle,
-            summary = MLang.AppSettings.Interface.AutoHideNavbarSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_auto_hide_navbar_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_auto_hide_navbar_summary),
             checked = bottomBarAutoHide,
             onCheckedChange = viewModel::onBottomBarAutoHideChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Interface.LegacyNavbarStyleTitle,
-            summary = MLang.AppSettings.Interface.LegacyNavbarStyleSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_legacy_navbar_style_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_legacy_navbar_style_summary),
             checked = bottomBarUseLegacyStyle,
             onCheckedChange = viewModel::onBottomBarUseLegacyStyleChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Interface.HomeControlFabTitle,
-            summary = MLang.AppSettings.Interface.HomeControlFabSummary,
+            title = stringResource(LocaleR.string.app_settings_interface_home_control_fab_title),
+            summary = stringResource(LocaleR.string.app_settings_interface_home_control_fab_summary),
             checked = homeUseFabProxyControl,
             onCheckedChange = viewModel::onHomeUseFabProxyControlChange,
         )
@@ -258,22 +259,22 @@ private fun AppPrivacySettingsSection(viewModel: AppSettingsViewModel) {
     val context = LocalContext.current
     val excludeFromRecents by viewModel.excludeFromRecents.state.collectAsStateWithLifecycle()
 
-    Title(MLang.AppSettings.Section.Privacy)
+    Title(stringResource(LocaleR.string.app_settings_section_privacy))
     Card {
         BiometricProtectedPreferenceSwitch(
             checkedFlow = viewModel.biometricUnlockEnabled.state,
-            title = MLang.AppSettings.Privacy.BiometricUnlockTitle,
-            summary = MLang.AppSettings.Privacy.BiometricUnlockSummary,
-            enableTitle = MLang.AppSettings.Privacy.BiometricDialogTitleEnable,
-            disableTitle = MLang.AppSettings.Privacy.BiometricDialogTitleDisable,
+            title = stringResource(LocaleR.string.app_settings_privacy_biometric_unlock_title),
+            summary = stringResource(LocaleR.string.app_settings_privacy_biometric_unlock_summary),
+            enableTitle = stringResource(LocaleR.string.app_settings_privacy_biometric_dialog_title_enable),
+            disableTitle = stringResource(LocaleR.string.app_settings_privacy_biometric_dialog_title_disable),
             onConfirmedChange = viewModel::onBiometricUnlockEnabledChange,
         )
         BiometricProtectedPreferenceSwitch(
             checkedFlow = viewModel.screenshotProtectionEnabled.state,
-            title = MLang.AppSettings.Privacy.ScreenshotProtectionTitle,
-            summary = MLang.AppSettings.Privacy.ScreenshotProtectionSummary,
-            enableTitle = MLang.AppSettings.Privacy.ScreenshotDialogTitleEnable,
-            disableTitle = MLang.AppSettings.Privacy.ScreenshotDialogTitleDisable,
+            title = stringResource(LocaleR.string.app_settings_privacy_screenshot_protection_title),
+            summary = stringResource(LocaleR.string.app_settings_privacy_screenshot_protection_summary),
+            enableTitle = stringResource(LocaleR.string.app_settings_privacy_screenshot_dialog_title_enable),
+            disableTitle = stringResource(LocaleR.string.app_settings_privacy_screenshot_dialog_title_disable),
             onConfirmedChange = viewModel::onScreenshotProtectionEnabledChange,
         )
         HideAppIconPreferenceItem(
@@ -282,8 +283,8 @@ private fun AppPrivacySettingsSection(viewModel: AppSettingsViewModel) {
             context = context,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Privacy.HideFromRecentsTitle,
-            summary = MLang.AppSettings.Privacy.HideFromRecentsSummary,
+            title = stringResource(LocaleR.string.app_settings_privacy_hide_from_recents_title),
+            summary = stringResource(LocaleR.string.app_settings_privacy_hide_from_recents_summary),
             checked = excludeFromRecents,
             onCheckedChange = viewModel::onExcludeFromRecentsChange,
         )
@@ -297,31 +298,32 @@ private fun AppServiceSettingsSection(viewModel: AppSettingsViewModel) {
     val singleNodeTest by viewModel.singleNodeTest.state.collectAsStateWithLifecycle()
     val exitUiWhenBackground by viewModel.exitUiWhenBackground.state.collectAsStateWithLifecycle()
 
-    Title(MLang.AppSettings.Section.Service)
+    val unknownError = stringResource(LocaleR.string.util_error_unknown_error)
+    Title(stringResource(LocaleR.string.app_settings_section_service))
     Card {
         PreferenceSwitchItem(
-            title = MLang.AppSettings.ServiceSection.TrafficNotificationTitle,
-            summary = MLang.AppSettings.ServiceSection.TrafficNotificationSummary,
+            title = stringResource(LocaleR.string.app_settings_service_section_traffic_notification_title),
+            summary = stringResource(LocaleR.string.app_settings_service_section_traffic_notification_summary),
             checked = showTrafficNotification,
             onCheckedChange = viewModel::onShowTrafficNotificationChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.ServiceSection.SingleNodeTestTitle,
-            summary = MLang.AppSettings.ServiceSection.SingleNodeTestSummary,
+            title = stringResource(LocaleR.string.app_settings_service_section_single_node_test_title),
+            summary = stringResource(LocaleR.string.app_settings_service_section_single_node_test_summary),
             checked = singleNodeTest,
             onCheckedChange = viewModel::onSingleNodeTestChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.ServiceSection.ExitUiWhenBackgroundTitle,
-            summary = MLang.AppSettings.ServiceSection.ExitUiWhenBackgroundSummary,
+            title = stringResource(LocaleR.string.app_settings_service_section_exit_ui_when_background_title),
+            summary = stringResource(LocaleR.string.app_settings_service_section_exit_ui_when_background_summary),
             checked = exitUiWhenBackground,
             onCheckedChange = viewModel::onExitUiWhenBackgroundChange,
         )
         PreferenceArrowItem(
-            title = MLang.AppSettings.ServiceSection.BatteryOptimizationTitle,
+            title = stringResource(LocaleR.string.app_settings_service_section_battery_optimization_title),
             onClick = {
                 if (!openBatteryOptimizationSettings(context)) {
-                    context.toast(MLang.Util.Error.UnknownError)
+                    context.toast(unknownError)
                 }
             },
         )
@@ -341,29 +343,30 @@ private fun AppExperimentalSettingsSection(
     val acgWallpaperBiasY by viewModel.acgWallpaperBiasY.state.collectAsStateWithLifecycle()
     val appUpdateInstallMethod by viewModel.appUpdateInstallMethod.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    Title(MLang.AppSettings.Section.Experimental)
+    val resetWallpaperSuccess = stringResource(LocaleR.string.app_settings_experimental_reset_wallpaper_success)
+    Title(stringResource(LocaleR.string.app_settings_section_experimental))
     Card {
         PreferenceEnumItem(
-            title = MLang.AppSettings.Behavior.UpdateInstallMethodTitle,
-            summary = MLang.AppSettings.Behavior.UpdateInstallMethodSummary,
+            title = stringResource(LocaleR.string.app_settings_behavior_update_install_method_title),
+            summary = stringResource(LocaleR.string.app_settings_behavior_update_install_method_summary),
             currentValue = appUpdateInstallMethod,
             items = listOf(
-                MLang.AppSettings.Behavior.UpdateInstallMethodSystem,
-                MLang.AppSettings.Behavior.UpdateInstallMethodShizuku,
-                MLang.AppSettings.Behavior.UpdateInstallMethodRoot,
+                stringResource(LocaleR.string.app_settings_behavior_update_install_method_system),
+                stringResource(LocaleR.string.app_settings_behavior_update_install_method_shizuku),
+                stringResource(LocaleR.string.app_settings_behavior_update_install_method_root),
             ),
             values = AppUpdateInstallMethod.entries,
             onValueChange = viewModel::onAppUpdateInstallMethodChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Experimental.AcgHomeTitle,
-            summary = MLang.AppSettings.Experimental.AcgHomeSummary,
+            title = stringResource(LocaleR.string.app_settings_experimental_acg_home_title),
+            summary = stringResource(LocaleR.string.app_settings_experimental_acg_home_summary),
             checked = acgMainUiEnabled,
             onCheckedChange = viewModel::onAcgMainUiEnabledChange,
         )
         PreferenceSwitchItem(
-            title = MLang.AppSettings.Experimental.AcgSidebarExpandedTitle,
-            summary = MLang.AppSettings.Experimental.AcgSidebarExpandedSummary,
+            title = stringResource(LocaleR.string.app_settings_experimental_acg_sidebar_expanded_title),
+            summary = stringResource(LocaleR.string.app_settings_experimental_acg_sidebar_expanded_summary),
             checked = acgSidebarExpanded,
             onCheckedChange = viewModel::onAcgSidebarExpandedChange,
         )
@@ -374,8 +377,8 @@ private fun AppExperimentalSettingsSection(
             wallpaperBiasY = acgWallpaperBiasY,
         )
         PreferenceValueItem(
-            title = MLang.AppSettings.Experimental.ResetWallpaperTitle,
-            summary = MLang.AppSettings.Experimental.ResetWallpaperSummary,
+            title = stringResource(LocaleR.string.app_settings_experimental_reset_wallpaper_title),
+            summary = stringResource(LocaleR.string.app_settings_experimental_reset_wallpaper_summary),
             onClick = {
                 if (acgWallpaperUri.isNotBlank()) {
                     runCatching {
@@ -386,7 +389,7 @@ private fun AppExperimentalSettingsSection(
                     }
                 }
                 viewModel.clearAcgWallpaperUri()
-                context.toast(MLang.AppSettings.Experimental.ResetWallpaperSuccess)
+                context.toast(resetWallpaperSuccess)
             },
         )
     }
@@ -405,6 +408,9 @@ private fun BiometricProtectedPreferenceSwitch(
     val checked by checkedFlow.collectAsStateWithLifecycle()
     val showUnavailableDialogState = remember { mutableStateOf(false) }
     var unavailableMessage by remember { mutableStateOf("") }
+    val biometricUnavailableMessage = stringResource(
+        LocaleR.string.app_settings_privacy_biometric_unavailable_message,
+    )
 
     PreferenceSwitchItem(
         title = title,
@@ -415,6 +421,7 @@ private fun BiometricProtectedPreferenceSwitch(
                 context = context,
                 title = if (targetState) enableTitle else disableTitle,
                 allowBypassWhenUnavailable = !targetState,
+                unavailableMessage = biometricUnavailableMessage,
                 onUnavailable = { message ->
                     unavailableMessage = message
                     showUnavailableDialogState.value = true
@@ -426,10 +433,10 @@ private fun BiometricProtectedPreferenceSwitch(
 
     WarningBottomSheet(
         show = showUnavailableDialogState,
-        title = MLang.AppSettings.Privacy.BiometricUnavailableTitle,
+        title = stringResource(LocaleR.string.app_settings_privacy_biometric_unavailable_title),
         messages = listOf(
             unavailableMessage.ifBlank {
-                MLang.AppSettings.Privacy.BiometricUnavailableMessage
+                biometricUnavailableMessage
             },
         ),
         onConfirm = { showUnavailableDialogState.value = false },
@@ -446,8 +453,8 @@ private fun HideAppIconPreferenceItem(
     val showHideIconDialogState = remember { mutableStateOf(false) }
 
     PreferenceSwitchItem(
-        title = MLang.AppSettings.Privacy.HideIconTitle,
-        summary = MLang.AppSettings.Privacy.HideIconSummary,
+        title = stringResource(LocaleR.string.app_settings_privacy_hide_icon_title),
+        summary = stringResource(LocaleR.string.app_settings_privacy_hide_icon_summary),
         checked = hideAppIcon,
         onCheckedChange = { checked ->
             if (checked) {
@@ -461,10 +468,10 @@ private fun HideAppIconPreferenceItem(
 
     WarningBottomSheet(
         show = showHideIconDialogState,
-        title = MLang.AppSettings.WarningDialog.Title,
+        title = stringResource(LocaleR.string.app_settings_warning_dialog_title),
         messages = listOf(
-            MLang.AppSettings.WarningDialog.HideIconMsg1,
-            MLang.AppSettings.WarningDialog.HideIconMsg2,
+            stringResource(LocaleR.string.app_settings_warning_dialog_hide_icon_msg1),
+            stringResource(LocaleR.string.app_settings_warning_dialog_hide_icon_msg2),
         ),
         onConfirm = {
             onHideAppIconChange(true)
@@ -498,8 +505,8 @@ private fun AcgWallpaperPreferenceItem(
     }
 
     PreferenceArrowItem(
-        title = MLang.AppSettings.Experimental.WallpaperTitle,
-        summary = MLang.AppSettings.Experimental.WallpaperSummary,
+        title = stringResource(LocaleR.string.app_settings_experimental_wallpaper_title),
+        summary = stringResource(LocaleR.string.app_settings_experimental_wallpaper_summary),
         onClick = {
             wallpaperPickerLauncher.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
@@ -512,6 +519,7 @@ private fun requestBiometricConfirmation(
     context: android.content.Context,
     title: String,
     allowBypassWhenUnavailable: Boolean = false,
+    unavailableMessage: String,
     onUnavailable: (String) -> Unit,
     onSuccess: () -> Unit,
 ) {
@@ -520,7 +528,7 @@ private fun requestBiometricConfirmation(
         if (allowBypassWhenUnavailable) {
             onSuccess()
         } else {
-            onUnavailable(MLang.AppSettings.Privacy.BiometricUnavailableMessage)
+            onUnavailable(unavailableMessage)
         }
         return
     }
@@ -628,8 +636,8 @@ private fun PageScalePreferenceItem(
     }
 
     PreferenceArrowItem(
-        title = MLang.AppSettings.Interface.PageScaleTitle,
-        summary = MLang.AppSettings.Interface.PageScaleSummary,
+        title = stringResource(LocaleR.string.app_settings_interface_page_scale_title),
+        summary = stringResource(LocaleR.string.app_settings_interface_page_scale_summary),
         endActions = {
             Text(
                 text = pageScalePercentText,
@@ -674,7 +682,7 @@ private fun PageScaleDialog(
 
     AppTextFieldDialog(
         show = show,
-        title = MLang.AppSettings.Interface.PageScaleTitle,
+        title = stringResource(LocaleR.string.app_settings_interface_page_scale_title),
         value = scaleText,
         onValueChange = { value ->
             if (value.isEmpty() || value.all(Char::isDigit)) {
@@ -689,7 +697,7 @@ private fun PageScaleDialog(
             onApply(clampedScale)
             onDismissRequest()
         },
-        summary = MLang.AppSettings.Interface.PageScaleDialogSummary,
+        summary = stringResource(LocaleR.string.app_settings_interface_page_scale_dialog_summary),
         renderInRootScaffold = true,
         singleLine = true,
         trailingIcon = {
