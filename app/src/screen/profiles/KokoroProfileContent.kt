@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -173,7 +174,7 @@ internal fun KokoroAccountCard(
                 is KokoroAuthState.Error -> {
                     StatusText(
                         title = stringResource(LocaleR.string.profiles_page_kokoro_check_failed),
-                        detail = authState.message.resolve(LocalContext.current.resources),
+                        detail = authState.message.resolve(LocalResources.current),
                         error = true,
                     )
                     Column(

@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -97,6 +98,7 @@ internal fun AddProfileSheet(
     val downloadSheetContentHeight = configuration.screenHeightDp.dp * 0.3f
     val downloadCompleteSheetContentHeight = configuration.screenHeightDp.dp * 0.42f
     val context = LocalContext.current
+    val resources = LocalResources.current
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -273,8 +275,8 @@ internal fun AddProfileSheet(
         }
         onDispose { }
     }
-    LaunchedEffect(uiState.errorText) {
-        val errorMessage = uiState.errorText?.resolve(context.resources)
+    LaunchedEffect(uiState.errorText, resources) {
+        val errorMessage = uiState.errorText?.resolve(resources)
         if (errorMessage != null) {
             context.toast(errorMessage, Toast.LENGTH_LONG, copyable = true)
             if (isDownloading) {
@@ -623,7 +625,7 @@ private fun DownloadProgressContent(
             }
         }
 
-        downloadProgress?.message?.resolve(LocalContext.current.resources)?.let { message ->
+        downloadProgress?.message?.resolve(LocalResources.current)?.let { message ->
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyLarge,

@@ -147,6 +147,12 @@ val mihomoVersion = providers.fileContents(rootProject.layout.projectDirectory.f
 android {
     namespace = gropify.project.namespace.base
 
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     defaultConfig {
         applicationId = projectApplicationId
         targetSdk = gropify.android.targetSdk

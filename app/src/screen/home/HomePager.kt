@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -81,6 +82,7 @@ fun HomePager(
     val tunnelMode by homeViewModel.tunnelMode.collectAsStateWithLifecycle()
     val useFabProxyControl by appSettings.homeUseFabProxyControl.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val hapticFeedback = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -97,16 +99,16 @@ fun HomePager(
         onPauseOrDispose { }
     }
 
-    LaunchedEffect(uiState.errorText) {
+    LaunchedEffect(uiState.errorText, resources) {
         uiState.errorText?.let {
-            context.toast(it.resolve(context.resources), Toast.LENGTH_LONG, copyable = true)
+            context.toast(it.resolve(resources), Toast.LENGTH_LONG, copyable = true)
             homeViewModel.consumeError()
         }
     }
 
-    LaunchedEffect(uiState.messageText) {
+    LaunchedEffect(uiState.messageText, resources) {
         uiState.messageText?.let {
-            context.toast(it.resolve(context.resources), Toast.LENGTH_SHORT)
+            context.toast(it.resolve(resources), Toast.LENGTH_SHORT)
             homeViewModel.consumeMessage()
         }
     }
