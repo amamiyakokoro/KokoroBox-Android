@@ -37,10 +37,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.GeoFileType
 import com.amamiyakokoro.box.core.model.GeoXItem
 import com.amamiyakokoro.box.core.model.geoXItems
@@ -54,7 +56,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -104,7 +105,7 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.MetaFeature.Title,
+                title = stringResource(LocaleR.string.meta_feature_title),
             )
         },
     ) { innerPadding ->
@@ -113,11 +114,11 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
-                Title(MLang.MetaFeature.Section.ConnectionAndTraffic)
+                Title(stringResource(LocaleR.string.meta_feature_section_connection_and_traffic))
                 Card {
                     PreferenceArrowItem(
-                        title = MLang.Connection.Title,
-                        summary = MLang.Connection.Summary,
+                        title = stringResource(LocaleR.string.connection_title),
+                        summary = stringResource(LocaleR.string.connection_summary),
                         onClick = {
                             navigator.navigate(ConnectionScreenDestination) {
                                 launchSingleTop = true
@@ -125,8 +126,8 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                         },
                     )
                     PreferenceArrowItem(
-                        title = MLang.TrafficStatistics.Title,
-                        summary = MLang.TrafficStatistics.EntrySummary,
+                        title = stringResource(LocaleR.string.traffic_statistics_title),
+                        summary = stringResource(LocaleR.string.traffic_statistics_entry_summary),
                         onClick = {
                             navigator.navigate(TrafficStatisticsScreenDestination) {
                                 launchSingleTop = true
@@ -136,19 +137,19 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                 }
             }
             item {
-                Title(MLang.MetaFeature.Section.GeoXUpdate)
+                Title(stringResource(LocaleR.string.meta_feature_section_geo_xupdate))
                 Card {
                     PreferenceArrowItem(
-                        title = MLang.MetaFeature.GeoX.OnlineUpdateTitle,
-                        summary = MLang.MetaFeature.GeoX.OnlineUpdateSummary,
+                        title = stringResource(LocaleR.string.meta_feature_geo_x_online_update_title),
+                        summary = stringResource(LocaleR.string.meta_feature_geo_x_online_update_summary),
                         onClick = {
                             refreshGeoXUpdateRecords()
                             showGeoXDownloadSheet.value = true
                         },
                     )
                     PreferenceArrowItem(
-                        title = MLang.MetaFeature.GeoX.LocalUpdateTitle,
-                        summary = MLang.MetaFeature.GeoX.LocalUpdateSummary,
+                        title = stringResource(LocaleR.string.meta_feature_geo_x_local_update_title),
+                        summary = stringResource(LocaleR.string.meta_feature_geo_x_local_update_summary),
                         onClick = {
                             refreshGeoXUpdateRecords()
                             showGeoXImportSheet.value = true
@@ -157,17 +158,17 @@ fun MetaFeatureScreen(navigator: DestinationsNavigator) {
                 }
             }
             item {
-                Title(MLang.MetaFeature.AgeKey.Section)
+                Title(stringResource(LocaleR.string.meta_feature_age_key_section))
                 Card {
                     PreferenceArrowItem(
-                        title = MLang.MetaFeature.AgeKey.X25519Title,
+                        title = stringResource(LocaleR.string.meta_feature_age_key_x25519_title),
                         onClick = {
                             ageKeyHybrid = false
                             ageKeySheetVisible = true
                         },
                     )
                     PreferenceArrowItem(
-                        title = MLang.MetaFeature.AgeKey.HybridTitle,
+                        title = stringResource(LocaleR.string.meta_feature_age_key_hybrid_title),
                         onClick = {
                             ageKeyHybrid = true
                             ageKeySheetVisible = true
@@ -223,6 +224,7 @@ private fun GeoXDownloadSheet(
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var downloadSession by remember { mutableIntStateOf(0) }
     var completedCounts by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    val selectFiles = stringResource(LocaleR.string.meta_feature_download_select_files)
 
     fun resetDownloadState() {
         downloadSession++
@@ -249,7 +251,7 @@ private fun GeoXDownloadSheet(
 
     AppActionBottomSheet(
         show = show.value,
-        title = MLang.MetaFeature.Download.DialogTitle,
+        title = stringResource(LocaleR.string.meta_feature_download_dialog_title),
         onDismissRequest = { cancelDownloadAndClose() },
         startAction = {
             AppBottomSheetCloseAction(
@@ -262,7 +264,7 @@ private fun GeoXDownloadSheet(
                 onClick = {
                     val itemsToDownload = geoXItems.filter { selectedItems[it.type] == true }
                     if (itemsToDownload.isEmpty()) {
-                        context.toast(MLang.MetaFeature.Download.SelectFiles)
+                        context.toast(selectFiles)
                         return@AppBottomSheetConfirmAction
                     }
                     isDownloading = true
@@ -302,7 +304,8 @@ private fun GeoXDownloadSheet(
             Column {
                 completedCounts?.let { (success, total) ->
                     Text(
-                        text = MLang.MetaFeature.Download.DownloadComplete.format(success, total),
+                        text = stringResource(LocaleR.string.meta_feature_download_download_complete)
+                            .format(success, total),
                         modifier = Modifier
                             .padding(UiDp.dp16)
                             .semantics { liveRegion = LiveRegionMode.Polite },
@@ -348,6 +351,8 @@ private fun GeoXImportSheet(
 ) {
     var importTargetItem by remember { mutableStateOf<GeoXItem?>(null) }
     var isImporting by remember { mutableStateOf(false) }
+    val importSuccess = stringResource(LocaleR.string.meta_feature_download_import_success)
+    val importFailed = stringResource(LocaleR.string.meta_feature_download_import_failed)
 
     LaunchedEffect(show.value) {
         if (show.value) onRefreshUpdateRecords()
@@ -368,9 +373,9 @@ private fun GeoXImportSheet(
             isImporting = false
             context.toast(
                 if (imported) {
-                    MLang.MetaFeature.Download.ImportSuccess.format(targetItem.title)
+                    importSuccess.format(targetItem.title)
                 } else {
-                    MLang.MetaFeature.Download.ImportFailed.format(targetItem.title)
+                    importFailed.format(targetItem.title)
                 }
             )
         }
@@ -378,7 +383,7 @@ private fun GeoXImportSheet(
 
     AppActionBottomSheet(
         show = show.value,
-        title = MLang.MetaFeature.Download.LocalDialogTitle,
+        title = stringResource(LocaleR.string.meta_feature_download_local_dialog_title),
         onDismissRequest = { if (!isImporting) show.value = false },
         startAction = {
             AppBottomSheetCloseAction(
@@ -470,18 +475,20 @@ private fun downloadGeoXFiles(
     }
 }
 
+@Composable
 private fun GeoXItem.lastUpdateSummary(record: GeoXUpdateRecord?): String {
-    if (record == null) return MLang.MetaFeature.Download.LastUpdateNever
-    return MLang.MetaFeature.Download.LastUpdate.format(
-        record.source.displayName,
+    if (record == null) return stringResource(LocaleR.string.meta_feature_download_last_update_never)
+    return stringResource(LocaleR.string.meta_feature_download_last_update).format(
+        record.source.displayName(),
         formatGeoXUpdateTime(record.timestamp),
     )
 }
 
-private val com.amamiyakokoro.box.data.controller.GeoXUpdateSource.displayName: String
-    get() = when (name) {
-        "Local" -> MLang.MetaFeature.Download.LastUpdateSourceLocal
-        else -> MLang.MetaFeature.Download.LastUpdateSourceOnline
+@Composable
+private fun com.amamiyakokoro.box.data.controller.GeoXUpdateSource.displayName(): String =
+    when (name) {
+        "Local" -> stringResource(LocaleR.string.meta_feature_download_last_update_source_local)
+        else -> stringResource(LocaleR.string.meta_feature_download_last_update_source_online)
     }
 
 private fun formatGeoXUpdateTime(timestamp: Long): String {
@@ -554,29 +561,32 @@ private fun Md3EWavyProgressIndicator(
     }
 }
 
+@Composable
 private fun GeoXDownloadProgressState.statusLabel(): String {
     return when (status) {
-        GeoXDownloadStatus.Pending -> MLang.MetaFeature.Download.StatusPending
-        GeoXDownloadStatus.Downloading -> MLang.MetaFeature.Download.StatusDownloading.format(progress)
-        GeoXDownloadStatus.Validating -> MLang.MetaFeature.Download.StatusValidating
-        GeoXDownloadStatus.Success -> MLang.MetaFeature.Download.StatusSuccess
-        GeoXDownloadStatus.Failed -> MLang.MetaFeature.Download.StatusFailed
+        GeoXDownloadStatus.Pending -> stringResource(LocaleR.string.meta_feature_download_status_pending)
+        GeoXDownloadStatus.Downloading -> stringResource(LocaleR.string.meta_feature_download_status_downloading)
+            .format(progress)
+        GeoXDownloadStatus.Validating -> stringResource(LocaleR.string.meta_feature_download_status_validating)
+        GeoXDownloadStatus.Success -> stringResource(LocaleR.string.meta_feature_download_status_success)
+        GeoXDownloadStatus.Failed -> stringResource(LocaleR.string.meta_feature_download_status_failed)
     }
 }
 
+@Composable
 private fun GeoXDownloadProgressState.detailText(): String {
     return when {
-        status == GeoXDownloadStatus.Success -> MLang.MetaFeature.Download.ProgressSuccess
-        status == GeoXDownloadStatus.Failed -> MLang.MetaFeature.Download.ProgressFailed
-        totalSize > 0L -> MLang.MetaFeature.Download.ProgressDetail.format(
+        status == GeoXDownloadStatus.Success -> stringResource(LocaleR.string.meta_feature_download_progress_success)
+        status == GeoXDownloadStatus.Failed -> stringResource(LocaleR.string.meta_feature_download_progress_failed)
+        totalSize > 0L -> stringResource(LocaleR.string.meta_feature_download_progress_detail).format(
             com.amamiyakokoro.box.common.util.formatBytes(currentSize),
             com.amamiyakokoro.box.common.util.formatBytes(totalSize),
             speed,
         )
-        currentSize > 0L -> MLang.MetaFeature.Download.ProgressDetailUnknownTotal.format(
+        currentSize > 0L -> stringResource(LocaleR.string.meta_feature_download_progress_detail_unknown_total).format(
             com.amamiyakokoro.box.common.util.formatBytes(currentSize),
             speed,
         )
-        else -> MLang.MetaFeature.Download.ProgressWaiting
+        else -> stringResource(LocaleR.string.meta_feature_download_progress_waiting)
     }
 }
