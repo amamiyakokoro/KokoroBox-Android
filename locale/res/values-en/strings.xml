@@ -204,7 +204,7 @@
     <string name="app_settings_service_section_traffic_notification_summary" formatted="false">Display traffic usage in notification bar</string>
     <string name="app_settings_service_section_traffic_notification_title" formatted="false">Show Traffic Notification</string>
     <string name="app_settings_title" formatted="false">App Settings</string>
-    <string name="app_settings_warning_dialog_hide_icon_msg1" formatted="false">Please make sure you can access this apps settings before hiding!s settings before hiding!</string>
+    <string name="app_settings_warning_dialog_hide_icon_msg1" formatted="false">Make sure you can still access the app settings before hiding the app icon.</string>
     <string name="app_settings_warning_dialog_hide_icon_msg2" formatted="false">For HyperOS, please enable Auto-start and Background Pop-up permissions to receive dialer codes!</string>
     <string name="app_settings_warning_dialog_title" formatted="false">Warning</string>
     <string name="component_bottom_bar_config" formatted="false">Config</string>

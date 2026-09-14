@@ -330,7 +330,7 @@ private fun VersionBadge(
             horizontalArrangement = Arrangement.spacedBy(spacing.space8)
         ) {
             Text(
-                text = versionInfo ?: "Unknown",
+                text = versionInfo ?: stringResource(LocaleR.string.home_node_info_unknown),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,

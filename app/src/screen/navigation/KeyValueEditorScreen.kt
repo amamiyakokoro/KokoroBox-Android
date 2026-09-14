@@ -217,7 +217,9 @@ fun StringListEditorScreen(
                         onClick = { dialogState = StringListDialogState.Edit(item.id) },
                         onDelete = { items.removeAll { it.id == item.id } },
                         deleteIcon = AppMd3Icons.Action.Delete,
-                        deleteContentDescription = "Delete",
+                        deleteContentDescription = stringResource(
+                            LocaleR.string.component_editor_action_delete,
+                        ),
                     )
                 }
             }
@@ -369,7 +371,9 @@ fun KeyValueEditorScreen(
                         onClick = { dialogState = KeyValueDialogState.Edit(item.id) },
                         onDelete = { items.removeAll { it.id == item.id } },
                         deleteIcon = AppMd3Icons.Action.Delete,
-                        deleteContentDescription = "Delete",
+                        deleteContentDescription = stringResource(
+                            LocaleR.string.component_editor_action_delete,
+                        ),
                     )
                 }
             }
