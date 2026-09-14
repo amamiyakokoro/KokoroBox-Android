@@ -24,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amamiyakokoro.box.data.integration.speedtest.CloudflareSpeedTestResult
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.integration.speedtest.CloudflareSpeedTestStage
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
@@ -39,7 +41,6 @@ import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
 
@@ -53,12 +54,12 @@ fun CloudflareSpeedTestScreen(navigator: DestinationsNavigator) {
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
-                title = MLang.Feature.SpeedTest.Title,
+                title = stringResource(LocaleR.string.feature_speed_test_title),
                 navigationIcon = {
                     IconButton(onClick = navigator::navigateUp) {
                         Icon(
                             imageVector = AppMd3Icons.Navigation.Back,
-                            contentDescription = MLang.Component.Navigation.Back,
+                            contentDescription = stringResource(LocaleR.string.component_navigation_back),
                         )
                     }
                 },
@@ -101,9 +102,9 @@ private fun CloudflareSpeedTestCard(
                 tint = MaterialTheme.colorScheme.primary,
             )
             Column(verticalArrangement = Arrangement.spacedBy(UiDp.dp2)) {
-                Text(MLang.Feature.SpeedTest.Title, style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(LocaleR.string.feature_speed_test_title), style = MaterialTheme.typography.titleMedium)
                 Text(
-                    MLang.Feature.SpeedTest.Summary,
+                    stringResource(LocaleR.string.feature_speed_test_summary),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -111,7 +112,7 @@ private fun CloudflareSpeedTestCard(
         }
 
         Text(
-            MLang.Feature.SpeedTest.DataUsage,
+            stringResource(LocaleR.string.feature_speed_test_data_usage),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -120,14 +121,14 @@ private fun CloudflareSpeedTestCard(
             state.running -> {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 Text(
-                    text = state.stage?.let(::speedTestStageLabel).orEmpty(),
+                    text = state.stage?.let { speedTestStageLabel(it) }.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
 
             state.failed -> Text(
-                MLang.Feature.SpeedTest.Error,
+                stringResource(LocaleR.string.feature_speed_test_error),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
             )
@@ -136,20 +137,20 @@ private fun CloudflareSpeedTestCard(
         }
 
         Text(
-            MLang.Feature.SpeedTest.PrivacyNotice,
+            stringResource(LocaleR.string.feature_speed_test_privacy_notice),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (state.running) {
             YumeMd3TextButton(
-                text = MLang.Feature.SpeedTest.Cancel,
+                text = stringResource(LocaleR.string.feature_speed_test_cancel),
                 onClick = onCancel,
                 modifier = Modifier.align(Alignment.End),
             )
         } else {
             YumeMd3FilledButton(
-                text = MLang.Feature.SpeedTest.Start,
+                text = stringResource(LocaleR.string.feature_speed_test_start),
                 onClick = onStart,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -160,13 +161,13 @@ private fun CloudflareSpeedTestCard(
 @Composable
 private fun CloudflareSpeedTestResults(result: CloudflareSpeedTestResult) {
     Column(verticalArrangement = Arrangement.spacedBy(UiDp.dp8)) {
-        SpeedTestMetric(MLang.Feature.SpeedTest.Download, formatMegabits(result.downloadBitsPerSecond))
-        SpeedTestMetric(MLang.Feature.SpeedTest.Upload, formatMegabits(result.uploadBitsPerSecond))
-        SpeedTestMetric(MLang.Feature.SpeedTest.Latency, formatMilliseconds(result.latencyMs))
-        SpeedTestMetric(MLang.Feature.SpeedTest.Jitter, formatMilliseconds(result.jitterMs))
+        SpeedTestMetric(stringResource(LocaleR.string.feature_speed_test_download), formatMegabits(result.downloadBitsPerSecond))
+        SpeedTestMetric(stringResource(LocaleR.string.feature_speed_test_upload), formatMegabits(result.uploadBitsPerSecond))
+        SpeedTestMetric(stringResource(LocaleR.string.feature_speed_test_latency), formatMilliseconds(result.latencyMs))
+        SpeedTestMetric(stringResource(LocaleR.string.feature_speed_test_jitter), formatMilliseconds(result.jitterMs))
         SpeedTestMetric(
-            MLang.Feature.SpeedTest.EdgeLocation,
-            result.cloudflareColo ?: MLang.Feature.SpeedTest.LocationUnknown,
+            stringResource(LocaleR.string.feature_speed_test_edge_location),
+            result.cloudflareColo ?: stringResource(LocaleR.string.feature_speed_test_location_unknown),
         )
     }
 }
@@ -179,11 +180,12 @@ private fun SpeedTestMetric(label: String, value: String) {
     }
 }
 
+@Composable
 private fun speedTestStageLabel(stage: CloudflareSpeedTestStage): String = when (stage) {
-    CloudflareSpeedTestStage.Preparing -> MLang.Feature.SpeedTest.Preparing
-    CloudflareSpeedTestStage.Latency -> MLang.Feature.SpeedTest.TestingLatency
-    CloudflareSpeedTestStage.Download -> MLang.Feature.SpeedTest.TestingDownload
-    CloudflareSpeedTestStage.Upload -> MLang.Feature.SpeedTest.TestingUpload
+    CloudflareSpeedTestStage.Preparing -> stringResource(LocaleR.string.feature_speed_test_preparing)
+    CloudflareSpeedTestStage.Latency -> stringResource(LocaleR.string.feature_speed_test_testing_latency)
+    CloudflareSpeedTestStage.Download -> stringResource(LocaleR.string.feature_speed_test_testing_download)
+    CloudflareSpeedTestStage.Upload -> stringResource(LocaleR.string.feature_speed_test_testing_upload)
 }
 
 private fun formatMegabits(bitsPerSecond: Long): String {

@@ -17,8 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.store.SUPPORTED_HEALTH_CHECK_CONCURRENCY
 import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
 import com.amamiyakokoro.box.presentation.component.Card
@@ -35,7 +37,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.CloudflareSpeedTestScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,18 +49,19 @@ fun LabScreen(navigator: DestinationsNavigator) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { TopBar(title = MLang.Feature.Title) },
+        topBar = { TopBar(title = stringResource(LocaleR.string.feature_title)) },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, mainLikePadding),
         ) {
             item {
-                Title(MLang.Feature.Node.Section)
+                Title(stringResource(LocaleR.string.feature_node_section))
                 Card {
                     YumeMd3DropdownPreference(
-                        title = MLang.Feature.Node.HealthCheckConcurrencyTitle,
-                        summary = MLang.Feature.Node.HealthCheckConcurrencySummary.format(healthCheckConcurrency),
+                        title = stringResource(LocaleR.string.feature_node_health_check_concurrency_title),
+                        summary = stringResource(LocaleR.string.feature_node_health_check_concurrency_summary)
+                            .format(healthCheckConcurrency),
                         items = SUPPORTED_HEALTH_CHECK_CONCURRENCY.map(Int::toString),
                         selectedIndex = SUPPORTED_HEALTH_CHECK_CONCURRENCY.indexOf(healthCheckConcurrency)
                             .takeIf { it >= 0 } ?: 0,
@@ -77,11 +79,11 @@ fun LabScreen(navigator: DestinationsNavigator) {
                 )
             }
             item {
-                Title(MLang.Feature.SpeedTest.Section)
+                Title(stringResource(LocaleR.string.feature_speed_test_section))
                 Card {
                     PreferenceArrowItem(
-                        title = MLang.Feature.SpeedTest.Title,
-                        summary = MLang.Feature.SpeedTest.Summary,
+                        title = stringResource(LocaleR.string.feature_speed_test_title),
+                        summary = stringResource(LocaleR.string.feature_speed_test_summary),
                         onClick = {
                             navigator.navigate(CloudflareSpeedTestScreenDestination) {
                                 launchSingleTop = true
@@ -102,12 +104,19 @@ private fun RuntimeConfigurationSection(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val opening = remember { mutableStateOf(false) }
+    val unknownProfile = stringResource(LocaleR.string.feature_runtime_config_unknown_profile)
+    val previewTitle = stringResource(LocaleR.string.feature_runtime_config_preview_title)
+    val notRunning = stringResource(LocaleR.string.feature_runtime_config_not_running)
+    val notReady = stringResource(LocaleR.string.feature_runtime_config_not_ready)
+    val unavailable = stringResource(LocaleR.string.feature_runtime_config_unavailable)
+    val empty = stringResource(LocaleR.string.feature_runtime_config_empty)
+    val runtimeChanged = stringResource(LocaleR.string.feature_runtime_config_runtime_changed)
 
-    Title(MLang.Feature.RuntimeConfig.Section)
+    Title(stringResource(LocaleR.string.feature_runtime_config_section))
     Card {
         PreferenceArrowItem(
-            title = MLang.Feature.RuntimeConfig.Title,
-            summary = MLang.Feature.RuntimeConfig.Summary,
+            title = stringResource(LocaleR.string.feature_runtime_config_title),
+            summary = stringResource(LocaleR.string.feature_runtime_config_summary),
             onClick = {
                 if (opening.value) return@PreferenceArrowItem
                 opening.value = true
@@ -116,10 +125,10 @@ private fun RuntimeConfigurationSection(
                         when (val result = viewModel.loadRunningConfiguration()) {
                             is RuntimeConfigLoadResult.Loaded -> {
                                 val profileName = result.profileName.ifBlank {
-                                    MLang.Feature.RuntimeConfig.UnknownProfile
+                                    unknownProfile
                                 }
                                 OverrideStructuredEditorStore.setupConfigPreview(
-                                    title = MLang.Feature.RuntimeConfig.PreviewTitle.format(profileName),
+                                    title = previewTitle.format(profileName),
                                     content = result.content,
                                     language = LanguageScope.Yaml,
                                 )
@@ -129,23 +138,23 @@ private fun RuntimeConfigurationSection(
                             }
 
                             RuntimeConfigLoadResult.NotRunning -> {
-                                context.toast(MLang.Feature.RuntimeConfig.NotRunning)
+                                context.toast(notRunning)
                             }
 
                             RuntimeConfigLoadResult.NotReady -> {
-                                context.toast(MLang.Feature.RuntimeConfig.NotReady)
+                                context.toast(notReady)
                             }
 
                             RuntimeConfigLoadResult.Unavailable -> {
-                                context.toast(MLang.Feature.RuntimeConfig.Unavailable)
+                                context.toast(unavailable)
                             }
 
                             RuntimeConfigLoadResult.Empty -> {
-                                context.toast(MLang.Feature.RuntimeConfig.Empty)
+                                context.toast(empty)
                             }
 
                             RuntimeConfigLoadResult.RuntimeChanged -> {
-                                context.toast(MLang.Feature.RuntimeConfig.RuntimeChanged)
+                                context.toast(runtimeChanged)
                             }
                         }
                     } finally {
