@@ -32,6 +32,7 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.runtime.service.R
@@ -40,7 +41,6 @@ import com.amamiyakokoro.box.service.common.constants.Components
 import com.amamiyakokoro.box.service.runtime.config.ServiceStore
 import com.amamiyakokoro.box.service.runtime.records.ImportedDao
 import com.tencent.mmkv.MMKV
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
@@ -123,7 +123,7 @@ class ServiceNotificationManager(
             return buildNotification(
                 NotificationPresentationFactory.createStatus(
                     profileName = profileName,
-                    status = MLang.Service.Notification.Running,
+                    status = service.getString(LocaleR.string.service_notification_running),
                 ),
             )
         }
@@ -133,6 +133,7 @@ class ServiceNotificationManager(
         val todayTrafficBytes = queryCachedTodayTrafficBytes()
         return buildNotification(
             NotificationPresentationFactory.createRunning(
+                resources = service.resources,
                 profileName = profileName,
                 trafficNow = now,
                 todayTrafficBytes = todayTrafficBytes,
@@ -182,10 +183,11 @@ class ServiceNotificationManager(
     }
 
     private fun resolveProfileName(): String {
-        val active = serviceStore.activeProfile ?: return MLang.Service.Notification.UnknownProfile
+        val active = serviceStore.activeProfile
+            ?: return service.getString(LocaleR.string.service_notification_unknown_profile)
         return ImportedDao.queryByUUID(active)?.name
             ?.takeIf { it.isNotBlank() }
-            ?: MLang.Service.Notification.UnknownProfile
+            ?: service.getString(LocaleR.string.service_notification_unknown_profile)
     }
 
     private fun shouldShowTrafficNotification(): Boolean {

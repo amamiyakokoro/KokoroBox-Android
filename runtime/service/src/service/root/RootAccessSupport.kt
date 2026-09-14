@@ -21,7 +21,7 @@
 package com.amamiyakokoro.box.service.root
 
 import android.content.Context
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -31,8 +31,8 @@ data class RootAccessStatus(
     val canStartRootTun: Boolean
         get() = rootAccessGranted
 
-    fun rootTunBlockedMessage(): String {
-        return MLang.NetworkSettings.Error.RootRequired
+    fun rootTunBlockedMessage(context: Context): String {
+        return context.getString(LocaleR.string.network_settings_error_root_required)
     }
 }
 
@@ -50,7 +50,7 @@ object RootAccessSupport {
 
     suspend fun requireRootTunAccess(context: Context): RootAccessStatus {
         return evaluateAsync(context).also { status ->
-            check(status.canStartRootTun) { status.rootTunBlockedMessage() }
+            check(status.canStartRootTun) { status.rootTunBlockedMessage(context) }
         }
     }
 }

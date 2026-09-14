@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.amamiyakokoro.box.common.util.formatBytes
@@ -118,7 +119,7 @@ fun TrafficStatisticsScreen() {
         ) {
             item {
                 TabRowWithContour(
-                    tabs = timeRanges.map { it.label },
+                    tabs = timeRanges.map { stringResource(it.labelRes) },
                     selectedTabIndex = selectedTabIndex,
                     onTabSelected = { index ->
                         timeRanges.getOrNull(index)?.let(viewModel::setTimeRange)

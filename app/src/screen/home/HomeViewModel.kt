@@ -491,7 +491,7 @@ class HomeViewModel(
                 if (!rootStatus.canStartRootTun) {
                     clearPendingStart()
                     _pendingTransition.value = PendingTransition.None
-                    showError(rootStatus.rootTunBlockedMessage())
+                    showError(rootStatus.rootTunBlockedMessage(getApplication()))
                     return
                 }
             }

@@ -22,7 +22,7 @@
 
 package com.amamiyakokoro.box.data.model
 
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 const val PROXY_SHEET_HEIGHT_FRACTION_MIN = 0.5f
 const val PROXY_SHEET_HEIGHT_FRACTION_MAX = 0.8f
@@ -31,19 +31,11 @@ const val PROXY_SHEET_HEIGHT_FRACTION_DEFAULT = 0.55f
 fun normalizeProxySheetHeightFraction(value: Float): Float =
     value.coerceIn(PROXY_SHEET_HEIGHT_FRACTION_MIN, PROXY_SHEET_HEIGHT_FRACTION_MAX)
 
-enum class ProxyDisplayMode {
-    SINGLE_DETAILED,
-    SINGLE_SIMPLE,
-    DOUBLE_DETAILED,
-    DOUBLE_SIMPLE;
-
-    val displayName: String
-        get() = when (this) {
-            SINGLE_DETAILED -> MLang.Proxy.DisplayMode.SingleDetailed
-            SINGLE_SIMPLE -> MLang.Proxy.DisplayMode.SingleSimple
-            DOUBLE_DETAILED -> MLang.Proxy.DisplayMode.DoubleDetailed
-            DOUBLE_SIMPLE -> MLang.Proxy.DisplayMode.DoubleSimple
-        }
+enum class ProxyDisplayMode(val labelRes: Int) {
+    SINGLE_DETAILED(LocaleR.string.proxy_display_mode_single_detailed),
+    SINGLE_SIMPLE(LocaleR.string.proxy_display_mode_single_simple),
+    DOUBLE_DETAILED(LocaleR.string.proxy_display_mode_double_detailed),
+    DOUBLE_SIMPLE(LocaleR.string.proxy_display_mode_double_simple);
 
     val isSingleColumn: Boolean
         get() = this == SINGLE_DETAILED || this == SINGLE_SIMPLE
@@ -52,15 +44,8 @@ enum class ProxyDisplayMode {
         get() = this == SINGLE_DETAILED || this == DOUBLE_DETAILED
 }
 
-enum class ProxySortMode {
-    DEFAULT,
-    BY_NAME,
-    BY_LATENCY;
-
-    val displayName: String
-        get() = when (this) {
-            DEFAULT -> MLang.Proxy.SortMode.Default
-            BY_NAME -> MLang.Proxy.SortMode.ByName
-            BY_LATENCY -> MLang.Proxy.SortMode.ByLatency
-        }
+enum class ProxySortMode(val labelRes: Int) {
+    DEFAULT(LocaleR.string.proxy_sort_mode_default),
+    BY_NAME(LocaleR.string.proxy_sort_mode_by_name),
+    BY_LATENCY(LocaleR.string.proxy_sort_mode_by_latency);
 }

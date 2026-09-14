@@ -20,10 +20,11 @@
 
 package com.amamiyakokoro.box.service.notification
 
+import android.content.res.Resources
 import com.amamiyakokoro.box.common.util.formatBytes
 import com.amamiyakokoro.box.common.util.formatSpeed
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ProxyGroup
-import dev.oom_wg.purejoy.mlang.MLang
 
 internal data class NotificationPresentation(
     val title: String,
@@ -34,13 +35,14 @@ internal data class NotificationPresentation(
 
 internal object NotificationPresentationFactory {
     fun createRunning(
+        resources: Resources,
         profileName: String,
         trafficNow: Long,
         todayTrafficBytes: Long,
         fallbackTrafficTotal: Long,
     ): NotificationPresentation {
-        val speedLine = buildSpeedLine(trafficNow)
-        val totalLine = buildTodayTotalLine(todayTrafficBytes, fallbackTrafficTotal)
+        val speedLine = buildSpeedLine(resources, trafficNow)
+        val totalLine = buildTodayTotalLine(resources, todayTrafficBytes, fallbackTrafficTotal)
         return NotificationPresentation(
             title = profileName,
             content = speedLine,
@@ -144,15 +146,21 @@ internal object NotificationPresentationFactory {
         return normalized
     }
 
-    private fun buildSpeedLine(trafficNow: Long): String {
+    private fun buildSpeedLine(resources: Resources, trafficNow: Long): String {
         val upNow = decodeTrafficHalf(trafficNow ushr 32)
         val downNow = decodeTrafficHalf(trafficNow and 0xFFFFFFFFL)
-        return MLang.Service.Notification.SpeedFormat.format(formatSpeed(downNow), formatSpeed(upNow))
+        return resources.getString(LocaleR.string.service_notification_speed_format)
+            .format(formatSpeed(downNow), formatSpeed(upNow))
     }
 
-    private fun buildTodayTotalLine(todayTrafficBytes: Long, fallbackTrafficTotal: Long): String {
+    private fun buildTodayTotalLine(
+        resources: Resources,
+        todayTrafficBytes: Long,
+        fallbackTrafficTotal: Long,
+    ): String {
         val totalBytes = todayTrafficBytes.takeIf { it > 0L } ?: decodeTrafficTotal(fallbackTrafficTotal)
-        return MLang.Service.Notification.TodayTrafficFormat.format(formatBytes(totalBytes))
+        return resources.getString(LocaleR.string.service_notification_today_traffic_format)
+            .format(formatBytes(totalBytes))
     }
 
     private fun decodeTrafficTotal(trafficTotal: Long): Long {

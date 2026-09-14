@@ -36,6 +36,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.runtime.service.R
 import com.amamiyakokoro.box.service.common.constants.Components
@@ -50,7 +51,6 @@ import com.amamiyakokoro.box.service.root.RootTunStatus
 import com.amamiyakokoro.box.service.runtime.util.sendClashStarted
 import com.amamiyakokoro.box.service.runtime.util.sendClashStopped
 import com.tencent.mmkv.MMKV
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
@@ -86,7 +86,8 @@ class RootTunService : BaseService() {
                 val cachedStatus = stateStore.snapshot()
                 val initialNotification = buildNotification(
                     NotificationPresentationFactory.createStatus(
-                        profileName = cachedStatus.profileName ?: MLang.Service.Notification.UnknownProfile,
+                        profileName = cachedStatus.profileName
+                            ?: getString(LocaleR.string.service_notification_unknown_profile),
                         status = describeStatus(cachedStatus),
                     ),
                 )
@@ -114,7 +115,8 @@ class RootTunService : BaseService() {
                                 val fallbackStatus = stateStore.snapshot().takeIf {
                                     it.state != RootTunState.Idle || !it.profileName.isNullOrBlank() || !it.lastError.isNullOrBlank()
                                 } ?: lastStatus
-                                val title = fallbackStatus.profileName ?: MLang.Service.Notification.UnknownProfile
+                                val title = fallbackStatus.profileName
+                                    ?: getString(LocaleR.string.service_notification_unknown_profile)
                                 val content = if (unreachableCount >= 3) {
                                     describeStatus(
                                         fallbackStatus.copy(
@@ -154,7 +156,8 @@ class RootTunService : BaseService() {
                                 notifyIfChanged(
                                     buildNotification(
                                         NotificationPresentationFactory.createStatus(
-                                            profileName = snapshot.profileName ?: MLang.Service.Notification.UnknownProfile,
+                                            profileName = snapshot.profileName
+                                                ?: getString(LocaleR.string.service_notification_unknown_profile),
                                             status = describeStatus(snapshot),
                                         ),
                                     ),
@@ -163,7 +166,8 @@ class RootTunService : BaseService() {
                                 return@collect
                             }
 
-                            val profileName = snapshot.profileName ?: MLang.Service.Notification.UnknownProfile
+                            val profileName = snapshot.profileName
+                                ?: getString(LocaleR.string.service_notification_unknown_profile)
                             val showTraffic = shouldShowTrafficNotification()
                             val now = SystemClock.elapsedRealtime()
                             val trafficDisplayChanged = showTraffic != lastTrafficDisplayEnabled
@@ -184,7 +188,7 @@ class RootTunService : BaseService() {
                                 } else {
                                     NotificationPresentationFactory.createStatus(
                                         profileName = profileName,
-                                        status = MLang.Service.Notification.Running,
+                                        status = getString(LocaleR.string.service_notification_running),
                                     )
                                 }
                             } else {
@@ -225,6 +229,7 @@ class RootTunService : BaseService() {
         val now = runCatching { RootTunServiceBridge.queryTrafficNow(appContextOrSelf) }.getOrDefault(0L)
         val total = runCatching { RootTunServiceBridge.queryTrafficTotal(appContextOrSelf) }.getOrDefault(0L)
         return NotificationPresentationFactory.createRunning(
+            resources = resources,
             profileName = profileName,
             trafficNow = now,
             todayTrafficBytes = queryCachedTodayTrafficBytes(),
@@ -271,7 +276,7 @@ class RootTunService : BaseService() {
             .setShowWhen(false)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .addAction(0, MLang.Service.Tile.ClickToStopProxy, stopIntent)
+            .addAction(0, getString(LocaleR.string.service_tile_click_to_stop_proxy), stopIntent)
             .build()
     }
 
@@ -312,7 +317,7 @@ class RootTunService : BaseService() {
     private fun describeStatus(status: RootTunStatus): String {
         return when (status.state) {
             RootTunState.Starting -> "Starting..."
-            RootTunState.Running -> MLang.Service.Notification.Running
+            RootTunState.Running -> getString(LocaleR.string.service_notification_running)
             RootTunState.Stopping -> "Stopping..."
             RootTunState.Failed -> "Failed: ${status.lastError ?: "unknown error"}"
             RootTunState.Idle -> "Stopped"

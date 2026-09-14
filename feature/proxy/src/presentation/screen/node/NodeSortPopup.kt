@@ -28,6 +28,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.data.model.ProxySortMode
 
@@ -56,7 +57,7 @@ internal fun NodeSortPopup(
             DropdownMenuItem(
                 text = {
                     Text(
-                        text = mode.displayName,
+                        text = stringResource(mode.labelRes),
                         color = if (selectedSortIndex == index) {
                             MaterialTheme.colorScheme.primary
                         } else {

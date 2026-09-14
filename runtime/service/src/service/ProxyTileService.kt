@@ -35,6 +35,7 @@ import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.data.store.MMKVProvider
 import com.amamiyakokoro.box.data.store.NetworkSettingsStore
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.runtime.service.R
 import com.amamiyakokoro.box.service.common.constants.Components
 import com.amamiyakokoro.box.service.root.RootTunServiceBridge
@@ -43,7 +44,6 @@ import com.amamiyakokoro.box.service.runtime.session.RuntimeServiceLauncher
 import com.amamiyakokoro.box.service.runtime.state.RuntimeOwner
 import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
 import com.amamiyakokoro.box.service.runtime.state.RuntimeSnapshot
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -122,7 +122,7 @@ class ProxyTileService : TileService() {
                         profileManager.queryActive()
                     }
                     if (activeProfile == null) {
-                        updateTileInactiveState(subtitle = MLang.Service.Tile.ClickToOpen)
+                        updateTileInactiveState(subtitle = getString(LocaleR.string.service_tile_click_to_open))
 
                         val intent = Intent(Intent.ACTION_MAIN).apply {
                             component = Components.MAIN_ACTIVITY
@@ -137,7 +137,7 @@ class ProxyTileService : TileService() {
                         ProxyMode.Tun -> {
                             val vpnIntent = VpnService.prepare(this@ProxyTileService)
                             if (vpnIntent != null) {
-                                updateTileInactiveState(subtitle = MLang.Service.Tile.ClickToOpen)
+                                updateTileInactiveState(subtitle = getString(LocaleR.string.service_tile_click_to_open))
                                 vpnIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 startActivityAndCollapseCompat(vpnIntent, requestCode = 1002)
                                 return@launch
@@ -259,9 +259,9 @@ class ProxyTileService : TileService() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             tile.subtitle = if (isRunning) {
-                MLang.Service.Tile.ClickToStopProxy
+                getString(LocaleR.string.service_tile_click_to_stop_proxy)
             } else {
-                MLang.Service.Tile.ClickToStartProxy
+                getString(LocaleR.string.service_tile_click_to_start_proxy)
             }
         }
 
@@ -280,9 +280,9 @@ class ProxyTileService : TileService() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             tile.subtitle = if (isStarting) {
-                MLang.Service.Tile.Connecting
+                getString(LocaleR.string.service_tile_connecting)
             } else {
-                MLang.Service.Tile.Disconnecting
+                getString(LocaleR.string.service_tile_disconnecting)
             }
         }
 

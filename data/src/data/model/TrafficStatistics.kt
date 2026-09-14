@@ -117,13 +117,10 @@ data class ConnectionTrafficBaseline(
     val appName: String,
 )
 
-enum class StatisticsTimeRange(val days: Int) {
-    TODAY(1),
-    WEEK(7);
-
-    val label: String
-        get() = when (this) {
-            TODAY -> dev.oom_wg.purejoy.mlang.MLang.TrafficStatistics.TimeRange.Today
-            WEEK -> dev.oom_wg.purejoy.mlang.MLang.TrafficStatistics.TimeRange.Week
-        }
+enum class StatisticsTimeRange(
+    val days: Int,
+    val labelRes: Int,
+) {
+    TODAY(1, com.amamiyakokoro.box.core.locale.R.string.traffic_statistics_time_range_today),
+    WEEK(7, com.amamiyakokoro.box.core.locale.R.string.traffic_statistics_time_range_week);
 }

@@ -176,7 +176,7 @@ private fun NetworkVpnServiceSection(
                         coroutineScope.launch {
                             val rootStatus = RootAccessSupport.evaluateAsync(context)
                             if (!rootStatus.canStartRootTun) {
-                                context.toast(rootStatus.rootTunBlockedMessage())
+                                context.toast(rootStatus.rootTunBlockedMessage(context))
                                 return@launch
                             }
                             viewModel.onProxyModeChange(mode)
