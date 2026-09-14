@@ -23,8 +23,9 @@ package com.amamiyakokoro.box.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun SnifferEditor(
@@ -35,30 +36,30 @@ fun SnifferEditor(
     Column(
         verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
     ) {
-        OverrideCardSection(MLang.Override.Form.BasicPolicy) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_basic_policy)) {
             NullableBooleanSelector(
-                title = MLang.Override.Label.Enable,
+                title = stringResource(LocaleR.string.override_label_enable),
                 value = config.sniffer.enable,
                 onValueChange = {
                     onConfigChange(config.copy(sniffer = config.sniffer.copy(enable = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.ForceDnsMapping,
+                title = stringResource(LocaleR.string.override_label_force_dns_mapping),
                 value = config.sniffer.forceDnsMapping,
                 onValueChange = {
                     onConfigChange(config.copy(sniffer = config.sniffer.copy(forceDnsMapping = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.ParsePureIp,
+                title = stringResource(LocaleR.string.override_label_parse_pure_ip),
                 value = config.sniffer.parsePureIp,
                 onValueChange = {
                     onConfigChange(config.copy(sniffer = config.sniffer.copy(parsePureIp = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.OverrideDestination,
+                title = stringResource(LocaleR.string.override_label_override_destination),
                 value = config.sniffer.overrideDestination,
                 onValueChange = {
                     onConfigChange(
@@ -69,7 +70,7 @@ fun SnifferEditor(
         }
         OverrideCardSection("HTTP") {
             StringListWithModifiersInput(
-                title = MLang.Override.Form.HttpPorts,
+                title = stringResource(LocaleR.string.override_form_http_ports),
                 replaceValue = config.sniffer.sniff.http.ports,
                 startValue = config.sniffer.sniff.http.portsStart,
                 endValue = config.sniffer.sniff.http.portsEnd,
@@ -110,7 +111,7 @@ fun SnifferEditor(
                 onEditListGroup = onEditStringList,
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.HttpOverride,
+                title = stringResource(LocaleR.string.override_label_http_override),
                 value = config.sniffer.sniff.http.overrideDestination,
                 onValueChange = {
                     onConfigChange(
@@ -129,7 +130,7 @@ fun SnifferEditor(
         }
         OverrideCardSection("TLS") {
             StringListWithModifiersInput(
-                title = MLang.Override.Form.TlsPorts,
+                title = stringResource(LocaleR.string.override_form_tls_ports),
                 replaceValue = config.sniffer.sniff.tls.ports,
                 startValue = config.sniffer.sniff.tls.portsStart,
                 endValue = config.sniffer.sniff.tls.portsEnd,
@@ -170,7 +171,7 @@ fun SnifferEditor(
                 onEditListGroup = onEditStringList,
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.TlsOverride,
+                title = stringResource(LocaleR.string.override_label_tls_override),
                 value = config.sniffer.sniff.tls.overrideDestination,
                 onValueChange = {
                     onConfigChange(
@@ -189,7 +190,7 @@ fun SnifferEditor(
         }
         OverrideCardSection("QUIC") {
             StringListWithModifiersInput(
-                title = MLang.Override.Form.QuicPorts,
+                title = stringResource(LocaleR.string.override_form_quic_ports),
                 replaceValue = config.sniffer.sniff.quic.ports,
                 startValue = config.sniffer.sniff.quic.portsStart,
                 endValue = config.sniffer.sniff.quic.portsEnd,
@@ -230,7 +231,7 @@ fun SnifferEditor(
                 onEditListGroup = onEditStringList,
             )
             NullableBooleanSelector(
-                title = MLang.Override.Label.QuicOverride,
+                title = stringResource(LocaleR.string.override_label_quic_override),
                 value = config.sniffer.sniff.quic.overrideDestination,
                 onValueChange = {
                     onConfigChange(
@@ -247,9 +248,9 @@ fun SnifferEditor(
                 },
             )
         }
-        OverrideCardSection(MLang.Override.Form.SkipAndForce) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_skip_and_force)) {
             StringListWithModifiersInput(
-                title = MLang.Override.Label.ForceDomain,
+                title = stringResource(LocaleR.string.override_label_force_domain),
                 replaceValue = config.sniffer.forceDomain,
                 startValue = config.sniffer.forceDomainStart,
                 endValue = config.sniffer.forceDomainEnd,
@@ -266,7 +267,7 @@ fun SnifferEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Label.SkipDomain,
+                title = stringResource(LocaleR.string.override_label_skip_domain),
                 replaceValue = config.sniffer.skipDomain,
                 startValue = config.sniffer.skipDomainStart,
                 endValue = config.sniffer.skipDomainEnd,
@@ -283,7 +284,7 @@ fun SnifferEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Form.SkipSrcAddress,
+                title = stringResource(LocaleR.string.override_form_skip_src_address),
                 replaceValue = config.sniffer.skipSrcAddress,
                 startValue = config.sniffer.skipSrcAddressStart,
                 endValue = config.sniffer.skipSrcAddressEnd,
@@ -304,7 +305,7 @@ fun SnifferEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Form.SkipDstAddress,
+                title = stringResource(LocaleR.string.override_form_skip_dst_address),
                 replaceValue = config.sniffer.skipDstAddress,
                 startValue = config.sniffer.skipDstAddressStart,
                 endValue = config.sniffer.skipDstAddressEnd,
