@@ -3,6 +3,7 @@ package com.amamiyakokoro.box.integration.update
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -39,8 +40,7 @@ class AppUpdateInstallNotifier(
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
-        return true
+        return postNotification(NOTIFICATION_ID, notification)
     }
 
     fun showAvailableUpdate(tag: String, releaseUrl: String): Boolean {
@@ -52,7 +52,7 @@ class AppUpdateInstallNotifier(
             Intent(Intent.ACTION_VIEW, android.net.Uri.parse(releaseUrl)),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        NotificationManagerCompat.from(context).notify(
+        return postNotification(
             NOTIFICATION_ID + 1,
             NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(ServiceR.drawable.ic_notification_furin)
@@ -64,7 +64,13 @@ class AppUpdateInstallNotifier(
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build(),
         )
-        return true
+    }
+
+    private fun postNotification(id: Int, notification: Notification): Boolean = try {
+        NotificationManagerCompat.from(context).notify(id, notification)
+        true
+    } catch (_: SecurityException) {
+        false
     }
 
     private fun canPostNotifications(): Boolean =

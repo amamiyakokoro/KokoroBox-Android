@@ -2,7 +2,6 @@ package com.amamiyakokoro.box.screen.about
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
@@ -40,7 +39,8 @@ fun AppUpdateDialog(
     val newer = release?.isNewerThan(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) == true
     val canInstallInApp = release?.hasVerifiedInAppAsset() == true
     val busy = installState.isBusy()
-    val message = installState.messageOrNull(context.resources) ?: when (result) {
+    val noBrowserMessage = stringResource(LocaleR.string.about_update_no_browser)
+    val message = installState.messageOrNull() ?: when (result) {
         is ReleaseCheck.Published -> when {
             currentVersion == null -> stringResource(LocaleR.string.about_update_unknown_version)
             newer -> "${stringResource(LocaleR.string.about_update_available)}: ${result.tag}"
@@ -117,7 +117,7 @@ fun AppUpdateDialog(
                                 openUrl(context, release.apkUrl ?: release.releaseUrl)
                                 onDismiss()
                             } catch (_: ActivityNotFoundException) {
-                                Toast.makeText(context, context.getString(LocaleR.string.about_update_no_browser), Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, noBrowserMessage, Toast.LENGTH_LONG).show()
                             }
                         },
                     ) {
@@ -160,14 +160,15 @@ private fun AppUpdateInstallState.isBusy(): Boolean = when (this) {
     else -> false
 }
 
-private fun AppUpdateInstallState.messageOrNull(resources: Resources): String? = when (this) {
-    is AppUpdateInstallState.Downloading -> resources.getString(LocaleR.string.about_update_downloading)
-    is AppUpdateInstallState.Verifying -> resources.getString(LocaleR.string.about_update_verifying)
+@Composable
+private fun AppUpdateInstallState.messageOrNull(): String? = when (this) {
+    is AppUpdateInstallState.Downloading -> stringResource(LocaleR.string.about_update_downloading)
+    is AppUpdateInstallState.Verifying -> stringResource(LocaleR.string.about_update_verifying)
     is AppUpdateInstallState.ReadyToInstall,
-    is AppUpdateInstallState.Installing, -> resources.getString(LocaleR.string.about_update_preparing_install)
-    is AppUpdateInstallState.InstallPermissionRequired -> resources.getString(LocaleR.string.about_update_install_permission_required)
-    is AppUpdateInstallState.WaitingForUserConfirmation -> resources.getString(LocaleR.string.about_update_waiting_for_install_confirmation)
-    AppUpdateInstallState.Installed -> resources.getString(LocaleR.string.about_update_installed)
-    is AppUpdateInstallState.Failed -> resources.getString(LocaleR.string.about_update_update_failed)
+    is AppUpdateInstallState.Installing, -> stringResource(LocaleR.string.about_update_preparing_install)
+    is AppUpdateInstallState.InstallPermissionRequired -> stringResource(LocaleR.string.about_update_install_permission_required)
+    is AppUpdateInstallState.WaitingForUserConfirmation -> stringResource(LocaleR.string.about_update_waiting_for_install_confirmation)
+    AppUpdateInstallState.Installed -> stringResource(LocaleR.string.about_update_installed)
+    is AppUpdateInstallState.Failed -> stringResource(LocaleR.string.about_update_update_failed)
     AppUpdateInstallState.Idle -> null
 }
