@@ -29,7 +29,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
@@ -41,7 +43,6 @@ import com.amamiyakokoro.box.presentation.util.OverrideListEditorMode
 import com.amamiyakokoro.box.presentation.util.OverrideListModeValues
 import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Scaffold
 
 
@@ -50,7 +51,8 @@ fun OverrideStringListEditorScreen(
     navigator: DestinationsNavigator,
 ) {
     val listState = rememberLazyListState()
-    val title = OverrideStructuredEditorStore.stringListEditorTitle.ifBlank { MLang.Override.Editor.List }
+    val listLabel = stringResource(LocaleR.string.override_editor_list)
+    val title = OverrideStructuredEditorStore.stringListEditorTitle.ifBlank { listLabel }
     val placeholder = OverrideStructuredEditorStore.stringListEditorPlaceholder
     val availableModes = OverrideStructuredEditorStore.stringListEditorAvailableModes
     var showItemDialog by remember { mutableStateOf(false) }
@@ -95,7 +97,7 @@ fun OverrideStringListEditorScreen(
                 controller = addFabController,
                 visible = showAddFab,
                 imageVector = AppMd3Icons.Action.Add,
-                contentDescription = MLang.Override.Editor.AddItem,
+                contentDescription = stringResource(LocaleR.string.override_editor_add_item),
                 onClick = {
                     editingIndex = -1
                     currentDraftValue = ""
@@ -109,7 +111,7 @@ fun OverrideStringListEditorScreen(
                 actions = {
                     OverrideTopBarAction(
                         icon = AppMd3Icons.Action.Undo,
-                        contentDescription = MLang.Override.Editor.ClearCurrentMode,
+                        contentDescription = stringResource(LocaleR.string.override_editor_clear_current_mode),
                         destructive = true,
                         onClick = { showResetDialog = true },
                     )
@@ -127,7 +129,7 @@ fun OverrideStringListEditorScreen(
             item {
                 Card {
                     YumeMd3DropdownPreference(
-                        title = MLang.Override.Editor.Mode.Title,
+                        title = stringResource(LocaleR.string.override_editor_mode_title),
                         items = availableModes.map(OverrideListEditorMode::label),
                         selectedIndex = selectedModeIndex,
                         onSelectedIndexChange = { index ->
@@ -173,7 +175,10 @@ fun OverrideStringListEditorScreen(
 
         StringListEntryDialog(
             show = showItemDialog,
-            title = if (editingIndex >= 0) MLang.Override.Editor.EditItem else MLang.Override.Editor.AddItem,
+            title = stringResource(
+                if (editingIndex >= 0) LocaleR.string.override_editor_edit_item
+                else LocaleR.string.override_editor_add_item,
+            ),
             placeholder = placeholder,
             initialValue = currentDraftValue,
             onConfirm = { updatedValue ->
@@ -204,8 +209,8 @@ fun OverrideStringListEditorScreen(
 
         AppDialog(
             show = showResetDialog,
-            title = MLang.Override.Editor.ClearCurrentMode,
-            summary = MLang.Override.Editor.ClearDialog.Summary.format(MLang.Override.Editor.List),
+            title = stringResource(LocaleR.string.override_editor_clear_current_mode),
+            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(listLabel),
             onDismissRequest = { showResetDialog = false },
         ) {
             DialogButtonRow(
@@ -215,8 +220,8 @@ fun OverrideStringListEditorScreen(
                     val mode = OverrideStructuredEditorStore.stringListEditorSelectedMode
                     applyStringListValues(currentStringListValues().update(mode, emptyList()))
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Clear,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_clear),
                 confirmDestructive = true,
             )
         }
@@ -255,7 +260,7 @@ private fun StringListEntryCard(
             )
             OverrideCardActionIconButton(
                 imageVector = AppMd3Icons.Action.Delete,
-                contentDescription = MLang.Override.Card.Delete,
+                contentDescription = stringResource(LocaleR.string.override_card_delete),
                 onClick = onDelete,
                 tone = OverrideActionTone.Danger,
             )
@@ -297,12 +302,12 @@ private fun StringListEntryDialog(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
                 YumeMd3TextButton(
-                    text = MLang.Override.Dialog.Button.Cancel,
+                    text = stringResource(LocaleR.string.override_dialog_button_cancel),
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f),
                 )
                 YumeMd3FilledButton(
-                    text = MLang.Override.Editor.Confirm,
+                    text = stringResource(LocaleR.string.override_editor_confirm),
                     onClick = { onConfirm(draftValue) },
                     modifier = Modifier.weight(1f),
                 )
