@@ -25,15 +25,16 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.presentation.AndroidContractStateViewModel
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.presentation.LoadableState
 import com.amamiyakokoro.box.data.controller.AccessControlController
 import com.amamiyakokoro.box.data.model.AccessControlMode
 import com.amamiyakokoro.box.data.store.NetworkSettingsStore
 import com.amamiyakokoro.box.service.root.RootPackageShell
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -70,12 +71,13 @@ class AccessControlViewModel(
         INSTALL_TIME,
         UPDATE_TIME;
 
-        val displayName: String
+        @get:StringRes
+        val labelRes: Int
             get() = when (this) {
-                PACKAGE_NAME -> MLang.AccessControl.SortMode.PackageName
-                LABEL -> MLang.AccessControl.SortMode.Label
-                INSTALL_TIME -> MLang.AccessControl.SortMode.InstallTime
-                UPDATE_TIME -> MLang.AccessControl.SortMode.UpdateTime
+                PACKAGE_NAME -> LocaleR.string.access_control_sort_mode_package_name
+                LABEL -> LocaleR.string.access_control_sort_mode_label
+                INSTALL_TIME -> LocaleR.string.access_control_sort_mode_install_time
+                UPDATE_TIME -> LocaleR.string.access_control_sort_mode_update_time
             }
     }
 

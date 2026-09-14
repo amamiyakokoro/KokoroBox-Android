@@ -51,8 +51,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
@@ -61,7 +63,6 @@ import com.amamiyakokoro.box.presentation.theme.AppTheme.spacing
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -77,12 +78,16 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val filteredApps by viewModel.filteredApps.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val searchPlaceholder = stringResource(LocaleR.string.access_control_search_placeholder)
+    val chinaApps = stringResource(LocaleR.string.access_control_settings_china_apps)
+    val overseasApps = stringResource(LocaleR.string.access_control_settings_overseas_apps)
+    val regionSelectResult = stringResource(LocaleR.string.access_control_settings_region_select_result)
 
     var showSettingsSheet by remember { mutableStateOf(false) }
     var searchStatus by remember {
         mutableStateOf(
             SearchStatus(
-                label = MLang.AccessControl.Search.Placeholder,
+                label = searchPlaceholder,
                 searchText = uiState.searchQuery,
             )
         )
@@ -133,12 +138,12 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
                 when (effect) {
                     is AccessControlViewModel.AccessControlUiEffect.RegionalSelectionCompleted -> {
                         val label = if (effect.selectChina) {
-                            MLang.AccessControl.Settings.ChinaApps
+                            chinaApps
                         } else {
-                            MLang.AccessControl.Settings.OverseasApps
+                            overseasApps
                         }
                         context.toast(
-                            MLang.AccessControl.Settings.RegionSelectResult.format(
+                            regionSelectResult.format(
                                 label,
                                 effect.selectedCount,
                             )
@@ -157,12 +162,15 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
             topBar = {
                 currentSearchStatus.TopAppBarAnim {
                     TopBar(
-                        title = MLang.AccessControl.Title,
+                        title = stringResource(LocaleR.string.access_control_title),
                         actions = {
                             IconButton(
                                 onClick = { showSettingsSheet = true }
                             ) {
-                                Icon(AppMd3Icons.Action.Settings, contentDescription = MLang.AccessControl.Settings.Title)
+                                Icon(
+                                    AppMd3Icons.Action.Settings,
+                                    contentDescription = stringResource(LocaleR.string.access_control_settings_title),
+                                )
                             }
                         }
                     )
@@ -203,7 +211,10 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Text(MLang.AccessControl.AppList.Loading, color = MaterialTheme.colorScheme.onSurface)
+                        Text(
+                            stringResource(LocaleR.string.access_control_app_list_loading),
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 } else {
                     ScreenLazyColumn(
@@ -216,7 +227,10 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
                         ),
                     ) {
                         item {
-                            Title(MLang.AccessControl.AppList.Title.format(uiState.selectedPackages.size))
+                            Title(
+                                stringResource(LocaleR.string.access_control_app_list_title)
+                                    .format(uiState.selectedPackages.size),
+                            )
                         }
 
                         items(
@@ -265,7 +279,7 @@ fun AccessControlScreen(@Suppress("UNUSED_PARAMETER") navigator: DestinationsNav
             endPadding = listEndPadding,
             emptyResult = {
                 SearchEmptyState(
-                    text = MLang.AccessControl.Search.Empty,
+                    text = stringResource(LocaleR.string.access_control_search_empty),
                     modifier = Modifier.padding(bottom = combinedBottomPadding),
                 )
             },
@@ -341,7 +355,7 @@ private fun FloatingAccessControlSearchBar(
     ) {
         Icon(
             imageVector = AppMd3Icons.Action.Search,
-            contentDescription = MLang.Component.Editor.Action.Search,
+            contentDescription = stringResource(LocaleR.string.component_editor_action_search),
             modifier = Modifier
                 .size(componentSizes.searchIconTouchTarget)
                 .padding(start = spacing.space16, end = spacing.space8),
@@ -376,39 +390,42 @@ private fun AccessControlSettingsSheet(
         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
     val sortModeEntries = remember { AccessControlViewModel.SortMode.entries }
+    val importSuccess = stringResource(LocaleR.string.access_control_settings_import_success)
+    val importFailed = stringResource(LocaleR.string.access_control_settings_import_failed)
+    val exportSuccess = stringResource(LocaleR.string.access_control_settings_export_success)
 
     AppActionBottomSheet(
         show = show,
         modifier = Modifier,
-        title = MLang.AccessControl.Settings.Title,
+        title = stringResource(LocaleR.string.access_control_settings_title),
         onDismissRequest = onDismiss,
         enableNestedScroll = true,
     ) {
         Column {
             Card {
                 PreferenceSwitchItem(
-                    title = MLang.AccessControl.Settings.ShowSystemApps,
+                    title = stringResource(LocaleR.string.access_control_settings_show_system_apps),
                     checked = uiState.showSystemApps,
                     onCheckedChange = onShowSystemAppsChange,
                 )
                 PreferenceSwitchItem(
-                    title = MLang.AccessControl.Settings.SelectedFirst,
+                    title = stringResource(LocaleR.string.access_control_settings_selected_first),
                     checked = uiState.selectedFirst,
                     onCheckedChange = onSelectedFirstChange,
                 )
                 PreferenceEnumItem(
-                    title = MLang.AccessControl.Settings.SortMode,
+                    title = stringResource(LocaleR.string.access_control_settings_sort_mode),
                     currentValue = uiState.sortMode,
-                    items = sortModeEntries.map { it.displayName },
+                    items = sortModeEntries.map { stringResource(it.labelRes) },
                     values = sortModeEntries,
                     onValueChange = onSortModeChange,
                 )
                 DropdownActionPreference(
-                    title = MLang.AccessControl.Settings.BatchOperation,
+                    title = stringResource(LocaleR.string.access_control_settings_batch_operation),
                     items = listOf(
-                        MLang.AccessControl.Settings.SelectAll,
-                        MLang.AccessControl.Settings.DeselectAll,
-                        MLang.AccessControl.Settings.Invert,
+                        stringResource(LocaleR.string.access_control_settings_select_all),
+                        stringResource(LocaleR.string.access_control_settings_deselect_all),
+                        stringResource(LocaleR.string.access_control_settings_invert),
                     ),
                     onSelectedIndexChange = { index ->
                         when (index) {
@@ -419,10 +436,10 @@ private fun AccessControlSettingsSheet(
                     },
                 )
                 DropdownActionPreference(
-                    title = MLang.AccessControl.Settings.RegionQuickSelect,
+                    title = stringResource(LocaleR.string.access_control_settings_region_quick_select),
                     items = listOf(
-                        MLang.AccessControl.Settings.ChinaApps,
-                        MLang.AccessControl.Settings.OverseasApps,
+                        stringResource(LocaleR.string.access_control_settings_china_apps),
+                        stringResource(LocaleR.string.access_control_settings_overseas_apps),
                     ),
                     onSelectedIndexChange = { index ->
                         when (index) {
@@ -432,10 +449,10 @@ private fun AccessControlSettingsSheet(
                     },
                 )
                 DropdownActionPreference(
-                    title = MLang.AccessControl.Settings.ImportExport,
+                    title = stringResource(LocaleR.string.access_control_settings_import_export),
                     items = listOf(
-                        MLang.AccessControl.Settings.Import,
-                        MLang.AccessControl.Settings.Export,
+                        stringResource(LocaleR.string.access_control_settings_import),
+                        stringResource(LocaleR.string.access_control_settings_export),
                     ),
                     onSelectedIndexChange = { index ->
                         when (index) {
@@ -448,9 +465,9 @@ private fun AccessControlSettingsSheet(
                                     .orEmpty()
                                 if (text.isNotEmpty()) {
                                     val count = onImportPackages(text)
-                                    context.toast(MLang.AccessControl.Settings.ImportSuccess.format(count))
+                                    context.toast(importSuccess.format(count))
                                 } else {
-                                    context.toast(MLang.AccessControl.Settings.ImportFailed)
+                                    context.toast(importFailed)
                                 }
                             }
 
@@ -459,7 +476,7 @@ private fun AccessControlSettingsSheet(
                                     ClipData.newPlainText("packages", onExportPackages())
                                 )
                                 context.toast(
-                                    MLang.AccessControl.Settings.ExportSuccess.format(uiState.selectedPackages.size)
+                                    exportSuccess.format(uiState.selectedPackages.size)
                                 )
                             }
                         }
@@ -475,7 +492,7 @@ private fun AccessControlSettingsSheet(
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f),
             ) {
-                Text(MLang.AccessControl.Button.Cancel)
+                Text(stringResource(LocaleR.string.access_control_button_cancel))
             }
             Button(
                 onClick = onDismiss,
@@ -485,7 +502,10 @@ private fun AccessControlSettingsSheet(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
             ) {
-                Text(MLang.AccessControl.Button.Confirm, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    stringResource(LocaleR.string.access_control_button_confirm),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
             }
         }
     }
@@ -497,7 +517,7 @@ private fun DropdownActionPreference(
     items: List<String>,
     onSelectedIndexChange: (Int) -> Unit,
 ) {
-    val placeholder = MLang.AccessControl.Settings.SelectAction
+    val placeholder = stringResource(LocaleR.string.access_control_settings_select_action)
     val displayItems = remember(items) { listOf(placeholder) + items }
 
     YumeMd3DropdownPreference(
