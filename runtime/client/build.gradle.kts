@@ -27,7 +27,15 @@ android {
     namespace = "com.amamiyakokoro.box.runtime.client"
 }
 
+extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
+    sourceSets.getByName("test").kotlin.directories.apply {
+        clear()
+        add("test")
+    }
+}
+
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":runtime:api"))
@@ -43,4 +51,3 @@ dependencies {
     implementation("com.github.topjohnwu.libsu:core:6.0.0")
     implementation("com.github.topjohnwu.libsu:service:6.0.0")
 }
-

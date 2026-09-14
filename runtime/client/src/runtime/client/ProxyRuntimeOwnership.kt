@@ -67,15 +67,21 @@ internal object ProxyRuntimeOwnership {
         localPhase: LocalRuntimePhase = LocalRuntimePhase.Idle,
         localStartedAt: Long? = null,
     ): RuntimeSnapshot {
+        val phase = when (owner) {
+            RuntimeOwner.RootTun -> rootPhase(rootStatus)
+            RuntimeOwner.LocalTun, RuntimeOwner.LocalHttp -> localPhase.toRuntimePhase()
+            RuntimeOwner.None -> RuntimePhase.Idle
+        }
         return RuntimeSnapshot(
             owner = owner,
-            phase = when (owner) {
-                RuntimeOwner.RootTun -> rootPhase(rootStatus)
-                RuntimeOwner.LocalTun, RuntimeOwner.LocalHttp -> localPhase.toRuntimePhase()
-                RuntimeOwner.None -> RuntimePhase.Idle
-            },
+            phase = phase,
             targetMode = modeForOwner(owner, configuredMode),
             profileReady = owner == RuntimeOwner.RootTun && !rootStatus.profileUuid.isNullOrBlank(),
+            configReady = phase == RuntimePhase.Running && when (owner) {
+                RuntimeOwner.RootTun -> rootStatus.runtimeReady
+                RuntimeOwner.LocalTun, RuntimeOwner.LocalHttp -> true
+                RuntimeOwner.None -> false
+            },
             profileUuid = rootStatus.profileUuid.takeIf { owner == RuntimeOwner.RootTun },
             profileName = rootStatus.profileName.takeIf { owner == RuntimeOwner.RootTun },
             lastError = if (owner == RuntimeOwner.RootTun) rootStatus.lastError else null,
@@ -85,6 +91,9 @@ internal object ProxyRuntimeOwnership {
                 RuntimeOwner.LocalHttp,
                     -> localStartedAt
                 RuntimeOwner.None -> null
+            },
+            effectiveFingerprint = rootStatus.overrideFingerprint.takeIf {
+                owner == RuntimeOwner.RootTun
             },
         )
     }
@@ -98,6 +107,7 @@ internal object ProxyRuntimeOwnership {
             owner = owner,
             phase = RuntimePhase.Running,
             targetMode = modeForOwner(owner, configuredMode),
+            configReady = true,
             lastError = null,
         )
     }
