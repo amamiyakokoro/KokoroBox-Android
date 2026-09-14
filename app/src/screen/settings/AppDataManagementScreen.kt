@@ -47,7 +47,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.common.util.formatBytes
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.controller.GeoXCacheEntry
 import com.amamiyakokoro.box.data.store.LogStore
 import com.amamiyakokoro.box.feature.editor.presentation.editor.CodeEditor
@@ -67,7 +69,6 @@ import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPa
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -82,6 +83,8 @@ fun AppDataManagementScreen() {
     val context = LocalContext.current
     val showGeoHistorySheet = remember { mutableStateOf(false) }
     val showLogFilesSheet = remember { mutableStateOf(false) }
+    val geoDeleteComplete = stringResource(LocaleR.string.app_data_management_geo_files_delete_complete)
+    val logDeleteComplete = stringResource(LocaleR.string.app_data_management_logs_delete_complete)
 
     if (uiState.selectedLogFileName != null) {
         AppDataLogViewerScreen(
@@ -94,17 +97,18 @@ fun AppDataManagementScreen() {
     }
 
     Scaffold(
-        topBar = { TopBar(title = MLang.AppDataManagement.Title) },
+        topBar = { TopBar(title = stringResource(LocaleR.string.app_data_management_title)) },
     ) { innerPadding ->
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding()),
         ) {
             item {
-                Title(MLang.AppDataManagement.Section.GeoFiles)
+                Title(stringResource(LocaleR.string.app_data_management_section_geo_files))
                 Card {
                     PreferenceArrowItem(
-                        title = MLang.AppDataManagement.GeoFiles.HistoryTitle,
-                        summary = MLang.AppDataManagement.GeoFiles.HistorySummary.format(uiState.geoHistory.size),
+                        title = stringResource(LocaleR.string.app_data_management_geo_files_history_title),
+                        summary = stringResource(LocaleR.string.app_data_management_geo_files_history_summary)
+                            .format(uiState.geoHistory.size),
                         onClick = {
                             viewModel.refresh()
                             showGeoHistorySheet.value = true
@@ -113,11 +117,12 @@ fun AppDataManagementScreen() {
                 }
             }
             item {
-                Title(MLang.AppDataManagement.Section.Logs)
+                Title(stringResource(LocaleR.string.app_data_management_section_logs))
                 Card {
                     PreferenceArrowItem(
-                        title = MLang.AppDataManagement.Logs.ManagementTitle,
-                        summary = MLang.AppDataManagement.Logs.ManagementSummary.format(uiState.logFiles.size),
+                        title = stringResource(LocaleR.string.app_data_management_logs_management_title),
+                        summary = stringResource(LocaleR.string.app_data_management_logs_management_summary)
+                            .format(uiState.logFiles.size),
                         onClick = {
                             viewModel.refresh()
                             showLogFilesSheet.value = true
@@ -137,7 +142,7 @@ fun AppDataManagementScreen() {
                 showGeoHistorySheet.value = false
                 android.widget.Toast.makeText(
                     context,
-                    MLang.AppDataManagement.GeoFiles.DeleteComplete.format(deleted),
+                    geoDeleteComplete.format(deleted),
                     android.widget.Toast.LENGTH_SHORT,
                 ).show()
             }
@@ -156,7 +161,7 @@ fun AppDataManagementScreen() {
             viewModel.deleteLogFiles(selectedNames) { deleted ->
                 android.widget.Toast.makeText(
                     context,
-                    MLang.AppDataManagement.Logs.DeleteComplete.format(deleted),
+                    logDeleteComplete.format(deleted),
                     android.widget.Toast.LENGTH_SHORT,
                 ).show()
             }
@@ -175,6 +180,8 @@ private fun AppDataLogViewerScreen(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val unknownError = stringResource(LocaleR.string.util_error_unknown_error)
+    val emptyLogContent = stringResource(LocaleR.string.app_data_management_logs_empty_log_content)
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/plain"),
     ) { uri ->
@@ -185,7 +192,7 @@ private fun AppDataLogViewerScreen(
                 launch(Dispatchers.Main) {
                     android.widget.Toast.makeText(
                         context,
-                        MLang.Util.Error.UnknownError,
+                        unknownError,
                         android.widget.Toast.LENGTH_SHORT,
                     ).show()
                 }
@@ -193,9 +200,9 @@ private fun AppDataLogViewerScreen(
         }
     }
 
-    val content = remember(entries, fileName) {
+    val content = remember(entries, fileName, emptyLogContent) {
         if (entries.isEmpty()) {
-            MLang.AppDataManagement.Logs.EmptyLogContent
+            emptyLogContent
         } else {
             entries.joinToString(separator = "\n") { entry ->
                 "${entry.time} [${entry.level.name}] ${entry.message}"
@@ -211,12 +218,12 @@ private fun AppDataLogViewerScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.AppDataManagement.Logs.ViewerTitle.format(fileName),
+                title = stringResource(LocaleR.string.app_data_management_logs_viewer_title).format(fileName),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = AppMd3Icons.Navigation.Back,
-                            contentDescription = MLang.Component.Navigation.Back,
+                            contentDescription = stringResource(LocaleR.string.component_navigation_back),
                         )
                     }
                 },
@@ -224,7 +231,7 @@ private fun AppDataLogViewerScreen(
                     IconButton(onClick = { exportLauncher.launch(fileName) }) {
                         Icon(
                             imageVector = AppMd3Icons.Action.Share,
-                            contentDescription = "Export",
+                            contentDescription = stringResource(LocaleR.string.component_profile_card_export),
                         )
                     }
                 },
@@ -258,21 +265,22 @@ private fun GeoHistorySheet(
 
     AppConfirmDialog(
         show = showDeleteConfirmDialog,
-        title = MLang.AppDataManagement.GeoFiles.DeleteConfirmTitle,
-        message = MLang.AppDataManagement.GeoFiles.DeleteConfirmMessage.format(selectedPaths.size),
+        title = stringResource(LocaleR.string.app_data_management_geo_files_delete_confirm_title),
+        message = stringResource(LocaleR.string.app_data_management_geo_files_delete_confirm_message)
+            .format(selectedPaths.size),
         onDismissRequest = { showDeleteConfirmDialog = false },
         onConfirm = {
             val paths = selectedPaths.toSet()
             showDeleteConfirmDialog = false
             onDelete(paths)
         },
-        confirmText = MLang.Component.Button.Delete,
+        confirmText = stringResource(LocaleR.string.component_button_delete),
         confirmDestructive = true,
     )
 
     AppActionBottomSheet(
         show = show,
-        title = MLang.AppDataManagement.GeoFiles.HistoryTitle,
+        title = stringResource(LocaleR.string.app_data_management_geo_files_history_title),
         onDismissRequest = onDismiss,
         startAction = { AppBottomSheetCloseAction(onClick = onDismiss) },
         endAction = {
@@ -282,7 +290,7 @@ private fun GeoHistorySheet(
             ) {
                 Icon(
                     imageVector = AppMd3Icons.Action.Delete,
-                    contentDescription = MLang.Component.Button.Delete,
+                    contentDescription = stringResource(LocaleR.string.component_button_delete),
                     tint = MaterialTheme.colorScheme.error,
                 )
             }
@@ -290,14 +298,14 @@ private fun GeoHistorySheet(
         content = {
             if (entries.isEmpty()) {
                 PreferenceListItem(
-                    title = MLang.AppDataManagement.GeoFiles.EmptyHistory,
-                    summary = MLang.AppDataManagement.GeoFiles.EmptyHistorySummary,
+                    title = stringResource(LocaleR.string.app_data_management_geo_files_empty_history),
+                    summary = stringResource(LocaleR.string.app_data_management_geo_files_empty_history_summary),
                 )
             } else {
                 entries.forEach { entry ->
                     PreferenceListItem(
                         title = entry.name,
-                        summary = MLang.AppDataManagement.GeoFiles.CacheItemSummary.format(
+                        summary = stringResource(LocaleR.string.app_data_management_geo_files_cache_item_summary).format(
                             formatBytes(entry.sizeBytes),
                             formatDateTime(entry.lastModified),
                         ),
@@ -327,21 +335,22 @@ private fun LogFilesSheet(
 
     AppConfirmDialog(
         show = showDeleteConfirmDialog,
-        title = MLang.AppDataManagement.Logs.DeleteConfirmTitle,
-        message = MLang.AppDataManagement.Logs.DeleteConfirmMessage.format(selectedNames.size),
+        title = stringResource(LocaleR.string.app_data_management_logs_delete_confirm_title),
+        message = stringResource(LocaleR.string.app_data_management_logs_delete_confirm_message)
+            .format(selectedNames.size),
         onDismissRequest = { showDeleteConfirmDialog = false },
         onConfirm = {
             val names = selectedNames.toSet()
             showDeleteConfirmDialog = false
             onDelete(names)
         },
-        confirmText = MLang.Component.Button.Delete,
+        confirmText = stringResource(LocaleR.string.component_button_delete),
         confirmDestructive = true,
     )
 
     AppActionBottomSheet(
         show = show,
-        title = MLang.AppDataManagement.Logs.ManagementTitle,
+        title = stringResource(LocaleR.string.app_data_management_logs_management_title),
         onDismissRequest = onDismiss,
         startAction = { AppBottomSheetCloseAction(onClick = onDismiss) },
         endAction = {
@@ -351,7 +360,7 @@ private fun LogFilesSheet(
             ) {
                 Icon(
                     imageVector = AppMd3Icons.Action.Delete,
-                    contentDescription = MLang.Component.Button.Delete,
+                    contentDescription = stringResource(LocaleR.string.component_button_delete),
                     tint = MaterialTheme.colorScheme.error,
             )
             }
@@ -359,18 +368,18 @@ private fun LogFilesSheet(
         content = {
             if (entries.isEmpty()) {
                 PreferenceListItem(
-                    title = MLang.AppDataManagement.Logs.EmptyLogs,
-                    summary = MLang.AppDataManagement.Logs.EmptyLogsSummary,
+                    title = stringResource(LocaleR.string.app_data_management_logs_empty_logs),
+                    summary = stringResource(LocaleR.string.app_data_management_logs_empty_logs_summary),
                 )
             } else {
                 entries.forEach { entry ->
                     PreferenceListItem(
                         title = if (entry.isRecording) {
-                            MLang.AppDataManagement.Logs.RecordingFileTitle.format(entry.name)
+                            stringResource(LocaleR.string.app_data_management_logs_recording_file_title).format(entry.name)
                         } else {
                             entry.name
                         },
-                        summary = MLang.AppDataManagement.Logs.LogItemSummary.format(
+                        summary = stringResource(LocaleR.string.app_data_management_logs_log_item_summary).format(
                             formatBytes(entry.size),
                             formatDateTime(entry.createdAt),
                         ),
