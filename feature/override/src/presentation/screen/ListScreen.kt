@@ -87,6 +87,8 @@ fun OverrideListScreen(
     val deleteTargetConfig = remember { mutableStateOf<OverrideConfig?>(null) }
     val exportTargetConfig = remember { mutableStateOf<OverrideConfig?>(null) }
     val importReadError = stringResource(LocaleR.string.override_import_read_error)
+    val importEmptyMessage = stringResource(LocaleR.string.override_save_import_empty)
+    val importDefaultName = stringResource(LocaleR.string.override_save_import_default_name)
     val importSuccessTemplate = stringResource(LocaleR.string.override_import_success)
     val importSuccessDefaultTemplate = stringResource(LocaleR.string.override_import_success_default)
     val importFailedTemplate = stringResource(LocaleR.string.override_import_failed)
@@ -146,6 +148,8 @@ fun OverrideListScreen(
             val importResult = viewModel.importConfigsFromJson(
                 jsonString = jsonText,
                 sourceName = displayName,
+                importEmptyMessage = importEmptyMessage,
+                importDefaultName = importDefaultName,
             )
             if (importResult.isSuccess) {
                 val importedCount = importResult.getOrNull() ?: 0

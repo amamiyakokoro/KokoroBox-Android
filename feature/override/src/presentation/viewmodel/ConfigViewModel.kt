@@ -40,7 +40,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
-import dev.oom_wg.purejoy.mlang.MLang
 
 data class OverrideEditSession(
     val routeConfigId: String,
@@ -325,12 +324,16 @@ class OverrideConfigViewModel(
     fun importConfigsFromJson(
         jsonString: String,
         sourceName: String? = null,
+        importEmptyMessage: String,
+        importDefaultName: String,
     ): Result<Int> {
         return try {
             val importedConfigs = parseImportedOverrideConfigs(
                 json = json,
                 jsonString = jsonString,
                 sourceName = sourceName,
+                importEmptyMessage = importEmptyMessage,
+                importDefaultName = importDefaultName,
             )
             viewModelScope.launch {
                 _pendingRevealConfigId.value = importedConfigs.lastOrNull()?.id
@@ -382,10 +385,12 @@ internal fun parseImportedOverrideConfigs(
     json: Json,
     jsonString: String,
     sourceName: String? = null,
+    importEmptyMessage: String,
+    importDefaultName: String,
     nowProvider: () -> Long = System::currentTimeMillis,
 ): List<OverrideConfig> {
     val normalizedJsonString = jsonString.trim()
-    require(normalizedJsonString.isNotEmpty()) { MLang.Override.Save.ImportEmpty }
+    require(normalizedJsonString.isNotEmpty()) { importEmptyMessage }
 
     val importedElements = when (val rootElement = json.parseToJsonElement(normalizedJsonString)) {
         is JsonArray -> rootElement
@@ -400,6 +405,7 @@ internal fun parseImportedOverrideConfigs(
             sourceName = sourceName,
             index = index,
             hasMultipleEntries = hasMultipleEntries,
+            importDefaultName = importDefaultName,
             now = nowProvider(),
         )
     }
@@ -411,6 +417,7 @@ private fun parseImportedOverrideConfigEntry(
     sourceName: String?,
     index: Int,
     hasMultipleEntries: Boolean,
+    importDefaultName: String,
     now: Long,
 ): OverrideConfig {
     runCatching {
@@ -425,7 +432,7 @@ private fun parseImportedOverrideConfigEntry(
         return OverrideConfig(
             id = importEnvelope.id?.takeIf(String::isNotBlank) ?: OverrideMetadata.generateId(),
             name = importEnvelope.name?.takeIf(String::isNotBlank)
-                ?: buildImportedConfigName(sourceName, index, hasMultipleEntries),
+                ?: buildImportedConfigName(sourceName, index, hasMultipleEntries, importDefaultName),
             description = importEnvelope.description?.takeIf(String::isNotBlank),
             config = importEnvelope.config,
             isSystem = false,
@@ -437,7 +444,7 @@ private fun parseImportedOverrideConfigEntry(
     val configurationOverride = json.decodeFromJsonElement(ConfigurationOverride.serializer(), element)
     return OverrideConfig(
         id = OverrideMetadata.generateId(),
-        name = buildImportedConfigName(sourceName, index, hasMultipleEntries),
+        name = buildImportedConfigName(sourceName, index, hasMultipleEntries, importDefaultName),
         description = null,
         config = configurationOverride,
         isSystem = false,
@@ -450,8 +457,9 @@ internal fun buildImportedConfigName(
     sourceName: String?,
     index: Int,
     hasMultipleEntries: Boolean,
+    importDefaultName: String,
 ): String {
-    val baseName = normalizeImportedConfigSourceName(sourceName) ?: MLang.Override.Save.ImportDefaultName
+    val baseName = normalizeImportedConfigSourceName(sourceName) ?: importDefaultName
     return if (hasMultipleEntries) {
         "$baseName ${index + 1}"
     } else {
