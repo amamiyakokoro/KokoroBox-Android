@@ -34,6 +34,7 @@ import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.service.common.constants.Intents
 import com.amamiyakokoro.box.service.common.log.Log
 import com.amamiyakokoro.box.service.common.util.CoreRuntimeConfig
+import com.amamiyakokoro.box.service.common.util.ServiceLanguageRuntime
 import com.amamiyakokoro.box.service.common.util.appContextOrSelf
 import com.amamiyakokoro.box.service.notification.ServiceNotificationManager
 import com.amamiyakokoro.box.service.runtime.session.LocalHttpTransport
@@ -67,6 +68,11 @@ class ClashService : BaseService() {
             when (intent?.action ?: return) {
                 Intents.ACTION_PROFILE_CHANGED,
                 Intents.ACTION_OVERRIDE_CHANGED -> scheduleReload()
+
+                Intents.ACTION_APP_LANGUAGE_CHANGED -> launch {
+                    ServiceLanguageRuntime.applyAppLanguage(this@ClashService)
+                    notificationManager.refreshNow()
+                }
 
                 Intents.ACTION_CLASH_REQUEST_STOP -> {
                     reason = intent.getStringExtra(Intents.EXTRA_STOP_REASON)
@@ -207,6 +213,7 @@ class ClashService : BaseService() {
         val filter = IntentFilter().apply {
             addAction(Intents.ACTION_PROFILE_CHANGED)
             addAction(Intents.ACTION_OVERRIDE_CHANGED)
+            addAction(Intents.ACTION_APP_LANGUAGE_CHANGED)
             addAction(Intents.ACTION_CLASH_REQUEST_STOP)
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {

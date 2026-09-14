@@ -25,8 +25,10 @@ package com.amamiyakokoro.box.service
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -40,6 +42,8 @@ import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.runtime.service.R
 import com.amamiyakokoro.box.service.common.constants.Components
+import com.amamiyakokoro.box.service.common.constants.Intents
+import com.amamiyakokoro.box.service.common.util.ServiceLanguageRuntime
 import com.amamiyakokoro.box.service.common.util.appContextOrSelf
 import com.amamiyakokoro.box.service.notification.NotificationPresentation
 import com.amamiyakokoro.box.service.notification.NotificationPresentationFactory
@@ -66,10 +70,20 @@ class RootTunService : BaseService() {
     private var lastNotificationFingerprint: String? = null
     private var lastTrafficDisplayEnabled: Boolean? = null
     private var lastTrafficNotificationAt: Long = 0L
+    private val languageChangedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != Intents.ACTION_APP_LANGUAGE_CHANGED) return
+            launch {
+                ServiceLanguageRuntime.applyAppLanguage(this@RootTunService)
+                refreshNotificationLanguage()
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
         createChannel()
+        registerLanguageChangedReceiver()
     }
 
     @SuppressLint("MissingPermission")
@@ -213,6 +227,7 @@ class RootTunService : BaseService() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        runCatching { unregisterReceiver(languageChangedReceiver) }
         notificationJob?.cancel()
         notificationJob = null
 
@@ -235,6 +250,32 @@ class RootTunService : BaseService() {
             todayTrafficBytes = queryCachedTodayTrafficBytes(),
             fallbackTrafficTotal = total,
         )
+    }
+
+    private suspend fun refreshNotificationLanguage() {
+        val status = stateStore.snapshot()
+        val profileName = status.profileName
+            ?: getString(LocaleR.string.service_notification_unknown_profile)
+        val presentation = if (status.state == RootTunState.Running && shouldShowTrafficNotification()) {
+            buildTrafficPresentation(profileName)
+        } else {
+            NotificationPresentationFactory.createStatus(
+                profileName = profileName,
+                status = describeStatus(status),
+            )
+        }
+        lastNotificationFingerprint = null
+        notifyIfChanged(buildNotification(presentation))
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private fun registerLanguageChangedReceiver() {
+        val filter = IntentFilter(Intents.ACTION_APP_LANGUAGE_CHANGED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(languageChangedReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(languageChangedReceiver, filter)
+        }
     }
 
     private fun buildNotification(presentation: NotificationPresentation): Notification {

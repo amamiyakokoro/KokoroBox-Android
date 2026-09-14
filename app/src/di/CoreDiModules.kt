@@ -22,6 +22,7 @@
 
 package com.amamiyakokoro.box.di
 
+import android.content.Intent
 import com.amamiyakokoro.box.data.controller.AccessControlController
 import com.amamiyakokoro.box.data.controller.AcgWallpaperStorage
 import com.amamiyakokoro.box.data.controller.AppSettingsController
@@ -53,6 +54,7 @@ import com.amamiyakokoro.box.runtime.client.ProxyFacade
 import com.amamiyakokoro.box.runtime.client.RuntimeStateMapper
 import com.amamiyakokoro.box.runtime.client.root.RootTunReloadScheduler
 import com.amamiyakokoro.box.service.ServicePowerController
+import com.amamiyakokoro.box.service.common.constants.Intents
 import com.amamiyakokoro.box.domain.model.TrafficData
 import com.amamiyakokoro.box.common.util.AppLanguageManager
 import com.tencent.mmkv.MMKV
@@ -94,7 +96,18 @@ val appFoundationModule = module {
 }
 
 val appDataRuntimeModule = module {
-    single { AppSettingsController(get(), applyLanguage = AppLanguageManager::apply) }
+    single {
+        val context = androidContext()
+        AppSettingsController(
+            store = get(),
+            applyLanguage = { language ->
+                AppLanguageManager.apply(language)
+                context.sendBroadcast(
+                    Intent(Intents.ACTION_APP_LANGUAGE_CHANGED).setPackage(context.packageName),
+                )
+            },
+        )
+    }
     single {
         val proxyFacade = get<ProxyFacade>()
         NetworkSettingsController(

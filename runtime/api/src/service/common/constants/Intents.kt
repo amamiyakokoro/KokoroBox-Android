@@ -37,6 +37,7 @@ object Intents {
     fun actionProfileChanged(packageName: String): String = intentAction(packageName, "PROFILE_CHANGED")
     fun actionProfileLoaded(packageName: String): String = intentAction(packageName, "PROFILE_LOADED")
     fun actionOverrideChanged(packageName: String): String = intentAction(packageName, "OVERRIDE_CHANGED")
+    fun actionAppLanguageChanged(packageName: String): String = intentAction(packageName, "APP_LANGUAGE_CHANGED")
     fun actionRootRuntimeFailed(packageName: String): String = intentAction(packageName, "ROOT_RUNTIME_FAILED")
     fun actionProxyGroupsUpdated(packageName: String): String = intentAction(packageName, "PROXY_GROUPS_UPDATED")
     fun actionPatchSelector(packageName: String): String = action(packageName, "PATCH_SELECTOR")
@@ -73,6 +74,9 @@ object Intents {
 
     val ACTION_OVERRIDE_CHANGED: String
         get() = actionOverrideChanged(packageName)
+
+    val ACTION_APP_LANGUAGE_CHANGED: String
+        get() = actionAppLanguageChanged(packageName)
 
     val ACTION_ROOT_RUNTIME_FAILED: String
         get() = actionRootRuntimeFailed(packageName)

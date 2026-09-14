@@ -82,6 +82,15 @@ class ServiceNotificationManager(
     }
 
     @SuppressLint("MissingPermission")
+    fun refreshNow() {
+        val showTraffic = shouldShowTrafficNotification()
+        val notification = buildRunningNotification(showTraffic)
+        lastTrafficDisplayEnabled = showTraffic
+        lastNotificationFingerprint = notificationFingerprint(notification)
+        notificationManager.notify(config.notificationId, notification)
+    }
+
+    @SuppressLint("MissingPermission")
     fun startTrafficUpdate(scope: CoroutineScope): Job {
         return scope.launch(Dispatchers.Default) {
             val powerController = ServicePowerController(service).also(ServicePowerController::start)

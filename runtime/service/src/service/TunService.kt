@@ -66,6 +66,10 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
             when (intent?.action ?: return) {
                 Intents.ACTION_PROFILE_CHANGED,
                 Intents.ACTION_OVERRIDE_CHANGED -> scheduleReload()
+                Intents.ACTION_APP_LANGUAGE_CHANGED -> launch {
+                    ServiceLanguageRuntime.applyAppLanguage(this@TunService)
+                    notificationManager.refreshNow()
+                }
                 Intents.ACTION_CLASH_REQUEST_STOP -> {
                     reason = intent.getStringExtra(Intents.EXTRA_STOP_REASON)
                     reloadJob?.cancel()
@@ -203,6 +207,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         val filter = IntentFilter().apply {
             addAction(Intents.ACTION_PROFILE_CHANGED)
             addAction(Intents.ACTION_OVERRIDE_CHANGED)
+            addAction(Intents.ACTION_APP_LANGUAGE_CHANGED)
             addAction(Intents.ACTION_CLASH_REQUEST_STOP)
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
