@@ -38,10 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.sp
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -57,7 +59,6 @@ import com.amamiyakokoro.box.presentation.theme.Spacing
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.amamiyakokoro.box.presentation.viewmodel.OverrideConfigViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -85,6 +86,14 @@ fun OverrideListScreen(
     val isEditOptionsDialogVisible = remember { mutableStateOf(false) }
     val deleteTargetConfig = remember { mutableStateOf<OverrideConfig?>(null) }
     val exportTargetConfig = remember { mutableStateOf<OverrideConfig?>(null) }
+    val importReadError = stringResource(LocaleR.string.override_import_read_error)
+    val importSuccessTemplate = stringResource(LocaleR.string.override_import_success)
+    val importSuccessDefaultTemplate = stringResource(LocaleR.string.override_import_success_default)
+    val importFailedTemplate = stringResource(LocaleR.string.override_import_failed)
+    val importFileErrorTemplate = stringResource(LocaleR.string.override_import_file_error)
+    val exportFailedTemplate = stringResource(LocaleR.string.override_export_failed)
+    val exportSuccessTemplate = stringResource(LocaleR.string.override_export_success)
+    val copyLabel = stringResource(LocaleR.string.override_card_copy)
 
     val listState = rememberLazyListState()
     val createFabController = rememberOverrideFabController()
@@ -132,7 +141,7 @@ fun OverrideListScreen(
             context.contentResolver.openInputStream(uri)
                 ?.bufferedReader()
                 ?.use { reader -> reader.readText() }
-                ?: error(MLang.Override.Import.ReadError)
+                ?: error(importReadError)
         }.onSuccess { jsonText ->
             val importResult = viewModel.importConfigsFromJson(
                 jsonString = jsonText,
@@ -141,17 +150,17 @@ fun OverrideListScreen(
             if (importResult.isSuccess) {
                 val importedCount = importResult.getOrNull() ?: 0
                 val importMessage = if (displayName.isNotBlank()) {
-                    MLang.Override.Import.Success.format(displayName, importedCount)
+                    importSuccessTemplate.format(displayName, importedCount)
                 } else {
-                    MLang.Override.Import.SuccessDefault.format(importedCount)
+                    importSuccessDefaultTemplate.format(importedCount)
                 }
                 context.toast(importMessage)
                 showCreateDialog.value = false
             } else {
-                context.toast(MLang.Override.Import.Failed.format(importResult.exceptionOrNull()?.message))
+                context.toast(importFailedTemplate.format(importResult.exceptionOrNull()?.message))
             }
         }.onFailure { throwable ->
-            context.toast(MLang.Override.Import.FileError.format(throwable.message))
+            context.toast(importFileErrorTemplate.format(throwable.message))
         }
     }
 
@@ -166,7 +175,7 @@ fun OverrideListScreen(
 
         val exportedConfig = viewModel.exportConfig(targetConfig.id)
         if (exportedConfig == null) {
-            context.toast(MLang.Override.Export.Failed.format(targetConfig.name))
+            context.toast(exportFailedTemplate.format(targetConfig.name))
             exportTargetConfig.value = null
             return@rememberLauncherForActivityResult
         }
@@ -175,11 +184,11 @@ fun OverrideListScreen(
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 outputStream.write(exportedConfig.toByteArray())
                 outputStream.flush()
-            } ?: error(MLang.Override.Export.Failed.format(targetConfig.name))
+            } ?: error(exportFailedTemplate.format(targetConfig.name))
         }.onSuccess {
-            context.toast(MLang.Override.Export.Success.format(targetConfig.name))
+            context.toast(exportSuccessTemplate.format(targetConfig.name))
         }.onFailure { throwable ->
-            context.toast(MLang.Override.Export.Failed.format(throwable.message))
+            context.toast(exportFailedTemplate.format(throwable.message))
         }
 
         exportTargetConfig.value = null
@@ -213,13 +222,13 @@ fun OverrideListScreen(
                 controller = createFabController,
                 visible = !showCreateDialog.value,
                 imageVector = AppMd3Icons.Action.Add,
-                contentDescription = MLang.Override.Action.Create,
+                contentDescription = stringResource(LocaleR.string.override_action_create),
                 onClick = { showCreateDialog.value = true },
             )
         },
         topBar = {
             TopBar(
-                title = MLang.Override.Title,
+                title = stringResource(LocaleR.string.override_title),
             )
         },
     ) { paddingValues ->
@@ -244,18 +253,18 @@ fun OverrideListScreen(
                             verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
                         ) {
                             CenteredText(
-                                firstLine = MLang.Override.Empty.Title,
-                                secondLine = MLang.Override.Empty.Hint,
+                                firstLine = stringResource(LocaleR.string.override_empty_title),
+                                secondLine = stringResource(LocaleR.string.override_empty_hint),
                             )
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                             ) {
                                 YumeMd3TextButton(
-                                    text = MLang.Override.Action.New,
+                                    text = stringResource(LocaleR.string.override_action_new),
                                     onClick = { showCreateDialog.value = true },
                                 )
                                 YumeMd3FilledButton(
-                                    text = MLang.Override.Action.Import,
+                                    text = stringResource(LocaleR.string.override_action_import),
                                     onClick = { importConfigLauncher.launch("*/*") },
                                 )
                             }
@@ -280,7 +289,7 @@ fun OverrideListScreen(
                                 isInUse = item.isInUse,
                                 onCopy = {
                                     viewModel.duplicateConfig(config.id)
-                                    context.toast(MLang.Override.Card.Copy + "：" + config.name)
+                                    context.toast(copyLabel + "：" + config.name)
                                 },
                                 onExport = {
                                     exportTargetConfig.value = config
@@ -362,7 +371,8 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
     val colorScheme = MaterialTheme.colorScheme
     val destructiveActionColors = yumeDestructiveActionColors()
     val accentTintColor = colorScheme.primary
-    val descriptionText = config.description?.takeIf(String::isNotBlank) ?: MLang.Override.Card.NoDescription
+    val descriptionText = config.description?.takeIf(String::isNotBlank)
+        ?: stringResource(LocaleR.string.override_card_no_description)
 
     Card(
         modifier = Modifier
@@ -419,13 +429,13 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
                 Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp8)) {
                     OverrideCardActionIconButton(
                         imageVector = AppMd3Icons.Action.Copy,
-                        contentDescription = MLang.Override.Card.Copy,
+                        contentDescription = stringResource(LocaleR.string.override_card_copy),
                         onClick = onCopy,
                     )
 
                     OverrideCardActionIconButton(
                         imageVector = AppMd3Icons.Action.Share,
-                        contentDescription = MLang.Override.Card.Export,
+                        contentDescription = stringResource(LocaleR.string.override_card_export),
                         onClick = onExport,
                     )
                 }
@@ -434,18 +444,18 @@ private fun ReorderableCollectionItemScope.OverrideConfigCard(
 
                 AppIconLabelButton(
                     modifier = Modifier.padding(end = UiDp.dp8),
-                    text = MLang.Override.Card.EditButton,
+                    text = stringResource(LocaleR.string.override_card_edit_button),
                     imageVector = AppMd3Icons.Action.Edit,
-                    contentDescription = MLang.Override.Card.Edit,
+                    contentDescription = stringResource(LocaleR.string.override_card_edit),
                     onClick = onEdit,
                     containerColor = colorScheme.primary.copy(alpha = 0.1f),
                     contentColor = accentTintColor,
                 )
 
                 AppIconLabelButton(
-                    text = MLang.Override.Card.DeleteButton,
+                    text = stringResource(LocaleR.string.override_card_delete_button),
                     imageVector = AppMd3Icons.Action.Delete,
-                    contentDescription = MLang.Override.Card.Delete,
+                    contentDescription = stringResource(LocaleR.string.override_card_delete),
                     onClick = onDelete,
                     containerColor = destructiveActionColors.containerColor,
                     contentColor = destructiveActionColors.contentColor,
@@ -462,7 +472,7 @@ private fun OverrideConfigStateIndicator() {
 
     OverrideStatusBadge(
         imageVector = AppMd3Icons.Security.Enabled,
-        contentDescription = MLang.Override.Status.InUse,
+        contentDescription = stringResource(LocaleR.string.override_status_in_use),
         tint = tint,
         backgroundColor = colorScheme.primary.copy(alpha = 0.1f),
     )
@@ -482,14 +492,14 @@ private fun CreateConfigDialog(
 
     AppActionBottomSheet(
         show = show.value,
-        title = MLang.Override.Dialog.Create.Title,
+        title = stringResource(LocaleR.string.override_dialog_create_title),
         startAction = {
             AppBottomSheetCloseAction(onClick = onDismiss)
         },
         endAction = {
             AppBottomSheetConfirmAction(
                 enabled = canConfirm,
-                contentDescription = MLang.Override.Action.Create,
+                contentDescription = stringResource(LocaleR.string.override_action_create),
                 onClick = {
                     if (canConfirm) {
                         keyboardController?.hide()
@@ -507,26 +517,26 @@ private fun CreateConfigDialog(
             YumeMd3OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = MLang.Override.Dialog.Create.Name,
+                label = stringResource(LocaleR.string.override_dialog_create_name),
                 modifier = Modifier.fillMaxWidth(),
             )
 
             YumeMd3OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = MLang.Override.Dialog.Create.Description,
+                label = stringResource(LocaleR.string.override_dialog_create_description),
                 modifier = Modifier.fillMaxWidth(),
             )
 
             Card(applyHorizontalPadding = false) {
                 PreferenceListItem(
-                    title = MLang.Override.Action.ImportFile,
-                    summary = MLang.Override.Dialog.Create.ImportHint,
+                    title = stringResource(LocaleR.string.override_action_import_file),
+                    summary = stringResource(LocaleR.string.override_dialog_create_import_hint),
                     startAction = {
                         AppIcon(
                             modifier = Modifier.padding(end = UiDp.dp16),
                             imageVector = AppMd3Icons.Action.Share,
-                            contentDescription = MLang.Override.Action.ImportFile,
+                            contentDescription = stringResource(LocaleR.string.override_action_import_file),
                             tint = MaterialTheme.colorScheme.onBackground,
                         )
                     },
@@ -560,13 +570,13 @@ private fun DeleteConfirmDialog(
 
     val summary = when {
         config == null -> ""
-        isInUse -> MLang.Override.Dialog.Delete.InUseMessage.format(config.name)
-        else -> MLang.Override.Dialog.Delete.Message.format(config.name)
+        isInUse -> stringResource(LocaleR.string.override_dialog_delete_in_use_message).format(config.name)
+        else -> stringResource(LocaleR.string.override_dialog_delete_message).format(config.name)
     }
 
     AppDialog(
         show = show.value,
-        title = MLang.Override.Dialog.Delete.Title,
+        title = stringResource(LocaleR.string.override_dialog_delete_title),
         summary = summary,
         onDismissRequest = onDismiss,
     ) {
@@ -576,8 +586,8 @@ private fun DeleteConfirmDialog(
             DialogButtonRow(
                 onCancel = onDismiss,
                 onConfirm = onConfirm,
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Dialog.Button.Delete,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_dialog_button_delete),
                 confirmDestructive = true,
             )
         }
@@ -594,7 +604,7 @@ private fun EditOptionsDialog(
 ) {
     AppDialog(
         show = show,
-        title = MLang.Override.Dialog.EditOptions.Title,
+        title = stringResource(LocaleR.string.override_dialog_edit_options_title),
         onDismissRequest = onDismiss,
         onDismissFinished = onDismissFinished,
     ) {
@@ -602,12 +612,12 @@ private fun EditOptionsDialog(
             verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
         ) {
             YumeMd3FilledButton(
-                text = MLang.Override.Dialog.EditOptions.VisualEditor,
+                text = stringResource(LocaleR.string.override_dialog_edit_options_visual_editor),
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onVisualEdit,
             )
             YumeMd3TextButton(
-                text = MLang.Override.Dialog.EditOptions.CodeEditor,
+                text = stringResource(LocaleR.string.override_dialog_edit_options_code_editor),
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onCodeEditor,
             )
