@@ -47,9 +47,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 typealias OpenStringListModifiersEditor = (
     title: String,
@@ -74,7 +75,7 @@ fun PortInputContent(
 
     PreferenceArrowItem(
         title = title,
-        summary = if (value != null) "$value" else MLang.Component.Selector.NotModify,
+        summary = if (value != null) "$value" else stringResource(LocaleR.string.component_selector_not_modify),
         onClick = {
             textValue = value?.toString() ?: ""
             inputValue = textValue
@@ -86,7 +87,7 @@ fun PortInputContent(
         show = showDialog,
         title = title,
         textValue = inputValue,
-        label = MLang.Component.ConfigInput.PortLabel,
+        label = stringResource(LocaleR.string.component_config_input_port_label),
         onTextValueChange = { input ->
             inputValue = input
         },
@@ -116,7 +117,7 @@ fun StringInputContent(
 
     PreferenceArrowItem(
         title = title,
-        summary = value?.takeIf { it.isNotEmpty() } ?: MLang.Component.Selector.NotModify,
+        summary = value?.takeIf { it.isNotEmpty() } ?: stringResource(LocaleR.string.component_selector_not_modify),
         onClick = {
             textValue = value ?: ""
             showDialog.value = true
@@ -142,9 +143,9 @@ fun StringListInputContent(
 ) {
     val itemCount = value?.size ?: 0
     val displayValue = if (itemCount > 0) {
-        MLang.Component.ConfigInput.CountItems.format(itemCount)
+        stringResource(LocaleR.string.component_config_input_count_items).format(itemCount)
     } else {
-        MLang.Component.Selector.NotModify
+        stringResource(LocaleR.string.component_selector_not_modify)
     }
 
     PreferenceArrowItem(
@@ -162,9 +163,9 @@ fun StringMapInputContent(
 ) {
     val itemCount = value?.size ?: 0
     val displayValue = if (itemCount > 0) {
-        MLang.Component.ConfigInput.CountItems.format(itemCount)
+        stringResource(LocaleR.string.component_config_input_count_items).format(itemCount)
     } else {
-        MLang.Component.Selector.NotModify
+        stringResource(LocaleR.string.component_selector_not_modify)
     }
 
     PreferenceArrowItem(
@@ -232,12 +233,13 @@ fun StringListWithModifiersInput(
     onEndChange: (List<String>?) -> Unit,
     onEditListGroup: OpenStringListModifiersEditor,
 ) {
-    val summary = remember(replaceValue, startValue, endValue) {
+    val notModify = stringResource(LocaleR.string.component_selector_not_modify)
+    val summary = remember(replaceValue, startValue, endValue, notModify) {
         buildList {
             replaceValue?.takeIf { it.isNotEmpty() }?.let { add("Replace ${it.size}") }
             startValue?.takeIf { it.isNotEmpty() }?.let { add("Prepend ${it.size}") }
             endValue?.takeIf { it.isNotEmpty() }?.let { add("Append ${it.size}") }
-        }.joinToString(" · ").ifEmpty { MLang.Component.Selector.NotModify }
+        }.joinToString(" · ").ifEmpty { notModify }
     }
 
     PreferenceArrowItem(
@@ -271,11 +273,12 @@ fun StringMapWithModifiersInput(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val summary = remember(replaceValue, mergeValue) {
+    val notModify = stringResource(LocaleR.string.component_selector_not_modify)
+    val summary = remember(replaceValue, mergeValue, notModify) {
         buildList {
             replaceValue?.takeIf { it.isNotEmpty() }?.let { add("Replace ${it.size}") }
             mergeValue?.takeIf { it.isNotEmpty() }?.let { add("Merge ${it.size}") }
-        }.joinToString(" · ").ifEmpty { MLang.Component.Selector.NotModify }
+        }.joinToString(" · ").ifEmpty { notModify }
     }
 
     Column {

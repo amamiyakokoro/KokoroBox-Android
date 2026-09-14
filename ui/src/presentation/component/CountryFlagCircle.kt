@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +40,7 @@ import com.amamiyakokoro.box.common.util.LocaleUtil
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 fun CountryFlagCircle(
@@ -64,7 +65,7 @@ fun CountryFlagCircle(
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
             ),
-            contentDescription = MLang.Component.Flag.ContentDescription.format(countryCode),
+            contentDescription = stringResource(LocaleR.string.component_flag_content_description).format(countryCode),
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
         )

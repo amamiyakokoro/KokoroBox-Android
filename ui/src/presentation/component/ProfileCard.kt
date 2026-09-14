@@ -57,6 +57,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -65,8 +66,8 @@ import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.amamiyakokoro.box.presentation.util.*
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.service.runtime.entity.Profile
-import dev.oom_wg.purejoy.mlang.MLang
 import java.io.File
 
 @Composable
@@ -338,7 +339,7 @@ fun ProfileCard(
                                     )
                                     Text(
                                         modifier = Modifier.padding(end = componentSizes.textLineCompactSpacing),
-                                        text = MLang.Component.ProfileCard.Update,
+                                        text = stringResource(LocaleR.string.component_profile_card_update),
                                         color = updateTint,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 15.sp,
@@ -369,7 +370,7 @@ fun ProfileCard(
                     )
                     Text(
                         modifier = Modifier.padding(start = spacing.space4, end = componentSizes.textLineCompactSpacing),
-                        text = MLang.Component.ProfileCard.Delete,
+                        text = stringResource(LocaleR.string.component_profile_card_delete),
                         color = deleteContentColor,
                         fontWeight = FontWeight.Medium,
                         fontSize = 15.sp

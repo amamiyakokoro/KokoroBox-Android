@@ -47,6 +47,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -65,7 +66,7 @@ import androidx.core.view.WindowCompat
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import top.yukonga.miuix.kmp.window.WindowBottomSheet
 
 object YumeMd3BottomSheetDefaults {
@@ -184,12 +185,12 @@ fun YumeMd3BottomSheetIconAction(
 fun YumeMd3BottomSheetCloseAction(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    contentDescription: String = MLang.Component.Button.Cancel,
+    contentDescription: String? = null,
 ) {
     YumeMd3BottomSheetIconAction(
         action = YumeMd3BottomSheetAction(
             icon = AppMd3Icons.Action.Close,
-            contentDescription = contentDescription,
+        contentDescription = contentDescription ?: stringResource(LocaleR.string.component_button_cancel),
             enabled = enabled,
             onClick = onClick,
         ),
@@ -200,12 +201,12 @@ fun YumeMd3BottomSheetCloseAction(
 fun YumeMd3BottomSheetConfirmAction(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    contentDescription: String = MLang.Component.Button.Confirm,
+    contentDescription: String? = null,
 ) {
     YumeMd3BottomSheetIconAction(
         action = YumeMd3BottomSheetAction(
             icon = AppMd3Icons.Action.Check,
-            contentDescription = contentDescription,
+        contentDescription = contentDescription ?: stringResource(LocaleR.string.component_button_confirm),
             enabled = enabled,
             onClick = onClick,
         ),

@@ -21,7 +21,6 @@
 package com.amamiyakokoro.box.presentation.component
 
 import androidx.compose.runtime.Composable
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun AppConfirmDialog(
@@ -30,8 +29,8 @@ fun AppConfirmDialog(
     message: String,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
-    confirmText: String = MLang.Component.Button.Confirm,
-    cancelText: String = MLang.Component.Button.Cancel,
+    confirmText: String? = null,
+    cancelText: String? = null,
     confirmDestructive: Boolean = false,
 ) {
     AppDialog(

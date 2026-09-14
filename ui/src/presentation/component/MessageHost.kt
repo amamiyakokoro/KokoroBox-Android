@@ -27,10 +27,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import top.yukonga.miuix.kmp.preference.ArrowPreference
 
 enum class MessageType {
@@ -78,7 +79,7 @@ fun MessageHost(
                 contentAlignment = Alignment.CenterEnd,
             ) {
                 ArrowPreference(
-                    title = MLang.Component.Message.Confirm,
+                    title = stringResource(LocaleR.string.component_message_confirm),
                     onClick = dismissDialog,
                 )
             }
@@ -116,7 +117,7 @@ fun SimpleMessage(
 ) {
     if (message != null) {
         MessageHost(
-            message = Message(MLang.Component.Message.Hint, message),
+            message = Message(stringResource(LocaleR.string.component_message_hint), message),
             onDismiss = onDismiss,
         )
     }
@@ -129,7 +130,7 @@ fun ErrorMessage(
 ) {
     if (error != null) {
         MessageHost(
-            message = Message(MLang.Component.Message.Error, error, MessageType.ERROR, autoClose = false),
+            message = Message(stringResource(LocaleR.string.component_message_error), error, MessageType.ERROR, autoClose = false),
             onDismiss = onDismiss,
         )
     }
@@ -142,7 +143,7 @@ fun SuccessMessage(
 ) {
     if (message != null) {
         MessageHost(
-            message = Message(MLang.Component.Message.Success, message, MessageType.SUCCESS),
+            message = Message(stringResource(LocaleR.string.component_message_success), message, MessageType.SUCCESS),
             onDismiss = onDismiss,
         )
     }

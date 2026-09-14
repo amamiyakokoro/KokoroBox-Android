@@ -35,7 +35,6 @@ import com.amamiyakokoro.box.presentation.component.md3.YumeMd3BottomSheetConfir
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3BottomSheetDefaults
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3BottomSheetIconAction
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
 
 object AppBottomSheetDefaults {
     val insideMargin: DpSize = YumeMd3BottomSheetDefaults.insideMargin
@@ -77,7 +76,7 @@ fun AppBottomSheetIconAction(
 fun AppBottomSheetCloseAction(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    contentDescription: String = MLang.Component.Button.Cancel,
+    contentDescription: String? = null,
 ) {
     YumeMd3BottomSheetCloseAction(
         onClick = onClick,
@@ -90,7 +89,7 @@ fun AppBottomSheetCloseAction(
 fun AppBottomSheetConfirmAction(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    contentDescription: String = MLang.Component.Button.Confirm,
+    contentDescription: String? = null,
 ) {
     YumeMd3BottomSheetConfirmAction(
         onClick = onClick,

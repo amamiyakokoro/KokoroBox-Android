@@ -47,11 +47,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 fun PulseRippleLoadingAnimation(
@@ -161,7 +162,7 @@ fun StartupLoadingOverlay(
             Spacer(modifier = Modifier.height(UiDp.dp32))
 
             AnimatedContent(
-                targetState = loadingText ?: MLang.Component.Loading.Starting,
+                targetState = loadingText ?: stringResource(LocaleR.string.component_loading_starting),
                 transitionSpec = {
                     fadeIn(
                         animationSpec = tween(AppMotion.DURATION_INSTANT, easing = AppMotion.EnterEasing)

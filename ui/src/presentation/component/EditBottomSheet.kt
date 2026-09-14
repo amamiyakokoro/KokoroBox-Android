@@ -32,11 +32,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3FilledButton
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 fun TextEditBottomSheet(
@@ -45,7 +46,7 @@ fun TextEditBottomSheet(
     textFieldValue: MutableState<TextFieldValue>,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit = { show.value = false },
-    secondaryButtonText: String = MLang.Component.Button.Cancel,
+    secondaryButtonText: String? = null,
     onSecondaryClick: () -> Unit = onDismiss,
 ) {
     AppActionBottomSheet(
@@ -62,12 +63,12 @@ fun TextEditBottomSheet(
             Spacer(modifier = Modifier.height(UiDp.dp16))
             Row(horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
                 YumeMd3FilledButton(
-                    text = secondaryButtonText,
+                    text = secondaryButtonText ?: stringResource(LocaleR.string.component_button_cancel),
                     onClick = onSecondaryClick,
                     modifier = Modifier.weight(1f),
                 )
                 YumeMd3FilledButton(
-                    text = MLang.Component.Button.Confirm,
+                    text = stringResource(LocaleR.string.component_button_confirm),
                     onClick = {
                         onConfirm(textFieldValue.value.text)
                         show.value = false
@@ -102,7 +103,7 @@ fun WarningBottomSheet(
             }
             Spacer(modifier = Modifier.height(UiDp.dp16))
             YumeMd3FilledButton(
-                text = MLang.Component.Button.Confirm,
+                text = stringResource(LocaleR.string.component_button_confirm),
                 onClick = {
                     onConfirm()
                     show.value = false

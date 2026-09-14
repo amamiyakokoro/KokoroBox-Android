@@ -31,9 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun YumeMd3TextButton(
@@ -76,8 +77,8 @@ fun YumeMd3DialogButtonRow(
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
-    cancelText: String = MLang.Component.Button.Cancel,
-    confirmText: String = MLang.Component.Button.Confirm,
+    cancelText: String? = null,
+    confirmText: String? = null,
     confirmEnabled: Boolean = true,
     confirmDestructive: Boolean = false,
 ) {
@@ -86,12 +87,12 @@ fun YumeMd3DialogButtonRow(
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
     ) {
         YumeMd3TextButton(
-            text = cancelText,
+            text = cancelText ?: stringResource(LocaleR.string.component_button_cancel),
             onClick = onCancel,
             modifier = Modifier.weight(1f),
         )
         YumeMd3FilledButton(
-            text = confirmText,
+            text = confirmText ?: stringResource(LocaleR.string.component_button_confirm),
             onClick = onConfirm,
             modifier = Modifier.weight(1f),
             enabled = confirmEnabled,
@@ -105,8 +106,8 @@ fun YumeMd3DialogFilledButtonRow(
     onSecondary: () -> Unit,
     onPrimary: () -> Unit,
     modifier: Modifier = Modifier,
-    secondaryText: String = MLang.Component.Button.Clear,
-    primaryText: String = MLang.Component.Button.Confirm,
+    secondaryText: String? = null,
+    primaryText: String? = null,
     secondaryEnabled: Boolean = true,
     primaryEnabled: Boolean = true,
     secondaryDestructive: Boolean = true,
@@ -122,10 +123,10 @@ fun YumeMd3DialogFilledButtonRow(
             modifier = Modifier.weight(1f),
             colors = yumeMd3FilledButtonColors(destructive = secondaryDestructive),
         ) {
-            Text(text = secondaryText)
+            Text(text = secondaryText ?: stringResource(LocaleR.string.component_button_clear))
         }
         YumeMd3FilledButton(
-            text = primaryText,
+            text = primaryText ?: stringResource(LocaleR.string.component_button_confirm),
             onClick = onPrimary,
             modifier = Modifier.weight(1f),
             enabled = primaryEnabled,

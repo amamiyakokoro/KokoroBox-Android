@@ -25,7 +25,6 @@ package com.amamiyakokoro.box.presentation.component
 import androidx.compose.runtime.Composable
 import com.amamiyakokoro.box.presentation.util.DialogState
 import com.amamiyakokoro.box.presentation.util.rememberDialogVisibilityState
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun ConfirmDialog(
@@ -34,8 +33,8 @@ fun ConfirmDialog(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit = { show.dismiss() },
-    cancelText: String = MLang.Component.Button.Cancel,
-    confirmText: String = MLang.Component.Button.Confirm,
+    cancelText: String? = null,
+    confirmText: String? = null,
 ) {
     AppActionBottomSheet(
         show = show.isShown,
@@ -58,8 +57,8 @@ fun ConfirmDialogSimple(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    cancelText: String = MLang.Component.Button.Cancel,
-    confirmText: String = MLang.Component.Button.Confirm,
+    cancelText: String? = null,
+    confirmText: String? = null,
 ) {
     val show = rememberDialogVisibilityState()
     if (!show.isShown) {
@@ -94,8 +93,8 @@ private fun ConfirmDialogContent(
     message: String,
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
-    cancelText: String,
-    confirmText: String,
+    cancelText: String?,
+    confirmText: String?,
 ) {
     AppConfirmDialogContent(
         message = message,

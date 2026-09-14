@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DialogColumn
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DialogMessage
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 internal fun AppDialogColumn(
@@ -55,8 +54,8 @@ internal fun AppConfirmDialogContent(
     message: String,
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
-    cancelText: String = MLang.Component.Button.Cancel,
-    confirmText: String = MLang.Component.Button.Confirm,
+    cancelText: String? = null,
+    confirmText: String? = null,
     confirmEnabled: Boolean = true,
     confirmDestructive: Boolean = false,
 ) {

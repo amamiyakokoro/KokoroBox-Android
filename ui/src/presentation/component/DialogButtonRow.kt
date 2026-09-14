@@ -25,14 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DialogButtonRow
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DialogFilledButtonRow
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun DialogButtonRow(
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
-    cancelText: String = MLang.Component.Button.Cancel,
-    confirmText: String = MLang.Component.Button.Confirm,
+    cancelText: String? = null,
+    confirmText: String? = null,
     confirmEnabled: Boolean = true,
     confirmDestructive: Boolean = false,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
@@ -52,8 +51,8 @@ fun DialogButtonRow(
 fun DialogFilledButtonRow(
     onSecondary: () -> Unit,
     onPrimary: () -> Unit,
-    secondaryText: String = MLang.Component.Button.Clear,
-    primaryText: String = MLang.Component.Button.Confirm,
+    secondaryText: String? = null,
+    primaryText: String? = null,
     secondaryEnabled: Boolean = true,
     primaryEnabled: Boolean = true,
     secondaryDestructive: Boolean = true,

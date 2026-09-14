@@ -23,8 +23,9 @@
 package com.amamiyakokoro.box.presentation.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 fun NullableBooleanSelector(
@@ -34,7 +35,11 @@ fun NullableBooleanSelector(
     onValueChange: (Boolean?) -> Unit,
 ) {
     val items =
-        listOf(MLang.Component.Selector.NotModify, MLang.Component.Selector.Enable, MLang.Component.Selector.Disable)
+        listOf(
+            stringResource(LocaleR.string.component_selector_not_modify),
+            stringResource(LocaleR.string.component_selector_enable),
+            stringResource(LocaleR.string.component_selector_disable),
+        )
     val selectedIndex = when (value) {
         null -> 0
         true -> 1
@@ -110,10 +115,10 @@ fun ListMergeStrategySelector(
     onValueChange: (ListMergeStrategy) -> Unit,
 ) {
     val items = listOf(
-        MLang.Component.Selector.NotModify,
-        MLang.Component.Selector.Replace,
-        MLang.Component.Selector.Prepend,
-        MLang.Component.Selector.Append,
+        stringResource(LocaleR.string.component_selector_not_modify),
+        stringResource(LocaleR.string.component_selector_replace),
+        stringResource(LocaleR.string.component_selector_prepend),
+        stringResource(LocaleR.string.component_selector_append),
     )
     val values = listOf(
         ListMergeStrategy.None,
@@ -140,9 +145,9 @@ fun MapMergeStrategySelector(
     onValueChange: (MapMergeStrategy) -> Unit,
 ) {
     val items = listOf(
-        MLang.Component.Selector.NotModify,
-        MLang.Component.Selector.Replace,
-        MLang.Component.Selector.Merge,
+        stringResource(LocaleR.string.component_selector_not_modify),
+        stringResource(LocaleR.string.component_selector_replace),
+        stringResource(LocaleR.string.component_selector_merge),
     )
     val values = listOf(
         MapMergeStrategy.None,

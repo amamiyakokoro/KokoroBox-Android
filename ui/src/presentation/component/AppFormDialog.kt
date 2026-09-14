@@ -31,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun AppFormDialog(
@@ -43,8 +42,8 @@ fun AppFormDialog(
     summary: String? = null,
     error: String? = null,
     confirmEnabled: Boolean = true,
-    cancelText: String = MLang.Component.Button.Cancel,
-    confirmText: String = MLang.Component.Button.Confirm,
+    cancelText: String? = null,
+    confirmText: String? = null,
     scrollable: Boolean = true,
     content: @Composable () -> Unit,
 ) {

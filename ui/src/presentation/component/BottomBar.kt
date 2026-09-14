@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,11 +62,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.kyant.shapes.Capsule
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
@@ -257,10 +258,10 @@ private fun ModernBottomBarContent(
                         icon = {
                             MaterialIcon(
                                 imageVector = destination.icon,
-                                contentDescription = destination.label,
+                                contentDescription = stringResource(destination.labelRes),
                             )
                         },
-                        label = { MaterialText(destination.label) },
+                        label = { MaterialText(stringResource(destination.labelRes)) },
                         enabled = bottomBarVisible,
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -396,12 +397,12 @@ private fun LegacyBottomBarContent(
                 ) {
                     MaterialIcon(
                         imageVector = destination.icon,
-                        contentDescription = destination.label,
+                        contentDescription = stringResource(destination.labelRes),
                         tint = itemIconColor,
                     )
                 }
                 BasicText(
-                    text = destination.label,
+                    text = stringResource(destination.labelRes),
                     style = TextStyle(
                         color = itemTextColor,
                         fontSize = 11.sp,
@@ -535,18 +536,11 @@ private fun RowScope.LegacyBottomNavigationTabItem(
 
 enum class BottomBarDestination(
     val icon: ImageVector,
+    val labelRes: Int,
 ) {
-    Home(AppMd3Icons.Shell.OpenHome),
-    Proxy(AppMd3Icons.Shell.OpenProxy),
-    Config(AppMd3Icons.Shell.OpenProfileConfig),
-    Setting(AppMd3Icons.Shell.OpenSettings),
+    Home(AppMd3Icons.Shell.OpenHome, LocaleR.string.component_bottom_bar_home),
+    Proxy(AppMd3Icons.Shell.OpenProxy, LocaleR.string.component_bottom_bar_proxy),
+    Config(AppMd3Icons.Shell.OpenProfileConfig, LocaleR.string.component_bottom_bar_config),
+    Setting(AppMd3Icons.Shell.OpenSettings, LocaleR.string.component_bottom_bar_setting),
     ;
-
-    val label: String
-        get() = when (this) {
-            Home -> MLang.Component.BottomBar.Home
-            Proxy -> MLang.Component.BottomBar.Proxy
-            Config -> MLang.Component.BottomBar.Config
-            Setting -> MLang.Component.BottomBar.Setting
-        }
 }
