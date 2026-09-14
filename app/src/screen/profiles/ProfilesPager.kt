@@ -37,9 +37,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.amamiyakokoro.box.App
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.MainActivity
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.data.controller.OverrideService
@@ -54,7 +56,6 @@ import com.amamiyakokoro.box.presentation.viewmodel.OverrideConfigViewModel
 import com.amamiyakokoro.box.screen.home.HomeViewModel
 import com.amamiyakokoro.box.service.runtime.entity.Profile
 import com.ramcosta.composedestinations.generated.destinations.OverrideConfigPreviewRouteDestination
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -80,6 +81,11 @@ fun ProfilesPager(
     val overrideService: OverrideService = koinInject()
     val userConfigs by overrideConfigViewModel.userConfigs.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val importedConfigMissing = stringResource(LocaleR.string.profiles_page_share_dialog_imported_config_missing)
+    val shareFile = stringResource(LocaleR.string.profiles_page_share_dialog_share_file)
+    val shareLink = stringResource(LocaleR.string.profiles_page_share_dialog_share_link)
+    val noLink = stringResource(LocaleR.string.profiles_page_share_dialog_no_link)
+    val configMissing = stringResource(LocaleR.string.profiles_page_settings_dialog_config_missing)
 
     val showAddBottomSheet = remember { mutableStateOf(false) }
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
@@ -135,7 +141,7 @@ fun ProfilesPager(
         Scaffold(
         topBar = {
             TopBar(
-                title = MLang.ProfilesPage.Title,
+                title = stringResource(LocaleR.string.profiles_page_title),
                 actions = {
                     IconButton(
                         modifier = Modifier.padding(end = UiDp.dp12),
@@ -150,7 +156,7 @@ fun ProfilesPager(
                     ) {
                         Icon(
                             ShellIcons.UpdateProfiles,
-                            contentDescription = MLang.ProfilesPage.Action.UpdateAll
+                            contentDescription = stringResource(LocaleR.string.profiles_page_action_update_all)
                         )
                     }
 
@@ -162,7 +168,7 @@ fun ProfilesPager(
                     ) {
                         Icon(
                             ShellIcons.AddProfile,
-                            contentDescription = MLang.ProfilesPage.Action.AddProfile
+                            contentDescription = stringResource(LocaleR.string.profiles_page_action_add_profile)
                         )
                     }
                 })
@@ -171,8 +177,8 @@ fun ProfilesPager(
         if (profiles.isEmpty()) {
 
             CenteredText(
-                firstLine = MLang.ProfilesPage.Empty.NoProfiles,
-                secondLine = MLang.ProfilesPage.Empty.Hint
+                firstLine = stringResource(LocaleR.string.profiles_page_empty_no_profiles),
+                secondLine = stringResource(LocaleR.string.profiles_page_empty_hint),
             )
         } else {
             val reorderableLazyListState =
@@ -352,7 +358,7 @@ fun ProfilesPager(
             val file = importedConfigFile(profile)
 
             if (!file.exists()) {
-                context.toast(MLang.ProfilesPage.ShareDialog.ImportedConfigMissing.format(file.absolutePath))
+                context.toast(importedConfigMissing.format(file.absolutePath))
             } else {
                 runCatching {
                     val uri = FileProvider.getUriForFile(
@@ -366,7 +372,7 @@ fun ProfilesPager(
                     }
                     context.startActivity(
                         Intent.createChooser(
-                            intent, MLang.ProfilesPage.ShareDialog.ShareFile
+                            intent, shareFile
                         ).apply {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         })
@@ -386,12 +392,12 @@ fun ProfilesPager(
                 }
                 context.startActivity(
                     Intent.createChooser(
-                        intent, MLang.ProfilesPage.ShareDialog.ShareLink
+                        intent, shareLink
                     ).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     })
             } ?: run {
-                context.toast(MLang.ProfilesPage.ShareDialog.NoLink)
+                context.toast(noLink)
             }
             showShareDialog.value = false
         })
@@ -405,7 +411,7 @@ fun ProfilesPager(
                 isEditOptionsDialogVisible = false
                 openProfileConfigPreview(
                     targetFile = importedConfigFile(profile),
-                    missingMessage = MLang.ProfilesPage.SettingsDialog.ConfigMissing.format(importedConfigFile(profile).absolutePath),
+                    missingMessage = configMissing.format(importedConfigFile(profile).absolutePath),
                     editable = true,
                     onReadFailed = context::toast,
                 ) { configContent, callback ->
