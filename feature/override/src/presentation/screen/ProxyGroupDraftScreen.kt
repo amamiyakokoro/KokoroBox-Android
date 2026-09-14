@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
@@ -34,7 +36,6 @@ import com.amamiyakokoro.box.presentation.util.OverrideProxyGroupTypePresets
 import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
 import com.amamiyakokoro.box.presentation.util.rememberCurrentReferenceCatalog
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Scaffold
 
 @Composable
@@ -42,9 +43,12 @@ fun OverrideProxyGroupDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
     val listState = rememberLazyListState()
-    val title = remember {
-        OverrideStructuredEditorStore.proxyGroupDraftEditorTitle.ifBlank { MLang.Override.Editor.ProxyGroup }
-    }
+    val proxyNodeLabel = stringResource(LocaleR.string.override_editor_proxy_node)
+    val proxyGroupLabel = stringResource(LocaleR.string.override_editor_proxy_group)
+    val nameLabel = stringResource(LocaleR.string.override_draft_name)
+    val nameRequiredMessage = stringResource(LocaleR.string.override_draft_name_required)
+    val typeEmptyMessage = stringResource(LocaleR.string.override_editor_type_empty)
+    val title = OverrideStructuredEditorStore.proxyGroupDraftEditorTitle.ifBlank { proxyGroupLabel }
     val initialValue = remember { OverrideStructuredEditorStore.proxyGroupDraftEditorValue }
     val saveFabController = rememberOverrideFabController()
 
@@ -89,17 +93,22 @@ fun OverrideProxyGroupDraftEditorScreen(
     val availableProxyGroupNames = remember(referenceCatalog.proxyGroupNames, excludedGroupNames) {
         referenceCatalog.proxyGroupNames.filterNot(excludedGroupNames::contains)
     }
-    val proxySelectionGroups = remember(referenceCatalog.proxyNames, availableProxyGroupNames) {
+    val proxySelectionGroups = remember(
+        referenceCatalog.proxyNames,
+        availableProxyGroupNames,
+        proxyNodeLabel,
+        proxyGroupLabel,
+    ) {
         listOfNotNull(
             referenceCatalog.proxyNames.takeIf { it.isNotEmpty() }?.let { values ->
                 OverrideSelectionGroup(
-                    title = MLang.Override.Editor.ProxyNode,
+                    title = proxyNodeLabel,
                     items = values,
                 )
             },
             availableProxyGroupNames.takeIf { it.isNotEmpty() }?.let { values ->
                 OverrideSelectionGroup(
-                    title = MLang.Override.Editor.ProxyGroup,
+                    title = proxyGroupLabel,
                     items = values,
                 )
             },
@@ -118,14 +127,14 @@ fun OverrideProxyGroupDraftEditorScreen(
                 controller = saveFabController,
                 visible = true,
                 imageVector = AppMd3Icons.Action.Save,
-                contentDescription = MLang.Override.Editor.SaveProxyGroup,
+                contentDescription = stringResource(LocaleR.string.override_editor_save_proxy_group),
                 onClick = {
                     if (name.trim().isBlank()) {
-                        errorText = MLang.Override.Draft.NameRequired
+                        errorText = nameRequiredMessage
                         return@OverrideAnimatedFab
                     }
                     if (type.trim().isBlank()) {
-                        errorText = MLang.Override.Editor.TypeEmpty
+                        errorText = typeEmptyMessage
                         return@OverrideAnimatedFab
                     }
                     OverrideStructuredEditorStore.submitProxyGroupDraft(
@@ -177,10 +186,10 @@ fun OverrideProxyGroupDraftEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
                 ) {
-                    OverrideSection(MLang.Override.Draft.BasicInfo) {
+                    OverrideSection(stringResource(LocaleR.string.override_draft_basic_info)) {
                         OverrideSelectorCard {
                             YumeMd3DropdownPreference(
-                                title = MLang.Override.Editor.RuleType,
+                                title = stringResource(LocaleR.string.override_editor_rule_type),
                                 items = OverrideProxyGroupTypePresets,
                                 selectedIndex = selectedPresetIndex,
                                 onSelectedIndexChange = { index ->
@@ -198,35 +207,35 @@ fun OverrideProxyGroupDraftEditorScreen(
                                     name = it
                                     errorText = null
                                 },
-                                label = MLang.Override.Draft.Name,
-                                errorText = errorText?.takeIf { it.contains(MLang.Override.Draft.Name) },
+                                label = nameLabel,
+                                errorText = errorText?.takeIf { it == nameRequiredMessage },
                             )
                             OverrideFormField(
                                 value = url,
                                 onValueChange = { url = it },
-                                label = MLang.Override.ProxyGroup.Field.Url,
+                                label = stringResource(LocaleR.string.override_proxy_group_field_url),
                             )
                             OverrideFormField(
                                 value = intervalText,
                                 onValueChange = { intervalText = it.filter(Char::isDigit) },
-                                label = MLang.Override.ProxyGroup.Field.Interval,
+                                label = stringResource(LocaleR.string.override_proxy_group_field_interval),
                             )
                             OverrideFormField(
                                 value = timeoutText,
                                 onValueChange = { timeoutText = it.filter(Char::isDigit) },
-                                label = MLang.Override.ProxyGroup.Field.Timeout,
+                                label = stringResource(LocaleR.string.override_proxy_group_field_timeout),
                             )
                             OverrideFormField(
                                 value = maxFailedTimesText,
                                 onValueChange = { maxFailedTimesText = it.filter(Char::isDigit) },
-                                label = MLang.Override.ProxyGroup.Field.MaxFailedTimes,
+                                label = stringResource(LocaleR.string.override_proxy_group_field_max_failed_times),
                             )
                         }
                     }
-                    OverrideSection(MLang.Override.Editor.MemberSource) {
+                    OverrideSection(stringResource(LocaleR.string.override_editor_member_source)) {
                         OverrideSelectorCard {
                             PreferenceArrowItem(
-                                title = MLang.Override.ProxyGroup.Field.Proxies,
+                                title = stringResource(LocaleR.string.override_proxy_group_field_proxies),
                                 onClick = {
                                     showProxySelector = true
                                     errorText = null
@@ -238,61 +247,61 @@ fun OverrideProxyGroupDraftEditorScreen(
                             OverrideFormField(
                                 value = useText,
                                 onValueChange = { useText = it },
-                                label = MLang.Override.ProxyGroup.Field.Use,
-                                supportText = MLang.Override.ProxyGroup.Field.UseHint,
+                                label = stringResource(LocaleR.string.override_proxy_group_field_use),
+                                supportText = stringResource(LocaleR.string.override_proxy_group_field_use_hint),
                                 modifier = Modifier.heightIn(min = UiDp.dp100),
                                 maxLines = 8,
                             )
                         }
                     }
-                    OverridePlainFormSection(MLang.Override.Editor.HealthCheckAndFilter) {
+                    OverridePlainFormSection(stringResource(LocaleR.string.override_editor_health_check_and_filter)) {
                         OverrideFormField(
                             value = interfaceName,
                             onValueChange = { interfaceName = it },
-                            label = MLang.Override.ProxyGroup.Field.InterfaceName,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_interface_name),
                         )
                         OverrideFormField(
                             value = routingMarkText,
                             onValueChange = { routingMarkText = it.filter(Char::isDigit) },
-                            label = MLang.Override.ProxyGroup.Field.RoutingMark,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_routing_mark),
                         )
                         OverrideFormField(
                             value = filter,
                             onValueChange = { filter = it },
-                            label = MLang.Override.ProxyGroup.Field.Filter,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_filter),
                         )
                         OverrideFormField(
                             value = excludeFilter,
                             onValueChange = { excludeFilter = it },
-                            label = MLang.Override.ProxyGroup.Field.ExcludeFilter,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_exclude_filter),
                         )
                         OverrideFormField(
                             value = excludeType,
                             onValueChange = { excludeType = it },
-                            label = MLang.Override.ProxyGroup.Field.ExcludeType,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_exclude_type),
                         )
                         OverrideFormField(
                             value = expectedStatus,
                             onValueChange = { expectedStatus = it },
-                            label = MLang.Override.ProxyGroup.Field.ExpectedStatus,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_expected_status),
                         )
                         OverrideFormField(
                             value = icon,
                             onValueChange = { icon = it },
-                            label = MLang.Override.ProxyGroup.Field.Icon,
+                            label = stringResource(LocaleR.string.override_proxy_group_field_icon),
                         )
                     }
-                    OverrideCardSection(MLang.Override.Draft.BooleanOptions) {
-                        NullableBooleanSelector(title = MLang.Override.ProxyGroup.Field.Lazy, value = lazy, onValueChange = { lazy = it })
-                        NullableBooleanSelector(title = MLang.Override.ProxyGroup.Field.DisableUdp, value = disableUdp, onValueChange = { disableUdp = it })
-                        NullableBooleanSelector(title = MLang.Override.ProxyGroup.Field.IncludeAll, value = includeAll, onValueChange = { includeAll = it })
-                        NullableBooleanSelector(title = MLang.Override.ProxyGroup.Field.IncludeAllProxies, value = includeAllProxies, onValueChange = { includeAllProxies = it })
-                        NullableBooleanSelector(title = MLang.Override.ProxyGroup.Field.IncludeAllProviders, value = includeAllProviders, onValueChange = { includeAllProviders = it })
-                        NullableBooleanSelector(title = MLang.Override.ProxyGroup.Field.Hidden, value = hidden, onValueChange = { hidden = it })
+                    OverrideCardSection(stringResource(LocaleR.string.override_draft_boolean_options)) {
+                        NullableBooleanSelector(title = stringResource(LocaleR.string.override_proxy_group_field_lazy), value = lazy, onValueChange = { lazy = it })
+                        NullableBooleanSelector(title = stringResource(LocaleR.string.override_proxy_group_field_disable_udp), value = disableUdp, onValueChange = { disableUdp = it })
+                        NullableBooleanSelector(title = stringResource(LocaleR.string.override_proxy_group_field_include_all), value = includeAll, onValueChange = { includeAll = it })
+                        NullableBooleanSelector(title = stringResource(LocaleR.string.override_proxy_group_field_include_all_proxies), value = includeAllProxies, onValueChange = { includeAllProxies = it })
+                        NullableBooleanSelector(title = stringResource(LocaleR.string.override_proxy_group_field_include_all_providers), value = includeAllProviders, onValueChange = { includeAllProviders = it })
+                        NullableBooleanSelector(title = stringResource(LocaleR.string.override_proxy_group_field_hidden), value = hidden, onValueChange = { hidden = it })
                     }
-                    OverrideSection(MLang.Override.Draft.ExtraFields) {
+                    OverrideSection(stringResource(LocaleR.string.override_draft_extra_fields)) {
                         OverrideExtraFieldsCard(
-                            title = MLang.Override.Draft.ExtraFields,
+                            title = stringResource(LocaleR.string.override_draft_extra_fields),
                             fields = extraFields,
                             onAddClick = {
                                 editingExtraKey = null
@@ -313,7 +322,10 @@ fun OverrideProxyGroupDraftEditorScreen(
         }
         OverrideExtraFieldDialog(
             show = showExtraFieldDialog,
-            title = if (editingExtraKey == null) MLang.Override.Draft.AddExtraField else MLang.Override.Draft.EditExtraField,
+            title = stringResource(
+                if (editingExtraKey == null) LocaleR.string.override_draft_add_extra_field
+                else LocaleR.string.override_draft_edit_extra_field,
+            ),
             initialValue = editingExtraKey?.let(extraFields::toExtraFieldDraft),
             onConfirm = { draft: OverrideExtraFieldDraft ->
                 extraFields = extraFields.updateExtraField(editingExtraKey, draft)
@@ -327,10 +339,10 @@ fun OverrideProxyGroupDraftEditorScreen(
         )
         OverrideMultiValueSelectionSheet(
             show = showProxySelector,
-            title = MLang.Override.Editor.SelectProxyGroupMember,
+            title = stringResource(LocaleR.string.override_editor_select_proxy_group_member),
             values = proxies,
             groups = proxySelectionGroups,
-            customInputLabel = MLang.Override.Editor.CustomMember,
+            customInputLabel = stringResource(LocaleR.string.override_editor_custom_member),
             onDismiss = { showProxySelector = false },
             onConfirm = { selectedValues ->
                 proxies = selectedValues
