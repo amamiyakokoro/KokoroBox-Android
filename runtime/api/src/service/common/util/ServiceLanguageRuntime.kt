@@ -20,13 +20,15 @@
 
 package com.amamiyakokoro.box.service.common.util
 
+import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import com.tencent.mmkv.MMKV
 import java.util.Locale
 
 object ServiceLanguageRuntime {
-    fun applyAppLanguage() {
+    fun applyAppLanguage(context: Context) {
         val language = runCatching {
             MMKV.mmkvWithID(SETTINGS_MMKV_ID, MMKV.MULTI_PROCESS_MODE)
                 .decodeString(APP_LANGUAGE_KEY, APP_LANGUAGE_SYSTEM)
@@ -41,6 +43,12 @@ object ServiceLanguageRuntime {
         }
 
         Locale.setDefault(locale)
+        val configuration = Configuration(context.resources.configuration).apply {
+            setLocale(locale)
+            setLayoutDirection(locale)
+        }
+        @Suppress("DEPRECATION")
+        context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
     }
 
     private fun systemLocale(): Locale {

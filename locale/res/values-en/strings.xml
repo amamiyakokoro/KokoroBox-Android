@@ -1217,7 +1217,7 @@
     <string name="service_auto_restart_checking" formatted="false">Checking auto-start...</string>
     <string name="service_notification_running" formatted="false">Running</string>
     <string name="service_notification_speed_format" formatted="false">Down %s  Up %s</string>
-    <string name="service_notification_today_traffic_format" formatted="false">Todays traffic %ss traffic %s</string>
+    <string name="service_notification_today_traffic_format" formatted="false">Today’s traffic: %s</string>
     <string name="service_notification_traffic_format" formatted="false">Total: %s</string>
     <string name="service_notification_unknown_profile" formatted="false">Unknown profile</string>
     <string name="service_tile_click_to_open" formatted="false">Click to open app</string>
