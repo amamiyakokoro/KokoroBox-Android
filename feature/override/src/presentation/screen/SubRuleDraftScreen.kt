@@ -26,11 +26,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Scaffold
 
 @Composable
@@ -46,7 +47,10 @@ fun OverrideSubRuleDraftEditorScreen(
     ) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val title = OverrideStructuredEditorStore.subRuleDraftEditorTitle.ifBlank { MLang.Override.Draft.SubRuleGroup }
+    val subRuleGroupLabel = stringResource(LocaleR.string.override_draft_sub_rule_group)
+    val nameRequiredMessage = stringResource(LocaleR.string.override_draft_name_required)
+    val editSubRulesLabel = stringResource(LocaleR.string.override_draft_edit_sub_rules)
+    val title = OverrideStructuredEditorStore.subRuleDraftEditorTitle.ifBlank { subRuleGroupLabel }
     val storeDraft = OverrideStructuredEditorStore.subRuleDraftEditorValue
     val saveFabController = rememberOverrideFabController()
     val draftUiId = remember { storeDraft?.uiId ?: OverrideSubRuleGroupDraft().uiId }
@@ -91,10 +95,10 @@ fun OverrideSubRuleDraftEditorScreen(
                 controller = saveFabController,
                 visible = true,
                 imageVector = AppMd3Icons.Action.Save,
-                contentDescription = MLang.Override.Draft.Save + MLang.Override.Draft.SubRuleGroup,
+                contentDescription = stringResource(LocaleR.string.override_draft_save) + subRuleGroupLabel,
                 onClick = {
                     if (name.trim().isBlank()) {
-                        errorText = MLang.Override.Draft.NameRequired
+                        errorText = nameRequiredMessage
                         return@OverrideAnimatedFab
                     }
                     OverrideStructuredEditorStore.submitSubRuleDraft(
@@ -127,7 +131,7 @@ fun OverrideSubRuleDraftEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
                 ) {
-                    OverridePlainFormSection(MLang.Override.Draft.BasicInfo) {
+                    OverridePlainFormSection(stringResource(LocaleR.string.override_draft_basic_info)) {
                         OverrideFormField(
                             value = name,
                             onValueChange = {
@@ -135,22 +139,22 @@ fun OverrideSubRuleDraftEditorScreen(
                                 errorText = null
                                 syncDraftSession(updatedName = it)
                             },
-                            label = MLang.Override.Draft.Name,
+                            label = stringResource(LocaleR.string.override_draft_name),
                             errorText = errorText,
                         )
                     }
-                    OverrideCardSection(MLang.Override.Draft.RuleList) {
+                    OverrideCardSection(stringResource(LocaleR.string.override_draft_rule_list)) {
                         PreferenceArrowItem(
-                            title = MLang.Override.Draft.RuleList,
+                            title = stringResource(LocaleR.string.override_draft_rule_list),
                             summary = if (rules.isEmpty()) {
-                                MLang.Override.Draft.NoRules
+                                stringResource(LocaleR.string.override_draft_no_rules)
                             } else {
-                                MLang.Override.Draft.RulesConfigured.format(rules.size)
+                                stringResource(LocaleR.string.override_draft_rules_configured).format(rules.size)
                             },
                             onClick = {
                                 syncDraftSession()
                                 onOpenRuleListEditor(
-                                    MLang.Override.Draft.EditSubRules,
+                                    editSubRulesLabel,
                                     OverrideListModeValues(replaceValue = rules),
                                     listOf(OverrideListEditorMode.Replace),
                                     OverrideListEditorMode.Replace,
