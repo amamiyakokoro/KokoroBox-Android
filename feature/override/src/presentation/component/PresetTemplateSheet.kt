@@ -32,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.officialMrsPresetIconUrl
 import com.amamiyakokoro.box.data.util.OverridePresetItem
 import com.amamiyakokoro.box.data.util.OverridePresetRegion
@@ -41,7 +43,6 @@ import com.amamiyakokoro.box.data.util.orderedPresetRegions
 import com.amamiyakokoro.box.data.util.orderedServicePresetItems
 import com.amamiyakokoro.box.data.util.sortPresetItems
 import com.amamiyakokoro.box.data.util.sortPresetRegions
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun OverridePresetTemplateSheet(
@@ -50,6 +51,16 @@ fun OverridePresetTemplateSheet(
     onDismiss: () -> Unit,
     onConfirm: (OverridePresetTemplateSelection) -> Unit,
 ) {
+    val presetTemplateTitle = stringResource(LocaleR.string.override_draft_preset_template)
+    val applyLabel = stringResource(LocaleR.string.override_draft_apply)
+    val presetApplySummary = stringResource(LocaleR.string.override_draft_preset_apply_summary)
+    val groupTypeTitle = stringResource(LocaleR.string.override_draft_group_type_title)
+    val urlTestGroupType = stringResource(LocaleR.string.override_draft_group_type_url_test)
+    val fallbackGroupType = stringResource(LocaleR.string.override_draft_group_type_fallback)
+    val urlTestRegionGroupTitle = stringResource(LocaleR.string.override_draft_url_test_region_group_title)
+    val fallbackRegionGroupTitle = stringResource(LocaleR.string.override_draft_fallback_region_group_title)
+    val basicRoutingTitle = stringResource(LocaleR.string.override_draft_basic_routing)
+    val serviceRoutingTitle = stringResource(LocaleR.string.override_draft_service_routing)
     val selectedUrlTestRegions = remember(show) { mutableStateListOf<OverridePresetRegion>() }
     val selectedFallbackRegions = remember(show) { mutableStateListOf<OverridePresetRegion>() }
     val enabledItems = remember(show) { mutableStateListOf<OverridePresetItem>() }
@@ -70,7 +81,7 @@ fun OverridePresetTemplateSheet(
     AppActionBottomSheet(
         show = show,
         modifier = Modifier,
-        title = MLang.Override.Draft.PresetTemplate,
+        title = presetTemplateTitle,
         enableNestedScroll = false,
         contentScrollEnabled = false,
         dragHandleColor = Color.Transparent,
@@ -79,7 +90,7 @@ fun OverridePresetTemplateSheet(
         },
         endAction = {
             AppBottomSheetConfirmAction(
-                contentDescription = MLang.Override.Draft.Apply,
+                contentDescription = applyLabel,
                 onClick = {
                     onConfirm(
                         OverridePresetTemplateSelection(
@@ -111,7 +122,7 @@ fun OverridePresetTemplateSheet(
                         verticalArrangement = Arrangement.spacedBy(UiDp.dp4),
                     ) {
                         AppText(
-                            text = MLang.Override.Draft.PresetApplySummary,
+                            text = presetApplySummary,
                             color = appOnSurfaceVariantColor(),
                         )
                     }
@@ -120,7 +131,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-group-types") {
                 RoutingSwitchCard(
-                    title = MLang.Override.Draft.GroupTypeTitle,
+                    title = groupTypeTitle,
                     items = listOf("urltest", "fallback"),
                     iconUrl = { type ->
                         officialMrsPresetIconUrl(
@@ -141,9 +152,9 @@ fun OverridePresetTemplateSheet(
                     },
                     itemTitle = {
                         if (it == "urltest") {
-                            MLang.Override.Draft.GroupTypeUrlTest
+                            urlTestGroupType
                         } else {
-                            MLang.Override.Draft.GroupTypeFallback
+                            fallbackGroupType
                         }
                     },
                     applyHorizontalPadding = false,
@@ -155,7 +166,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-urltest-regions") {
                 RoutingSwitchCard(
-                    title = MLang.Override.Draft.UrlTestRegionGroupTitle,
+                    title = urlTestRegionGroupTitle,
                     items = orderedPresetRegions(),
                     iconUrl = OverridePresetRegion::icon,
                     isChecked = { region -> region in selectedUrlTestRegions },
@@ -172,7 +183,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-fallback-regions") {
                 RoutingSwitchCard(
-                    title = MLang.Override.Draft.FallbackRegionGroupTitle,
+                    title = fallbackRegionGroupTitle,
                     items = orderedPresetRegions(),
                     iconUrl = OverridePresetRegion::icon,
                     isChecked = { region -> region in selectedFallbackRegions },
@@ -189,7 +200,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-base-items") {
                 RoutingSwitchCard(
-                    title = MLang.Override.Draft.BasicRouting,
+                    title = basicRoutingTitle,
                     items = orderedBasePresetItems(),
                     iconUrl = OverridePresetItem::icon,
                     isChecked = { item -> item in enabledItems },
@@ -204,7 +215,7 @@ fun OverridePresetTemplateSheet(
 
             item(key = "preset-service-items") {
                 RoutingSwitchCard(
-                    title = MLang.Override.Draft.ServiceRouting,
+                    title = serviceRoutingTitle,
                     items = orderedServicePresetItems(),
                     iconUrl = OverridePresetItem::icon,
                     isChecked = { item -> item in enabledItems },

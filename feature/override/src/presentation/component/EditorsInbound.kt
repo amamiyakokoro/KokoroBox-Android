@@ -23,8 +23,9 @@ package com.amamiyakokoro.box.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun InboundEditor(
@@ -35,29 +36,29 @@ fun InboundEditor(
     Column(
         verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
     ) {
-        OverrideFormSection(MLang.Override.Form.ProxyPorts) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_proxy_ports)) {
             OverridePortInputContent(
-                title = MLang.Override.General.HttpPort,
+                title = stringResource(LocaleR.string.override_general_http_port),
                 value = config.httpPort,
                 onValueChange = { onConfigChange(config.copy(httpPort = it)) },
             )
             OverridePortInputContent(
-                title = MLang.Override.General.SocksPort,
+                title = stringResource(LocaleR.string.override_general_socks_port),
                 value = config.socksPort,
                 onValueChange = { onConfigChange(config.copy(socksPort = it)) },
             )
             OverridePortInputContent(
-                title = MLang.Override.General.MixedPort,
+                title = stringResource(LocaleR.string.override_general_mixed_port),
                 value = config.mixedPort,
                 onValueChange = { onConfigChange(config.copy(mixedPort = it)) },
             )
             OverridePortInputContent(
-                title = MLang.Override.General.RedirectPort,
+                title = stringResource(LocaleR.string.override_general_redirect_port),
                 value = config.redirectPort,
                 onValueChange = { onConfigChange(config.copy(redirectPort = it)) },
             )
             OverridePortInputContent(
-                title = MLang.Override.General.TproxyPort,
+                title = stringResource(LocaleR.string.override_general_tproxy_port),
                 value = config.tproxyPort,
                 onValueChange = { onConfigChange(config.copy(tproxyPort = it)) },
             )

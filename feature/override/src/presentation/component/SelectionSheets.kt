@@ -26,8 +26,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
-import dev.oom_wg.purejoy.mlang.MLang
 
 private val SelectionSheetListMaxHeight = UiDp.dp420
 
@@ -72,7 +73,7 @@ fun OverrideSingleValueSelectionSheet(
         },
         endAction = {
             AppBottomSheetConfirmAction(
-                contentDescription = MLang.Override.Editor.Confirm,
+                contentDescription = stringResource(LocaleR.string.override_editor_confirm),
                 onClick = { onConfirm(selectedValue.trim()) },
             )
         },
@@ -86,7 +87,7 @@ fun OverrideSingleValueSelectionSheet(
         ) {
             if (allowCustomValue) {
                 SelectionAddCustomCard(
-                    title = MLang.Override.Editor.AddCustom,
+                    title = stringResource(LocaleR.string.override_editor_add_custom),
                     onClick = { showCustomInputDialog = true },
                 )
             }
@@ -119,7 +120,7 @@ fun OverrideSingleValueSelectionSheet(
 
     OverrideSelectionInputDialog(
         show = allowCustomValue && showCustomInputDialog,
-        title = MLang.Override.Editor.AddCustom,
+        title = stringResource(LocaleR.string.override_editor_add_custom),
         label = customInputLabel,
         onConfirm = { inputValue ->
             selectedValue = inputValue.trim()
@@ -170,7 +171,7 @@ fun OverrideMultiValueSelectionSheet(
         },
         endAction = {
             AppBottomSheetConfirmAction(
-                contentDescription = MLang.Override.Editor.Confirm,
+                contentDescription = stringResource(LocaleR.string.override_editor_confirm),
                 onClick = { onConfirm(selectedValues.toList()) },
             )
         },
@@ -183,7 +184,7 @@ fun OverrideMultiValueSelectionSheet(
             verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
         ) {
             SelectionAddCustomCard(
-                title = MLang.Override.Editor.AddCustom,
+                title = stringResource(LocaleR.string.override_editor_add_custom),
                 onClick = { showCustomInputDialog = true },
             )
             if (customValues.isNotEmpty()) {
@@ -213,7 +214,7 @@ fun OverrideMultiValueSelectionSheet(
 
     OverrideSelectionInputDialog(
         show = showCustomInputDialog,
-        title = MLang.Override.Editor.AddCustom,
+        title = stringResource(LocaleR.string.override_editor_add_custom),
         label = customInputLabel,
         onConfirm = { inputValue ->
             val normalizedValue = inputValue.trim()
@@ -288,6 +289,7 @@ private fun OverrideSelectionInputDialog(
         return
     }
 
+    val contentEmptyMessage = stringResource(LocaleR.string.override_editor_content_empty)
     var inputValue by remember(show) { mutableStateOf("") }
     var errorText by remember(show) { mutableStateOf<String?>(null) }
 
@@ -303,7 +305,7 @@ private fun OverrideSelectionInputDialog(
         onConfirm = {
             val normalizedValue = inputValue.trim()
             if (normalizedValue.isBlank()) {
-                errorText = MLang.Override.Editor.ContentEmpty
+                errorText = contentEmptyMessage
                 return@AppTextFieldDialog
             }
             onConfirm(normalizedValue)

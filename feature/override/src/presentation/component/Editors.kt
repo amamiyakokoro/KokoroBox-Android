@@ -31,8 +31,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
-import dev.oom_wg.purejoy.mlang.MLang
 
 typealias OpenStringListEditor = (
     title: String,
@@ -83,7 +84,7 @@ internal fun OverrideIntInputContent(
 
     PreferenceArrowItem(
         title = title,
-        summary = value?.toString() ?: MLang.Component.Selector.NotModify,
+        summary = value?.toString() ?: stringResource(LocaleR.string.component_selector_not_modify),
         onClick = {
             textValue = value?.toString().orEmpty()
             showDialog.value = true
