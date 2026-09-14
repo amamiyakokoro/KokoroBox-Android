@@ -23,10 +23,11 @@ package com.amamiyakokoro.box.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
 import com.amamiyakokoro.box.core.model.LogMessage
 import com.amamiyakokoro.box.core.model.TunnelState
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun GeneralEditor(
@@ -37,15 +38,15 @@ fun GeneralEditor(
     Column(
         verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
     ) {
-        OverrideCardSection(MLang.Override.Form.RunAndLog) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_run_and_log)) {
             NullableEnumSelector(
-                title = MLang.Override.General.ProxyMode,
+                title = stringResource(LocaleR.string.override_general_proxy_mode),
                 value = config.mode,
                 items = listOf(
-                    MLang.Component.Selector.NotModify,
-                    MLang.Proxy.Mode.Direct,
-                    MLang.Proxy.Mode.Global,
-                    MLang.Proxy.Mode.Rule,
+                    stringResource(LocaleR.string.component_selector_not_modify),
+                    stringResource(LocaleR.string.proxy_mode_direct),
+                    stringResource(LocaleR.string.proxy_mode_global),
+                    stringResource(LocaleR.string.proxy_mode_rule),
                 ),
                 values = listOf(
                     null,
@@ -56,15 +57,15 @@ fun GeneralEditor(
                 onValueChange = { onConfigChange(config.copy(mode = it)) },
             )
             NullableBooleanSelector(
-                title = MLang.Override.General.Ipv6,
+                title = stringResource(LocaleR.string.override_general_ipv6),
                 value = config.ipv6,
                 onValueChange = { onConfigChange(config.copy(ipv6 = it)) },
             )
             NullableEnumSelector(
-                title = MLang.Override.General.LogLevel,
+                title = stringResource(LocaleR.string.override_general_log_level),
                 value = config.logLevel,
                 items = listOf(
-                    MLang.Component.Selector.NotModify,
+                    stringResource(LocaleR.string.component_selector_not_modify),
                     "Info",
                     "Warning",
                     "Error",
@@ -82,9 +83,9 @@ fun GeneralEditor(
                 onValueChange = { onConfigChange(config.copy(logLevel = it)) },
             )
             NullableEnumSelector(
-                title = MLang.Override.Form.ProcessMode,
+                title = stringResource(LocaleR.string.override_form_process_mode),
                 value = config.findProcessMode,
-                items = listOf(MLang.Override.Form.NotModify, "Always", "Strict", "Off"),
+                items = listOf(stringResource(LocaleR.string.override_form_not_modify), "Always", "Strict", "Off"),
                 values = listOf(
                     null,
                     ConfigurationOverride.FindProcessMode.Always,
@@ -94,72 +95,72 @@ fun GeneralEditor(
                 onValueChange = { onConfigChange(config.copy(findProcessMode = it)) },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Form.UnifiedDelay,
+                title = stringResource(LocaleR.string.override_form_unified_delay),
                 value = config.unifiedDelay,
                 onValueChange = { onConfigChange(config.copy(unifiedDelay = it)) },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Form.TcpConcurrent,
+                title = stringResource(LocaleR.string.override_form_tcp_concurrent),
                 value = config.tcpConcurrent,
                 onValueChange = { onConfigChange(config.copy(tcpConcurrent = it)) },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Form.GeodataMode,
+                title = stringResource(LocaleR.string.override_form_geodata_mode),
                 value = config.geodataMode,
                 onValueChange = { onConfigChange(config.copy(geodataMode = it)) },
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.RunAndLogExtra) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_run_and_log_extra)) {
             OverrideIntInputContent(
-                title = MLang.Override.Label.KeepAliveInterval,
+                title = stringResource(LocaleR.string.override_label_keep_alive_interval),
                 value = config.keepAliveInterval,
-                placeholder = MLang.Override.Form.Seconds,
+                placeholder = stringResource(LocaleR.string.override_form_seconds),
                 onValueChange = { onConfigChange(config.copy(keepAliveInterval = it)) },
             )
             OverrideIntInputContent(
-                title = MLang.Override.Label.KeepAliveIdle,
+                title = stringResource(LocaleR.string.override_label_keep_alive_idle),
                 value = config.keepAliveIdle,
-                placeholder = MLang.Override.Form.Seconds,
+                placeholder = stringResource(LocaleR.string.override_form_seconds),
                 onValueChange = { onConfigChange(config.copy(keepAliveIdle = it)) },
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.ConnectionNetwork) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_connection_network)) {
             OverrideTextInputContent(
-                title = MLang.Override.Form.OutboundInterface,
+                title = stringResource(LocaleR.string.override_form_outbound_interface),
                 value = config.interfaceName,
                 placeholder = "en0 / wlan0",
                 onValueChange = { onConfigChange(config.copy(interfaceName = it)) },
             )
             OverrideIntInputContent(
-                title = MLang.Override.Form.RoutingMark,
+                title = stringResource(LocaleR.string.override_form_routing_mark),
                 value = config.routingMark,
                 placeholder = "6666",
                 onValueChange = { onConfigChange(config.copy(routingMark = it)) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.GeositeMatcher,
+                title = stringResource(LocaleR.string.override_form_geosite_matcher),
                 value = config.geositeMatcher,
                 placeholder = "standard / succinct",
                 onValueChange = { onConfigChange(config.copy(geositeMatcher = it)) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.GlobalClientFingerprint,
+                title = stringResource(LocaleR.string.override_form_global_client_fingerprint),
                 value = config.globalClientFingerprint,
                 placeholder = "chrome / safari",
                 onValueChange = { onConfigChange(config.copy(globalClientFingerprint = it)) },
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.LanAccess) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_lan_access)) {
             NullableBooleanSelector(
-                title = MLang.Override.General.AllowLan,
+                title = stringResource(LocaleR.string.override_general_allow_lan),
                 value = config.allowLan,
                 onValueChange = { onConfigChange(config.copy(allowLan = it)) },
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Form.AllowedIPs,
+                title = stringResource(LocaleR.string.override_form_allowed_ips),
                 replaceValue = config.lanAllowedIps,
                 startValue = config.lanAllowedIpsStart,
                 endValue = config.lanAllowedIpsEnd,
@@ -170,7 +171,7 @@ fun GeneralEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Form.DisallowedIPs,
+                title = stringResource(LocaleR.string.override_form_disallowed_ips),
                 replaceValue = config.lanDisallowedIps,
                 startValue = config.lanDisallowedIpsStart,
                 endValue = config.lanDisallowedIpsEnd,
@@ -182,18 +183,18 @@ fun GeneralEditor(
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.LanAddress) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_lan_address)) {
             OverrideTextInputContent(
-                title = MLang.Override.Form.BindAddress,
+                title = stringResource(LocaleR.string.override_form_bind_address),
                 value = config.bindAddress,
                 placeholder = "* / 192.168.1.1 / [::1]",
                 onValueChange = { onConfigChange(config.copy(bindAddress = it)) },
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.UserAuth) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_user_auth)) {
             StringListWithModifiersInput(
-                title = MLang.Override.Form.UserAuth,
+                title = stringResource(LocaleR.string.override_form_user_auth),
                 replaceValue = config.authentication,
                 startValue = config.authenticationStart,
                 endValue = config.authenticationEnd,
@@ -204,7 +205,7 @@ fun GeneralEditor(
                 onEditListGroup = onEditStringList,
             )
             StringListWithModifiersInput(
-                title = MLang.Override.Form.SkipAuthIPs,
+                title = stringResource(LocaleR.string.override_form_skip_auth_ips),
                 replaceValue = config.skipAuthPrefixes,
                 startValue = config.skipAuthPrefixesStart,
                 endValue = config.skipAuthPrefixesEnd,
@@ -216,34 +217,34 @@ fun GeneralEditor(
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.ExternalControl) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_external_control)) {
             OverrideTextInputContent(
-                title = MLang.Override.Form.ExternalController,
+                title = stringResource(LocaleR.string.override_form_external_controller),
                 value = config.externalController,
                 placeholder = "127.0.0.1:9090",
                 onValueChange = { onConfigChange(config.copy(externalController = it)) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.ExternalControllerHttps,
+                title = stringResource(LocaleR.string.override_form_external_controller_https),
                 value = config.externalControllerTLS,
                 placeholder = "127.0.0.1:9443",
                 onValueChange = { onConfigChange(config.copy(externalControllerTLS = it)) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.ExternalDoH,
+                title = stringResource(LocaleR.string.override_form_external_do_h),
                 value = config.externalDohServer,
                 placeholder = "/dns-query",
                 onValueChange = { onConfigChange(config.copy(externalDohServer = it)) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.ApiSecret,
+                title = stringResource(LocaleR.string.override_form_api_secret),
                 value = config.secret,
-                placeholder = MLang.Override.Form.ApiSecret,
+                placeholder = stringResource(LocaleR.string.override_form_api_secret),
                 onValueChange = { onConfigChange(config.copy(secret = it)) },
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.ControllerCors) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_controller_cors)) {
             StringListWithModifiersInput(
                 title = "CORS Allow Origins",
                 replaceValue = config.externalControllerCors.allowOrigins,
@@ -280,7 +281,7 @@ fun GeneralEditor(
                 onEditListGroup = onEditStringList,
             )
             NullableBooleanSelector(
-                title = MLang.Override.Form.AllowPrivateNetwork,
+                title = stringResource(LocaleR.string.override_form_allow_private_network),
                 value = config.externalControllerCors.allowPrivateNetwork,
                 onValueChange = {
                     onConfigChange(
@@ -294,16 +295,16 @@ fun GeneralEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.ConfigPersistence) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_config_persistence)) {
             NullableBooleanSelector(
-                title = MLang.Override.Form.SaveGroupSelection,
+                title = stringResource(LocaleR.string.override_form_save_group_selection),
                 value = config.profile.storeSelected,
                 onValueChange = {
                     onConfigChange(config.copy(profile = config.profile.copy(storeSelected = it)))
                 },
             )
             NullableBooleanSelector(
-                title = MLang.Override.Form.SaveFakeIpMapping,
+                title = stringResource(LocaleR.string.override_form_save_fake_ip_mapping),
                 value = config.profile.storeFakeIp,
                 onValueChange = {
                     onConfigChange(config.copy(profile = config.profile.copy(storeFakeIp = it)))
@@ -311,23 +312,23 @@ fun GeneralEditor(
             )
         }
 
-        OverrideCardSection(MLang.Override.Form.GeoResources) {
+        OverrideCardSection(stringResource(LocaleR.string.override_form_geo_resources)) {
             NullableBooleanSelector(
-                title = MLang.Override.Form.AutoUpdateGeo,
+                title = stringResource(LocaleR.string.override_form_auto_update_geo),
                 value = config.geoAutoUpdate,
                 onValueChange = { onConfigChange(config.copy(geoAutoUpdate = it)) },
             )
         }
 
-        OverrideFormSection(MLang.Override.Form.GeoResources) {
+        OverrideFormSection(stringResource(LocaleR.string.override_form_geo_resources)) {
             OverrideIntInputContent(
-                title = MLang.Override.Form.GeoUpdateInterval,
+                title = stringResource(LocaleR.string.override_form_geo_update_interval),
                 value = config.geoUpdateInterval,
-                placeholder = MLang.Override.Form.Hours,
+                placeholder = stringResource(LocaleR.string.override_form_hours),
                 onValueChange = { onConfigChange(config.copy(geoUpdateInterval = it)) },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.GeoipUrl,
+                title = stringResource(LocaleR.string.override_form_geoip_url),
                 value = config.geoxurl.geoip,
                 placeholder = "https://...",
                 onValueChange = {
@@ -335,7 +336,7 @@ fun GeneralEditor(
                 },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.GeositeUrl,
+                title = stringResource(LocaleR.string.override_form_geosite_url),
                 value = config.geoxurl.geosite,
                 placeholder = "https://...",
                 onValueChange = {
@@ -343,7 +344,7 @@ fun GeneralEditor(
                 },
             )
             OverrideTextInputContent(
-                title = MLang.Override.Form.MmdbUrl,
+                title = stringResource(LocaleR.string.override_form_mmdb_url),
                 value = config.geoxurl.mmdb,
                 placeholder = "https://...",
                 onValueChange = {
