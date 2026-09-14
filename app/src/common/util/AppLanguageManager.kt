@@ -27,7 +27,6 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.amamiyakokoro.box.data.model.AppLanguage
-import dev.oom_wg.purejoy.mlang.MLang
 import java.util.Locale
 
 object AppLanguageManager {
@@ -37,10 +36,6 @@ object AppLanguageManager {
 
     @Volatile
     private var activeLocale: Locale = Locale.getDefault()
-
-    fun initialize(context: Context) {
-        MLang.initialize(context)
-    }
 
     fun apply(language: AppLanguage) {
         activeLanguage = language
@@ -58,7 +53,6 @@ object AppLanguageManager {
 
         Locale.setDefault(locale)
         LocaleUtil.setCurrentLocale(locale)
-        MLang.updateLocale(locale)
     }
 
     fun wrap(base: Context): Context {

@@ -78,7 +78,6 @@ import com.amamiyakokoro.box.screen.home.HomeProxyControlState
 import com.amamiyakokoro.box.screen.home.HomeViewModel
 import com.amamiyakokoro.box.screen.home.displayableExternalIp
 import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

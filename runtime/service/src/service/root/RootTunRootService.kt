@@ -209,7 +209,7 @@ class RootTunRootService : RootService() {
         Global.init(this)
         initializeServiceGlobal(this)
         MMKV.initialize(this)
-        ServiceLanguageRuntime.applyAppLanguage(this)
+        ServiceLanguageRuntime.applyAppLanguage()
         stateStore = RootTunStateStore(this)
         startupLogStore = RootTunStartupLogStore(this)
         runtimeSpecFactory = SessionRuntimeSpecFactory(this)

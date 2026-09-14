@@ -35,7 +35,7 @@ abstract class BaseService : Service(), CoroutineScope by CoroutineScope(Dispatc
         super.onCreate()
 
         initializeServiceGlobal(appContextOrSelf)
-        ServiceLanguageRuntime.applyAppLanguage(this)
+        ServiceLanguageRuntime.applyAppLanguage()
     }
 
     override fun onDestroy() {

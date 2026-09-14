@@ -65,7 +65,6 @@ class App : Application() {
         StartupGate.verify(this)
         Global.init(this)
         MMKV.initialize(this)
-        AppLanguageManager.initialize(this)
 
         val koinApp = startKoin {
             androidContext(this@App)

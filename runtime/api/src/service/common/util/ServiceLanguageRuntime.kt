@@ -20,16 +20,13 @@
 
 package com.amamiyakokoro.box.service.common.util
 
-import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import com.tencent.mmkv.MMKV
-import dev.oom_wg.purejoy.mlang.MLang
 import java.util.Locale
 
 object ServiceLanguageRuntime {
-    fun applyAppLanguage(context: Context) {
-        MLang.initialize(context)
+    fun applyAppLanguage() {
         val language = runCatching {
             MMKV.mmkvWithID(SETTINGS_MMKV_ID, MMKV.MULTI_PROCESS_MODE)
                 .decodeString(APP_LANGUAGE_KEY, APP_LANGUAGE_SYSTEM)
@@ -44,7 +41,6 @@ object ServiceLanguageRuntime {
         }
 
         Locale.setDefault(locale)
-        MLang.updateLocale(locale)
     }
 
     private fun systemLocale(): Locale {
