@@ -24,9 +24,10 @@ package com.amamiyakokoro.box.presentation.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
 import com.amamiyakokoro.box.presentation.util.*
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
 
 typealias OpenRuleListEditor = (
@@ -72,16 +73,17 @@ fun RulesEditor(
     onConfigChange: (ConfigurationOverride) -> Unit,
     onEditRuleList: OpenRuleListEditor,
 ) {
+    val rulesTitle = stringResource(LocaleR.string.override_editor_rules)
     Column {
-        Title(MLang.Override.Form.RuleChain)
+        Title(stringResource(LocaleR.string.override_form_rule_chain))
         OverrideSelectorCard {
             StructuredEditorEntry(
-                title = MLang.Override.Editor.Rules,
+                title = rulesTitle,
                 summary = buildModifierSummary(
                     replaceCount = config.rules?.size ?: 0,
                     startCount = config.rulesStart?.size ?: 0,
                     endCount = config.rulesEnd?.size ?: 0,
-                    emptyHint = MLang.Override.Form.RuleChainNotSet,
+                    emptyHint = stringResource(LocaleR.string.override_form_rule_chain_not_set),
                 ),
                 onClick = {
                     val values = OverrideListModeValues(
@@ -90,7 +92,7 @@ fun RulesEditor(
                         endValue = config.rulesEnd,
                     )
                     onEditRuleList(
-                        MLang.Override.Editor.Rules,
+                        rulesTitle,
                         values,
                         listOf(
                             OverrideListEditorMode.Replace,
@@ -128,23 +130,24 @@ fun SubRulesEditorSection(
     onEditSubRules: OpenSubRulesEditor,
     onEditJson: OpenJsonEditor,
 ) {
+    val subRulesTitle = stringResource(LocaleR.string.override_form_sub_rules)
     Column {
-        Title(MLang.Override.Form.SubRules)
+        Title(subRulesTitle)
         StructuredInputContent(
-            title = MLang.Override.Form.SubRules,
+            title = subRulesTitle,
             summary = buildMergeModifierSummary(
                 replaceCount = config.subRules?.size ?: 0,
                 mergeCount = config.subRulesMerge?.size ?: 0,
-                emptyHint = MLang.Override.Form.SubRulesHint,
+                emptyHint = stringResource(LocaleR.string.override_form_sub_rules_hint),
             ),
-            advancedSummary = MLang.Override.Form.SubRulesAdvanced,
+            advancedSummary = stringResource(LocaleR.string.override_form_sub_rules_advanced),
             onStructuredClick = {
                 val values = OverrideListModeValues(
                     replaceValue = config.subRules,
                     mergeValue = config.subRulesMerge,
                 )
                     onEditSubRules(
-                        MLang.Override.Form.SubRules,
+                        subRulesTitle,
                         values,
                         listOf(
                             OverrideListEditorMode.Replace,
@@ -169,7 +172,7 @@ fun SubRulesEditorSection(
             },
             onAdvancedClick = {
                 onEditJson(
-                    MLang.Override.Form.SubRules,
+                    subRulesTitle,
                     "{\n  \"sub-rule\": [\"DOMAIN,example.com,DIRECT\"]\n}",
                     encodeSubRules(config.subRules),
                 ) {
@@ -187,16 +190,17 @@ fun RuleProvidersEditor(
     onEditObjectMap: OpenObjectMapEditor,
     onEditJson: OpenJsonEditor,
 ) {
+    val ruleProvidersTitle = stringResource(LocaleR.string.override_form_rule_providers)
     Column {
-        Title(MLang.Override.Form.RuleProviders)
+        Title(ruleProvidersTitle)
         StructuredInputContent(
-            title = MLang.Override.Form.RuleProviders,
+            title = ruleProvidersTitle,
             summary = buildMergeModifierSummary(
                 replaceCount = config.ruleProviders?.size ?: 0,
                 mergeCount = config.ruleProvidersMerge?.size ?: 0,
-                emptyHint = MLang.Override.Form.RuleProvidersHint,
+                emptyHint = stringResource(LocaleR.string.override_form_rule_providers_hint),
             ),
-            advancedSummary = MLang.Override.Form.RuleProvidersAdvanced,
+            advancedSummary = stringResource(LocaleR.string.override_form_rule_providers_advanced),
             onStructuredClick = {
                 val values = OverrideListModeValues(
                     replaceValue = config.ruleProviders,
@@ -204,7 +208,7 @@ fun RuleProvidersEditor(
                 )
                 onEditObjectMap(
                     OverrideStructuredMapType.RuleProviders,
-                    MLang.Override.Form.RuleProviders,
+                    ruleProvidersTitle,
                     values,
                     listOf(
                         OverrideListEditorMode.Replace,
@@ -228,7 +232,7 @@ fun RuleProvidersEditor(
             },
             onAdvancedClick = {
                 onEditJson(
-                    MLang.Override.Form.RuleProviders,
+                    ruleProvidersTitle,
                     "{\n  \"google\": {\n    \"type\": \"http\"\n  }\n}",
                     encodeObjectMap(config.ruleProviders),
                 ) {
@@ -246,16 +250,17 @@ fun ProxiesEditor(
     onEditObjectList: OpenStructuredObjectListEditor,
     onEditJson: OpenJsonEditor,
 ) {
+    val proxyNodesTitle = stringResource(LocaleR.string.override_form_proxy_nodes)
     Column {
-        Title(MLang.Override.Form.ProxyNodes)
+        Title(proxyNodesTitle)
         OverrideSelectorCard {
             StructuredEditorEntry(
-                title = MLang.Override.Form.ProxyNodes,
+                title = proxyNodesTitle,
                 summary = buildModifierSummary(
                     replaceCount = config.proxies?.size ?: 0,
                     startCount = config.proxiesStart?.size ?: 0,
                     endCount = config.proxiesEnd?.size ?: 0,
-                    emptyHint = MLang.Override.Form.ProxyNodesHint,
+                    emptyHint = stringResource(LocaleR.string.override_form_proxy_nodes_hint),
                 ),
                 onClick = {
                     val values = OverrideListModeValues(
@@ -265,7 +270,7 @@ fun ProxiesEditor(
                     )
                     onEditObjectList(
                         OverrideStructuredObjectType.Proxies,
-                        MLang.Override.Form.ProxyNodes,
+                        proxyNodesTitle,
                         values,
                         listOf(
                             OverrideListEditorMode.Replace,
@@ -304,16 +309,17 @@ fun ProxyProvidersEditor(
     onEditObjectMap: OpenObjectMapEditor,
     onEditJson: OpenJsonEditor,
 ) {
+    val proxyProvidersTitle = stringResource(LocaleR.string.override_form_proxy_providers)
     Column {
-        Title(MLang.Override.Form.ProxyProviders)
+        Title(proxyProvidersTitle)
         StructuredInputContent(
-            title = MLang.Override.Form.ProxyProviders,
+            title = proxyProvidersTitle,
             summary = buildMergeModifierSummary(
                 replaceCount = config.proxyProviders?.size ?: 0,
                 mergeCount = config.proxyProvidersMerge?.size ?: 0,
-                emptyHint = MLang.Override.Form.ProxyProvidersHint,
+                emptyHint = stringResource(LocaleR.string.override_form_proxy_providers_hint),
             ),
-            advancedSummary = MLang.Override.Form.ProxyProvidersAdvanced,
+            advancedSummary = stringResource(LocaleR.string.override_form_proxy_providers_advanced),
             onStructuredClick = {
                 val values = OverrideListModeValues(
                     replaceValue = config.proxyProviders,
@@ -321,7 +327,7 @@ fun ProxyProvidersEditor(
                 )
                 onEditObjectMap(
                     OverrideStructuredMapType.ProxyProviders,
-                    MLang.Override.Form.ProxyProviders,
+                    proxyProvidersTitle,
                     values,
                     listOf(
                         OverrideListEditorMode.Replace,
@@ -345,7 +351,7 @@ fun ProxyProvidersEditor(
             },
             onAdvancedClick = {
                 onEditJson(
-                    MLang.Override.Form.ProxyProviders,
+                    proxyProvidersTitle,
                     "{\n  \"provider\": {\n    \"type\": \"http\"\n  }\n}",
                     encodeObjectMap(config.proxyProviders),
                 ) {
@@ -363,16 +369,17 @@ fun ProxyGroupsEditor(
     onEditObjectList: OpenStructuredObjectListEditor,
     onEditJson: OpenJsonEditor,
 ) {
+    val proxyGroupsTitle = stringResource(LocaleR.string.override_form_proxy_groups)
     Column {
-        Title(MLang.Override.Form.ProxyGroups)
+        Title(proxyGroupsTitle)
         OverrideSelectorCard {
             StructuredEditorEntry(
-                title = MLang.Override.Form.ProxyGroups,
+                title = proxyGroupsTitle,
                 summary = buildModifierSummary(
                     replaceCount = config.proxyGroups?.size ?: 0,
                     startCount = config.proxyGroupsStart?.size ?: 0,
                     endCount = config.proxyGroupsEnd?.size ?: 0,
-                    emptyHint = MLang.Override.Form.ProxyGroupsHint,
+                    emptyHint = stringResource(LocaleR.string.override_form_proxy_groups_hint),
                 ),
                 onClick = {
                     val values = OverrideListModeValues(
@@ -382,7 +389,7 @@ fun ProxyGroupsEditor(
                     )
                     onEditObjectList(
                         OverrideStructuredObjectType.ProxyGroups,
-                        MLang.Override.Form.ProxyGroups,
+                        proxyGroupsTitle,
                         values,
                         listOf(
                             OverrideListEditorMode.Replace,
@@ -426,20 +433,20 @@ private fun StructuredInputContent(
     Column {
         OverrideSelectorCard {
             PreferenceArrowItem(
-                title = MLang.Override.Form.StructuredEdit.format(title),
+                title = stringResource(LocaleR.string.override_form_structured_edit).format(title),
                 summary = summary,
                 onClick = onStructuredClick,
             )
         }
         OverrideAdvancedCard(
-            title = MLang.Override.Form.AdvancedJson.format(title),
+            title = stringResource(LocaleR.string.override_form_advanced_json).format(title),
             summary = advancedSummary,
             expanded = advancedExpanded,
             onExpandedChange = { advancedExpanded = it },
         ) {
             PreferenceArrowItem(
-                title = MLang.Override.Form.OpenAdvancedEdit,
-                summary = MLang.Override.Form.OpenAdvancedEditSummary,
+                title = stringResource(LocaleR.string.override_form_open_advanced_edit),
+                summary = stringResource(LocaleR.string.override_form_open_advanced_edit_summary),
                 onClick = onAdvancedClick,
             )
         }
@@ -459,17 +466,19 @@ private fun StructuredEditorEntry(
     )
 }
 
+@Composable
 private fun buildStructuredSummary(
     count: Int,
     emptyHint: String,
 ): String {
     return if (count > 0) {
-        MLang.Override.Form.ItemsConfigured.format(count)
+        stringResource(LocaleR.string.override_form_items_configured).format(count)
     } else {
         emptyHint
     }
 }
 
+@Composable
 private fun buildModifierSummary(
     replaceCount: Int,
     startCount: Int,
@@ -478,17 +487,18 @@ private fun buildModifierSummary(
 ): String {
     return buildList {
         if (replaceCount > 0) {
-            add(MLang.Override.Modifier.ItemsCount.format(replaceCount))
+            add(stringResource(LocaleR.string.override_modifier_items_count).format(replaceCount))
         }
         if (startCount > 0) {
-            add(MLang.Override.Modifier.Start)
+            add(stringResource(LocaleR.string.override_modifier_start))
         }
         if (endCount > 0) {
-            add(MLang.Override.Modifier.End)
+            add(stringResource(LocaleR.string.override_modifier_end))
         }
     }.joinToString(" · ").ifEmpty { emptyHint }
 }
 
+@Composable
 private fun buildMergeModifierSummary(
     replaceCount: Int,
     mergeCount: Int,
@@ -496,10 +506,10 @@ private fun buildMergeModifierSummary(
 ): String {
     return buildList {
         if (replaceCount > 0) {
-            add(MLang.Override.Modifier.ItemsCount.format(replaceCount))
+            add(stringResource(LocaleR.string.override_modifier_items_count).format(replaceCount))
         }
         if (mergeCount > 0) {
-            add(MLang.Override.Modifier.Merge)
+            add(stringResource(LocaleR.string.override_modifier_merge))
         }
     }.joinToString(" · ").ifEmpty { emptyHint }
 }
