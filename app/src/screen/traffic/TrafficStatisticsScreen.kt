@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.amamiyakokoro.box.common.util.formatBytes
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.AppTrafficUsage
 import com.amamiyakokoro.box.data.model.StatisticsTimeRange
 import com.amamiyakokoro.box.data.model.TrafficStatisticsBuckets
@@ -64,7 +65,6 @@ import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
@@ -80,32 +80,33 @@ fun TrafficStatisticsScreen() {
     val selectedTabIndex = timeRanges.indexOf(uiState.selectedTimeRange).coerceAtLeast(0)
     val activeSummary = uiState.summary
     var showClearConfirmDialog by remember { mutableStateOf(false) }
+    val clearSuccess = stringResource(LocaleR.string.traffic_statistics_action_clear_success)
 
     AppConfirmDialog(
         show = showClearConfirmDialog,
-        title = MLang.TrafficStatistics.Action.Clear,
-        message = MLang.TrafficStatistics.Action.ClearConfirmMessage,
+        title = stringResource(LocaleR.string.traffic_statistics_action_clear),
+        message = stringResource(LocaleR.string.traffic_statistics_action_clear_confirm_message),
         onDismissRequest = { showClearConfirmDialog = false },
         onConfirm = {
             showClearConfirmDialog = false
             viewModel.clearAllStatistics()
-            context.toast(MLang.TrafficStatistics.Action.ClearSuccess)
+            context.toast(clearSuccess)
         },
-        confirmText = MLang.TrafficStatistics.Action.Clear,
+        confirmText = stringResource(LocaleR.string.traffic_statistics_action_clear),
         confirmDestructive = true,
     )
 
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.TrafficStatistics.Title,
+                title = stringResource(LocaleR.string.traffic_statistics_title),
                 actions = {
                     IconButton(
                         onClick = { showClearConfirmDialog = true },
                     ) {
                         Icon(
                             imageVector = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.TrafficStatistics.Action.Clear,
+                            contentDescription = stringResource(LocaleR.string.traffic_statistics_action_clear),
                             tint = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -165,9 +166,9 @@ fun TrafficStatisticsScreen() {
                                     )
                                     Text(
                                         text = if (uiState.selectedTimeRange == StatisticsTimeRange.TODAY) {
-                                            MLang.TrafficStatistics.Summary.TodayTraffic
+                                            stringResource(LocaleR.string.traffic_statistics_summary_today_traffic)
                                         } else {
-                                            MLang.TrafficStatistics.Summary.WeekTraffic
+                                            stringResource(LocaleR.string.traffic_statistics_summary_week_traffic)
                                         },
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -181,7 +182,7 @@ fun TrafficStatisticsScreen() {
             }
 
             item {
-                Title(MLang.TrafficStatistics.Section.Traffic)
+                Title(stringResource(LocaleR.string.traffic_statistics_section_traffic))
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -198,7 +199,7 @@ fun TrafficStatisticsScreen() {
             }
 
             item {
-                Title(MLang.TrafficStatistics.Section.TopApps)
+                Title(stringResource(LocaleR.string.traffic_statistics_section_top_apps))
             }
 
             if (uiState.topApps.isEmpty()) {
@@ -215,7 +216,7 @@ fun TrafficStatisticsScreen() {
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = MLang.TrafficStatistics.Section.EmptyApps,
+                                text = stringResource(LocaleR.string.traffic_statistics_section_empty_apps),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -260,12 +261,12 @@ private fun TrafficMetricCard(
             verticalArrangement = Arrangement.spacedBy(spacing.space18),
         ) {
             TrafficMetricLine(
-                label = MLang.TrafficStatistics.Metric.Download,
+                label = stringResource(LocaleR.string.traffic_statistics_metric_download),
                 value = downloadValue,
                 valueColor = semanticColors.traffic.download,
             )
             TrafficMetricLine(
-                label = MLang.TrafficStatistics.Metric.Upload,
+                label = stringResource(LocaleR.string.traffic_statistics_metric_upload),
                 value = uploadValue,
                 valueColor = semanticColors.traffic.upload,
             )
@@ -334,7 +335,7 @@ private fun AppTrafficRow(
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = MLang.TrafficStatistics.Metric.UsageLine.format(
+                    text = stringResource(LocaleR.string.traffic_statistics_metric_usage_line).format(
                         formatBytes(usage.totalDownload),
                         formatBytes(usage.totalUpload),
                     ),
