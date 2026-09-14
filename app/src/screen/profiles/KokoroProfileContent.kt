@@ -37,9 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.amamiyakokoro.box.common.util.ByteFormatter
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.Md3EIndeterminateCircularWavyProgressIndicator
 import com.amamiyakokoro.box.presentation.component.PreferenceSwitchItem
@@ -48,7 +50,6 @@ import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.github.panpf.sketch.rememberAsyncImagePainter
 import com.github.panpf.sketch.request.ImageRequest
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 internal fun KokoroProfileContent(
@@ -81,16 +82,16 @@ internal fun KokoroProfileContent(
             }
 
             authenticated != null -> KokoroSubscriptionNotice(
-                text = MLang.ProfilesPage.Kokoro.NoSubscription,
+                text = stringResource(LocaleR.string.profiles_page_kokoro_no_subscription),
             )
 
             authState == KokoroAuthState.Checking -> KokoroSubscriptionNotice(
-                text = MLang.ProfilesPage.Kokoro.Checking,
+                text = stringResource(LocaleR.string.profiles_page_kokoro_checking),
                 loading = true,
             )
 
             else -> KokoroSubscriptionNotice(
-                text = MLang.ProfilesPage.Kokoro.SignInFromSettings,
+                text = stringResource(LocaleR.string.profiles_page_kokoro_sign_in_from_settings),
             )
         }
 
@@ -155,22 +156,22 @@ internal fun KokoroAccountCard(
                     horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                 ) {
                     Md3EIndeterminateCircularWavyProgressIndicator()
-                    Text(MLang.ProfilesPage.Kokoro.Checking)
+                    Text(stringResource(LocaleR.string.profiles_page_kokoro_checking))
                 }
 
                 KokoroAuthState.LoggedOut -> {
                     StatusText(
-                        title = MLang.ProfilesPage.Kokoro.LoggedOut,
-                        detail = MLang.ProfilesPage.Kokoro.LoginHint,
+                        title = stringResource(LocaleR.string.profiles_page_kokoro_logged_out),
+                        detail = stringResource(LocaleR.string.profiles_page_kokoro_login_hint),
                     )
                     Button(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                        Text(MLang.ProfilesPage.Kokoro.Login)
+                        Text(stringResource(LocaleR.string.profiles_page_kokoro_login))
                     }
                 }
 
                 is KokoroAuthState.Error -> {
                     StatusText(
-                        title = MLang.ProfilesPage.Kokoro.CheckFailed,
+                        title = stringResource(LocaleR.string.profiles_page_kokoro_check_failed),
                         detail = authState.message,
                         error = true,
                     )
@@ -179,10 +180,10 @@ internal fun KokoroAccountCard(
                         verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
                     ) {
                         Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-                            Text(MLang.ProfilesPage.Kokoro.Retry)
+                            Text(stringResource(LocaleR.string.profiles_page_kokoro_retry))
                         }
                         OutlinedButton(onClick = onLogin, modifier = Modifier.fillMaxWidth()) {
-                            Text(MLang.ProfilesPage.Kokoro.Login)
+                            Text(stringResource(LocaleR.string.profiles_page_kokoro_login))
                         }
                     }
                 }
@@ -200,13 +201,13 @@ internal fun KokoroAccountCard(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = authState.account.displayName
-                                    ?: MLang.ProfilesPage.Kokoro.LoggedIn,
+                                    ?: stringResource(LocaleR.string.profiles_page_kokoro_logged_in),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
                                 text = if (subscriptions.isEmpty()) {
-                                    MLang.ProfilesPage.Kokoro.NoSubscription
+                                    stringResource(LocaleR.string.profiles_page_kokoro_no_subscription)
                                 } else {
                                     subscriptions.joinToString(", ") { it.plan }
                                 },
@@ -215,7 +216,7 @@ internal fun KokoroAccountCard(
                             )
                         }
                         TextButton(onClick = onLogout) {
-                            Text(MLang.ProfilesPage.Kokoro.Logout)
+                            Text(stringResource(LocaleR.string.profiles_page_kokoro_logout))
                         }
                     }
 
@@ -223,19 +224,20 @@ internal fun KokoroAccountCard(
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         subscription.usedBytes?.let {
                             SubscriptionLine(
-                                MLang.ProfilesPage.Kokoro.TrafficUsed,
+                                stringResource(LocaleR.string.profiles_page_kokoro_traffic_used),
                                 ByteFormatter.format(it),
                             )
                         }
                         subscription.totalBytes?.let {
                             SubscriptionLine(
-                                MLang.ProfilesPage.Kokoro.BandwidthLimit,
-                                if (it > 0) ByteFormatter.format(it) else MLang.ProfilesPage.Kokoro.Unlimited,
+                                stringResource(LocaleR.string.profiles_page_kokoro_bandwidth_limit),
+                                if (it > 0) ByteFormatter.format(it)
+                                else stringResource(LocaleR.string.profiles_page_kokoro_unlimited),
                             )
                         }
                         if (!subscription.expiresAt.isNullOrBlank()) {
                             SubscriptionLine(
-                                MLang.ProfilesPage.Kokoro.Expires,
+                                stringResource(LocaleR.string.profiles_page_kokoro_expires),
                                 displayExpiry(subscription.expiresAt),
                             )
                         }
@@ -269,12 +271,12 @@ internal fun MihomoSubscriptionSettingsContent(
             .animateContentSize(),
         verticalArrangement = Arrangement.spacedBy(spacing.space12),
     ) {
-        SectionLabel(MLang.ProfilesPage.Kokoro.Subscription)
+        SectionLabel(stringResource(LocaleR.string.profiles_page_kokoro_subscription))
 
         Card {
             Column {
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Kokoro.Protocol,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_protocol),
                     items = availableOptions.protocols.map { it.label },
                     selectedIndex = availableOptions.protocols.indexOfFirst { it.value == normalized.protocol }
                         .coerceAtLeast(0),
@@ -292,7 +294,7 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Kokoro.Plan,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_plan),
                     items = availableOptions.plans.map { it.name },
                     selectedIndex = availableOptions.plans.indexOfFirst { it.name == normalized.plan }
                         .coerceAtLeast(0),
@@ -305,7 +307,7 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Kokoro.Isp,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_isp),
                     items = selectableIsps.map { localizedIspLabel(it) },
                     selectedIndex = selectableIsps.indexOfFirst { it.value == normalized.isp }.coerceAtLeast(0),
                     onSelectedIndexChange = { index ->
@@ -315,10 +317,10 @@ internal fun MihomoSubscriptionSettingsContent(
                 )
                 AnimatedVisibility(visible = supportsDirect) {
                     YumeMd3DropdownPreference(
-                        title = MLang.ProfilesPage.Kokoro.Mode,
+                        title = stringResource(LocaleR.string.profiles_page_kokoro_mode),
                         items = listOf(
-                            MLang.ProfilesPage.Kokoro.Relay,
-                            MLang.ProfilesPage.Kokoro.Direct,
+                            stringResource(LocaleR.string.profiles_page_kokoro_relay),
+                            stringResource(LocaleR.string.profiles_page_kokoro_direct),
                         ),
                         selectedIndex = if (normalized.mode == "direct") 1 else 0,
                         onSelectedIndexChange = { index ->
@@ -330,15 +332,15 @@ internal fun MihomoSubscriptionSettingsContent(
             }
         }
 
-        SectionLabel(MLang.ProfilesPage.Kokoro.Routing)
+        SectionLabel(stringResource(LocaleR.string.profiles_page_kokoro_routing))
 
         Card {
             Column {
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Kokoro.RuleSource,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_rule_source),
                     items = availableOptions.ruleSources.map {
-                        if (it == "mirror") MLang.ProfilesPage.Kokoro.Mirror
-                        else MLang.ProfilesPage.Kokoro.Origin
+                        if (it == "mirror") stringResource(LocaleR.string.profiles_page_kokoro_mirror)
+                        else stringResource(LocaleR.string.profiles_page_kokoro_origin)
                     },
                     selectedIndex = availableOptions.ruleSources.indexOf(normalized.ruleSource).coerceAtLeast(0),
                     onSelectedIndexChange = { index ->
@@ -347,10 +349,10 @@ internal fun MihomoSubscriptionSettingsContent(
                     showDivider = true,
                 )
                 YumeMd3DropdownPreference(
-                    title = MLang.ProfilesPage.Kokoro.FinalRoute,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_final_route),
                     items = availableOptions.finalRoutes.map {
-                        if (it == "direct") MLang.ProfilesPage.Kokoro.Direct
-                        else MLang.ProfilesPage.Kokoro.Proxy
+                        if (it == "direct") stringResource(LocaleR.string.profiles_page_kokoro_direct)
+                        else stringResource(LocaleR.string.profiles_page_kokoro_proxy)
                     },
                     selectedIndex = availableOptions.finalRoutes.indexOf(normalized.finalRoute).coerceAtLeast(0),
                     onSelectedIndexChange = { index ->
@@ -361,12 +363,12 @@ internal fun MihomoSubscriptionSettingsContent(
             }
         }
 
-        SectionLabel(MLang.ProfilesPage.Kokoro.Updates)
+        SectionLabel(stringResource(LocaleR.string.profiles_page_kokoro_updates))
 
         Card {
             Column {
                 PreferenceSwitchItem(
-                    title = MLang.ProfilesPage.Kokoro.RuleProviderAutoUpdate,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_rule_provider_auto_update),
                     checked = normalized.ruleProviderAutoUpdate,
                     onCheckedChange = {
                         onSettingsChange(normalized.copy(ruleProviderAutoUpdate = it))
@@ -374,7 +376,7 @@ internal fun MihomoSubscriptionSettingsContent(
                 )
                 SettingsDivider()
                 PreferenceSwitchItem(
-                    title = MLang.ProfilesPage.Kokoro.SubscriptionAutoUpdate,
+                    title = stringResource(LocaleR.string.profiles_page_kokoro_subscription_auto_update),
                     checked = normalized.subscriptionAutoUpdate,
                     onCheckedChange = {
                         onSettingsChange(normalized.copy(subscriptionAutoUpdate = it))
@@ -417,6 +419,8 @@ private fun UpdateIntervalPreference(
     maxHours: Int,
     onHoursChange: (Int) -> Unit,
 ) {
+    val decreaseDescription = stringResource(LocaleR.string.profiles_page_kokoro_decrease_update_hours)
+    val increaseDescription = stringResource(LocaleR.string.profiles_page_kokoro_increase_update_hours)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -425,12 +429,12 @@ private fun UpdateIntervalPreference(
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
     ) {
         Text(
-            text = MLang.ProfilesPage.Kokoro.ProfileUpdate,
+            text = stringResource(LocaleR.string.profiles_page_kokoro_profile_update),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = MLang.ProfilesPage.Kokoro.UpdateHoursValue.format(hours),
+            text = stringResource(LocaleR.string.profiles_page_kokoro_update_hours_value).format(hours),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -443,7 +447,7 @@ private fun UpdateIntervalPreference(
                     onClick = { onHoursChange(hours - 1) },
                     enabled = hours > minHours,
                     modifier = Modifier.semantics {
-                        contentDescription = MLang.ProfilesPage.Kokoro.DecreaseUpdateHours
+                        contentDescription = decreaseDescription
                     },
                 ) {
                     Text(
@@ -459,7 +463,7 @@ private fun UpdateIntervalPreference(
                     onClick = { onHoursChange(hours + 1) },
                     enabled = hours < maxHours,
                     modifier = Modifier.semantics {
-                        contentDescription = MLang.ProfilesPage.Kokoro.IncreaseUpdateHours
+                        contentDescription = increaseDescription
                     },
                 ) {
                     Text(
@@ -475,6 +479,8 @@ private fun UpdateIntervalPreference(
 @Composable
 private fun OsuAvatar(displayName: String?, avatarUrl: String?) {
     val context = LocalContext.current
+    val loggedIn = stringResource(LocaleR.string.profiles_page_kokoro_logged_in)
+    val avatarDescription = stringResource(LocaleR.string.profiles_page_kokoro_avatar_description)
     Box(
         modifier = Modifier
             .size(UiDp.dp48)
@@ -488,8 +494,8 @@ private fun OsuAvatar(displayName: String?, avatarUrl: String?) {
                     request = ImageRequest(context, avatarUrl),
                     contentScale = ContentScale.Crop,
                 ),
-                contentDescription = MLang.ProfilesPage.Kokoro.AvatarDescription.format(
-                    displayName ?: MLang.ProfilesPage.Kokoro.LoggedIn,
+                contentDescription = avatarDescription.format(
+                    displayName ?: loggedIn,
                 ),
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,
@@ -516,11 +522,11 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun localizedIspLabel(option: KokoroSubscriptionOptions.IspOption): String = when (option.value) {
-    "" -> MLang.ProfilesPage.Kokoro.IspAuto
-    "ct" -> MLang.ProfilesPage.Kokoro.IspCt
-    "cu" -> MLang.ProfilesPage.Kokoro.IspCu
-    "cm" -> MLang.ProfilesPage.Kokoro.IspCm
-    "other" -> MLang.ProfilesPage.Kokoro.IspOther
+    "" -> stringResource(LocaleR.string.profiles_page_kokoro_isp_auto)
+    "ct" -> stringResource(LocaleR.string.profiles_page_kokoro_isp_ct)
+    "cu" -> stringResource(LocaleR.string.profiles_page_kokoro_isp_cu)
+    "cm" -> stringResource(LocaleR.string.profiles_page_kokoro_isp_cm)
+    "other" -> stringResource(LocaleR.string.profiles_page_kokoro_isp_other)
     else -> option.label
 }
 
