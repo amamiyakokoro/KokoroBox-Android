@@ -1,0 +1,1282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_app_description" formatted="false">A Material You Android client powered by Mihomo</string>
+    <string name="about_app_version_failed" formatted="false">Failed to load</string>
+    <string name="about_app_version_loading" formatted="false">Loading...</string>
+    <string name="about_copyright" formatted="false">© 2026 KokoroBox Contributors</string>
+    <string name="about_license_agpl_description" formatted="false">This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License.</string>
+    <string name="about_license_agpl_name" formatted="false">GNU Affero General Public License v3.0</string>
+    <string name="about_license_check_update" formatted="false">Check for Updates</string>
+    <string name="about_license_check_update_summary" formatted="false">Check the latest GitHub release manually</string>
+    <string name="about_license_libraries" formatted="false">Libraries</string>
+    <string name="about_license_libraries_summary" formatted="false">View all third-party libraries used in this app</string>
+    <string name="about_section_license" formatted="false">License</string>
+    <string name="about_section_project_links" formatted="false">Project Links</string>
+    <string name="about_title" formatted="false">About</string>
+    <string name="about_update_available" formatted="false">Update available</string>
+    <string name="about_update_browser_download" formatted="false">Download the latest APK in your browser.</string>
+    <string name="about_update_checking" formatted="false">Checking GitHub Releases…</string>
+    <string name="about_update_continue_install" formatted="false">Continue</string>
+    <string name="about_update_download" formatted="false">Download APK</string>
+    <string name="about_update_downloading" formatted="false">Downloading update…</string>
+    <string name="about_update_in_app_download" formatted="false">Download and update</string>
+    <string name="about_update_in_app_download_summary" formatted="false">The APK will be downloaded, verified, and handed to Androids installer.s installer.</string>
+    <string name="about_update_install_permission_required" formatted="false">Allow KokoroBox to install updates, then continue.</string>
+    <string name="about_update_installed" formatted="false">Update installation completed.</string>
+    <string name="about_update_invalid_response" formatted="false">GitHub returned unsupported release information. Please try again later.</string>
+    <string name="about_update_network_error" formatted="false">Unable to check for updates. Check your connection and try again.</string>
+    <string name="about_update_no_apk" formatted="false">The compatible APK is not available yet. View the release page or check again later.</string>
+    <string name="about_update_no_browser" formatted="false">No app is available to open this download.</string>
+    <string name="about_update_no_release" formatted="false">No published stable release is available yet.</string>
+    <string name="about_update_ok" formatted="false">OK</string>
+    <string name="about_update_open_install_settings" formatted="false">Open settings</string>
+    <string name="about_update_open_release" formatted="false">View release</string>
+    <string name="about_update_preparing_install" formatted="false">Preparing the system installer…</string>
+    <string name="about_update_rate_limited" formatted="false">GitHub is limiting requests. Please wait before checking again.</string>
+    <string name="about_update_retry" formatted="false">Retry</string>
+    <string name="about_update_unknown_version" formatted="false">Cannot compare this build’s version. Check GitHub Releases manually.</string>
+    <string name="about_update_up_to_date" formatted="false">You are already using this version or a newer version.</string>
+    <string name="about_update_update_failed" formatted="false">Update failed</string>
+    <string name="about_update_verifying" formatted="false">Verifying the downloaded APK…</string>
+    <string name="about_update_waiting_for_install_confirmation" formatted="false">Continue in the Android installation dialog.</string>
+    <string name="access_control_app_list_loading" formatted="false">Loading...</string>
+    <string name="access_control_app_list_title" formatted="false">App List (%d selected)</string>
+    <string name="access_control_button_cancel" formatted="false">Cancel</string>
+    <string name="access_control_button_confirm" formatted="false">Confirm</string>
+    <string name="access_control_search_empty" formatted="false">No matching apps</string>
+    <string name="access_control_search_placeholder" formatted="false">Search apps...</string>
+    <string name="access_control_settings_batch_operation" formatted="false">Batch Operation</string>
+    <string name="access_control_settings_china_apps" formatted="false">China Apps</string>
+    <string name="access_control_settings_descending_order" formatted="false">Descending Order</string>
+    <string name="access_control_settings_deselect_all" formatted="false">Deselect All</string>
+    <string name="access_control_settings_export" formatted="false">Export to Clipboard</string>
+    <string name="access_control_settings_export_success" formatted="false">Copied %d package names to clipboard</string>
+    <string name="access_control_settings_import" formatted="false">Import from Clipboard</string>
+    <string name="access_control_settings_import_export" formatted="false">Import/Export</string>
+    <string name="access_control_settings_import_failed" formatted="false">Import failed</string>
+    <string name="access_control_settings_import_success" formatted="false">Imported: %d package names</string>
+    <string name="access_control_settings_invert" formatted="false">Invert</string>
+    <string name="access_control_settings_overseas_apps" formatted="false">Non-China Apps</string>
+    <string name="access_control_settings_region_quick_select" formatted="false">Region Quick Select</string>
+    <string name="access_control_settings_region_select_result" formatted="false">Quick selected by \"%s\", total %d</string>
+    <string name="access_control_settings_select_action" formatted="false">Select</string>
+    <string name="access_control_settings_select_all" formatted="false">Select All</string>
+    <string name="access_control_settings_selected_first" formatted="false">Selected Apps First</string>
+    <string name="access_control_settings_show_system_apps" formatted="false">Show System Apps</string>
+    <string name="access_control_settings_sort_mode" formatted="false">Sort Mode</string>
+    <string name="access_control_settings_sort_mode_current" formatted="false">Current: %s</string>
+    <string name="access_control_settings_title" formatted="false">Access Control Settings</string>
+    <string name="access_control_sort_mode_install_time" formatted="false">Install Time</string>
+    <string name="access_control_sort_mode_label" formatted="false">App Name</string>
+    <string name="access_control_sort_mode_package_name" formatted="false">Package Name</string>
+    <string name="access_control_sort_mode_update_time" formatted="false">Update Time</string>
+    <string name="access_control_title" formatted="false">Access Control</string>
+    <string name="app_data_management_geo_files_cache_item_summary" formatted="false">%s · %s</string>
+    <string name="app_data_management_geo_files_delete_complete" formatted="false">Deleted %d historical GeoX files</string>
+    <string name="app_data_management_geo_files_delete_confirm_message" formatted="false">Delete %d selected historical GeoX files? This action cannot be undone.</string>
+    <string name="app_data_management_geo_files_delete_confirm_title" formatted="false">Delete GeoX files?</string>
+    <string name="app_data_management_geo_files_empty_history" formatted="false">No historical downloads to clean</string>
+    <string name="app_data_management_geo_files_empty_history_summary" formatted="false">GeoX files that fail validation are deleted immediately and will not appear here</string>
+    <string name="app_data_management_geo_files_history_summary" formatted="false">Historical download cache: %d</string>
+    <string name="app_data_management_geo_files_history_title" formatted="false">Manage GeoX Files</string>
+    <string name="app_data_management_logs_delete_complete" formatted="false">Deleted %d log files</string>
+    <string name="app_data_management_logs_delete_confirm_message" formatted="false">Delete %d selected log files? This action cannot be undone.</string>
+    <string name="app_data_management_logs_delete_confirm_title" formatted="false">Delete log files?</string>
+    <string name="app_data_management_logs_empty_log_content" formatted="false">Log is empty</string>
+    <string name="app_data_management_logs_empty_log_content_summary" formatted="false">This file has no displayable log entries</string>
+    <string name="app_data_management_logs_empty_logs" formatted="false">No logs to clean</string>
+    <string name="app_data_management_logs_empty_logs_summary" formatted="false">After starting recording on the Log page, log files will appear here</string>
+    <string name="app_data_management_logs_log_item_summary" formatted="false">%s · %s</string>
+    <string name="app_data_management_logs_log_line_title" formatted="false">[%s] [%s]</string>
+    <string name="app_data_management_logs_management_summary" formatted="false">Log files: %d</string>
+    <string name="app_data_management_logs_management_title" formatted="false">Manage Logs</string>
+    <string name="app_data_management_logs_recording_file_title" formatted="false">%s (recording)</string>
+    <string name="app_data_management_logs_viewer_limit_hint" formatted="false">Showing recent logs only</string>
+    <string name="app_data_management_logs_viewer_limit_summary" formatted="false">Currently showing the latest %d entries</string>
+    <string name="app_data_management_logs_viewer_title" formatted="false">View Log: %s</string>
+    <string name="app_data_management_section_geo_files" formatted="false">Geo Files</string>
+    <string name="app_data_management_section_logs" formatted="false">Logs</string>
+    <string name="app_data_management_title" formatted="false">App Data Management</string>
+    <string name="app_settings_backup_export_failed" formatted="false">Failed to export settings backup</string>
+    <string name="app_settings_backup_export_failed_detail" formatted="false">Failed to export settings backup: %s</string>
+    <string name="app_settings_backup_export_success" formatted="false">Settings backup exported</string>
+    <string name="app_settings_backup_export_summary" formatted="false">Save app preferences, network options, profile links, and display settings as a JSON file</string>
+    <string name="app_settings_backup_export_title" formatted="false">Export Settings Backup</string>
+    <string name="app_settings_backup_import_failed_detail" formatted="false">Failed to import settings backup: %s</string>
+    <string name="app_settings_backup_import_read_failed" formatted="false">Failed to read backup file</string>
+    <string name="app_settings_backup_import_success" formatted="false">Settings backup imported</string>
+    <string name="app_settings_backup_import_summary" formatted="false">Restore settings from a KokoroBox backup JSON file</string>
+    <string name="app_settings_backup_import_title" formatted="false">Import Settings Backup</string>
+    <string name="app_settings_behavior_auto_start_summary" formatted="false">Automatically start proxy service on app launch and boot</string>
+    <string name="app_settings_behavior_auto_start_title" formatted="false">Auto Start</string>
+    <string name="app_settings_behavior_auto_update_on_start_summary" formatted="false">Auto-update the active subscription profile on start</string>
+    <string name="app_settings_behavior_auto_update_on_start_title" formatted="false">Update on Start</string>
+    <string name="app_settings_behavior_automatic_update_check_summary" formatted="false">Check GitHub Releases once a day when the app opens</string>
+    <string name="app_settings_behavior_automatic_update_check_title" formatted="false">Automatically Check for Updates</string>
+    <string name="app_settings_behavior_update_channel_nightly" formatted="false">Nightly</string>
+    <string name="app_settings_behavior_update_channel_stable" formatted="false">Stable</string>
+    <string name="app_settings_behavior_update_channel_summary" formatted="false">Choose stable releases or development nightly builds</string>
+    <string name="app_settings_behavior_update_channel_title" formatted="false">Update Channel</string>
+    <string name="app_settings_behavior_update_install_method_root" formatted="false">Root</string>
+    <string name="app_settings_behavior_update_install_method_shizuku" formatted="false">Shizuku</string>
+    <string name="app_settings_behavior_update_install_method_summary" formatted="false">Advanced: System is recommended. Shizuku and Root bypass Androids install confirmation.s install confirmation.</string>
+    <string name="app_settings_behavior_update_install_method_system" formatted="false">System</string>
+    <string name="app_settings_behavior_update_install_method_title" formatted="false">Update Installation Method</string>
+    <string name="app_settings_button_apply" formatted="false">Apply</string>
+    <string name="app_settings_experimental_acg_home_summary" formatted="false">Enable the new ACG-inspired home layout</string>
+    <string name="app_settings_experimental_acg_home_title" formatted="false">ACG Experimental Home</string>
+    <string name="app_settings_experimental_acg_sidebar_expanded_summary" formatted="false">Open the left info sidebar by default on the ACG home page</string>
+    <string name="app_settings_experimental_acg_sidebar_expanded_title" formatted="false">Expand ACG Sidebar by Default</string>
+    <string name="app_settings_experimental_health_check_concurrency_summary" formatted="false">当前选项：%s</string>
+    <string name="app_settings_experimental_health_check_concurrency_title" formatted="false">测速并发数</string>
+    <string name="app_settings_experimental_reset_wallpaper_success" formatted="false">Default wallpaper restored</string>
+    <string name="app_settings_experimental_reset_wallpaper_summary" formatted="false">Restore the built-in default wallpaper and reset crop position and wallpaper color seed</string>
+    <string name="app_settings_experimental_reset_wallpaper_title" formatted="false">Reset ACG Wallpaper</string>
+    <string name="app_settings_experimental_wallpaper_summary" formatted="false">Choose a custom wallpaper for the ACG home page</string>
+    <string name="app_settings_experimental_wallpaper_title" formatted="false">ACG Wallpaper</string>
+    <string name="app_settings_interface_auto_hide_navbar_summary" formatted="false">Hide navbar on scroll down and show on scroll up</string>
+    <string name="app_settings_interface_auto_hide_navbar_title" formatted="false">Auto-hide Navbar</string>
+    <string name="app_settings_interface_color_theme_acg_wallpaper_summary" formatted="false">Generate the theme from the main color extracted from the current ACG home wallpaper. The color seed updates automatically after changing and applying a wallpaper.</string>
+    <string name="app_settings_interface_color_theme_code_label" formatted="false">Theme Color Code (#RRGGBB)</string>
+    <string name="app_settings_interface_color_theme_custom_summary" formatted="false">Current theme color: %s</string>
+    <string name="app_settings_interface_color_theme_dynamic_summary" formatted="false">Currently following system colors</string>
+    <string name="app_settings_interface_color_theme_mode_acg_wallpaper" formatted="false">From ACG Wallpaper</string>
+    <string name="app_settings_interface_color_theme_mode_custom" formatted="false">Custom Theme Color</string>
+    <string name="app_settings_interface_color_theme_mode_monet" formatted="false">Follow System</string>
+    <string name="app_settings_interface_color_theme_mode_summary" formatted="false">Choose between following system colors and a manual theme seed</string>
+    <string name="app_settings_interface_color_theme_mode_title" formatted="false">Color Source</string>
+    <string name="app_settings_interface_color_theme_picker_title" formatted="false">Pick Theme Color</string>
+    <string name="app_settings_interface_color_theme_title" formatted="false">Theme Palette</string>
+    <string name="app_settings_interface_home_control_fab_summary" formatted="false">Use a floating action button instead of tapping the traffic panel to start or stop the proxy</string>
+    <string name="app_settings_interface_home_control_fab_title" formatted="false">Home Control FAB</string>
+    <string name="app_settings_interface_language_chinese" formatted="false">简体中文</string>
+    <string name="app_settings_interface_language_english" formatted="false">English</string>
+    <string name="app_settings_interface_language_summary" formatted="false">Choose the app language</string>
+    <string name="app_settings_interface_language_system" formatted="false">Follow System</string>
+    <string name="app_settings_interface_language_title" formatted="false">App Language</string>
+    <string name="app_settings_interface_language_traditional_chinese" formatted="false">繁體中文</string>
+    <string name="app_settings_interface_legacy_navbar_style_summary" formatted="false">Floating Navigation Bar Style</string>
+    <string name="app_settings_interface_legacy_navbar_style_title" formatted="false">Floating Navigation Bar</string>
+    <string name="app_settings_interface_page_scale_dialog_summary" formatted="false">80% - 120%</string>
+    <string name="app_settings_interface_page_scale_summary" formatted="false">Adjust the overall UI scaling ratio of the app</string>
+    <string name="app_settings_interface_page_scale_title" formatted="false">Page Scale</string>
+    <string name="app_settings_interface_theme_color_polarity_invert_summary" formatted="false">If themed colors look odd, try enabling this</string>
+    <string name="app_settings_interface_theme_color_polarity_invert_title" formatted="false">Invert Theme Foreground</string>
+    <string name="app_settings_interface_theme_mode_dark" formatted="false">Dark</string>
+    <string name="app_settings_interface_theme_mode_light" formatted="false">Light</string>
+    <string name="app_settings_interface_theme_mode_summary" formatted="false">Select the apps theme styles theme style</string>
+    <string name="app_settings_interface_theme_mode_system" formatted="false">Follow System</string>
+    <string name="app_settings_interface_theme_mode_title" formatted="false">Theme Mode</string>
+    <string name="app_settings_privacy_biometric_dialog_title_disable" formatted="false">Disable Biometric Unlock</string>
+    <string name="app_settings_privacy_biometric_dialog_title_enable" formatted="false">Enable Biometric Unlock</string>
+    <string name="app_settings_privacy_biometric_exit_button" formatted="false">Exit</string>
+    <string name="app_settings_privacy_biometric_prompt_message" formatted="false">Complete authentication to continue into the app</string>
+    <string name="app_settings_privacy_biometric_prompt_title" formatted="false">Verify Identity</string>
+    <string name="app_settings_privacy_biometric_retry_button" formatted="false">Retry</string>
+    <string name="app_settings_privacy_biometric_unavailable_hw_unavailable" formatted="false">Biometric hardware is currently unavailable. Please try again later</string>
+    <string name="app_settings_privacy_biometric_unavailable_message" formatted="false">Authentication is currently unavailable. Please try again later or check device credential and biometric settings</string>
+    <string name="app_settings_privacy_biometric_unavailable_no_device_credential" formatted="false">No secure screen lock is configured. Set up a PIN, pattern, or password first</string>
+    <string name="app_settings_privacy_biometric_unavailable_no_hardware" formatted="false">This device does not support biometrics. Enable a secure screen lock or disable this feature</string>
+    <string name="app_settings_privacy_biometric_unavailable_none_enrolled" formatted="false">No biometric data is enrolled yet. Add biometrics in system settings or enable a secure screen lock first</string>
+    <string name="app_settings_privacy_biometric_unavailable_title" formatted="false">Biometric Unavailable</string>
+    <string name="app_settings_privacy_biometric_unlock_summary" formatted="false">Require biometric or device credential authentication on app launch</string>
+    <string name="app_settings_privacy_biometric_unlock_title" formatted="false">Biometric Unlock</string>
+    <string name="app_settings_privacy_hide_from_recents_summary" formatted="false">Do not show this app in the recent tasks list (recents card)</string>
+    <string name="app_settings_privacy_hide_from_recents_title" formatted="false">Hide Recents Card</string>
+    <string name="app_settings_privacy_hide_icon_summary" formatted="false">After hiding, you can open via dialer *#*#0721#*#*</string>
+    <string name="app_settings_privacy_hide_icon_title" formatted="false">Hide App Icon</string>
+    <string name="app_settings_privacy_screenshot_dialog_title_disable" formatted="false">Disable Screenshot Protection</string>
+    <string name="app_settings_privacy_screenshot_dialog_title_enable" formatted="false">Enable Screenshot Protection</string>
+    <string name="app_settings_privacy_screenshot_protection_summary" formatted="false">Block screenshots, screen recording, and recents preview</string>
+    <string name="app_settings_privacy_screenshot_protection_title" formatted="false">Screenshot Protection</string>
+    <string name="app_settings_section_backup" formatted="false">Backup</string>
+    <string name="app_settings_section_behavior" formatted="false">Behavior</string>
+    <string name="app_settings_section_experimental" formatted="false">Experimental</string>
+    <string name="app_settings_section_interface" formatted="false">Interface</string>
+    <string name="app_settings_section_privacy" formatted="false">Privacy</string>
+    <string name="app_settings_section_service" formatted="false">Service</string>
+    <string name="app_settings_service_section_battery_optimization_title" formatted="false">Unrestricted Battery</string>
+    <string name="app_settings_service_section_exit_ui_when_background_summary" formatted="false">Release the activity UI when the app is fully hidden in background while keeping the proxy service running</string>
+    <string name="app_settings_service_section_exit_ui_when_background_title" formatted="false">Release UI In Background</string>
+    <string name="app_settings_service_section_single_node_test_summary" formatted="false">Tap icon on node card to test individual node delay</string>
+    <string name="app_settings_service_section_single_node_test_title" formatted="false">Single Node Test</string>
+    <string name="app_settings_service_section_traffic_notification_summary" formatted="false">Display traffic usage in notification bar</string>
+    <string name="app_settings_service_section_traffic_notification_title" formatted="false">Show Traffic Notification</string>
+    <string name="app_settings_title" formatted="false">App Settings</string>
+    <string name="app_settings_warning_dialog_hide_icon_msg1" formatted="false">Please make sure you can access this apps settings before hiding!s settings before hiding!</string>
+    <string name="app_settings_warning_dialog_hide_icon_msg2" formatted="false">For HyperOS, please enable Auto-start and Background Pop-up permissions to receive dialer codes!</string>
+    <string name="app_settings_warning_dialog_title" formatted="false">Warning</string>
+    <string name="component_bottom_bar_config" formatted="false">Config</string>
+    <string name="component_bottom_bar_home" formatted="false">Home</string>
+    <string name="component_bottom_bar_proxy" formatted="false">Proxy</string>
+    <string name="component_bottom_bar_setting" formatted="false">Settings</string>
+    <string name="component_button_cancel" formatted="false">Cancel</string>
+    <string name="component_button_clear" formatted="false">Clear</string>
+    <string name="component_button_confirm" formatted="false">Confirm</string>
+    <string name="component_button_copy" formatted="false">Copy</string>
+    <string name="component_button_delete" formatted="false">Delete</string>
+    <string name="component_button_ok" formatted="false">OK</string>
+    <string name="component_config_input_count_items" formatted="false">%d items</string>
+    <string name="component_config_input_port_label" formatted="false">Port (leave empty to not modify)</string>
+    <string name="component_editor_action_add" formatted="false">Add</string>
+    <string name="component_editor_action_delete" formatted="false">Delete</string>
+    <string name="component_editor_action_reset" formatted="false">Reset</string>
+    <string name="component_editor_action_search" formatted="false">Search</string>
+    <string name="component_editor_count_items" formatted="false">Total %d items</string>
+    <string name="component_editor_dialog_add_title" formatted="false">Add Entry</string>
+    <string name="component_editor_dialog_edit_title" formatted="false">Edit Entry</string>
+    <string name="component_editor_dialog_reset_message" formatted="false">Clear all entries and restore to unmodified state?</string>
+    <string name="component_editor_dialog_reset_title" formatted="false">Confirm Reset</string>
+    <string name="component_editor_empty_hint" formatted="false">Click top-right button to add</string>
+    <string name="component_editor_empty_title" formatted="false">No Entries</string>
+    <string name="component_editor_error_key_empty" formatted="false">Key cannot be empty</string>
+    <string name="component_editor_error_key_exists" formatted="false">Key already exists</string>
+    <string name="component_editor_rule_content" formatted="false">Rule Content</string>
+    <string name="component_editor_rule_error_content_required" formatted="false">Rule content cannot be empty</string>
+    <string name="component_editor_rule_error_target_required" formatted="false">Please select target</string>
+    <string name="component_editor_rule_no_resolve" formatted="false">No Resolve</string>
+    <string name="component_editor_rule_src" formatted="false">Src IP</string>
+    <string name="component_editor_rule_target" formatted="false">Target</string>
+    <string name="component_editor_rule_target_direct" formatted="false">DIRECT</string>
+    <string name="component_editor_rule_target_match" formatted="false">MATCH</string>
+    <string name="component_editor_rule_target_reject" formatted="false">REJECT</string>
+    <string name="component_editor_rule_type" formatted="false">Rule Type</string>
+    <string name="component_flag_content_description" formatted="false">%s flag</string>
+    <string name="component_loading_starting" formatted="false">Starting...</string>
+    <string name="component_message_confirm" formatted="false">Confirm</string>
+    <string name="component_message_error" formatted="false">Error</string>
+    <string name="component_message_hint" formatted="false">Hint</string>
+    <string name="component_message_success" formatted="false">Success</string>
+    <string name="component_navigation_back" formatted="false">Back</string>
+    <string name="component_navigation_refresh" formatted="false">Refresh</string>
+    <string name="component_profile_card_click_to_update" formatted="false">Click update to get subscription info</string>
+    <string name="component_profile_card_days_ago" formatted="false">%d days ago</string>
+    <string name="component_profile_card_delete" formatted="false">Delete</string>
+    <string name="component_profile_card_edit" formatted="false">Edit</string>
+    <string name="component_profile_card_expire_at" formatted="false">Expires: %s (%d days left)</string>
+    <string name="component_profile_card_expire_today" formatted="false">Expires: Today</string>
+    <string name="component_profile_card_expired" formatted="false">Expired: %s</string>
+    <string name="component_profile_card_export" formatted="false">Export</string>
+    <string name="component_profile_card_hours_ago" formatted="false">%d hours ago</string>
+    <string name="component_profile_card_just_now" formatted="false">Just now</string>
+    <string name="component_profile_card_local_config" formatted="false">Local Configuration</string>
+    <string name="component_profile_card_local_file" formatted="false">Local File</string>
+    <string name="component_profile_card_minutes_ago" formatted="false">%d min ago</string>
+    <string name="component_profile_card_remote_subscription" formatted="false">Remote Subscription</string>
+    <string name="component_profile_card_traffic" formatted="false">Traffic: %s / %s (%d%%)</string>
+    <string name="component_profile_card_update" formatted="false">Update</string>
+    <string name="component_profile_card_used_traffic" formatted="false">Used: %s</string>
+    <string name="component_selector_append" formatted="false">Append</string>
+    <string name="component_selector_disable" formatted="false">Disable</string>
+    <string name="component_selector_enable" formatted="false">Enable</string>
+    <string name="component_selector_merge" formatted="false">Merge</string>
+    <string name="component_selector_not_modify" formatted="false">Dont Modifyt Modify</string>
+    <string name="component_selector_prepend" formatted="false">Prepend</string>
+    <string name="component_selector_replace" formatted="false">Replace</string>
+    <string name="component_update_action_download_now" formatted="false">Download Now</string>
+    <string name="component_update_message_available" formatted="false">A new update is available</string>
+    <string name="component_update_message_check_failed" formatted="false">Failed to check updates: %s</string>
+    <string name="component_update_message_checking" formatted="false">Checking for updates...</string>
+    <string name="component_update_message_close" formatted="false">Got it</string>
+    <string name="component_update_message_cover_desc" formatted="false">Update cover</string>
+    <string name="component_update_message_current_version" formatted="false">Current Version</string>
+    <string name="component_update_message_download_already_running" formatted="false">The update package is still downloading</string>
+    <string name="component_update_message_download_error_with_code" formatted="false">Download failed (%d): %s</string>
+    <string name="component_update_message_download_ready" formatted="false">Download complete, ready to install</string>
+    <string name="component_update_message_downloading" formatted="false">Downloading update package...</string>
+    <string name="component_update_message_downloading_with_progress" formatted="false">Downloading update package %d%%</string>
+    <string name="component_update_message_error" formatted="false">Download failed, please try again later</string>
+    <string name="component_update_message_finished" formatted="false">Download complete, waiting for install confirmation</string>
+    <string name="component_update_message_install_failed" formatted="false">Failed to open installer: %s</string>
+    <string name="component_update_message_install_prompt_opened" formatted="false">Download complete, installer opened</string>
+    <string name="component_update_message_missing_release_metadata" formatted="false">The latest release is missing update metadata</string>
+    <string name="component_update_message_no_compatible_asset" formatted="false">No compatible APK was found in the latest release</string>
+    <string name="component_update_message_no_update" formatted="false">Already on the latest version</string>
+    <string name="component_update_message_preparing" formatted="false">Preparing download...</string>
+    <string name="component_update_message_remote_version" formatted="false">Target Version</string>
+    <string name="component_update_message_updating" formatted="false">Updating</string>
+    <string name="component_update_message_verify_failed" formatted="false">Package verification failed, please retry</string>
+    <string name="component_update_message_verifying" formatted="false">Verifying update package...</string>
+    <string name="component_update_message_waiting" formatted="false">Waiting for download...</string>
+    <string name="component_update_title_available" formatted="false">New Version Available</string>
+    <string name="component_web_view_invalid_url" formatted="false">Invalid URL</string>
+    <string name="connection_chain_count" formatted="false">x%d</string>
+    <string name="connection_detail_action_interrupt" formatted="false">Interrupt connection</string>
+    <string name="connection_detail_action_interrupting" formatted="false">Interrupting connection...</string>
+    <string name="connection_detail_label_content" formatted="false">Content</string>
+    <string name="connection_detail_label_destination_address" formatted="false">Destination Address</string>
+    <string name="connection_detail_label_download" formatted="false">Download</string>
+    <string name="connection_detail_label_duration" formatted="false">Duration</string>
+    <string name="connection_detail_label_process" formatted="false">Process</string>
+    <string name="connection_detail_label_protocol" formatted="false">Protocol</string>
+    <string name="connection_detail_label_source_address" formatted="false">Source Address</string>
+    <string name="connection_detail_label_type" formatted="false">Type</string>
+    <string name="connection_detail_label_upload" formatted="false">Upload</string>
+    <string name="connection_detail_section_info" formatted="false">Connection Info</string>
+    <string name="connection_detail_section_rule" formatted="false">Rule</string>
+    <string name="connection_empty" formatted="false">No active connections</string>
+    <string name="connection_loading" formatted="false">Loading...</string>
+    <string name="connection_no_results" formatted="false">No matching connections</string>
+    <string name="connection_relative_time_date" formatted="false">%02d-%02d</string>
+    <string name="connection_relative_time_days_ago" formatted="false">%d days ago</string>
+    <string name="connection_relative_time_hours_ago" formatted="false">%d hours ago</string>
+    <string name="connection_relative_time_just_now" formatted="false">Just now</string>
+    <string name="connection_relative_time_minutes_ago" formatted="false">%d minutes ago</string>
+    <string name="connection_search" formatted="false">Search</string>
+    <string name="connection_search_hint" formatted="false">Search host, process...</string>
+    <string name="connection_sort_download" formatted="false">Download</string>
+    <string name="connection_sort_host" formatted="false">Host</string>
+    <string name="connection_sort_time" formatted="false">Time</string>
+    <string name="connection_sort_upload" formatted="false">Upload</string>
+    <string name="connection_sort_by" formatted="false">Sort by:</string>
+    <string name="connection_summary" formatted="false">View active connections</string>
+    <string name="connection_tab_active" formatted="false">Active</string>
+    <string name="connection_tab_closed" formatted="false">Closed</string>
+    <string name="connection_title" formatted="false">Connections</string>
+    <string name="editor_action_discard" formatted="false">Discard</string>
+    <string name="editor_action_format" formatted="false">Format</string>
+    <string name="editor_action_save" formatted="false">Save</string>
+    <string name="editor_common_config_preview_title" formatted="false">Config Preview</string>
+    <string name="editor_common_edit_config_title" formatted="false">Edit Config</string>
+    <string name="editor_common_edit_override_config_title" formatted="false">Edit Override Config</string>
+    <string name="editor_common_edit_profile_config_title" formatted="false">Edit Profile Config</string>
+    <string name="editor_common_json_subtitle" formatted="false">Edit using JSON format</string>
+    <string name="editor_diagnostic_duplicate_key" formatted="false">Duplicate key</string>
+    <string name="editor_diagnostic_expected" formatted="false">Expected %s</string>
+    <string name="editor_diagnostic_json_format_error" formatted="false">JSON format error</string>
+    <string name="editor_diagnostic_json_must_start_with_object_or_array" formatted="false">JSON must start with {' or '['{ or '[' or ['[</string>
+    <string name="editor_diagnostic_json_syntax_error" formatted="false">JSON syntax error</string>
+    <string name="editor_diagnostic_no_value" formatted="false">Missing value</string>
+    <string name="editor_diagnostic_unknown" formatted="false">Unknown</string>
+    <string name="editor_diagnostic_unterminated" formatted="false">Unterminated string or object</string>
+    <string name="editor_dialog_discard_title" formatted="false">Discard Changes</string>
+    <string name="editor_dialog_unsaved_changes_message" formatted="false">There are unsaved changes. Discard them?</string>
+    <string name="editor_dialog_unsaved_changes_title" formatted="false">Unsaved Changes</string>
+    <string name="editor_toast_format_failed_or_unchanged" formatted="false">Format failed or no changes needed</string>
+    <string name="editor_toast_format_success" formatted="false">Formatted successfully</string>
+    <string name="editor_toast_save_failed" formatted="false">Save failed</string>
+    <string name="editor_toast_syntax_error" formatted="false">Syntax error, please check the content</string>
+    <string name="feature_node_health_check_concurrency_summary" formatted="false">Current option: %s</string>
+    <string name="feature_node_health_check_concurrency_title" formatted="false">Health Check Concurrency</string>
+    <string name="feature_node_section" formatted="false">Nodes</string>
+    <string name="feature_runtime_config_empty" formatted="false">The runtime configuration file is empty</string>
+    <string name="feature_runtime_config_not_ready" formatted="false">The runtime configuration is not ready yet</string>
+    <string name="feature_runtime_config_not_running" formatted="false">Start the proxy before viewing its runtime configuration</string>
+    <string name="feature_runtime_config_preview_title" formatted="false">Runtime Configuration · %s</string>
+    <string name="feature_runtime_config_runtime_changed" formatted="false">The running profile changed; open the configuration again</string>
+    <string name="feature_runtime_config_section" formatted="false">Diagnostics</string>
+    <string name="feature_runtime_config_summary" formatted="false">Inspect the final read-only YAML currently loaded by Mihomo; it may contain sensitive data</string>
+    <string name="feature_runtime_config_title" formatted="false">View Runtime Configuration</string>
+    <string name="feature_runtime_config_unavailable" formatted="false">The runtime configuration file is unavailable</string>
+    <string name="feature_runtime_config_unknown_profile" formatted="false">Unknown profile</string>
+    <string name="feature_speed_test_cancel" formatted="false">Cancel</string>
+    <string name="feature_speed_test_data_usage" formatted="false">Uses up to 32 MB download and 8 MB upload per test</string>
+    <string name="feature_speed_test_download" formatted="false">Download</string>
+    <string name="feature_speed_test_edge_location" formatted="false">Cloudflare edge</string>
+    <string name="feature_speed_test_error" formatted="false">The speed test could not be completed. Check your connection and try again.</string>
+    <string name="feature_speed_test_jitter" formatted="false">Jitter</string>
+    <string name="feature_speed_test_latency" formatted="false">Latency</string>
+    <string name="feature_speed_test_location_unknown" formatted="false">Unknown</string>
+    <string name="feature_speed_test_preparing" formatted="false">Preparing test…</string>
+    <string name="feature_speed_test_privacy_notice" formatted="false">Test traffic is sent to Cloudflare. Packet-loss testing is not included.</string>
+    <string name="feature_speed_test_section" formatted="false">Network Test</string>
+    <string name="feature_speed_test_start" formatted="false">Start test</string>
+    <string name="feature_speed_test_summary" formatted="false">Measure the current connection to Cloudflares edges edge</string>
+    <string name="feature_speed_test_testing_download" formatted="false">Measuring download speed…</string>
+    <string name="feature_speed_test_testing_latency" formatted="false">Measuring latency…</string>
+    <string name="feature_speed_test_testing_upload" formatted="false">Measuring upload speed…</string>
+    <string name="feature_speed_test_title" formatted="false">Cloudflare Speed Test</string>
+    <string name="feature_speed_test_upload" formatted="false">Upload</string>
+    <string name="feature_title" formatted="false">Advanced Features</string>
+    <string name="home_control_hint_add_profile" formatted="false">Please add a profile first</string>
+    <string name="home_control_hint_enable_profile" formatted="false">Please enable a profile in Config page first</string>
+    <string name="home_control_hint_profiles_loading" formatted="false">Profiles are still loading. Please wait.</string>
+    <string name="home_control_start" formatted="false">Start</string>
+    <string name="home_control_stop" formatted="false">Stop</string>
+    <string name="home_ip_info_exit_ip" formatted="false">Exit IP</string>
+    <string name="home_message_config_switch_failed" formatted="false">Config switch failed: %s</string>
+    <string name="home_message_config_switched" formatted="false">Config switched</string>
+    <string name="home_message_control_busy" formatted="false">Proxy is %s. Please wait.</string>
+    <string name="home_message_preparing" formatted="false">Preparing...</string>
+    <string name="home_message_start_failed" formatted="false">Start failed: %s</string>
+    <string name="home_message_stop_failed" formatted="false">Stop failed: %s</string>
+    <string name="home_message_waiting_for_vpn_permission" formatted="false">Waiting for VPN permission</string>
+    <string name="home_node_info_delay" formatted="false">Delay</string>
+    <string name="home_node_info_delay_value" formatted="false">%dms</string>
+    <string name="home_node_info_node" formatted="false">Node</string>
+    <string name="home_node_info_unknown" formatted="false">Unknown</string>
+    <string name="home_proxy_mode_http" formatted="false">HTTP</string>
+    <string name="home_proxy_mode_tun" formatted="false">TUN</string>
+    <string name="home_proxy_mode_vpn" formatted="false">VPN</string>
+    <string name="home_status_connecting" formatted="false">Connecting</string>
+    <string name="home_status_disconnecting" formatted="false">Disconnecting</string>
+    <string name="home_status_running" formatted="false">Running</string>
+    <string name="home_status_tap_fab_to_start" formatted="false">Tap the floating button to start</string>
+    <string name="home_status_tap_to_start" formatted="false">Tap to start</string>
+    <string name="home_title" formatted="false">KokoroBox</string>
+    <string name="home_traffic_down_short" formatted="false">DOWN</string>
+    <string name="home_traffic_no_profile" formatted="false">No Profile</string>
+    <string name="home_traffic_up_short" formatted="false">UP</string>
+    <string name="log_action_save" formatted="false">Save</string>
+    <string name="log_action_start_recording" formatted="false">Start Recording</string>
+    <string name="log_action_stop_recording" formatted="false">Stop Recording</string>
+    <string name="log_detail_waiting_log" formatted="false">Waiting for logs...</string>
+    <string name="log_detail_will_show_when_generated" formatted="false">Logs will appear when generated</string>
+    <string name="log_empty_no_logs" formatted="false">No log records</string>
+    <string name="log_empty_start_recording_hint" formatted="false">Click the bottom-right button to start recording logs</string>
+    <string name="log_title" formatted="false">Logs</string>
+    <string name="meta_feature_age_key_derive_public_key" formatted="false">Derive Public Key</string>
+    <string name="meta_feature_age_key_generate" formatted="false">Generate</string>
+    <string name="meta_feature_age_key_hybrid_title" formatted="false">mlkem768-x25519</string>
+    <string name="meta_feature_age_key_public_key" formatted="false">Public Key</string>
+    <string name="meta_feature_age_key_secret_key" formatted="false">Secret Key</string>
+    <string name="meta_feature_age_key_section" formatted="false">Age Keys</string>
+    <string name="meta_feature_age_key_x25519_title" formatted="false">X25519</string>
+    <string name="meta_feature_custom_rules_add_rule" formatted="false">Add rule</string>
+    <string name="meta_feature_custom_rules_back_to_kokoro_settings" formatted="false">Back to Kokoro Settings</string>
+    <string name="meta_feature_custom_rules_cancel" formatted="false">Cancel</string>
+    <string name="meta_feature_custom_rules_confirm" formatted="false">Confirm</string>
+    <string name="meta_feature_custom_rules_conflict_message" formatted="false">Choose the remote version, or keep your local edits and save them again using the latest revision.</string>
+    <string name="meta_feature_custom_rules_conflict_title" formatted="false">Rules changed on another device</string>
+    <string name="meta_feature_custom_rules_delete_rule" formatted="false">Delete rule</string>
+    <string name="meta_feature_custom_rules_discard_message" formatted="false">This action will discard unsaved changes.</string>
+    <string name="meta_feature_custom_rules_discard_title" formatted="false">Discard local changes?</string>
+    <string name="meta_feature_custom_rules_edit_rule" formatted="false">Edit rule</string>
+    <string name="meta_feature_custom_rules_empty" formatted="false">The default rule list is empty.</string>
+    <string name="meta_feature_custom_rules_error_load" formatted="false">Unable to load custom rules.</string>
+    <string name="meta_feature_custom_rules_error_not_found" formatted="false">The default rule list is unavailable; server state was reloaded.</string>
+    <string name="meta_feature_custom_rules_error_rate_limited" formatted="false">Too many requests. Try again later.</string>
+    <string name="meta_feature_custom_rules_error_request" formatted="false">The server rejected the request.</string>
+    <string name="meta_feature_custom_rules_error_unknown" formatted="false">The save result could not be confirmed. Review the remote version before continuing.</string>
+    <string name="meta_feature_custom_rules_error_validation" formatted="false">Rule %d is invalid. Refresh options and correct it before saving.</string>
+    <string name="meta_feature_custom_rules_error_validation_general" formatted="false">The rule list is invalid. Refresh options and correct it before saving.</string>
+    <string name="meta_feature_custom_rules_keep_local" formatted="false">Keep local</string>
+    <string name="meta_feature_custom_rules_loading" formatted="false">Loading custom rules…</string>
+    <string name="meta_feature_custom_rules_match_payload_hint" formatted="false">MATCH does not use a payload.</string>
+    <string name="meta_feature_custom_rules_move_down" formatted="false">Move rule down</string>
+    <string name="meta_feature_custom_rules_move_up" formatted="false">Move rule up</string>
+    <string name="meta_feature_custom_rules_payload" formatted="false">Payload</string>
+    <string name="meta_feature_custom_rules_provider" formatted="false">Rule provider</string>
+    <string name="meta_feature_custom_rules_refresh" formatted="false">Reload from server</string>
+    <string name="meta_feature_custom_rules_retry" formatted="false">Retry</string>
+    <string name="meta_feature_custom_rules_rules" formatted="false">Rules</string>
+    <string name="meta_feature_custom_rules_save" formatted="false">Save rules</string>
+    <string name="meta_feature_custom_rules_saved" formatted="false">Custom rules saved</string>
+    <string name="meta_feature_custom_rules_target" formatted="false">Target</string>
+    <string name="meta_feature_custom_rules_title" formatted="false">Custom Rules</string>
+    <string name="meta_feature_custom_rules_type" formatted="false">Type</string>
+    <string name="meta_feature_custom_rules_use_remote" formatted="false">Use remote</string>
+    <string name="meta_feature_download_dialog_title" formatted="false">Update GeoX Online</string>
+    <string name="meta_feature_download_download_complete" formatted="false">Download complete: %d/%d</string>
+    <string name="meta_feature_download_import_failed" formatted="false">%s import failed: invalid file or validation failed</string>
+    <string name="meta_feature_download_import_success" formatted="false">%s imported and applied</string>
+    <string name="meta_feature_download_last_update" formatted="false">Last update (%s): %s</string>
+    <string name="meta_feature_download_last_update_never" formatted="false">No record</string>
+    <string name="meta_feature_download_last_update_source_local" formatted="false">local</string>
+    <string name="meta_feature_download_last_update_source_online" formatted="false">online</string>
+    <string name="meta_feature_download_local_dialog_title" formatted="false">Update GeoX Locally</string>
+    <string name="meta_feature_download_progress_detail" formatted="false">%s / %s · %s</string>
+    <string name="meta_feature_download_progress_detail_unknown_total" formatted="false">%s · %s</string>
+    <string name="meta_feature_download_progress_failed" formatted="false">Download or validation failed; usable fallback file was kept</string>
+    <string name="meta_feature_download_progress_success" formatted="false">File updated and validated</string>
+    <string name="meta_feature_download_progress_summary" formatted="false">Keep this page open while files are downloaded and validated</string>
+    <string name="meta_feature_download_progress_title" formatted="false">Updating GeoX</string>
+    <string name="meta_feature_download_progress_waiting" formatted="false">Waiting to start</string>
+    <string name="meta_feature_download_select_files" formatted="false">Please select files to update</string>
+    <string name="meta_feature_download_status_downloading" formatted="false">Downloading %d%%</string>
+    <string name="meta_feature_download_status_failed" formatted="false">Failed</string>
+    <string name="meta_feature_download_status_pending" formatted="false">Pending</string>
+    <string name="meta_feature_download_status_success" formatted="false">Done</string>
+    <string name="meta_feature_download_status_validating" formatted="false">Validating</string>
+    <string name="meta_feature_geo_x_local_update_summary" formatted="false">Import and apply database files from local storage</string>
+    <string name="meta_feature_geo_x_local_update_title" formatted="false">Update GeoX Locally</string>
+    <string name="meta_feature_geo_x_online_update_summary" formatted="false">Download database files from remote sources</string>
+    <string name="meta_feature_geo_x_online_update_title" formatted="false">Update GeoX Online</string>
+    <string name="meta_feature_geo_x_runtime_home_info" formatted="false">GeoX data downloads into the core directory: %s</string>
+    <string name="meta_feature_section_connection_and_traffic" formatted="false">Connections &amp; Traffic</string>
+    <string name="meta_feature_section_geo_xupdate" formatted="false">GeoX Update</string>
+    <string name="meta_feature_title" formatted="false">Meta Features</string>
+    <string name="network_settings_error_root_required" formatted="false">RootTun requires KokoroBox to have working root access</string>
+    <string name="network_settings_error_vpn_denied" formatted="false">VPN permission denied</string>
+    <string name="network_settings_experimental_anti_pollution_dns_summary" formatted="false">Override profile DNS with encrypted regional and global resolvers; requires GeoSite data</string>
+    <string name="network_settings_experimental_anti_pollution_dns_title" formatted="false">DNS Pollution Protection</string>
+    <string name="network_settings_network_custom_user_agent_summary_default" formatted="false">Not set, using default</string>
+    <string name="network_settings_network_custom_user_agent_title" formatted="false">Custom User-Agent</string>
+    <string name="network_settings_network_user_agent_dialog_title" formatted="false">Edit User-Agent</string>
+    <string name="network_settings_proxy_options_access_control_mode_title" formatted="false">Access Control Mode</string>
+    <string name="network_settings_proxy_options_allow_all" formatted="false">Allow All</string>
+    <string name="network_settings_proxy_options_allow_selected" formatted="false">Allow Selected</string>
+    <string name="network_settings_proxy_options_manage_access_control_summary" formatted="false">Configure access control rules for apps and domains</string>
+    <string name="network_settings_proxy_options_manage_access_control_title" formatted="false">Manage Access Control</string>
+    <string name="network_settings_proxy_options_reject_selected" formatted="false">Reject Selected</string>
+    <string name="network_settings_proxy_options_tun_stack_title" formatted="false">TUN Stack</string>
+    <string name="network_settings_root_tun_auto_redirect_summary" formatted="false">Automatically enable required redirect rules</string>
+    <string name="network_settings_root_tun_auto_redirect_title" formatted="false">Auto Redirect</string>
+    <string name="network_settings_root_tun_auto_route_summary" formatted="false">Automatically add required routes</string>
+    <string name="network_settings_root_tun_auto_route_title" formatted="false">Auto Route</string>
+    <string name="network_settings_root_tun_dns_mode_fake_ip" formatted="false">FakeIP</string>
+    <string name="network_settings_root_tun_dns_mode_redir_host" formatted="false">RedirHost</string>
+    <string name="network_settings_root_tun_dns_mode_summary" formatted="false">Choose between RedirHost and FakeIP</string>
+    <string name="network_settings_root_tun_dns_mode_title" formatted="false">DNS Mode</string>
+    <string name="network_settings_root_tun_fake_ip_range6_summary" formatted="false">Only effective when DNS mode is FakeIP</string>
+    <string name="network_settings_root_tun_fake_ip_range6_title" formatted="false">FakeIP IPv6 Range</string>
+    <string name="network_settings_root_tun_fake_ip_range_summary" formatted="false">Only effective when DNS mode is FakeIP</string>
+    <string name="network_settings_root_tun_fake_ip_range_title" formatted="false">FakeIP IPv4 Range</string>
+    <string name="network_settings_root_tun_if_name_summary" formatted="false">Virtual interface name created by RootTun</string>
+    <string name="network_settings_root_tun_if_name_title" formatted="false">Interface Name</string>
+    <string name="network_settings_root_tun_mtu_summary" formatted="false">Maximum transmission unit used by RootTun</string>
+    <string name="network_settings_root_tun_mtu_title" formatted="false">MTU</string>
+    <string name="network_settings_root_tun_strict_route_summary" formatted="false">Only matched traffic is routed into RootTun</string>
+    <string name="network_settings_root_tun_strict_route_title" formatted="false">Strict Route</string>
+    <string name="network_settings_section_experimental" formatted="false">Experimental</string>
+    <string name="network_settings_section_network" formatted="false">Network</string>
+    <string name="network_settings_section_proxy_options" formatted="false">Access Control</string>
+    <string name="network_settings_section_vpn_options" formatted="false">Service Options</string>
+    <string name="network_settings_section_vpn_service" formatted="false">Proxy Mode</string>
+    <string name="network_settings_title" formatted="false">Network Settings</string>
+    <string name="network_settings_vpn_options_allow_bypass_summary" formatted="false">Allow apps to bypass VPN</string>
+    <string name="network_settings_vpn_options_allow_bypass_title" formatted="false">Allow App Bypass</string>
+    <string name="network_settings_vpn_options_bypass_private_summary" formatted="false">Bypass private networks and local addresses</string>
+    <string name="network_settings_vpn_options_bypass_private_title" formatted="false">Bypass Private Networks</string>
+    <string name="network_settings_vpn_options_dns_hijack_summary" formatted="false">Redirect all DNS requests to KokoroBox</string>
+    <string name="network_settings_vpn_options_dns_hijack_title" formatted="false">DNS Hijack</string>
+    <string name="network_settings_vpn_options_enable_ipv6_summary" formatted="false">Allow IPv6 traffic through VPN</string>
+    <string name="network_settings_vpn_options_enable_ipv6_title" formatted="false">Enable IPv6</string>
+    <string name="network_settings_vpn_options_system_proxy_summary" formatted="false">Only in VPN mode, set an HTTP proxy for apps outside the TUN path</string>
+    <string name="network_settings_vpn_options_system_proxy_title" formatted="false">VPN Built-in System Proxy</string>
+    <string name="network_settings_vpn_service_root_tun_mode" formatted="false">Root TUN</string>
+    <string name="network_settings_vpn_service_route_traffic_summary" formatted="false">Select which proxy mode should take over system traffic</string>
+    <string name="network_settings_vpn_service_route_traffic_title" formatted="false">Route System Traffic</string>
+    <string name="network_settings_vpn_service_system_proxy" formatted="false">HTTP System Proxy</string>
+    <string name="network_settings_vpn_service_vpn_mode" formatted="false">VPN Mode</string>
+    <string name="onboarding_finish_subtitle" formatted="false">Setup complete, entering the main app</string>
+    <string name="onboarding_finish_title" formatted="false">Ready to Go</string>
+    <string name="onboarding_navigation_back" formatted="false">Back</string>
+    <string name="onboarding_navigation_enter" formatted="false">Enter App</string>
+    <string name="onboarding_navigation_next" formatted="false">Next</string>
+    <string name="onboarding_navigation_start" formatted="false">Start Setup</string>
+    <string name="onboarding_permission_app_list_summary_need" formatted="false">Required for per-app proxy features</string>
+    <string name="onboarding_permission_app_list_title" formatted="false">App List Permission</string>
+    <string name="onboarding_permission_common_granted" formatted="false">Granted</string>
+    <string name="onboarding_permission_notification_summary_need" formatted="false">Show connection status and traffic notifications</string>
+    <string name="onboarding_permission_notification_summary_not_required" formatted="false">Not required on your Android version</string>
+    <string name="onboarding_permission_notification_title" formatted="false">Notification Permission</string>
+    <string name="onboarding_permission_subtitle" formatted="false">Permissions affect notifications and per-app proxy features</string>
+    <string name="onboarding_permission_title" formatted="false">Confirm Runtime Access</string>
+    <string name="onboarding_personalize_subtitle" formatted="false">Theme mode and accent color can be changed anytime in settings</string>
+    <string name="onboarding_personalize_title" formatted="false">Tune the Interface</string>
+    <string name="onboarding_privacy_accept_title" formatted="false">I have read and agree to the privacy policy</string>
+    <string name="onboarding_privacy_policy_link" formatted="false">Privacy Policy</string>
+    <string name="onboarding_privacy_privacy_title" formatted="false">Privacy Policy</string>
+    <string name="onboarding_privacy_rich_text_lead" formatted="false">You need to accept the privacy policy before using KokoroBox.</string>
+    <string name="onboarding_privacy_rich_text_prefix" formatted="false">Before continuing, please review and accept the </string>
+    <string name="onboarding_privacy_rich_text_suffix" formatted="false">.</string>
+    <string name="onboarding_privacy_subtitle" formatted="false">Review and accept the privacy policy to continue</string>
+    <string name="onboarding_privacy_title" formatted="false">Confirm Privacy Policy</string>
+    <string name="onboarding_sheet_load_failed" formatted="false">Failed to load policy content</string>
+    <string name="onboarding_sheet_privacy_policy_title" formatted="false">Privacy Policy</string>
+    <string name="open_source_licenses_license_sheet_no_content" formatted="false">No license content</string>
+    <string name="open_source_licenses_title" formatted="false">Open Source Licenses</string>
+    <string name="override_action_create" formatted="false">Create Config</string>
+    <string name="override_action_import" formatted="false">Import JSON</string>
+    <string name="override_action_import_file" formatted="false">Import Config File</string>
+    <string name="override_action_new" formatted="false">New Config</string>
+    <string name="override_card_copy" formatted="false">Copy Config</string>
+    <string name="override_card_delete" formatted="false">Delete Config</string>
+    <string name="override_card_delete_button" formatted="false">Delete</string>
+    <string name="override_card_edit" formatted="false">Edit Config</string>
+    <string name="override_card_edit_button" formatted="false">Edit</string>
+    <string name="override_card_export" formatted="false">Export Config</string>
+    <string name="override_card_no_description" formatted="false">No description</string>
+    <string name="override_dialog_button_cancel" formatted="false">Cancel</string>
+    <string name="override_dialog_button_delete" formatted="false">Delete</string>
+    <string name="override_dialog_create_description" formatted="false">Config Description</string>
+    <string name="override_dialog_create_import_hint" formatted="false">Select a JSON file to import override config</string>
+    <string name="override_dialog_create_name" formatted="false">Config Name</string>
+    <string name="override_dialog_create_title" formatted="false">Add Config</string>
+    <string name="override_dialog_delete_in_use_message" formatted="false">Config %s is being used by subscriptions. Deleting will unbind the relationship. Are you sure? This action cannot be undone.</string>
+    <string name="override_dialog_delete_message" formatted="false">Are you sure you want to delete config %s? This action cannot be undone.</string>
+    <string name="override_dialog_delete_title" formatted="false">Delete Config</string>
+    <string name="override_dialog_edit_options_code_editor" formatted="false">Code Editor</string>
+    <string name="override_dialog_edit_options_title" formatted="false">Edit Config</string>
+    <string name="override_dialog_edit_options_visual_editor" formatted="false">Visual Editor</string>
+    <string name="override_dns_append_system" formatted="false">Append System DNS</string>
+    <string name="override_dns_default" formatted="false">Default DNS</string>
+    <string name="override_dns_default_hint" formatted="false">For resolving DNS server domains</string>
+    <string name="override_dns_enhanced_disable" formatted="false">Disable</string>
+    <string name="override_dns_enhanced_fakeip" formatted="false">FakeIP</string>
+    <string name="override_dns_enhanced_mapping" formatted="false">Mapping</string>
+    <string name="override_dns_enhanced_mode" formatted="false">Enhanced Mode</string>
+    <string name="override_dns_enhanced_not_modify" formatted="false">Dont Modifyt Modify</string>
+    <string name="override_dns_fakeip_blacklist" formatted="false">Blacklist</string>
+    <string name="override_dns_fakeip_filter" formatted="false">FakeIP Filter</string>
+    <string name="override_dns_fakeip_filter_hint" formatted="false">e.g.: +.lan, localhost</string>
+    <string name="override_dns_fakeip_filter_mode" formatted="false">FakeIP Filter Mode</string>
+    <string name="override_dns_fakeip_whitelist" formatted="false">Whitelist</string>
+    <string name="override_dns_fallback" formatted="false">Fallback DNS</string>
+    <string name="override_dns_fallback_domain" formatted="false">Domain Fallback</string>
+    <string name="override_dns_fallback_domain_hint" formatted="false">e.g.: +.google.com</string>
+    <string name="override_dns_fallback_geoip" formatted="false">GeoIP Fallback</string>
+    <string name="override_dns_fallback_geoip_code" formatted="false">GeoIP Code</string>
+    <string name="override_dns_fallback_geoip_code_hint" formatted="false">e.g.: CN</string>
+    <string name="override_dns_fallback_hint" formatted="false">e.g.: 1.1.1.1</string>
+    <string name="override_dns_fallback_ipcidr" formatted="false">IP CIDR Fallback</string>
+    <string name="override_dns_fallback_ipcidr_hint" formatted="false">e.g.: 240.0.0.0/4</string>
+    <string name="override_dns_ipv6" formatted="false">DNS IPv6</string>
+    <string name="override_dns_listen" formatted="false">Listen Address</string>
+    <string name="override_dns_listen_hint" formatted="false">e.g.: 0.0.0.0:53</string>
+    <string name="override_dns_nameserver_policy" formatted="false">Nameserver Policy</string>
+    <string name="override_dns_nameserver_policy_key" formatted="false">Domain match rule</string>
+    <string name="override_dns_nameserver_policy_value" formatted="false">DNS server</string>
+    <string name="override_dns_policy" formatted="false">DNS Policy</string>
+    <string name="override_dns_policy_force_enable" formatted="false">Force Enable</string>
+    <string name="override_dns_policy_not_modify" formatted="false">Dont Modifyt Modify</string>
+    <string name="override_dns_policy_use_builtin" formatted="false">Use Built-in</string>
+    <string name="override_dns_prefer_h3" formatted="false">Prefer HTTP/3</string>
+    <string name="override_dns_servers" formatted="false">DNS Servers</string>
+    <string name="override_dns_servers_hint" formatted="false">e.g.: 8.8.8.8, tls://dns.google</string>
+    <string name="override_dns_use_hosts" formatted="false">Use Hosts</string>
+    <string name="override_draft_add_extra_field" formatted="false">Add Extra Field</string>
+    <string name="override_draft_add_health_check_field" formatted="false">Add health-check extra field</string>
+    <string name="override_draft_add_override_field" formatted="false">Add override extra field</string>
+    <string name="override_draft_apply" formatted="false">Apply</string>
+    <string name="override_draft_basic_identity" formatted="false">Basic Identity</string>
+    <string name="override_draft_basic_info" formatted="false">Basic Info</string>
+    <string name="override_draft_basic_routing" formatted="false">Basic Routing</string>
+    <string name="override_draft_boolean_options" formatted="false">Boolean Options</string>
+    <string name="override_draft_click_to_add_extra_field" formatted="false">Click to add extra field</string>
+    <string name="override_draft_config_description" formatted="false">Config Description</string>
+    <string name="override_draft_config_name" formatted="false">Config Name</string>
+    <string name="override_draft_config_sections" formatted="false">Config Sections</string>
+    <string name="override_draft_core_source" formatted="false">Core Source</string>
+    <string name="override_draft_delete_extra_field" formatted="false">Delete extra field</string>
+    <string name="override_draft_double_value" formatted="false">Double value</string>
+    <string name="override_draft_edit_extra_field" formatted="false">Edit Extra Field</string>
+    <string name="override_draft_edit_health_check_field" formatted="false">Edit health-check extra field</string>
+    <string name="override_draft_edit_override_field" formatted="false">Edit override extra field</string>
+    <string name="override_draft_edit_sub_rules" formatted="false">Edit Sub Rules</string>
+    <string name="override_draft_extra_fields" formatted="false">Extra Fields</string>
+    <string name="override_draft_extra_fields_configured" formatted="false">%d extra fields configured</string>
+    <string name="override_draft_fallback_region_group_title" formatted="false">Fallback Region Groups</string>
+    <string name="override_draft_group_type_fallback" formatted="false">Fallback</string>
+    <string name="override_draft_group_type_title" formatted="false">Group Types</string>
+    <string name="override_draft_group_type_url_test" formatted="false">UrlTest</string>
+    <string name="override_draft_header_hint" formatted="false">One header per line, format: Key: value1 | value2</string>
+    <string name="override_draft_health_check_fields" formatted="false">Health Check Extra Fields</string>
+    <string name="override_draft_health_check_switch" formatted="false">Health Check Switch</string>
+    <string name="override_draft_int_value" formatted="false">Integer value</string>
+    <string name="override_draft_json_fragment" formatted="false">Single JSON fragment</string>
+    <string name="override_draft_key_name_empty" formatted="false">Key name cannot be empty</string>
+    <string name="override_draft_name" formatted="false">Name</string>
+    <string name="override_draft_name_required" formatted="false">Name cannot be empty</string>
+    <string name="override_draft_network_auth" formatted="false">Network &amp; Auth</string>
+    <string name="override_draft_no_rules" formatted="false">No rules configured</string>
+    <string name="override_draft_object" formatted="false">Object</string>
+    <string name="override_draft_official_mrs" formatted="false">Official MRS Common Routing</string>
+    <string name="override_draft_official_mrs_summary" formatted="false">Top template editor with regional auto-groups and individual switches; applies by rebuilding rule sections in current override.</string>
+    <string name="override_draft_override_fields" formatted="false">Override Extra Fields</string>
+    <string name="override_draft_override_switch" formatted="false">Override Switch</string>
+    <string name="override_draft_preset_apply_summary" formatted="false">Applying will replace the current overrides rule providers, proxy groups, and ruless rule providers, proxy groups, and rules</string>
+    <string name="override_draft_preset_template" formatted="false">Preset Routing Template</string>
+    <string name="override_draft_regional_auto_group" formatted="false">Regional Auto Group</string>
+    <string name="override_draft_rule_list" formatted="false">Rule List</string>
+    <string name="override_draft_rules_configured" formatted="false">%d rules configured</string>
+    <string name="override_draft_save" formatted="false">Save</string>
+    <string name="override_draft_service_routing" formatted="false">Service Routing</string>
+    <string name="override_draft_string_value" formatted="false">String value</string>
+    <string name="override_draft_sub_rule_group" formatted="false">Sub Rule Group</string>
+    <string name="override_draft_url_test_region_group_title" formatted="false">UrlTest Region Groups</string>
+    <string name="override_draft_value_type" formatted="false">Value Type</string>
+    <string name="override_draft_value_type_mismatch" formatted="false">Current value does not match selected type</string>
+    <string name="override_edit_button_cancel" formatted="false">Cancel</string>
+    <string name="override_edit_button_discard" formatted="false">Discard</string>
+    <string name="override_edit_empty_name_summary" formatted="false">Current name is empty, cannot save in real-time. Are you sure to discard these unsaved changes?</string>
+    <string name="override_edit_empty_name_title" formatted="false">Empty Name</string>
+    <string name="override_edit_preset_applied" formatted="false">Preset routing template updated</string>
+    <string name="override_edit_title_edit" formatted="false">Edit Config</string>
+    <string name="override_edit_title_new" formatted="false">New Config</string>
+    <string name="override_editor_add_custom" formatted="false">Add Custom</string>
+    <string name="override_editor_add_item" formatted="false">Add Item</string>
+    <string name="override_editor_add_object" formatted="false">Add Object</string>
+    <string name="override_editor_add_sub_rule_group" formatted="false">Add Sub Rule Group</string>
+    <string name="override_editor_additional_params" formatted="false">Additional Params</string>
+    <string name="override_editor_array_items" formatted="false">Array %d items</string>
+    <string name="override_editor_basic_connection" formatted="false">Basic Connection</string>
+    <string name="override_editor_cancel_delete" formatted="false">Cancel Delete</string>
+    <string name="override_editor_clear" formatted="false">Clear</string>
+    <string name="override_editor_clear_current_mode" formatted="false">Clear Current Mode</string>
+    <string name="override_editor_clear_dialog_summary" formatted="false">Clearing will remove all %s in current mode.</string>
+    <string name="override_editor_clear_dialog_title" formatted="false">Clear %s</string>
+    <string name="override_editor_clear_mode" formatted="false">Clear Current Mode</string>
+    <string name="override_editor_clear_sub_rules" formatted="false">Clear Sub Rules</string>
+    <string name="override_editor_confirm" formatted="false">Confirm</string>
+    <string name="override_editor_content_empty" formatted="false">Content cannot be empty</string>
+    <string name="override_editor_copy" formatted="false">Copy</string>
+    <string name="override_editor_custom_match_result" formatted="false">Custom Match Result</string>
+    <string name="override_editor_custom_member" formatted="false">Custom Member</string>
+    <string name="override_editor_custom_proxy_group_target" formatted="false">Custom Proxy Group Target</string>
+    <string name="override_editor_custom_sub_rule_target" formatted="false">Custom Sub Rule Target</string>
+    <string name="override_editor_delete" formatted="false">Delete</string>
+    <string name="override_editor_delete_last_item" formatted="false">Delete Last Item</string>
+    <string name="override_editor_delete_selected" formatted="false">Delete Selected</string>
+    <string name="override_editor_delete_selected_rules" formatted="false">Delete Selected Rules</string>
+    <string name="override_editor_drag_to_sort" formatted="false">Drag to Sort</string>
+    <string name="override_editor_edit" formatted="false">Edit</string>
+    <string name="override_editor_edit_item" formatted="false">Edit Item</string>
+    <string name="override_editor_edit_proxy_group" formatted="false">Edit Proxy Group</string>
+    <string name="override_editor_edit_proxy_node" formatted="false">Edit Proxy Node</string>
+    <string name="override_editor_edit_rule" formatted="false">Edit Rule</string>
+    <string name="override_editor_edit_sub_rule" formatted="false">Edit Sub Rule</string>
+    <string name="override_editor_edit_sub_rule_group" formatted="false">Edit Sub Rule Group</string>
+    <string name="override_editor_empty_string" formatted="false">Empty String</string>
+    <string name="override_editor_enter_delete_mode" formatted="false">Enter Delete Mode</string>
+    <string name="override_editor_extra_params_hint" formatted="false">Extra params beyond src,no-resolve\nFor logical rules, enter full payload directly, e.g. ((DOMAIN,google.com),(NETWORK,udp)).</string>
+    <string name="override_editor_health_check_and_filter" formatted="false">Health Check &amp; Filter</string>
+    <string name="override_editor_json_block_subtitle" formatted="false">Edit this config block in JSON format</string>
+    <string name="override_editor_key_name" formatted="false">Key Name</string>
+    <string name="override_editor_list" formatted="false">List</string>
+    <string name="override_editor_logical_rule_hint" formatted="false">Logical rules can have full payload directly</string>
+    <string name="override_editor_match_result" formatted="false">Match Result</string>
+    <string name="override_editor_member_source" formatted="false">Member Source</string>
+    <string name="override_editor_mode_title" formatted="false">Modifier Mode</string>
+    <string name="override_editor_move_down" formatted="false">Move Down</string>
+    <string name="override_editor_move_up" formatted="false">Move Up</string>
+    <string name="override_editor_network_and_route" formatted="false">Network &amp; Route</string>
+    <string name="override_editor_new" formatted="false">Add</string>
+    <string name="override_editor_new_provider" formatted="false">Add Provider</string>
+    <string name="override_editor_new_proxy_group" formatted="false">Add Proxy Group</string>
+    <string name="override_editor_new_proxy_node" formatted="false">Add Proxy Node</string>
+    <string name="override_editor_new_rule" formatted="false">Add New Rule</string>
+    <string name="override_editor_new_sub_rule_group" formatted="false">Add New Sub Rule Group</string>
+    <string name="override_editor_no_rules" formatted="false">No rules</string>
+    <string name="override_editor_object_fallback_title" formatted="false">Object %d</string>
+    <string name="override_editor_object_field_count" formatted="false">%d fields</string>
+    <string name="override_editor_object_field_hint" formatted="false">Field values support simple values and JSON structures.</string>
+    <string name="override_editor_object_fields" formatted="false">Object %d fields</string>
+    <string name="override_editor_object_json_placeholder" formatted="false">{ \"name\": \"proxy\", \"type\": \"ss\" }</string>
+    <string name="override_editor_object_list_hint" formatted="false">Structured object list editor. Field values support strings, numbers, booleans, and JSON fragments.</string>
+    <string name="override_editor_one_item_per_line" formatted="false">One item per line</string>
+    <string name="override_editor_other_extra_params" formatted="false">Other extra params, comma-separated</string>
+    <string name="override_editor_payload" formatted="false">Payload</string>
+    <string name="override_editor_payload_empty" formatted="false">Payload cannot be empty</string>
+    <string name="override_editor_port_empty_hint" formatted="false">Leave empty to not override port</string>
+    <string name="override_editor_provider_map_hint" formatted="false">Structured Provider dictionary editor. Duplicate keys overwrite previous values.</string>
+    <string name="override_editor_proxy_group" formatted="false">Proxy Group</string>
+    <string name="override_editor_proxy_group_target" formatted="false">Proxy Group Target</string>
+    <string name="override_editor_proxy_node" formatted="false">Proxy Node</string>
+    <string name="override_editor_rule_body" formatted="false">Rule Body</string>
+    <string name="override_editor_rule_edit" formatted="false">Rule Edit</string>
+    <string name="override_editor_rule_placeholder" formatted="false">DOMAIN-SUFFIX,example.com,DIRECT</string>
+    <string name="override_editor_rule_provider_input_hint" formatted="false">Custom content in input field; uses selected rule provider when empty</string>
+    <string name="override_editor_rule_type" formatted="false">Type</string>
+    <string name="override_editor_rule_type_empty" formatted="false">Rule type cannot be empty</string>
+    <string name="override_editor_rules" formatted="false">Rules</string>
+    <string name="override_editor_rules_configured_inline" formatted="false">%d rules configured</string>
+    <string name="override_editor_save_proxy_group" formatted="false">Save Proxy Group</string>
+    <string name="override_editor_save_proxy_node" formatted="false">Save Proxy Node</string>
+    <string name="override_editor_save_rule" formatted="false">Save Rule</string>
+    <string name="override_editor_select_match_result" formatted="false">Select Match Result</string>
+    <string name="override_editor_select_proxy_group_member" formatted="false">Select Proxy Group Member</string>
+    <string name="override_editor_select_proxy_group_target" formatted="false">Select Proxy Group Target</string>
+    <string name="override_editor_select_rule_provider" formatted="false">Select Rule Provider</string>
+    <string name="override_editor_select_sub_rule_target" formatted="false">Select Sub Rule Target</string>
+    <string name="override_editor_sub_rule_group_hint" formatted="false">Each sub-rule group contains a name and a list of rules.</string>
+    <string name="override_editor_sub_rule_name" formatted="false">Sub Rule Name</string>
+    <string name="override_editor_sub_rule_target" formatted="false">Sub Rule Target</string>
+    <string name="override_editor_target_empty" formatted="false">Target cannot be empty</string>
+    <string name="override_editor_type_empty" formatted="false">Type cannot be empty</string>
+    <string name="override_editor_unnamed" formatted="false">Unnamed %s</string>
+    <string name="override_editor_unnamed_provider" formatted="false">Unnamed Provider</string>
+    <string name="override_editor_unnamed_proxy_group" formatted="false">Unnamed Proxy Group</string>
+    <string name="override_editor_unnamed_proxy_node" formatted="false">Unnamed Proxy Node</string>
+    <string name="override_editor_unnamed_rule" formatted="false">Unnamed Rule</string>
+    <string name="override_editor_unnamed_sub_rule_group" formatted="false">Unnamed Sub Rule Group</string>
+    <string name="override_empty_hint" formatted="false">Click the button below to create a new config, or import JSON</string>
+    <string name="override_empty_title" formatted="false">No override configs</string>
+    <string name="override_export_failed" formatted="false">Export failed: %s</string>
+    <string name="override_export_success" formatted="false">Exported config: %s</string>
+    <string name="override_form_advanced_json" formatted="false">%s · Advanced JSON</string>
+    <string name="override_form_allow_private_network" formatted="false">Allow Private Network</string>
+    <string name="override_form_allowed_ips" formatted="false">Allowed IPs</string>
+    <string name="override_form_api_secret" formatted="false">API Secret</string>
+    <string name="override_form_auto_detect_interface" formatted="false">Auto Detect Interface</string>
+    <string name="override_form_auto_redirect" formatted="false">Auto Redirect</string>
+    <string name="override_form_auto_route" formatted="false">Auto Route</string>
+    <string name="override_form_auto_update_geo" formatted="false">Auto Update GEO</string>
+    <string name="override_form_basic_policy" formatted="false">Basic Policy</string>
+    <string name="override_form_bind_address" formatted="false">Bind Address</string>
+    <string name="override_form_cache_limit" formatted="false">Cache Limit</string>
+    <string name="override_form_config_persistence" formatted="false">Config Persistence</string>
+    <string name="override_form_connection_network" formatted="false">Connection &amp; Network</string>
+    <string name="override_form_controller_cors" formatted="false">Controller CORS</string>
+    <string name="override_form_direct_follow_policy" formatted="false">Direct follows Policy</string>
+    <string name="override_form_disable_icmp_forward" formatted="false">Disable ICMP Forward</string>
+    <string name="override_form_disallowed_ips" formatted="false">Disallowed IPs</string>
+    <string name="override_form_dns_basic_params" formatted="false">DNS Basic Params</string>
+    <string name="override_form_dns_basic_switch" formatted="false">Basic Switch</string>
+    <string name="override_form_dns_fake_ip_range" formatted="false">FakeIP Range</string>
+    <string name="override_form_dns_hijack" formatted="false">DNS Hijack</string>
+    <string name="override_form_dns_policy_mode" formatted="false">Policy Mode</string>
+    <string name="override_form_dns_upstream" formatted="false">Upstream Servers</string>
+    <string name="override_form_dns_upstream_servers" formatted="false">Upstream Servers</string>
+    <string name="override_form_enable_gso" formatted="false">Enable GSO</string>
+    <string name="override_form_endpoint_independent_nat" formatted="false">Endpoint Independent NAT</string>
+    <string name="override_form_exclude_package" formatted="false">Exclude Package</string>
+    <string name="override_form_external_control" formatted="false">External Control</string>
+    <string name="override_form_external_controller" formatted="false">External Controller</string>
+    <string name="override_form_external_controller_https" formatted="false">HTTPS Controller</string>
+    <string name="override_form_external_do_h" formatted="false">External DoH Service</string>
+    <string name="override_form_fake_ip_ipv6_range" formatted="false">Fake-IP IPv6 Range</string>
+    <string name="override_form_fake_ip_mode" formatted="false">Fake-IP Mode</string>
+    <string name="override_form_fake_ip_params" formatted="false">Fake-IP Params</string>
+    <string name="override_form_fallback_filter" formatted="false">Fallback Filter</string>
+    <string name="override_form_fallback_params" formatted="false">Fallback Params</string>
+    <string name="override_form_fallback_switch" formatted="false">Fallback Switch</string>
+    <string name="override_form_filter_list" formatted="false">Filter List</string>
+    <string name="override_form_geo_resources" formatted="false">GEO Resources</string>
+    <string name="override_form_geo_update_interval" formatted="false">GEO Update Interval</string>
+    <string name="override_form_geodata_mode" formatted="false">Geodata Mode</string>
+    <string name="override_form_geoip_url" formatted="false">GeoIP URL</string>
+    <string name="override_form_geosite_matcher" formatted="false">Geosite Matcher</string>
+    <string name="override_form_geosite_url" formatted="false">GeoSite URL</string>
+    <string name="override_form_global_client_fingerprint" formatted="false">Global Client Fingerprint</string>
+    <string name="override_form_hours" formatted="false">hours</string>
+    <string name="override_form_http_ports" formatted="false">HTTP Ports</string>
+    <string name="override_form_include_package" formatted="false">Include Package</string>
+    <string name="override_form_ipv6_timeout" formatted="false">IPv6 Timeout</string>
+    <string name="override_form_items_configured" formatted="false">%d items configured</string>
+    <string name="override_form_lan_access" formatted="false">LAN Access</string>
+    <string name="override_form_lan_address" formatted="false">LAN Address</string>
+    <string name="override_form_mmdb_url" formatted="false">MMDB URL</string>
+    <string name="override_form_nameserver_policy_section" formatted="false">Nameserver Policy</string>
+    <string name="override_form_network_perf_params" formatted="false">Network Perf Params</string>
+    <string name="override_form_network_perf_switch" formatted="false">Network Perf Switch</string>
+    <string name="override_form_not_modify" formatted="false">Dont Modifyt Modify</string>
+    <string name="override_form_open_advanced_edit" formatted="false">Open Advanced Edit</string>
+    <string name="override_form_open_advanced_edit_summary" formatted="false">Edit raw object directly, for fields not covered by structured form</string>
+    <string name="override_form_outbound_interface" formatted="false">Outbound Interface</string>
+    <string name="override_form_process_mode" formatted="false">Process Match Mode</string>
+    <string name="override_form_proxy_groups" formatted="false">Proxy Groups</string>
+    <string name="override_form_proxy_groups_hint" formatted="false">Structured proxy groups</string>
+    <string name="override_form_proxy_nodes" formatted="false">Proxy Nodes</string>
+    <string name="override_form_proxy_nodes_hint" formatted="false">Structured proxy entries</string>
+    <string name="override_form_proxy_ports" formatted="false">Proxy Ports</string>
+    <string name="override_form_proxy_providers" formatted="false">Proxy Providers</string>
+    <string name="override_form_proxy_providers_advanced" formatted="false">Enter Advanced JSON when protocol details, validation or extra fields are needed</string>
+    <string name="override_form_proxy_providers_hint" formatted="false">Structured Providers</string>
+    <string name="override_form_proxy_server_nameserver_policy" formatted="false">Proxy Server Nameserver Policy</string>
+    <string name="override_form_quic_ports" formatted="false">QUIC Ports</string>
+    <string name="override_form_route_address" formatted="false">Route Address</string>
+    <string name="override_form_route_exclude_address" formatted="false">Route Exclude Address</string>
+    <string name="override_form_routing_mark" formatted="false">Routing Mark</string>
+    <string name="override_form_rule_chain" formatted="false">Rule Chain</string>
+    <string name="override_form_rule_chain_not_set" formatted="false">Rule chain not set</string>
+    <string name="override_form_rule_providers" formatted="false">Rule Providers</string>
+    <string name="override_form_rule_providers_advanced" formatted="false">Enter Advanced JSON when complex Provider fields are needed</string>
+    <string name="override_form_rule_providers_hint" formatted="false">Structured Providers</string>
+    <string name="override_form_run_and_log" formatted="false">Run &amp; Log</string>
+    <string name="override_form_run_and_log_extra" formatted="false">Run &amp; Log Extra</string>
+    <string name="override_form_save_fake_ip_mapping" formatted="false">Save Fake-IP Mapping</string>
+    <string name="override_form_save_group_selection" formatted="false">Save Group Selection</string>
+    <string name="override_form_seconds" formatted="false">seconds</string>
+    <string name="override_form_skip_and_force" formatted="false">Skip &amp; Force</string>
+    <string name="override_form_skip_auth_ips" formatted="false">Skip Auth IPs</string>
+    <string name="override_form_skip_dst_address" formatted="false">Skip Dst Address</string>
+    <string name="override_form_skip_src_address" formatted="false">Skip Src Address</string>
+    <string name="override_form_sniffer_force_domain" formatted="false">Force Domain</string>
+    <string name="override_form_sniffer_override" formatted="false">Override Destination</string>
+    <string name="override_form_sniffer_parse_pure_ip" formatted="false">Parse Pure IP</string>
+    <string name="override_form_sniffer_ports" formatted="false">Ports</string>
+    <string name="override_form_sniffer_skip_domain" formatted="false">Skip Domain</string>
+    <string name="override_form_sniffer_switch" formatted="false">Switch</string>
+    <string name="override_form_stack" formatted="false">Stack</string>
+    <string name="override_form_strict_route" formatted="false">Strict Route</string>
+    <string name="override_form_structured_edit" formatted="false">%s · Structured Edit</string>
+    <string name="override_form_sub_rules" formatted="false">Sub Rules</string>
+    <string name="override_form_sub_rules_advanced" formatted="false">Complex sub rule structures are collected in Advanced JSON</string>
+    <string name="override_form_sub_rules_hint" formatted="false">Structured rule groups</string>
+    <string name="override_form_tcp_concurrent" formatted="false">TCP Concurrent</string>
+    <string name="override_form_tls_ports" formatted="false">TLS Ports</string>
+    <string name="override_form_tun_basic_switch" formatted="false">Basic Switch</string>
+    <string name="override_form_tun_route_and_apps" formatted="false">Route &amp; Apps</string>
+    <string name="override_form_unified_delay" formatted="false">Unified Delay</string>
+    <string name="override_form_user_auth" formatted="false">User Auth</string>
+    <string name="override_general_allow_lan" formatted="false">Allow LAN</string>
+    <string name="override_general_http_port" formatted="false">HTTP Port</string>
+    <string name="override_general_ipv6" formatted="false">IPv6</string>
+    <string name="override_general_log_level" formatted="false">Log Level</string>
+    <string name="override_general_mixed_port" formatted="false">Mixed Port</string>
+    <string name="override_general_proxy_mode" formatted="false">Proxy Mode</string>
+    <string name="override_general_redirect_port" formatted="false">Redirect Port</string>
+    <string name="override_general_socks_port" formatted="false">SOCKS Port</string>
+    <string name="override_general_tproxy_port" formatted="false">TProxy Port</string>
+    <string name="override_import_failed" formatted="false">Import failed: %s</string>
+    <string name="override_import_file_error" formatted="false">Failed to read file: %s</string>
+    <string name="override_import_read_error" formatted="false">Cannot read import file</string>
+    <string name="override_import_success" formatted="false">Imported %d configs from %s</string>
+    <string name="override_import_success_default" formatted="false">Imported %d configs</string>
+    <string name="override_label_cache_algorithm" formatted="false">Cache Algorithm</string>
+    <string name="override_label_enable" formatted="false">Enable</string>
+    <string name="override_label_fake_ip_range" formatted="false">FakeIP Range</string>
+    <string name="override_label_force_dns_mapping" formatted="false">Force DNS Mapping</string>
+    <string name="override_label_force_domain" formatted="false">Force Domain</string>
+    <string name="override_label_http_override" formatted="false">HTTP Override</string>
+    <string name="override_label_keep_alive_idle" formatted="false">Keep Alive Idle</string>
+    <string name="override_label_keep_alive_interval" formatted="false">Keep Alive Interval</string>
+    <string name="override_label_override_destination" formatted="false">Override Destination</string>
+    <string name="override_label_parse_pure_ip" formatted="false">Parse Pure IP</string>
+    <string name="override_label_quic_override" formatted="false">QUIC Override</string>
+    <string name="override_label_respect_rules" formatted="false">Respect Rules</string>
+    <string name="override_label_rules_replace" formatted="false">Override Rules</string>
+    <string name="override_label_skip_domain" formatted="false">Skip Domain</string>
+    <string name="override_label_tls_override" formatted="false">TLS Override</string>
+    <string name="override_label_use_system_hosts" formatted="false">Use System Hosts</string>
+    <string name="override_modifier_end" formatted="false">Append</string>
+    <string name="override_modifier_force" formatted="false">Force Replace</string>
+    <string name="override_modifier_items_count" formatted="false">%d items</string>
+    <string name="override_modifier_merge" formatted="false">Merge</string>
+    <string name="override_modifier_no_changes" formatted="false">No changes</string>
+    <string name="override_modifier_not_modified" formatted="false">Not Modified</string>
+    <string name="override_modifier_replace" formatted="false">Replace</string>
+    <string name="override_modifier_start" formatted="false">Prepend</string>
+    <string name="override_proxy_group_field_disable_udp" formatted="false">Disable UDP</string>
+    <string name="override_proxy_group_field_exclude_filter" formatted="false">Exclude Filter</string>
+    <string name="override_proxy_group_field_exclude_type" formatted="false">Exclude Type</string>
+    <string name="override_proxy_group_field_expected_status" formatted="false">Expected Status</string>
+    <string name="override_proxy_group_field_filter" formatted="false">Filter</string>
+    <string name="override_proxy_group_field_hidden" formatted="false">Hidden</string>
+    <string name="override_proxy_group_field_icon" formatted="false">Icon</string>
+    <string name="override_proxy_group_field_include_all" formatted="false">Include All</string>
+    <string name="override_proxy_group_field_include_all_providers" formatted="false">Include All Providers</string>
+    <string name="override_proxy_group_field_include_all_proxies" formatted="false">Include All Proxies</string>
+    <string name="override_proxy_group_field_interface_name" formatted="false">Interface Name</string>
+    <string name="override_proxy_group_field_interval" formatted="false">Interval</string>
+    <string name="override_proxy_group_field_lazy" formatted="false">Lazy</string>
+    <string name="override_proxy_group_field_max_failed_times" formatted="false">Max Failed Times</string>
+    <string name="override_proxy_group_field_proxies" formatted="false">Members</string>
+    <string name="override_proxy_group_field_routing_mark" formatted="false">Routing Mark</string>
+    <string name="override_proxy_group_field_timeout" formatted="false">Timeout</string>
+    <string name="override_proxy_group_field_url" formatted="false">URL</string>
+    <string name="override_proxy_group_field_use" formatted="false">Use Providers</string>
+    <string name="override_proxy_group_field_use_hint" formatted="false">One Provider name per line</string>
+    <string name="override_rule_empty_warning" formatted="false">Rule #%d is empty</string>
+    <string name="override_rule_invalid_format_warning" formatted="false">Rule #%d format may be incorrect: %s</string>
+    <string name="override_rule_missing_target_warning" formatted="false">Rule #%d missing policy group target: %s</string>
+    <string name="override_save_apply_failed" formatted="false">Override saved, but failed to reapply to current config</string>
+    <string name="override_save_failed" formatted="false">Failed to save override config</string>
+    <string name="override_save_import_default_name" formatted="false">Imported Override Config</string>
+    <string name="override_save_import_empty" formatted="false">Import content cannot be empty</string>
+    <string name="override_save_preset_not_modifiable" formatted="false">System preset cannot be modified</string>
+    <string name="override_section_dns_summary" formatted="false">Basic switches, Fake-IP, upstream &amp; policy</string>
+    <string name="override_section_dns_title" formatted="false">DNS</string>
+    <string name="override_section_general_summary" formatted="false">Run mode, controller, persistence &amp; GEO</string>
+    <string name="override_section_general_title" formatted="false">General</string>
+    <string name="override_section_inbound_summary" formatted="false">Ports, authentication, LAN access</string>
+    <string name="override_section_inbound_title" formatted="false">Inbound</string>
+    <string name="override_section_proxies_summary" formatted="false">Proxy nodes &amp; protocol objects</string>
+    <string name="override_section_proxies_title" formatted="false">Outbound Proxies</string>
+    <string name="override_section_proxy_groups_summary" formatted="false">Proxy Groups prepend, override, append</string>
+    <string name="override_section_proxy_groups_title" formatted="false">Proxy Groups</string>
+    <string name="override_section_proxy_providers_summary" formatted="false">Proxy Providers merge &amp; override</string>
+    <string name="override_section_proxy_providers_title" formatted="false">Proxy Providers</string>
+    <string name="override_section_rule_providers_summary" formatted="false">Rule Providers merge &amp; override</string>
+    <string name="override_section_rule_providers_title" formatted="false">Rule Providers</string>
+    <string name="override_section_rules_summary" formatted="false">Rule chain &amp; matching order</string>
+    <string name="override_section_rules_title" formatted="false">Routing Rules</string>
+    <string name="override_section_sniffer_summary" formatted="false">Policy switches, protocol ports, skip rules</string>
+    <string name="override_section_sniffer_title" formatted="false">Domain Sniffer</string>
+    <string name="override_section_sub_rules_summary" formatted="false">Sub Rules grouping &amp; merging</string>
+    <string name="override_section_sub_rules_title" formatted="false">Sub Rules</string>
+    <string name="override_section_tun_summary" formatted="false">Tun inbound, routing &amp; app scope</string>
+    <string name="override_section_tun_title" formatted="false">Tun</string>
+    <string name="override_status_in_use" formatted="false">In Use</string>
+    <string name="override_status_not_in_use" formatted="false">Not in Use</string>
+    <string name="override_structured_proxies_empty_hint" formatted="false">No proxy nodes</string>
+    <string name="override_structured_proxies_item_label" formatted="false">Proxy Node</string>
+    <string name="override_structured_proxies_title" formatted="false">Proxy Nodes</string>
+    <string name="override_structured_proxy_groups_empty_hint" formatted="false">No proxy groups</string>
+    <string name="override_structured_proxy_groups_item_label" formatted="false">Proxy Group</string>
+    <string name="override_structured_proxy_groups_title" formatted="false">Proxy Groups</string>
+    <string name="override_structured_proxy_providers_item_label" formatted="false">Provider</string>
+    <string name="override_structured_proxy_providers_title" formatted="false">Proxy Providers</string>
+    <string name="override_structured_rule_providers_item_label" formatted="false">Provider</string>
+    <string name="override_structured_rule_providers_title" formatted="false">Rule Providers</string>
+    <string name="override_structured_sub_rules_item_label" formatted="false">Sub Rule Group</string>
+    <string name="override_structured_sub_rules_title" formatted="false">Sub Rules</string>
+    <string name="override_title" formatted="false">Override Configs</string>
+    <string name="profiles_page_action_add_profile" formatted="false">Add Profile</string>
+    <string name="profiles_page_action_update_all" formatted="false">Update All</string>
+    <string name="profiles_page_button_cancel" formatted="false">Cancel</string>
+    <string name="profiles_page_button_confirm" formatted="false">Confirm</string>
+    <string name="profiles_page_delete_dialog_confirm" formatted="false">Delete</string>
+    <string name="profiles_page_delete_dialog_message" formatted="false">Are you sure you want to delete %s'?%s??</string>
+    <string name="profiles_page_delete_dialog_title" formatted="false">Delete Profile</string>
+    <string name="profiles_page_edit_dialog_title" formatted="false">Edit Profile Name</string>
+    <string name="profiles_page_empty_hint" formatted="false">Click top-right to add profile</string>
+    <string name="profiles_page_empty_no_profiles" formatted="false">No profiles</string>
+    <string name="profiles_page_input_new_profile" formatted="false">New Profile</string>
+    <string name="profiles_page_input_profile_name" formatted="false">Profile Name</string>
+    <string name="profiles_page_input_select_file" formatted="false">Click to select file</string>
+    <string name="profiles_page_input_subscription_url" formatted="false">Subscription URL (HTTP/HTTPS)</string>
+    <string name="profiles_page_input_subscription_user_agent" formatted="false">User-Agent (blank uses global setting)</string>
+    <string name="profiles_page_kokoro_account" formatted="false">Account</string>
+    <string name="profiles_page_kokoro_avatar_description" formatted="false">%ss osu! avatars osu! avatar</string>
+    <string name="profiles_page_kokoro_bandwidth_limit" formatted="false">Bandwidth limit</string>
+    <string name="profiles_page_kokoro_check_failed" formatted="false">Unable to check account</string>
+    <string name="profiles_page_kokoro_check_failed_detail" formatted="false">Check your connection, then try again.</string>
+    <string name="profiles_page_kokoro_checking" formatted="false">Checking sign-in status...</string>
+    <string name="profiles_page_kokoro_decrease_update_hours" formatted="false">Decrease update interval</string>
+    <string name="profiles_page_kokoro_default_profile_name" formatted="false">Kokoro</string>
+    <string name="profiles_page_kokoro_direct" formatted="false">Direct</string>
+    <string name="profiles_page_kokoro_disabled" formatted="false">Disabled</string>
+    <string name="profiles_page_kokoro_enabled" formatted="false">Enabled</string>
+    <string name="profiles_page_kokoro_expires" formatted="false">Expires</string>
+    <string name="profiles_page_kokoro_fallback" formatted="false">Unmatched traffic</string>
+    <string name="profiles_page_kokoro_final_route" formatted="false">Final route</string>
+    <string name="profiles_page_kokoro_increase_update_hours" formatted="false">Increase update interval</string>
+    <string name="profiles_page_kokoro_invalid_update_hours" formatted="false">Update interval must be a positive number of hours</string>
+    <string name="profiles_page_kokoro_isp" formatted="false">ISP</string>
+    <string name="profiles_page_kokoro_isp_auto" formatted="false">Automatic</string>
+    <string name="profiles_page_kokoro_isp_cm" formatted="false">China Mobile</string>
+    <string name="profiles_page_kokoro_isp_ct" formatted="false">China Telecom</string>
+    <string name="profiles_page_kokoro_isp_cu" formatted="false">China Unicom</string>
+    <string name="profiles_page_kokoro_isp_other" formatted="false">Other</string>
+    <string name="profiles_page_kokoro_keep_fallback" formatted="false">Keep configuration fallback</string>
+    <string name="profiles_page_kokoro_logged_in" formatted="false">Signed in</string>
+    <string name="profiles_page_kokoro_logged_in_as" formatted="false">Signed in as %s</string>
+    <string name="profiles_page_kokoro_logged_out" formatted="false">Not signed in</string>
+    <string name="profiles_page_kokoro_login" formatted="false">Sign in with osu!</string>
+    <string name="profiles_page_kokoro_login_failed" formatted="false">Sign-in failed or was cancelled</string>
+    <string name="profiles_page_kokoro_login_hint" formatted="false">Sign in with osu! to load your proxy subscription.</string>
+    <string name="profiles_page_kokoro_login_required" formatted="false">Sign in and select an active subscription first</string>
+    <string name="profiles_page_kokoro_logout" formatted="false">Sign out</string>
+    <string name="profiles_page_kokoro_mirror" formatted="false">Mirror</string>
+    <string name="profiles_page_kokoro_mode" formatted="false">Connection mode</string>
+    <string name="profiles_page_kokoro_no_subscription" formatted="false">This account has no active proxy subscription.</string>
+    <string name="profiles_page_kokoro_origin" formatted="false">Original</string>
+    <string name="profiles_page_kokoro_plan" formatted="false">Plan</string>
+    <string name="profiles_page_kokoro_profile_update" formatted="false">Profile Update Interval</string>
+    <string name="profiles_page_kokoro_protocol" formatted="false">Protocol</string>
+    <string name="profiles_page_kokoro_proxy" formatted="false">Proxy</string>
+    <string name="profiles_page_kokoro_relay" formatted="false">Relay</string>
+    <string name="profiles_page_kokoro_retry" formatted="false">Retry</string>
+    <string name="profiles_page_kokoro_routing" formatted="false">Routing</string>
+    <string name="profiles_page_kokoro_rule_provider_auto_update" formatted="false">Update Rule Providers</string>
+    <string name="profiles_page_kokoro_rule_provider_auto_update_summary" formatted="false">Automatically refresh remote rule sets</string>
+    <string name="profiles_page_kokoro_rule_source" formatted="false">Rule source</string>
+    <string name="profiles_page_kokoro_rule_update" formatted="false">Remote rule updates</string>
+    <string name="profiles_page_kokoro_secure_token_session" formatted="false">Tokens are protected by Android Keystore.</string>
+    <string name="profiles_page_kokoro_sign_in_from_settings" formatted="false">Sign in from Settings → Kokoro Settings before adding a Kokoro Subscription.</string>
+    <string name="profiles_page_kokoro_subscription" formatted="false">Subscription</string>
+    <string name="profiles_page_kokoro_subscription_auto_update" formatted="false">Automatically Update Profile</string>
+    <string name="profiles_page_kokoro_subscription_auto_update_summary" formatted="false">Refresh this configuration on schedule</string>
+    <string name="profiles_page_kokoro_subscription_number" formatted="false">Subscription %s</string>
+    <string name="profiles_page_kokoro_traffic" formatted="false">Traffic</string>
+    <string name="profiles_page_kokoro_traffic_used" formatted="false">Traffic used</string>
+    <string name="profiles_page_kokoro_unlimited" formatted="false">Unlimited</string>
+    <string name="profiles_page_kokoro_update_custom" formatted="false">Custom</string>
+    <string name="profiles_page_kokoro_update_hours" formatted="false">Hours (positive integer)</string>
+    <string name="profiles_page_kokoro_update_hours_range" formatted="false">Update interval (%s–%s hours)</string>
+    <string name="profiles_page_kokoro_update_hours_value" formatted="false">%s hr</string>
+    <string name="profiles_page_kokoro_update_off" formatted="false">Disabled</string>
+    <string name="profiles_page_kokoro_update_on" formatted="false">Every hour</string>
+    <string name="profiles_page_kokoro_updates" formatted="false">Updates</string>
+    <string name="profiles_page_kokoro_vmess_relay_only" formatted="false">VMess always uses relay mode</string>
+    <string name="profiles_page_link_settings_add_link" formatted="false">Add Link</string>
+    <string name="profiles_page_link_settings_close" formatted="false">Close</string>
+    <string name="profiles_page_link_settings_default_link" formatted="false">Default Link</string>
+    <string name="profiles_page_link_settings_default_link_summary" formatted="false">Link opened when clicking top-left shortcut button</string>
+    <string name="profiles_page_link_settings_edit_link" formatted="false">Edit Link</string>
+    <string name="profiles_page_link_settings_name" formatted="false">Name</string>
+    <string name="profiles_page_link_settings_open_mode" formatted="false">Open Mode</string>
+    <string name="profiles_page_link_settings_open_mode_external" formatted="false">External Browser</string>
+    <string name="profiles_page_link_settings_open_mode_in_app" formatted="false">In App</string>
+    <string name="profiles_page_link_settings_title" formatted="false">Link Settings</string>
+    <string name="profiles_page_link_settings_url" formatted="false">URL</string>
+    <string name="profiles_page_link_settings_validation_enter_name" formatted="false">Please enter name</string>
+    <string name="profiles_page_link_settings_validation_enter_url" formatted="false">Please enter URL</string>
+    <string name="profiles_page_link_settings_validation_invalid_url" formatted="false">Please enter a valid URL</string>
+    <string name="profiles_page_message_unknown_file" formatted="false">Unknown file</string>
+    <string name="profiles_page_misc_complete" formatted="false">Complete</string>
+    <string name="profiles_page_misc_error" formatted="false">Error</string>
+    <string name="profiles_page_progress_downloading" formatted="false">Downloading...</string>
+    <string name="profiles_page_qr_scanner_need_camera" formatted="false">Camera permission required for scanning</string>
+    <string name="profiles_page_qr_scanner_need_permission" formatted="false">Camera permission required</string>
+    <string name="profiles_page_qr_scanner_recognize_error" formatted="false">Recognition failed: %s</string>
+    <string name="profiles_page_qr_scanner_recognize_failed" formatted="false">Failed to recognize QR code</string>
+    <string name="profiles_page_qr_scanner_recognize_success" formatted="false">Recognition successful</string>
+    <string name="profiles_page_qr_scanner_scan_success" formatted="false">Scan successful</string>
+    <string name="profiles_page_qr_scanner_select_from_album" formatted="false">Select QR code from album</string>
+    <string name="profiles_page_settings_dialog_change_link" formatted="false">Change Subscription Link</string>
+    <string name="profiles_page_settings_dialog_config_missing" formatted="false">Config not found: %s</string>
+    <string name="profiles_page_settings_dialog_edit_profile" formatted="false">Edit Profile</string>
+    <string name="profiles_page_settings_dialog_edit_settings" formatted="false">Edit Settings</string>
+    <string name="profiles_page_settings_dialog_no_description" formatted="false">No description set</string>
+    <string name="profiles_page_settings_dialog_open_config" formatted="false">Open Config</string>
+    <string name="profiles_page_settings_dialog_save_failed" formatted="false">Failed to save profile</string>
+    <string name="profiles_page_settings_dialog_system_preset" formatted="false">Enable Override Preset</string>
+    <string name="profiles_page_settings_dialog_system_preset_summary" formatted="false">Enable the built-in override preset</string>
+    <string name="profiles_page_settings_dialog_title" formatted="false">Subscription Settings</string>
+    <string name="profiles_page_share_dialog_imported_config_missing" formatted="false">Imported config missing: %s</string>
+    <string name="profiles_page_share_dialog_no_link" formatted="false">This profile has no subscription link</string>
+    <string name="profiles_page_share_dialog_share_file" formatted="false">Share Config File</string>
+    <string name="profiles_page_share_dialog_share_link" formatted="false">Share Subscription Link</string>
+    <string name="profiles_page_share_dialog_title" formatted="false">Share Profile</string>
+    <string name="profiles_page_sheet_add_title" formatted="false">Add Profile</string>
+    <string name="profiles_page_sheet_edit_title" formatted="false">Edit Profile</string>
+    <string name="profiles_page_title" formatted="false">Profiles</string>
+    <string name="profiles_page_type_kokoro" formatted="false">Kokoro Subscription</string>
+    <string name="profiles_page_type_local_file" formatted="false">Local File</string>
+    <string name="profiles_page_type_qr_scan" formatted="false">Scan QR Code</string>
+    <string name="profiles_page_type_subscription" formatted="false">Subscription URL</string>
+    <string name="profiles_page_type_title" formatted="false">Profile Type</string>
+    <string name="profiles_page_validation_enter_url" formatted="false">Please enter URL</string>
+    <string name="profiles_page_validation_select_file" formatted="false">Please select a file</string>
+    <string name="profiles_page_validation_yaml_only" formatted="false">Only .yaml or .yml format supported</string>
+    <string name="profiles_vm_error_profile_not_exist" formatted="false">Profile does not exist</string>
+    <string name="profiles_vm_message_add_failed" formatted="false">Add profile failed: %s</string>
+    <string name="profiles_vm_message_delete_failed" formatted="false">Delete profile failed: %s</string>
+    <string name="profiles_vm_message_import_failed" formatted="false">Import profile failed: %s</string>
+    <string name="profiles_vm_message_profile_added" formatted="false">Profile added: %s</string>
+    <string name="profiles_vm_message_profile_added_and_activated" formatted="false">Profile added and activated: %s</string>
+    <string name="profiles_vm_message_profile_deleted" formatted="false">Profile deleted</string>
+    <string name="profiles_vm_message_profile_imported" formatted="false">Profile imported: %s</string>
+    <string name="profiles_vm_message_profile_updated" formatted="false">Profile updated: %s</string>
+    <string name="profiles_vm_message_toggle_failed" formatted="false">Toggle state failed: %s</string>
+    <string name="profiles_vm_message_update_failed" formatted="false">Update profile failed: %s</string>
+    <string name="profiles_vm_progress_import_complete" formatted="false">Import complete</string>
+    <string name="profiles_vm_progress_import_preparing" formatted="false">Preparing to import file...</string>
+    <string name="profiles_vm_progress_preparing" formatted="false">Preparing download...</string>
+    <string name="profiles_vm_progress_verifying" formatted="false">Verifying configuration...</string>
+    <string name="providers_action_operation" formatted="false">Operation</string>
+    <string name="providers_action_update" formatted="false">Update</string>
+    <string name="providers_action_update_all" formatted="false">Update All</string>
+    <string name="providers_action_upload" formatted="false">Upload</string>
+    <string name="providers_empty_no_providers" formatted="false">No external resources</string>
+    <string name="providers_empty_no_providers_hint" formatted="false">Current profile doesnt contain external resourcest contain external resources</string>
+    <string name="providers_empty_not_running" formatted="false">Proxy not running</string>
+    <string name="providers_empty_not_running_hint" formatted="false">Please start proxy service to view external resources</string>
+    <string name="providers_info_summary" formatted="false">Geo assets and shared runtime files live in: %s. Rule and proxy providers are always written into the active profiles private directory.s private directory.</string>
+    <string name="providers_info_title" formatted="false">Core Directory</string>
+    <string name="providers_message_all_updated" formatted="false">All updated</string>
+    <string name="providers_message_fetch_failed" formatted="false">Failed to fetch resources: %s</string>
+    <string name="providers_message_update_failed" formatted="false">Update failed: %s</string>
+    <string name="providers_message_update_success" formatted="false">%s updated successfully</string>
+    <string name="providers_message_upload_failed" formatted="false">Upload failed: %s</string>
+    <string name="providers_message_upload_success" formatted="false">%s uploaded successfully</string>
+    <string name="providers_provider_path" formatted="false">Resource path: %s</string>
+    <string name="providers_title" formatted="false">External Resources</string>
+    <string name="providers_type_proxy_providers" formatted="false">Proxy Providers (%d)</string>
+    <string name="providers_type_rule_providers" formatted="false">Rule Providers (%d)</string>
+    <string name="providers_vehicle_type_compatible" formatted="false">Compatible</string>
+    <string name="providers_vehicle_type_file" formatted="false">File</string>
+    <string name="providers_vehicle_type_http" formatted="false">HTTP</string>
+    <string name="providers_vehicle_type_inline" formatted="false">Inline</string>
+    <string name="proxy_action_sort" formatted="false">Sort</string>
+    <string name="proxy_action_test" formatted="false">Test</string>
+    <string name="proxy_display_mode_double_detailed" formatted="false">Double Detailed</string>
+    <string name="proxy_display_mode_double_simple" formatted="false">Double Simple</string>
+    <string name="proxy_display_mode_single_detailed" formatted="false">Single Detailed</string>
+    <string name="proxy_display_mode_single_simple" formatted="false">Single Simple</string>
+    <string name="proxy_empty_hint" formatted="false">Please load a profile in Config page</string>
+    <string name="proxy_empty_no_nodes" formatted="false">No nodes</string>
+    <string name="proxy_mode_direct" formatted="false">Direct</string>
+    <string name="proxy_mode_global" formatted="false">Global</string>
+    <string name="proxy_mode_rule" formatted="false">Rule</string>
+    <string name="proxy_mode_switch_failed" formatted="false">Mode switch failed: %s</string>
+    <string name="proxy_mode_switched" formatted="false">Switched to: %s mode</string>
+    <string name="proxy_mode_unknown" formatted="false">Unknown</string>
+    <string name="proxy_node_count" formatted="false">%d nodes</string>
+    <string name="proxy_node_timeout" formatted="false">Timeout</string>
+    <string name="proxy_selection_error" formatted="false">Switch failed: %s</string>
+    <string name="proxy_selection_failed" formatted="false">Switch failed</string>
+    <string name="proxy_selection_switched" formatted="false">Switched to: %s</string>
+    <string name="proxy_sort_mode_by_latency" formatted="false">By Latency</string>
+    <string name="proxy_sort_mode_by_name" formatted="false">By Name</string>
+    <string name="proxy_sort_mode_default" formatted="false">Default</string>
+    <string name="proxy_testing_all" formatted="false">Testing all node groups...</string>
+    <string name="proxy_testing_failed" formatted="false">Test failed: %s</string>
+    <string name="proxy_testing_group" formatted="false">Testing node group: %s</string>
+    <string name="proxy_testing_in_progress" formatted="false">Testing the node</string>
+    <string name="proxy_testing_request_sent" formatted="false">Test request sent</string>
+    <string name="proxy_title" formatted="false">Proxy</string>
+    <string name="proxy_type_compatible" formatted="false">Compatible</string>
+    <string name="proxy_type_direct" formatted="false">Direct</string>
+    <string name="proxy_type_fallback" formatted="false">Fallback</string>
+    <string name="proxy_type_load_balance" formatted="false">Load Balance</string>
+    <string name="proxy_type_pass" formatted="false">Pass</string>
+    <string name="proxy_type_reject" formatted="false">Reject</string>
+    <string name="proxy_type_reject_drop" formatted="false">Drop</string>
+    <string name="proxy_type_relay" formatted="false">Relay</string>
+    <string name="proxy_type_selector" formatted="false">Selector</string>
+    <string name="proxy_type_smart" formatted="false">Smart</string>
+    <string name="proxy_type_unknown" formatted="false">Unknown</string>
+    <string name="proxy_type_url_test" formatted="false">UrlTest</string>
+    <string name="service_auto_restart_channel_description" formatted="false">Used to restart proxy service automatically</string>
+    <string name="service_auto_restart_channel_name" formatted="false">Auto Restart Service</string>
+    <string name="service_auto_restart_checking" formatted="false">Checking auto-start...</string>
+    <string name="service_notification_running" formatted="false">Running</string>
+    <string name="service_notification_speed_format" formatted="false">Down %s  Up %s</string>
+    <string name="service_notification_today_traffic_format" formatted="false">Todays traffic %ss traffic %s</string>
+    <string name="service_notification_traffic_format" formatted="false">Total: %s</string>
+    <string name="service_notification_unknown_profile" formatted="false">Unknown profile</string>
+    <string name="service_tile_click_to_open" formatted="false">Click to open app</string>
+    <string name="service_tile_click_to_start_proxy" formatted="false">Start proxy</string>
+    <string name="service_tile_click_to_stop_proxy" formatted="false">Stop proxy</string>
+    <string name="service_tile_connecting" formatted="false">Connecting...</string>
+    <string name="service_tile_disconnecting" formatted="false">Disconnecting...</string>
+    <string name="settings_data_settings_app_data_management" formatted="false">App Data Management</string>
+    <string name="settings_data_settings_app_data_management_summary" formatted="false">Clean up some cache files</string>
+    <string name="settings_data_settings_export_backup" formatted="false">Export Backup</string>
+    <string name="settings_data_settings_export_backup_summary" formatted="false">Save user settings to a JSON file</string>
+    <string name="settings_data_settings_import_backup" formatted="false">Import Backup</string>
+    <string name="settings_data_settings_import_backup_summary" formatted="false">Restore user settings from a backup file</string>
+    <string name="settings_error_webview_failed" formatted="false">Unable to open WebView: %s</string>
+    <string name="settings_kokoro_custom_rules" formatted="false">Custom Rules</string>
+    <string name="settings_kokoro_custom_rules_summary" formatted="false">Edit the default rules applied to generated profiles</string>
+    <string name="settings_kokoro_summary" formatted="false">Account · Custom Rules</string>
+    <string name="settings_kokoro_title" formatted="false">Kokoro Settings</string>
+    <string name="settings_more_about" formatted="false">About</string>
+    <string name="settings_more_about_summary" formatted="false">Version &amp; License</string>
+    <string name="settings_more_logs" formatted="false">Logs</string>
+    <string name="settings_more_logs_summary" formatted="false">Runtime Logs</string>
+    <string name="settings_network_settings_lab" formatted="false">Lab</string>
+    <string name="settings_network_settings_lab_summary" formatted="false">Node testing</string>
+    <string name="settings_network_settings_meta_features" formatted="false">Meta Features</string>
+    <string name="settings_network_settings_meta_features_summary" formatted="false">Meta Extensions</string>
+    <string name="settings_network_settings_network" formatted="false">Network</string>
+    <string name="settings_network_settings_network_summary" formatted="false">DNS · Port · Inbound</string>
+    <string name="settings_network_settings_override" formatted="false">Override</string>
+    <string name="settings_network_settings_override_summary" formatted="false">Rule Override</string>
+    <string name="settings_section_data_settings" formatted="false">Data Settings</string>
+    <string name="settings_section_kokoro" formatted="false">Kokoro</string>
+    <string name="settings_section_more" formatted="false">More</string>
+    <string name="settings_section_network_settings" formatted="false">Network Settings</string>
+    <string name="settings_section_ui_settings" formatted="false">UI Settings</string>
+    <string name="settings_title" formatted="false">Settings</string>
+    <string name="settings_ui_settings_app" formatted="false">App</string>
+    <string name="settings_ui_settings_app_summary" formatted="false">Appearance · Language · Theme</string>
+    <string name="traffic_statistics_action_clear" formatted="false">Clear Statistics</string>
+    <string name="traffic_statistics_action_clear_confirm_message" formatted="false">This will permanently clear all traffic statistics.</string>
+    <string name="traffic_statistics_action_clear_success" formatted="false">Statistics cleared</string>
+    <string name="traffic_statistics_chart_daily" formatted="false">Daily</string>
+    <string name="traffic_statistics_chart_hourly" formatted="false">4 Hours</string>
+    <string name="traffic_statistics_compare_less_than_yesterday" formatted="false">vs yesterday %s</string>
+    <string name="traffic_statistics_compare_more_than_yesterday" formatted="false">vs yesterday +%s</string>
+    <string name="traffic_statistics_compare_same_as_yesterday" formatted="false">Same as yesterday</string>
+    <string name="traffic_statistics_compare_week_stats" formatted="false">Last 7 days stats</string>
+    <string name="traffic_statistics_donut_other" formatted="false">Other</string>
+    <string name="traffic_statistics_entry_summary" formatted="false">View traffic usage</string>
+    <string name="traffic_statistics_metric_download" formatted="false">Download</string>
+    <string name="traffic_statistics_metric_upload" formatted="false">Upload</string>
+    <string name="traffic_statistics_metric_usage_line" formatted="false">Down %s  Up %s</string>
+    <string name="traffic_statistics_section_empty_apps" formatted="false">No app traffic statistics</string>
+    <string name="traffic_statistics_section_top_apps" formatted="false">Top Apps</string>
+    <string name="traffic_statistics_section_traffic" formatted="false">Traffic</string>
+    <string name="traffic_statistics_summary_today_traffic" formatted="false">Todays Traffics Traffic</string>
+    <string name="traffic_statistics_summary_week_traffic" formatted="false">This Weeks Traffics Traffic</string>
+    <string name="traffic_statistics_time_range_today" formatted="false">Today</string>
+    <string name="traffic_statistics_time_range_week" formatted="false">This Week</string>
+    <string name="traffic_statistics_title" formatted="false">Traffic Statistics</string>
+    <string name="util_error_unknown_error" formatted="false">Unknown error</string>
+</resources>

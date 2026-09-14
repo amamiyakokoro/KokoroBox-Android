@@ -1,0 +1,1282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_app_description" formatted="false">基于 Mihomo 的 Material You Android 代理客户端</string>
+    <string name="about_app_version_failed" formatted="false">Failed to load</string>
+    <string name="about_app_version_loading" formatted="false">Loading...</string>
+    <string name="about_copyright" formatted="false">© 2026 KokoroBox 贡献者</string>
+    <string name="about_license_agpl_description" formatted="false">This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License.</string>
+    <string name="about_license_agpl_name" formatted="false">GNU Affero General Public License v3.0</string>
+    <string name="about_license_check_update" formatted="false">检查更新</string>
+    <string name="about_license_check_update_summary" formatted="false">手动检查 GitHub Release 更新</string>
+    <string name="about_license_libraries" formatted="false">引用库</string>
+    <string name="about_license_libraries_summary" formatted="false">View all third-party libraries used in this app</string>
+    <string name="about_section_license" formatted="false">许可证</string>
+    <string name="about_section_project_links" formatted="false">项目链接</string>
+    <string name="about_title" formatted="false">关于</string>
+    <string name="about_update_available" formatted="false">有可用更新</string>
+    <string name="about_update_browser_download" formatted="false">将通过浏览器下载最新 APK。</string>
+    <string name="about_update_checking" formatted="false">正在检查 GitHub Releases…</string>
+    <string name="about_update_continue_install" formatted="false">继续</string>
+    <string name="about_update_download" formatted="false">下载 APK</string>
+    <string name="about_update_downloading" formatted="false">正在下载更新…</string>
+    <string name="about_update_in_app_download" formatted="false">下载并更新</string>
+    <string name="about_update_in_app_download_summary" formatted="false">APK 会先下载并验证，再交由 Android 系统安装程序处理。</string>
+    <string name="about_update_install_permission_required" formatted="false">请允许 KokoroBox 安装更新后再继续。</string>
+    <string name="about_update_installed" formatted="false">更新安装已完成。</string>
+    <string name="about_update_invalid_response" formatted="false">GitHub 返回的版本信息不受支持，请稍后再试。</string>
+    <string name="about_update_network_error" formatted="false">无法检查更新，请确认网络连接后重试。</string>
+    <string name="about_update_no_apk" formatted="false">兼容的 APK 尚未就绪，请查看 Release 页面或稍后再检查。</string>
+    <string name="about_update_no_browser" formatted="false">没有可打开此下载的应用。</string>
+    <string name="about_update_no_release" formatted="false">目前尚无已发布的正式版本。</string>
+    <string name="about_update_ok" formatted="false">确定</string>
+    <string name="about_update_open_install_settings" formatted="false">打开设置</string>
+    <string name="about_update_open_release" formatted="false">查看 Release</string>
+    <string name="about_update_preparing_install" formatted="false">正在准备系统安装程序…</string>
+    <string name="about_update_rate_limited" formatted="false">GitHub 已限制请求次数，请稍后再检查。</string>
+    <string name="about_update_retry" formatted="false">重试</string>
+    <string name="about_update_unknown_version" formatted="false">无法比较此构建的版本，请手动查看 GitHub Releases。</string>
+    <string name="about_update_up_to_date" formatted="false">当前已是此版本或更新的版本。</string>
+    <string name="about_update_update_failed" formatted="false">更新失败</string>
+    <string name="about_update_verifying" formatted="false">正在验证下载的 APK…</string>
+    <string name="about_update_waiting_for_install_confirmation" formatted="false">请在 Android 安装对话框中继续。</string>
+    <string name="access_control_app_list_loading" formatted="false">加载中...</string>
+    <string name="access_control_app_list_title" formatted="false">应用列表 (%d 已选择)</string>
+    <string name="access_control_button_cancel" formatted="false">取消</string>
+    <string name="access_control_button_confirm" formatted="false">确定</string>
+    <string name="access_control_search_empty" formatted="false">没有匹配的应用</string>
+    <string name="access_control_search_placeholder" formatted="false">搜索应用...</string>
+    <string name="access_control_settings_batch_operation" formatted="false">批量操作</string>
+    <string name="access_control_settings_china_apps" formatted="false">中国应用</string>
+    <string name="access_control_settings_descending_order" formatted="false">倒序排列</string>
+    <string name="access_control_settings_deselect_all" formatted="false">全不选</string>
+    <string name="access_control_settings_export" formatted="false">导出到剪贴板</string>
+    <string name="access_control_settings_export_success" formatted="false">已复制 %d 个包名到剪贴板</string>
+    <string name="access_control_settings_import" formatted="false">从剪贴板导入</string>
+    <string name="access_control_settings_import_export" formatted="false">导入/导出</string>
+    <string name="access_control_settings_import_failed" formatted="false">导入失败</string>
+    <string name="access_control_settings_import_success" formatted="false">导入成功：%d 个包名</string>
+    <string name="access_control_settings_invert" formatted="false">反选</string>
+    <string name="access_control_settings_overseas_apps" formatted="false">非中国应用</string>
+    <string name="access_control_settings_region_quick_select" formatted="false">地区快捷选择</string>
+    <string name="access_control_settings_region_select_result" formatted="false">已按「%s」快捷选择，共 %d 个</string>
+    <string name="access_control_settings_select_action" formatted="false">选择</string>
+    <string name="access_control_settings_select_all" formatted="false">全选</string>
+    <string name="access_control_settings_selected_first" formatted="false">已选应用优先</string>
+    <string name="access_control_settings_show_system_apps" formatted="false">显示系统应用</string>
+    <string name="access_control_settings_sort_mode" formatted="false">排序方式</string>
+    <string name="access_control_settings_sort_mode_current" formatted="false">当前：%s</string>
+    <string name="access_control_settings_title" formatted="false">访问控制设置</string>
+    <string name="access_control_sort_mode_install_time" formatted="false">安装时间</string>
+    <string name="access_control_sort_mode_label" formatted="false">应用名称</string>
+    <string name="access_control_sort_mode_package_name" formatted="false">包名</string>
+    <string name="access_control_sort_mode_update_time" formatted="false">更新时间</string>
+    <string name="access_control_title" formatted="false">访问控制</string>
+    <string name="app_data_management_geo_files_cache_item_summary" formatted="false">%s · %s</string>
+    <string name="app_data_management_geo_files_delete_complete" formatted="false">已删除 %d 个历史 GeoX 文件</string>
+    <string name="app_data_management_geo_files_delete_confirm_message" formatted="false">确定删除已选中的 %d 个历史 GeoX 文件吗？此操作无法撤销。</string>
+    <string name="app_data_management_geo_files_delete_confirm_title" formatted="false">删除 GeoX 文件？</string>
+    <string name="app_data_management_geo_files_empty_history" formatted="false">没有可清理的历史下载</string>
+    <string name="app_data_management_geo_files_empty_history_summary" formatted="false">校验失败的 GeoX 文件会被直接删除，不会进入这里</string>
+    <string name="app_data_management_geo_files_history_summary" formatted="false">历史下载缓存：%d 个</string>
+    <string name="app_data_management_geo_files_history_title" formatted="false">管理 GeoX 文件</string>
+    <string name="app_data_management_logs_delete_complete" formatted="false">已删除 %d 个日志文件</string>
+    <string name="app_data_management_logs_delete_confirm_message" formatted="false">确定删除已选中的 %d 个日志文件吗？此操作无法撤销。</string>
+    <string name="app_data_management_logs_delete_confirm_title" formatted="false">删除日志文件？</string>
+    <string name="app_data_management_logs_empty_log_content" formatted="false">日志为空</string>
+    <string name="app_data_management_logs_empty_log_content_summary" formatted="false">该文件没有可显示的日志条目</string>
+    <string name="app_data_management_logs_empty_logs" formatted="false">没有可清理的日志</string>
+    <string name="app_data_management_logs_empty_logs_summary" formatted="false">在日志页面开始记录后，日志文件会显示在这里</string>
+    <string name="app_data_management_logs_log_item_summary" formatted="false">%s · %s</string>
+    <string name="app_data_management_logs_log_line_title" formatted="false">[%s] [%s]</string>
+    <string name="app_data_management_logs_management_summary" formatted="false">日志文件：%d 个</string>
+    <string name="app_data_management_logs_management_title" formatted="false">管理日志</string>
+    <string name="app_data_management_logs_recording_file_title" formatted="false">%s（记录中）</string>
+    <string name="app_data_management_logs_viewer_limit_hint" formatted="false">仅显示最近的日志</string>
+    <string name="app_data_management_logs_viewer_limit_summary" formatted="false">当前显示最近 %d 条</string>
+    <string name="app_data_management_logs_viewer_title" formatted="false">查看日志：%s</string>
+    <string name="app_data_management_section_geo_files" formatted="false">Geo 文件</string>
+    <string name="app_data_management_section_logs" formatted="false">日志</string>
+    <string name="app_data_management_title" formatted="false">应用数据管理</string>
+    <string name="app_settings_backup_export_failed" formatted="false">导出设置备份失败</string>
+    <string name="app_settings_backup_export_failed_detail" formatted="false">导出设置备份失败：%s</string>
+    <string name="app_settings_backup_export_success" formatted="false">已导出设置备份</string>
+    <string name="app_settings_backup_export_summary" formatted="false">将应用偏好、网络选项、配置链接和显示设置保存为 JSON 文件</string>
+    <string name="app_settings_backup_export_title" formatted="false">导出设置备份</string>
+    <string name="app_settings_backup_import_failed_detail" formatted="false">导入设置备份失败：%s</string>
+    <string name="app_settings_backup_import_read_failed" formatted="false">读取备份文件失败</string>
+    <string name="app_settings_backup_import_success" formatted="false">已导入设置备份</string>
+    <string name="app_settings_backup_import_summary" formatted="false">从 KokoroBox 备份 JSON 文件恢复设置</string>
+    <string name="app_settings_backup_import_title" formatted="false">导入设置备份</string>
+    <string name="app_settings_behavior_auto_start_summary" formatted="false">应用启动和开机时自动启动代理服务</string>
+    <string name="app_settings_behavior_auto_start_title" formatted="false">自动启动</string>
+    <string name="app_settings_behavior_auto_update_on_start_summary" formatted="false">启动时自动更新当前订阅配置</string>
+    <string name="app_settings_behavior_auto_update_on_start_title" formatted="false">启动更新配置</string>
+    <string name="app_settings_behavior_automatic_update_check_summary" formatted="false">打开应用时每天检查一次 GitHub Release</string>
+    <string name="app_settings_behavior_automatic_update_check_title" formatted="false">自动检查更新</string>
+    <string name="app_settings_behavior_update_channel_nightly" formatted="false">测试版（nightly）</string>
+    <string name="app_settings_behavior_update_channel_stable" formatted="false">正式版</string>
+    <string name="app_settings_behavior_update_channel_summary" formatted="false">选择正式版或开发中的 nightly 测试版</string>
+    <string name="app_settings_behavior_update_channel_title" formatted="false">更新通道</string>
+    <string name="app_settings_behavior_update_install_method_root" formatted="false">Root</string>
+    <string name="app_settings_behavior_update_install_method_shizuku" formatted="false">Shizuku</string>
+    <string name="app_settings_behavior_update_install_method_summary" formatted="false">高级设置：推荐系统安装。Shizuku 和 Root 会跳过 Android 安装确认。</string>
+    <string name="app_settings_behavior_update_install_method_system" formatted="false">系统</string>
+    <string name="app_settings_behavior_update_install_method_title" formatted="false">更新安装方式</string>
+    <string name="app_settings_button_apply" formatted="false">应用</string>
+    <string name="app_settings_experimental_acg_home_summary" formatted="false">启用新的 ACG 风格首页布局</string>
+    <string name="app_settings_experimental_acg_home_title" formatted="false">ACG 实验首页</string>
+    <string name="app_settings_experimental_acg_sidebar_expanded_summary" formatted="false">进入 ACG 首页时默认展开左侧信息栏</string>
+    <string name="app_settings_experimental_acg_sidebar_expanded_title" formatted="false">ACG 侧栏默认展开</string>
+    <string name="app_settings_experimental_health_check_concurrency_summary" formatted="false">当前选项：%s</string>
+    <string name="app_settings_experimental_health_check_concurrency_title" formatted="false">测速并发数</string>
+    <string name="app_settings_experimental_reset_wallpaper_success" formatted="false">已恢复默认壁纸</string>
+    <string name="app_settings_experimental_reset_wallpaper_summary" formatted="false">恢复内置默认壁纸，并重置裁剪位置与壁纸取色</string>
+    <string name="app_settings_experimental_reset_wallpaper_title" formatted="false">重置 ACG 壁纸</string>
+    <string name="app_settings_experimental_wallpaper_summary" formatted="false">为 ACG 首页选择自定义壁纸</string>
+    <string name="app_settings_experimental_wallpaper_title" formatted="false">ACG 壁纸</string>
+    <string name="app_settings_interface_auto_hide_navbar_summary" formatted="false">向下滑动时自动隐藏底栏，向上滑动时显示</string>
+    <string name="app_settings_interface_auto_hide_navbar_title" formatted="false">滑动隐藏底栏</string>
+    <string name="app_settings_interface_color_theme_acg_wallpaper_summary" formatted="false">将使用当前 ACG 首页壁纸提取的主色生成主题；更换并应用壁纸后会自动更新取色。</string>
+    <string name="app_settings_interface_color_theme_code_label" formatted="false">主题色代码（#RRGGBB）</string>
+    <string name="app_settings_interface_color_theme_custom_summary" formatted="false">当前主题色：%s</string>
+    <string name="app_settings_interface_color_theme_dynamic_summary" formatted="false">当前跟随系统配色</string>
+    <string name="app_settings_interface_color_theme_mode_acg_wallpaper" formatted="false">根据 ACG 壁纸取色</string>
+    <string name="app_settings_interface_color_theme_mode_custom" formatted="false">自定义主题色</string>
+    <string name="app_settings_interface_color_theme_mode_monet" formatted="false">跟随系统</string>
+    <string name="app_settings_interface_color_theme_mode_summary" formatted="false">选择跟随系统或手动指定主题色</string>
+    <string name="app_settings_interface_color_theme_mode_title" formatted="false">取色来源</string>
+    <string name="app_settings_interface_color_theme_picker_title" formatted="false">选择主题色</string>
+    <string name="app_settings_interface_color_theme_title" formatted="false">主题配色</string>
+    <string name="app_settings_interface_home_control_fab_summary" formatted="false">使用悬浮按钮启动或停止代理，不再通过点击流量面板控制</string>
+    <string name="app_settings_interface_home_control_fab_title" formatted="false">首页控制悬浮按钮</string>
+    <string name="app_settings_interface_language_chinese" formatted="false">简体中文</string>
+    <string name="app_settings_interface_language_english" formatted="false">English</string>
+    <string name="app_settings_interface_language_summary" formatted="false">选择应用语言</string>
+    <string name="app_settings_interface_language_system" formatted="false">跟随系统</string>
+    <string name="app_settings_interface_language_title" formatted="false">应用语言</string>
+    <string name="app_settings_interface_language_traditional_chinese" formatted="false">繁體中文</string>
+    <string name="app_settings_interface_legacy_navbar_style_summary" formatted="false">悬浮导航栏样式</string>
+    <string name="app_settings_interface_legacy_navbar_style_title" formatted="false">浮动导航栏</string>
+    <string name="app_settings_interface_page_scale_dialog_summary" formatted="false">80% - 120%</string>
+    <string name="app_settings_interface_page_scale_summary" formatted="false">调整应用界面的整体缩放比例</string>
+    <string name="app_settings_interface_page_scale_title" formatted="false">页面缩放</string>
+    <string name="app_settings_interface_theme_color_polarity_invert_summary" formatted="false">当主题取色看起来怪异时可尝试开启</string>
+    <string name="app_settings_interface_theme_color_polarity_invert_title" formatted="false">反转主题前景色</string>
+    <string name="app_settings_interface_theme_mode_dark" formatted="false">深色</string>
+    <string name="app_settings_interface_theme_mode_light" formatted="false">浅色</string>
+    <string name="app_settings_interface_theme_mode_summary" formatted="false">选择应用的主题样式</string>
+    <string name="app_settings_interface_theme_mode_system" formatted="false">跟随系统</string>
+    <string name="app_settings_interface_theme_mode_title" formatted="false">主题模式</string>
+    <string name="app_settings_privacy_biometric_dialog_title_disable" formatted="false">关闭启动验证</string>
+    <string name="app_settings_privacy_biometric_dialog_title_enable" formatted="false">开启启动验证</string>
+    <string name="app_settings_privacy_biometric_exit_button" formatted="false">退出</string>
+    <string name="app_settings_privacy_biometric_prompt_message" formatted="false">请完成验证以继续进入应用</string>
+    <string name="app_settings_privacy_biometric_prompt_title" formatted="false">验证身份</string>
+    <string name="app_settings_privacy_biometric_retry_button" formatted="false">重试</string>
+    <string name="app_settings_privacy_biometric_unavailable_hw_unavailable" formatted="false">生物识别硬件当前不可用，请稍后再试</string>
+    <string name="app_settings_privacy_biometric_unavailable_message" formatted="false">当前无法使用生物识别，请稍后重试或检查系统锁屏与生物识别设置</string>
+    <string name="app_settings_privacy_biometric_unavailable_no_device_credential" formatted="false">当前未设置系统锁屏验证，请先启用 PIN、图案或密码</string>
+    <string name="app_settings_privacy_biometric_unavailable_no_hardware" formatted="false">当前设备不支持生物识别，请启用系统锁屏验证或关闭此功能</string>
+    <string name="app_settings_privacy_biometric_unavailable_none_enrolled" formatted="false">您尚未录入生物信息，请先在系统设置中录入，或启用 PIN、图案、密码等锁屏验证</string>
+    <string name="app_settings_privacy_biometric_unavailable_title" formatted="false">无法使用指纹验证</string>
+    <string name="app_settings_privacy_biometric_unlock_summary" formatted="false">每次打开应用需要生物识别或锁屏凭据验证才能进入</string>
+    <string name="app_settings_privacy_biometric_unlock_title" formatted="false">启动时生物验证</string>
+    <string name="app_settings_privacy_hide_from_recents_summary" formatted="false">启用后不在最近任务列表（后台卡片）中显示应用</string>
+    <string name="app_settings_privacy_hide_from_recents_title" formatted="false">隐藏后台卡片</string>
+    <string name="app_settings_privacy_hide_icon_summary" formatted="false">隐藏后可通过拨号盘 *#*#0721#*#* 打开</string>
+    <string name="app_settings_privacy_hide_icon_title" formatted="false">隐藏应用图标</string>
+    <string name="app_settings_privacy_screenshot_dialog_title_disable" formatted="false">关闭禁止截图</string>
+    <string name="app_settings_privacy_screenshot_dialog_title_enable" formatted="false">开启禁止截图</string>
+    <string name="app_settings_privacy_screenshot_protection_summary" formatted="false">禁止截图、录屏及最近任务预览</string>
+    <string name="app_settings_privacy_screenshot_protection_title" formatted="false">禁止截图</string>
+    <string name="app_settings_section_backup" formatted="false">备份</string>
+    <string name="app_settings_section_behavior" formatted="false">行为</string>
+    <string name="app_settings_section_experimental" formatted="false">实验性内容</string>
+    <string name="app_settings_section_interface" formatted="false">界面</string>
+    <string name="app_settings_section_privacy" formatted="false">隐私</string>
+    <string name="app_settings_section_service" formatted="false">服务</string>
+    <string name="app_settings_service_section_battery_optimization_title" formatted="false">电池优化无限制</string>
+    <string name="app_settings_service_section_exit_ui_when_background_summary" formatted="false">应用退到后台且界面不可见时主动释放 UI，仅保留运行中的代理服务</string>
+    <string name="app_settings_service_section_exit_ui_when_background_title" formatted="false">后台隐藏时释放界面</string>
+    <string name="app_settings_service_section_single_node_test_summary" formatted="false">点击节点卡片右侧图标测试单个节点延迟</string>
+    <string name="app_settings_service_section_single_node_test_title" formatted="false">单节点测试</string>
+    <string name="app_settings_service_section_traffic_notification_summary" formatted="false">在通知栏中显示流量使用情况</string>
+    <string name="app_settings_service_section_traffic_notification_title" formatted="false">显示流量通知</string>
+    <string name="app_settings_title" formatted="false">应用设置</string>
+    <string name="app_settings_warning_dialog_hide_icon_msg1" formatted="false">请在隐藏之前确认你能够访问本应用的设置界面！</string>
+    <string name="app_settings_warning_dialog_hide_icon_msg2" formatted="false">对于 HyperOS, 请开启 自启动 和 后台弹出界面 权限，以接受拨号界面代码！</string>
+    <string name="app_settings_warning_dialog_title" formatted="false">警告</string>
+    <string name="component_bottom_bar_config" formatted="false">配置文件</string>
+    <string name="component_bottom_bar_home" formatted="false">首页</string>
+    <string name="component_bottom_bar_proxy" formatted="false">代理</string>
+    <string name="component_bottom_bar_setting" formatted="false">设置</string>
+    <string name="component_button_cancel" formatted="false">取消</string>
+    <string name="component_button_clear" formatted="false">清除</string>
+    <string name="component_button_confirm" formatted="false">确定</string>
+    <string name="component_button_copy" formatted="false">复制</string>
+    <string name="component_button_delete" formatted="false">删除</string>
+    <string name="component_button_ok" formatted="false">确定</string>
+    <string name="component_config_input_count_items" formatted="false">%d 项</string>
+    <string name="component_config_input_port_label" formatted="false">端口号 (留空表示不修改)</string>
+    <string name="component_editor_action_add" formatted="false">添加</string>
+    <string name="component_editor_action_delete" formatted="false">删除</string>
+    <string name="component_editor_action_reset" formatted="false">重置</string>
+    <string name="component_editor_action_search" formatted="false">搜索</string>
+    <string name="component_editor_count_items" formatted="false">共 %d 项</string>
+    <string name="component_editor_dialog_add_title" formatted="false">添加条目</string>
+    <string name="component_editor_dialog_edit_title" formatted="false">编辑条目</string>
+    <string name="component_editor_dialog_reset_message" formatted="false">清空所有条目并恢复为不修改状态？</string>
+    <string name="component_editor_dialog_reset_title" formatted="false">重置确认</string>
+    <string name="component_editor_empty_hint" formatted="false">点击右上角按钮添加</string>
+    <string name="component_editor_empty_title" formatted="false">暂无条目</string>
+    <string name="component_editor_error_key_empty" formatted="false">键不能为空</string>
+    <string name="component_editor_error_key_exists" formatted="false">键已存在</string>
+    <string name="component_editor_rule_content" formatted="false">规则内容</string>
+    <string name="component_editor_rule_error_content_required" formatted="false">规则内容不能为空</string>
+    <string name="component_editor_rule_error_target_required" formatted="false">请选择目标</string>
+    <string name="component_editor_rule_no_resolve" formatted="false">不解析</string>
+    <string name="component_editor_rule_src" formatted="false">源 IP</string>
+    <string name="component_editor_rule_target" formatted="false">目标</string>
+    <string name="component_editor_rule_target_direct" formatted="false">DIRECT</string>
+    <string name="component_editor_rule_target_match" formatted="false">MATCH</string>
+    <string name="component_editor_rule_target_reject" formatted="false">REJECT</string>
+    <string name="component_editor_rule_type" formatted="false">规则类型</string>
+    <string name="component_flag_content_description" formatted="false">%s 旗帜</string>
+    <string name="component_loading_starting" formatted="false">启动中...</string>
+    <string name="component_message_confirm" formatted="false">确定</string>
+    <string name="component_message_error" formatted="false">错误</string>
+    <string name="component_message_hint" formatted="false">提示</string>
+    <string name="component_message_success" formatted="false">成功</string>
+    <string name="component_navigation_back" formatted="false">返回</string>
+    <string name="component_navigation_refresh" formatted="false">刷新</string>
+    <string name="component_profile_card_click_to_update" formatted="false">点击更新获取订阅信息</string>
+    <string name="component_profile_card_days_ago" formatted="false">%d 天前</string>
+    <string name="component_profile_card_delete" formatted="false">删除</string>
+    <string name="component_profile_card_edit" formatted="false">编辑</string>
+    <string name="component_profile_card_expire_at" formatted="false">到期：%s (剩余%d 天)</string>
+    <string name="component_profile_card_expire_today" formatted="false">到期：今天</string>
+    <string name="component_profile_card_expired" formatted="false">已过期：%s</string>
+    <string name="component_profile_card_export" formatted="false">导出</string>
+    <string name="component_profile_card_hours_ago" formatted="false">%d 小时前</string>
+    <string name="component_profile_card_just_now" formatted="false">刚刚</string>
+    <string name="component_profile_card_local_config" formatted="false">本地配置文件</string>
+    <string name="component_profile_card_local_file" formatted="false">本地文件</string>
+    <string name="component_profile_card_minutes_ago" formatted="false">%d 分钟前</string>
+    <string name="component_profile_card_remote_subscription" formatted="false">远程订阅</string>
+    <string name="component_profile_card_traffic" formatted="false">流量：%s / %s (%d%%)</string>
+    <string name="component_profile_card_update" formatted="false">更新</string>
+    <string name="component_profile_card_used_traffic" formatted="false">已用：%s</string>
+    <string name="component_selector_append" formatted="false">后置</string>
+    <string name="component_selector_disable" formatted="false">禁用</string>
+    <string name="component_selector_enable" formatted="false">启用</string>
+    <string name="component_selector_merge" formatted="false">合并</string>
+    <string name="component_selector_not_modify" formatted="false">不修改</string>
+    <string name="component_selector_prepend" formatted="false">前置</string>
+    <string name="component_selector_replace" formatted="false">替换</string>
+    <string name="component_update_action_download_now" formatted="false">立即下载</string>
+    <string name="component_update_message_available" formatted="false">检测到可用更新</string>
+    <string name="component_update_message_check_failed" formatted="false">检查更新失败：%s</string>
+    <string name="component_update_message_checking" formatted="false">正在检查更新...</string>
+    <string name="component_update_message_close" formatted="false">知道了</string>
+    <string name="component_update_message_cover_desc" formatted="false">更新封面</string>
+    <string name="component_update_message_current_version" formatted="false">当前版本</string>
+    <string name="component_update_message_download_already_running" formatted="false">更新包仍在下载中</string>
+    <string name="component_update_message_download_error_with_code" formatted="false">下载失败 (%d): %s</string>
+    <string name="component_update_message_download_ready" formatted="false">下载完成，准备安装</string>
+    <string name="component_update_message_downloading" formatted="false">正在下载更新包...</string>
+    <string name="component_update_message_downloading_with_progress" formatted="false">正在下载更新包 %d%%</string>
+    <string name="component_update_message_error" formatted="false">下载失败，请稍后重试</string>
+    <string name="component_update_message_finished" formatted="false">下载完成，等待安装确认</string>
+    <string name="component_update_message_install_failed" formatted="false">打开安装器失败：%s</string>
+    <string name="component_update_message_install_prompt_opened" formatted="false">下载完成，已打开安装器</string>
+    <string name="component_update_message_missing_release_metadata" formatted="false">最新发布缺少版本元数据</string>
+    <string name="component_update_message_no_compatible_asset" formatted="false">最新发布中没有找到适合当前设备的 APK</string>
+    <string name="component_update_message_no_update" formatted="false">当前已经是最新版本</string>
+    <string name="component_update_message_preparing" formatted="false">正在准备下载...</string>
+    <string name="component_update_message_remote_version" formatted="false">推送版本</string>
+    <string name="component_update_message_updating" formatted="false">正在更新</string>
+    <string name="component_update_message_verify_failed" formatted="false">安装包校验失败，请重试</string>
+    <string name="component_update_message_verifying" formatted="false">正在校验安装包...</string>
+    <string name="component_update_message_waiting" formatted="false">等待下载开始...</string>
+    <string name="component_update_title_available" formatted="false">发现新版本</string>
+    <string name="component_web_view_invalid_url" formatted="false">无效的 URL</string>
+    <string name="connection_chain_count" formatted="false">x%d</string>
+    <string name="connection_detail_action_interrupt" formatted="false">打断连接</string>
+    <string name="connection_detail_action_interrupting" formatted="false">正在打断连接...</string>
+    <string name="connection_detail_label_content" formatted="false">内容</string>
+    <string name="connection_detail_label_destination_address" formatted="false">目标地址</string>
+    <string name="connection_detail_label_download" formatted="false">下载</string>
+    <string name="connection_detail_label_duration" formatted="false">连接时长</string>
+    <string name="connection_detail_label_process" formatted="false">进程</string>
+    <string name="connection_detail_label_protocol" formatted="false">协议</string>
+    <string name="connection_detail_label_source_address" formatted="false">源地址</string>
+    <string name="connection_detail_label_type" formatted="false">类型</string>
+    <string name="connection_detail_label_upload" formatted="false">上传</string>
+    <string name="connection_detail_section_info" formatted="false">连接信息</string>
+    <string name="connection_detail_section_rule" formatted="false">规则</string>
+    <string name="connection_empty" formatted="false">暂无活动连接</string>
+    <string name="connection_loading" formatted="false">加载中...</string>
+    <string name="connection_no_results" formatted="false">没有匹配的连接</string>
+    <string name="connection_relative_time_date" formatted="false">%02d-%02d</string>
+    <string name="connection_relative_time_days_ago" formatted="false">%d 天前</string>
+    <string name="connection_relative_time_hours_ago" formatted="false">%d 小时前</string>
+    <string name="connection_relative_time_just_now" formatted="false">刚刚</string>
+    <string name="connection_relative_time_minutes_ago" formatted="false">%d 分钟前</string>
+    <string name="connection_search" formatted="false">搜索</string>
+    <string name="connection_search_hint" formatted="false">搜索主机、进程...</string>
+    <string name="connection_sort_download" formatted="false">下载</string>
+    <string name="connection_sort_host" formatted="false">主机</string>
+    <string name="connection_sort_time" formatted="false">时间</string>
+    <string name="connection_sort_upload" formatted="false">上传</string>
+    <string name="connection_sort_by" formatted="false">排序:</string>
+    <string name="connection_summary" formatted="false">查看当前活动连接</string>
+    <string name="connection_tab_active" formatted="false">活动中</string>
+    <string name="connection_tab_closed" formatted="false">已关闭</string>
+    <string name="connection_title" formatted="false">连接</string>
+    <string name="editor_action_discard" formatted="false">放弃</string>
+    <string name="editor_action_format" formatted="false">格式化</string>
+    <string name="editor_action_save" formatted="false">保存</string>
+    <string name="editor_common_config_preview_title" formatted="false">配置预览</string>
+    <string name="editor_common_edit_config_title" formatted="false">编辑配置</string>
+    <string name="editor_common_edit_override_config_title" formatted="false">编辑覆写配置</string>
+    <string name="editor_common_edit_profile_config_title" formatted="false">编辑订阅配置</string>
+    <string name="editor_common_json_subtitle" formatted="false">使用 JSON 格式编辑</string>
+    <string name="editor_diagnostic_duplicate_key" formatted="false">重复的键</string>
+    <string name="editor_diagnostic_expected" formatted="false">期望 %s</string>
+    <string name="editor_diagnostic_json_format_error" formatted="false">JSON 格式错误</string>
+    <string name="editor_diagnostic_json_must_start_with_object_or_array" formatted="false">JSON 必须以 {' 或 '[' 开头{ 或 '[' 开头 或 [' 开头[ 开头 开头</string>
+    <string name="editor_diagnostic_json_syntax_error" formatted="false">JSON 语法错误</string>
+    <string name="editor_diagnostic_no_value" formatted="false">缺少值</string>
+    <string name="editor_diagnostic_unknown" formatted="false">未知</string>
+    <string name="editor_diagnostic_unterminated" formatted="false">未终止的字符串或对象</string>
+    <string name="editor_dialog_discard_title" formatted="false">放弃修改</string>
+    <string name="editor_dialog_unsaved_changes_message" formatted="false">当前有未保存的修改，确定要放弃吗？</string>
+    <string name="editor_dialog_unsaved_changes_title" formatted="false">未保存的修改</string>
+    <string name="editor_toast_format_failed_or_unchanged" formatted="false">格式化失败或无需格式化</string>
+    <string name="editor_toast_format_success" formatted="false">格式化成功</string>
+    <string name="editor_toast_save_failed" formatted="false">保存失败</string>
+    <string name="editor_toast_syntax_error" formatted="false">语法错误，请检查内容</string>
+    <string name="feature_node_health_check_concurrency_summary" formatted="false">当前选项：%s</string>
+    <string name="feature_node_health_check_concurrency_title" formatted="false">测速并发数</string>
+    <string name="feature_node_section" formatted="false">节点</string>
+    <string name="feature_runtime_config_empty" formatted="false">运行时配置文件没有内容</string>
+    <string name="feature_runtime_config_not_ready" formatted="false">运行时配置尚未准备完成</string>
+    <string name="feature_runtime_config_not_running" formatted="false">请先启动代理，再查看运行时配置</string>
+    <string name="feature_runtime_config_preview_title" formatted="false">运行时配置 · %s</string>
+    <string name="feature_runtime_config_runtime_changed" formatted="false">运行中的配置已变更，请重新打开</string>
+    <string name="feature_runtime_config_section" formatted="false">诊断</string>
+    <string name="feature_runtime_config_summary" formatted="false">查看 Mihomo 当前实际加载的只读 YAML；内容可能包含敏感数据</string>
+    <string name="feature_runtime_config_title" formatted="false">查看运行时配置</string>
+    <string name="feature_runtime_config_unavailable" formatted="false">找不到当前的运行时配置文件</string>
+    <string name="feature_runtime_config_unknown_profile" formatted="false">未知配置</string>
+    <string name="feature_speed_test_cancel" formatted="false">取消</string>
+    <string name="feature_speed_test_data_usage" formatted="false">每次测试最多使用 32 MB 下载与 8 MB 上传流量</string>
+    <string name="feature_speed_test_download" formatted="false">下载</string>
+    <string name="feature_speed_test_edge_location" formatted="false">Cloudflare Edge</string>
+    <string name="feature_speed_test_error" formatted="false">无法完成速度测试，请检查连接后再试一次。</string>
+    <string name="feature_speed_test_jitter" formatted="false">抖动</string>
+    <string name="feature_speed_test_latency" formatted="false">延迟</string>
+    <string name="feature_speed_test_location_unknown" formatted="false">未知</string>
+    <string name="feature_speed_test_preparing" formatted="false">正在准备测试…</string>
+    <string name="feature_speed_test_privacy_notice" formatted="false">测试流量会发送至 Cloudflare；不包含丢包测试。</string>
+    <string name="feature_speed_test_section" formatted="false">网络测试</string>
+    <string name="feature_speed_test_start" formatted="false">开始测试</string>
+    <string name="feature_speed_test_summary" formatted="false">测量当前连接至 Cloudflare Edge 的质量</string>
+    <string name="feature_speed_test_testing_download" formatted="false">正在测量下载速度…</string>
+    <string name="feature_speed_test_testing_latency" formatted="false">正在测量延迟…</string>
+    <string name="feature_speed_test_testing_upload" formatted="false">正在测量上传速度…</string>
+    <string name="feature_speed_test_title" formatted="false">Cloudflare 速度测试</string>
+    <string name="feature_speed_test_upload" formatted="false">上传</string>
+    <string name="feature_title" formatted="false">高级功能</string>
+    <string name="home_control_hint_add_profile" formatted="false">请先添加配置文件</string>
+    <string name="home_control_hint_enable_profile" formatted="false">请先在「配置」页面启用一个配置</string>
+    <string name="home_control_hint_profiles_loading" formatted="false">配置文件仍在加载，请稍候。</string>
+    <string name="home_control_start" formatted="false">启动</string>
+    <string name="home_control_stop" formatted="false">停止</string>
+    <string name="home_ip_info_exit_ip" formatted="false">出口 IP</string>
+    <string name="home_message_config_switch_failed" formatted="false">配置切换失败：%s</string>
+    <string name="home_message_config_switched" formatted="false">配置已切换</string>
+    <string name="home_message_control_busy" formatted="false">代理%s，请稍候。</string>
+    <string name="home_message_preparing" formatted="false">正在准备...</string>
+    <string name="home_message_start_failed" formatted="false">启动失败：%s</string>
+    <string name="home_message_stop_failed" formatted="false">停止失败：%s</string>
+    <string name="home_message_waiting_for_vpn_permission" formatted="false">正在等待 VPN 授权</string>
+    <string name="home_node_info_delay" formatted="false">延迟</string>
+    <string name="home_node_info_delay_value" formatted="false">%dms</string>
+    <string name="home_node_info_node" formatted="false">节点</string>
+    <string name="home_node_info_unknown" formatted="false">未知</string>
+    <string name="home_proxy_mode_http" formatted="false">HTTP</string>
+    <string name="home_proxy_mode_tun" formatted="false">TUN</string>
+    <string name="home_proxy_mode_vpn" formatted="false">VPN</string>
+    <string name="home_status_connecting" formatted="false">连接中</string>
+    <string name="home_status_disconnecting" formatted="false">断开中</string>
+    <string name="home_status_running" formatted="false">运行中</string>
+    <string name="home_status_tap_fab_to_start" formatted="false">点击悬浮按钮启动</string>
+    <string name="home_status_tap_to_start" formatted="false">轻触启动</string>
+    <string name="home_title" formatted="false">KokoroBox</string>
+    <string name="home_traffic_down_short" formatted="false">DOWN</string>
+    <string name="home_traffic_no_profile" formatted="false">无配置</string>
+    <string name="home_traffic_up_short" formatted="false">UP</string>
+    <string name="log_action_save" formatted="false">保存</string>
+    <string name="log_action_start_recording" formatted="false">开始记录</string>
+    <string name="log_action_stop_recording" formatted="false">停止记录</string>
+    <string name="log_detail_waiting_log" formatted="false">等待日志...</string>
+    <string name="log_detail_will_show_when_generated" formatted="false">日志将在产生时显示</string>
+    <string name="log_empty_no_logs" formatted="false">暂无日志记录</string>
+    <string name="log_empty_start_recording_hint" formatted="false">点击右下角按钮开始记录日志</string>
+    <string name="log_title" formatted="false">日志</string>
+    <string name="meta_feature_age_key_derive_public_key" formatted="false">推导公钥</string>
+    <string name="meta_feature_age_key_generate" formatted="false">生成</string>
+    <string name="meta_feature_age_key_hybrid_title" formatted="false">mlkem768-x25519</string>
+    <string name="meta_feature_age_key_public_key" formatted="false">公钥</string>
+    <string name="meta_feature_age_key_secret_key" formatted="false">私钥</string>
+    <string name="meta_feature_age_key_section" formatted="false">Age 密钥</string>
+    <string name="meta_feature_age_key_x25519_title" formatted="false">X25519</string>
+    <string name="meta_feature_custom_rules_add_rule" formatted="false">新增规则</string>
+    <string name="meta_feature_custom_rules_back_to_kokoro_settings" formatted="false">返回 Kokoro 设置</string>
+    <string name="meta_feature_custom_rules_cancel" formatted="false">取消</string>
+    <string name="meta_feature_custom_rules_confirm" formatted="false">确认</string>
+    <string name="meta_feature_custom_rules_conflict_message" formatted="false">请选择远程版本，或保留本地编辑并使用最新 revision 再次保存。</string>
+    <string name="meta_feature_custom_rules_conflict_title" formatted="false">规则已在其他设备更改</string>
+    <string name="meta_feature_custom_rules_delete_rule" formatted="false">删除规则</string>
+    <string name="meta_feature_custom_rules_discard_message" formatted="false">此操作会放弃尚未保存的更改。</string>
+    <string name="meta_feature_custom_rules_discard_title" formatted="false">放弃本地更改？</string>
+    <string name="meta_feature_custom_rules_edit_rule" formatted="false">编辑规则</string>
+    <string name="meta_feature_custom_rules_empty" formatted="false">default 规则目前为空。</string>
+    <string name="meta_feature_custom_rules_error_load" formatted="false">无法加载自定义规则。</string>
+    <string name="meta_feature_custom_rules_error_not_found" formatted="false">default 规则目前无法使用，已重新加载服务器状态。</string>
+    <string name="meta_feature_custom_rules_error_rate_limited" formatted="false">请求过于频繁，请稍后再试。</string>
+    <string name="meta_feature_custom_rules_error_request" formatted="false">服务器拒绝了此项请求。</string>
+    <string name="meta_feature_custom_rules_error_unknown" formatted="false">无法确认保存结果，继续前请检查远程版本。</string>
+    <string name="meta_feature_custom_rules_error_validation" formatted="false">第 %d 条规则无效，请刷新选项并修正后再保存。</string>
+    <string name="meta_feature_custom_rules_error_validation_general" formatted="false">规则列表无效，请刷新选项并修正后再保存。</string>
+    <string name="meta_feature_custom_rules_keep_local" formatted="false">保留本地版本</string>
+    <string name="meta_feature_custom_rules_loading" formatted="false">正在加载自定义规则…</string>
+    <string name="meta_feature_custom_rules_match_payload_hint" formatted="false">MATCH 不使用内容字段。</string>
+    <string name="meta_feature_custom_rules_move_down" formatted="false">向下移动规则</string>
+    <string name="meta_feature_custom_rules_move_up" formatted="false">向上移动规则</string>
+    <string name="meta_feature_custom_rules_payload" formatted="false">内容</string>
+    <string name="meta_feature_custom_rules_provider" formatted="false">规则提供者</string>
+    <string name="meta_feature_custom_rules_refresh" formatted="false">从服务器重新加载</string>
+    <string name="meta_feature_custom_rules_retry" formatted="false">重试</string>
+    <string name="meta_feature_custom_rules_rules" formatted="false">规则</string>
+    <string name="meta_feature_custom_rules_save" formatted="false">保存规则</string>
+    <string name="meta_feature_custom_rules_saved" formatted="false">自定义规则已保存</string>
+    <string name="meta_feature_custom_rules_target" formatted="false">目标</string>
+    <string name="meta_feature_custom_rules_title" formatted="false">自定义规则</string>
+    <string name="meta_feature_custom_rules_type" formatted="false">类型</string>
+    <string name="meta_feature_custom_rules_use_remote" formatted="false">使用远程版本</string>
+    <string name="meta_feature_download_dialog_title" formatted="false">在线更新 GeoX</string>
+    <string name="meta_feature_download_download_complete" formatted="false">下载完成：%d/%d</string>
+    <string name="meta_feature_download_import_failed" formatted="false">%s 导入失败：文件无效或校验未通过</string>
+    <string name="meta_feature_download_import_success" formatted="false">%s 已导入并应用</string>
+    <string name="meta_feature_download_last_update" formatted="false">上次更新（%s）：%s</string>
+    <string name="meta_feature_download_last_update_never" formatted="false">暂无记录</string>
+    <string name="meta_feature_download_last_update_source_local" formatted="false">本地</string>
+    <string name="meta_feature_download_last_update_source_online" formatted="false">在线</string>
+    <string name="meta_feature_download_local_dialog_title" formatted="false">本地更新 GeoX</string>
+    <string name="meta_feature_download_progress_detail" formatted="false">%s / %s · %s</string>
+    <string name="meta_feature_download_progress_detail_unknown_total" formatted="false">%s · %s</string>
+    <string name="meta_feature_download_progress_failed" formatted="false">下载或校验失败，已保留可用回退文件</string>
+    <string name="meta_feature_download_progress_success" formatted="false">文件已更新并通过校验</string>
+    <string name="meta_feature_download_progress_summary" formatted="false">请保持此页面打开，正在下载并校验文件</string>
+    <string name="meta_feature_download_progress_title" formatted="false">正在更新 GeoX</string>
+    <string name="meta_feature_download_progress_waiting" formatted="false">等待开始</string>
+    <string name="meta_feature_download_select_files" formatted="false">请选择要更新的文件</string>
+    <string name="meta_feature_download_status_downloading" formatted="false">下载中 %d%%</string>
+    <string name="meta_feature_download_status_failed" formatted="false">失败</string>
+    <string name="meta_feature_download_status_pending" formatted="false">等待中</string>
+    <string name="meta_feature_download_status_success" formatted="false">已完成</string>
+    <string name="meta_feature_download_status_validating" formatted="false">校验中</string>
+    <string name="meta_feature_geo_x_local_update_summary" formatted="false">从本地文件导入并应用数据库</string>
+    <string name="meta_feature_geo_x_local_update_title" formatted="false">本地更新 GeoX</string>
+    <string name="meta_feature_geo_x_online_update_summary" formatted="false">从远程源下载数据库文件</string>
+    <string name="meta_feature_geo_x_online_update_title" formatted="false">在线更新 GeoX</string>
+    <string name="meta_feature_geo_x_runtime_home_info" formatted="false">GeoX 数据库文件下载并存放在内核目录：%s</string>
+    <string name="meta_feature_section_connection_and_traffic" formatted="false">连接与流量统计</string>
+    <string name="meta_feature_section_geo_xupdate" formatted="false">GeoX 更新</string>
+    <string name="meta_feature_title" formatted="false">Meta 功能</string>
+    <string name="network_settings_error_root_required" formatted="false">RootTun 需要 KokoroBox 已获取可用的 Root 权限</string>
+    <string name="network_settings_error_vpn_denied" formatted="false">VPN 权限被拒绝</string>
+    <string name="network_settings_experimental_anti_pollution_dns_summary" formatted="false">使用加密的境内外 DNS 与分流策略覆盖订阅配置；需要 GeoSite 数据</string>
+    <string name="network_settings_experimental_anti_pollution_dns_title" formatted="false">抗污染 DNS</string>
+    <string name="network_settings_network_custom_user_agent_summary_default" formatted="false">未设置，使用默认值</string>
+    <string name="network_settings_network_custom_user_agent_title" formatted="false">自定义 User-Agent</string>
+    <string name="network_settings_network_user_agent_dialog_title" formatted="false">编辑 User-Agent</string>
+    <string name="network_settings_proxy_options_access_control_mode_title" formatted="false">访问控制模式</string>
+    <string name="network_settings_proxy_options_allow_all" formatted="false">允许所有</string>
+    <string name="network_settings_proxy_options_allow_selected" formatted="false">允许选择</string>
+    <string name="network_settings_proxy_options_manage_access_control_summary" formatted="false">为应用和域名配置访问控制规则</string>
+    <string name="network_settings_proxy_options_manage_access_control_title" formatted="false">管理访问控制列表</string>
+    <string name="network_settings_proxy_options_reject_selected" formatted="false">拒绝选择</string>
+    <string name="network_settings_proxy_options_tun_stack_title" formatted="false">TUN 协议栈</string>
+    <string name="network_settings_root_tun_auto_redirect_summary" formatted="false">自动启用 RootTun 所需的重定向规则</string>
+    <string name="network_settings_root_tun_auto_redirect_title" formatted="false">自动重定向</string>
+    <string name="network_settings_root_tun_auto_route_summary" formatted="false">自动添加转发所需路由</string>
+    <string name="network_settings_root_tun_auto_route_title" formatted="false">自动路由</string>
+    <string name="network_settings_root_tun_dns_mode_fake_ip" formatted="false">FakeIP</string>
+    <string name="network_settings_root_tun_dns_mode_redir_host" formatted="false">RedirHost</string>
+    <string name="network_settings_root_tun_dns_mode_summary" formatted="false">选择 RedirHost 或 FakeIP</string>
+    <string name="network_settings_root_tun_dns_mode_title" formatted="false">DNS 模式</string>
+    <string name="network_settings_root_tun_fake_ip_range6_summary" formatted="false">仅在 FakeIP 模式下生效</string>
+    <string name="network_settings_root_tun_fake_ip_range6_title" formatted="false">FakeIP IPv6 地址段</string>
+    <string name="network_settings_root_tun_fake_ip_range_summary" formatted="false">仅在 FakeIP 模式下生效</string>
+    <string name="network_settings_root_tun_fake_ip_range_title" formatted="false">FakeIP IPv4 地址段</string>
+    <string name="network_settings_root_tun_if_name_summary" formatted="false">RootTun 创建的虚拟网卡名</string>
+    <string name="network_settings_root_tun_if_name_title" formatted="false">接口名称</string>
+    <string name="network_settings_root_tun_mtu_summary" formatted="false">RootTun 链路的最大传输单元</string>
+    <string name="network_settings_root_tun_mtu_title" formatted="false">MTU</string>
+    <string name="network_settings_root_tun_strict_route_summary" formatted="false">仅允许命中的流量走 RootTun</string>
+    <string name="network_settings_root_tun_strict_route_title" formatted="false">严格路由</string>
+    <string name="network_settings_section_experimental" formatted="false">实验性功能</string>
+    <string name="network_settings_section_network" formatted="false">网络</string>
+    <string name="network_settings_section_proxy_options" formatted="false">访问控制</string>
+    <string name="network_settings_section_vpn_options" formatted="false">服务配置</string>
+    <string name="network_settings_section_vpn_service" formatted="false">代理模式</string>
+    <string name="network_settings_title" formatted="false">网络设置</string>
+    <string name="network_settings_vpn_options_allow_bypass_summary" formatted="false">允许应用绕过 VPN</string>
+    <string name="network_settings_vpn_options_allow_bypass_title" formatted="false">允许应用绕过</string>
+    <string name="network_settings_vpn_options_bypass_private_summary" formatted="false">绕过私有网络和本地地址</string>
+    <string name="network_settings_vpn_options_bypass_private_title" formatted="false">绕过私有网络</string>
+    <string name="network_settings_vpn_options_dns_hijack_summary" formatted="false">将所有 DNS 请求重定向到 KokoroBox</string>
+    <string name="network_settings_vpn_options_dns_hijack_title" formatted="false">DNS 劫持</string>
+    <string name="network_settings_vpn_options_enable_ipv6_summary" formatted="false">允许通过 VPN 路由 IPv6 流量</string>
+    <string name="network_settings_vpn_options_enable_ipv6_title" formatted="false">运行 IPv6</string>
+    <string name="network_settings_vpn_options_system_proxy_summary" formatted="false">仅在 VPN 模式下，为未走 TUN 的应用设置 HTTP 代理</string>
+    <string name="network_settings_vpn_options_system_proxy_title" formatted="false">VPN 系统代理</string>
+    <string name="network_settings_vpn_service_root_tun_mode" formatted="false">Root TUN</string>
+    <string name="network_settings_vpn_service_route_traffic_summary" formatted="false">选择当前用于接管系统流量的代理模式</string>
+    <string name="network_settings_vpn_service_route_traffic_title" formatted="false">路由系统流量</string>
+    <string name="network_settings_vpn_service_system_proxy" formatted="false">HTTP 系统代理</string>
+    <string name="network_settings_vpn_service_vpn_mode" formatted="false">VPN 模式</string>
+    <string name="onboarding_finish_subtitle" formatted="false">基础设置已就绪即将进入主页</string>
+    <string name="onboarding_finish_title" formatted="false">准备完成</string>
+    <string name="onboarding_navigation_back" formatted="false">返回</string>
+    <string name="onboarding_navigation_enter" formatted="false">进入应用</string>
+    <string name="onboarding_navigation_next" formatted="false">下一步</string>
+    <string name="onboarding_navigation_start" formatted="false">开始设置</string>
+    <string name="onboarding_permission_app_list_summary_need" formatted="false">用于分应用代理等功能</string>
+    <string name="onboarding_permission_app_list_title" formatted="false">应用列表权限</string>
+    <string name="onboarding_permission_common_granted" formatted="false">已授权</string>
+    <string name="onboarding_permission_notification_summary_need" formatted="false">用于显示连接状态和流量通知</string>
+    <string name="onboarding_permission_notification_summary_not_required" formatted="false">当前系统无需额外授权</string>
+    <string name="onboarding_permission_notification_title" formatted="false">通知权限</string>
+    <string name="onboarding_permission_subtitle" formatted="false">权限会影响通知和分应用代理等功能</string>
+    <string name="onboarding_permission_title" formatted="false">确认运行权限</string>
+    <string name="onboarding_personalize_subtitle" formatted="false">主题模式和主色可随时在设置中修改</string>
+    <string name="onboarding_personalize_title" formatted="false">调整界面风格</string>
+    <string name="onboarding_privacy_accept_title" formatted="false">我已阅读并同意隐私政策</string>
+    <string name="onboarding_privacy_policy_link" formatted="false">《隐私政策》</string>
+    <string name="onboarding_privacy_privacy_title" formatted="false">隐私政策</string>
+    <string name="onboarding_privacy_rich_text_lead" formatted="false">在开始使用前需要同意隐私政策，才能继续使用 KokoroBox。</string>
+    <string name="onboarding_privacy_rich_text_prefix" formatted="false">继续前请先阅读并同意</string>
+    <string name="onboarding_privacy_rich_text_suffix" formatted="false">。</string>
+    <string name="onboarding_privacy_subtitle" formatted="false">阅读并同意隐私政策后方可继续</string>
+    <string name="onboarding_privacy_title" formatted="false">确认隐私政策</string>
+    <string name="onboarding_sheet_load_failed" formatted="false">无法加载协议内容</string>
+    <string name="onboarding_sheet_privacy_policy_title" formatted="false">隐私政策</string>
+    <string name="open_source_licenses_license_sheet_no_content" formatted="false">暂无许可证内容</string>
+    <string name="open_source_licenses_title" formatted="false">开源许可证</string>
+    <string name="override_action_create" formatted="false">创建配置</string>
+    <string name="override_action_import" formatted="false">导入 JSON</string>
+    <string name="override_action_import_file" formatted="false">导入配置文件</string>
+    <string name="override_action_new" formatted="false">新建配置</string>
+    <string name="override_card_copy" formatted="false">复制配置</string>
+    <string name="override_card_delete" formatted="false">删除配置</string>
+    <string name="override_card_delete_button" formatted="false">删除</string>
+    <string name="override_card_edit" formatted="false">编辑配置</string>
+    <string name="override_card_edit_button" formatted="false">编辑</string>
+    <string name="override_card_export" formatted="false">导出配置</string>
+    <string name="override_card_no_description" formatted="false">未填写描述</string>
+    <string name="override_dialog_button_cancel" formatted="false">取消</string>
+    <string name="override_dialog_button_delete" formatted="false">删除</string>
+    <string name="override_dialog_create_description" formatted="false">配置描述</string>
+    <string name="override_dialog_create_import_hint" formatted="false">选择 JSON 文件导入覆写配置</string>
+    <string name="override_dialog_create_name" formatted="false">配置名称</string>
+    <string name="override_dialog_create_title" formatted="false">添加配置</string>
+    <string name="override_dialog_delete_in_use_message" formatted="false">配置 %s 正在被订阅使用，删除后将解除绑定关系。确定要删除吗？此操作不可恢复。</string>
+    <string name="override_dialog_delete_message" formatted="false">确定要删除配置 %s 吗？此操作不可恢复。</string>
+    <string name="override_dialog_delete_title" formatted="false">删除配置</string>
+    <string name="override_dialog_edit_options_code_editor" formatted="false">代码编辑器</string>
+    <string name="override_dialog_edit_options_title" formatted="false">编辑配置</string>
+    <string name="override_dialog_edit_options_visual_editor" formatted="false">可视化编辑</string>
+    <string name="override_dns_append_system" formatted="false">追加系统 DNS</string>
+    <string name="override_dns_default" formatted="false">默认 DNS</string>
+    <string name="override_dns_default_hint" formatted="false">用于解析 DNS 服务器域名</string>
+    <string name="override_dns_enhanced_disable" formatted="false">禁用</string>
+    <string name="override_dns_enhanced_fakeip" formatted="false">FakeIP</string>
+    <string name="override_dns_enhanced_mapping" formatted="false">Mapping</string>
+    <string name="override_dns_enhanced_mode" formatted="false">增强模式</string>
+    <string name="override_dns_enhanced_not_modify" formatted="false">不修改</string>
+    <string name="override_dns_fakeip_blacklist" formatted="false">黑名单</string>
+    <string name="override_dns_fakeip_filter" formatted="false">FakeIP 过滤</string>
+    <string name="override_dns_fakeip_filter_hint" formatted="false">例如：+.lan, localhost</string>
+    <string name="override_dns_fakeip_filter_mode" formatted="false">FakeIP 过滤模式</string>
+    <string name="override_dns_fakeip_whitelist" formatted="false">白名单</string>
+    <string name="override_dns_fallback" formatted="false">备用 DNS</string>
+    <string name="override_dns_fallback_domain" formatted="false">域名回退</string>
+    <string name="override_dns_fallback_domain_hint" formatted="false">例如：+.google.com</string>
+    <string name="override_dns_fallback_geoip" formatted="false">GeoIP 回退</string>
+    <string name="override_dns_fallback_geoip_code" formatted="false">GeoIP 代码</string>
+    <string name="override_dns_fallback_geoip_code_hint" formatted="false">例如：CN</string>
+    <string name="override_dns_fallback_hint" formatted="false">例如：1.1.1.1</string>
+    <string name="override_dns_fallback_ipcidr" formatted="false">IP CIDR 回退</string>
+    <string name="override_dns_fallback_ipcidr_hint" formatted="false">例如：240.0.0.0/4</string>
+    <string name="override_dns_ipv6" formatted="false">DNS IPv6</string>
+    <string name="override_dns_listen" formatted="false">监听地址</string>
+    <string name="override_dns_listen_hint" formatted="false">例如：0.0.0.0:53</string>
+    <string name="override_dns_nameserver_policy" formatted="false">DNS 策略</string>
+    <string name="override_dns_nameserver_policy_key" formatted="false">域名匹配规则</string>
+    <string name="override_dns_nameserver_policy_value" formatted="false">DNS 服务器</string>
+    <string name="override_dns_policy" formatted="false">DNS 策略</string>
+    <string name="override_dns_policy_force_enable" formatted="false">强制启用</string>
+    <string name="override_dns_policy_not_modify" formatted="false">不修改</string>
+    <string name="override_dns_policy_use_builtin" formatted="false">使用内置</string>
+    <string name="override_dns_prefer_h3" formatted="false">优先 HTTP/3</string>
+    <string name="override_dns_servers" formatted="false">DNS 服务器</string>
+    <string name="override_dns_servers_hint" formatted="false">例如：8.8.8.8, tls://dns.google</string>
+    <string name="override_dns_use_hosts" formatted="false">使用 hosts</string>
+    <string name="override_draft_add_extra_field" formatted="false">新增额外字段</string>
+    <string name="override_draft_add_health_check_field" formatted="false">新增 health-check 额外字段</string>
+    <string name="override_draft_add_override_field" formatted="false">新增 override 额外字段</string>
+    <string name="override_draft_apply" formatted="false">应用</string>
+    <string name="override_draft_basic_identity" formatted="false">基础身份</string>
+    <string name="override_draft_basic_info" formatted="false">基础信息</string>
+    <string name="override_draft_basic_routing" formatted="false">基础分流</string>
+    <string name="override_draft_boolean_options" formatted="false">布尔选项</string>
+    <string name="override_draft_click_to_add_extra_field" formatted="false">点击添加额外字段</string>
+    <string name="override_draft_config_description" formatted="false">配置说明</string>
+    <string name="override_draft_config_name" formatted="false">配置名称</string>
+    <string name="override_draft_config_sections" formatted="false">配置分区</string>
+    <string name="override_draft_core_source" formatted="false">核心来源</string>
+    <string name="override_draft_delete_extra_field" formatted="false">删除额外字段</string>
+    <string name="override_draft_double_value" formatted="false">浮点数值</string>
+    <string name="override_draft_edit_extra_field" formatted="false">编辑额外字段</string>
+    <string name="override_draft_edit_health_check_field" formatted="false">编辑 health-check 额外字段</string>
+    <string name="override_draft_edit_override_field" formatted="false">编辑 override 额外字段</string>
+    <string name="override_draft_edit_sub_rules" formatted="false">编辑子规则</string>
+    <string name="override_draft_extra_fields" formatted="false">额外字段</string>
+    <string name="override_draft_extra_fields_configured" formatted="false">已配置 %d 个额外字段</string>
+    <string name="override_draft_fallback_region_group_title" formatted="false">Fallback 地区组</string>
+    <string name="override_draft_group_type_fallback" formatted="false">Fallback</string>
+    <string name="override_draft_group_type_title" formatted="false">策略组类型</string>
+    <string name="override_draft_group_type_url_test" formatted="false">UrlTest</string>
+    <string name="override_draft_header_hint" formatted="false">每行一个 header，格式：Key: value1 | value2</string>
+    <string name="override_draft_health_check_fields" formatted="false">Health Check 额外字段</string>
+    <string name="override_draft_health_check_switch" formatted="false">Health Check 开关</string>
+    <string name="override_draft_int_value" formatted="false">整数值</string>
+    <string name="override_draft_json_fragment" formatted="false">单个 JSON 片段</string>
+    <string name="override_draft_key_name_empty" formatted="false">键名不能为空</string>
+    <string name="override_draft_name" formatted="false">名称</string>
+    <string name="override_draft_name_required" formatted="false">名称不能为空</string>
+    <string name="override_draft_network_auth" formatted="false">网络与认证</string>
+    <string name="override_draft_no_rules" formatted="false">未配置规则</string>
+    <string name="override_draft_object" formatted="false">对象</string>
+    <string name="override_draft_official_mrs" formatted="false">官方 MRS 常用分流</string>
+    <string name="override_draft_official_mrs_summary" formatted="false">顶部模板编辑器，支持地区自动组和每个分流项单独开关；应用时会重建当前覆写里的规则三块。</string>
+    <string name="override_draft_override_fields" formatted="false">Override 额外字段</string>
+    <string name="override_draft_override_switch" formatted="false">Override 开关</string>
+    <string name="override_draft_preset_apply_summary" formatted="false">应用后会覆盖当前覆写里的规则提供者、策略组和规则</string>
+    <string name="override_draft_preset_template" formatted="false">预设分流模板</string>
+    <string name="override_draft_regional_auto_group" formatted="false">地区自动组</string>
+    <string name="override_draft_rule_list" formatted="false">规则列表</string>
+    <string name="override_draft_rules_configured" formatted="false">已配置 %d 条规则</string>
+    <string name="override_draft_save" formatted="false">保存</string>
+    <string name="override_draft_service_routing" formatted="false">服务分流</string>
+    <string name="override_draft_string_value" formatted="false">字符串值</string>
+    <string name="override_draft_sub_rule_group" formatted="false">子规则组</string>
+    <string name="override_draft_url_test_region_group_title" formatted="false">UrlTest 地区组</string>
+    <string name="override_draft_value_type" formatted="false">值类型</string>
+    <string name="override_draft_value_type_mismatch" formatted="false">当前值与所选类型不匹配</string>
+    <string name="override_edit_button_cancel" formatted="false">取消</string>
+    <string name="override_edit_button_discard" formatted="false">放弃</string>
+    <string name="override_edit_empty_name_summary" formatted="false">当前名称为空，无法实时保存。确定放弃这次未保存的修改吗？</string>
+    <string name="override_edit_empty_name_title" formatted="false">名称为空</string>
+    <string name="override_edit_preset_applied" formatted="false">已更新预设分流模板</string>
+    <string name="override_edit_title_edit" formatted="false">编辑配置</string>
+    <string name="override_edit_title_new" formatted="false">新建配置</string>
+    <string name="override_editor_add_custom" formatted="false">添加自定义</string>
+    <string name="override_editor_add_item" formatted="false">新增条目</string>
+    <string name="override_editor_add_object" formatted="false">新增对象</string>
+    <string name="override_editor_add_sub_rule_group" formatted="false">新增子规则组</string>
+    <string name="override_editor_additional_params" formatted="false">附加参数</string>
+    <string name="override_editor_array_items" formatted="false">数组 %d 项</string>
+    <string name="override_editor_basic_connection" formatted="false">基础连接</string>
+    <string name="override_editor_cancel_delete" formatted="false">取消删除</string>
+    <string name="override_editor_clear" formatted="false">清空</string>
+    <string name="override_editor_clear_current_mode" formatted="false">清空当前模式</string>
+    <string name="override_editor_clear_dialog_summary" formatted="false">清空后将移除当前模式里的所有%s。</string>
+    <string name="override_editor_clear_dialog_title" formatted="false">清空%s</string>
+    <string name="override_editor_clear_mode" formatted="false">清空当前模式</string>
+    <string name="override_editor_clear_sub_rules" formatted="false">清空子规则</string>
+    <string name="override_editor_confirm" formatted="false">确定</string>
+    <string name="override_editor_content_empty" formatted="false">内容不能为空</string>
+    <string name="override_editor_copy" formatted="false">复制</string>
+    <string name="override_editor_custom_match_result" formatted="false">自定义匹配结果</string>
+    <string name="override_editor_custom_member" formatted="false">自定义成员</string>
+    <string name="override_editor_custom_proxy_group_target" formatted="false">自定义策略组目标</string>
+    <string name="override_editor_custom_sub_rule_target" formatted="false">自定义子规则目标</string>
+    <string name="override_editor_delete" formatted="false">删除</string>
+    <string name="override_editor_delete_last_item" formatted="false">删除最后一项</string>
+    <string name="override_editor_delete_selected" formatted="false">删除已选条目</string>
+    <string name="override_editor_delete_selected_rules" formatted="false">删除已选规则</string>
+    <string name="override_editor_drag_to_sort" formatted="false">拖拽排序</string>
+    <string name="override_editor_edit" formatted="false">编辑</string>
+    <string name="override_editor_edit_item" formatted="false">编辑条目</string>
+    <string name="override_editor_edit_proxy_group" formatted="false">编辑策略组</string>
+    <string name="override_editor_edit_proxy_node" formatted="false">编辑代理节点</string>
+    <string name="override_editor_edit_rule" formatted="false">编辑规则</string>
+    <string name="override_editor_edit_sub_rule" formatted="false">编辑子规则</string>
+    <string name="override_editor_edit_sub_rule_group" formatted="false">编辑子规则组</string>
+    <string name="override_editor_empty_string" formatted="false">空字符串</string>
+    <string name="override_editor_enter_delete_mode" formatted="false">进入删除模式</string>
+    <string name="override_editor_extra_params_hint" formatted="false">例如 src,no-resolve 之外的额外参数\n逻辑规则请直接填写完整 payload，例如 ((DOMAIN,google.com),(NETWORK,udp))。</string>
+    <string name="override_editor_health_check_and_filter" formatted="false">健康检查与过滤</string>
+    <string name="override_editor_json_block_subtitle" formatted="false">使用 JSON 格式编辑该配置块</string>
+    <string name="override_editor_key_name" formatted="false">键名</string>
+    <string name="override_editor_list" formatted="false">列表</string>
+    <string name="override_editor_logical_rule_hint" formatted="false">逻辑规则可直接填写完整 payload</string>
+    <string name="override_editor_match_result" formatted="false">匹配结果</string>
+    <string name="override_editor_member_source" formatted="false">成员来源</string>
+    <string name="override_editor_mode_title" formatted="false">修饰符模式</string>
+    <string name="override_editor_move_down" formatted="false">下移</string>
+    <string name="override_editor_move_up" formatted="false">上移</string>
+    <string name="override_editor_network_and_route" formatted="false">网络与路由</string>
+    <string name="override_editor_new" formatted="false">新增</string>
+    <string name="override_editor_new_provider" formatted="false">新增 Provider</string>
+    <string name="override_editor_new_proxy_group" formatted="false">新增策略组</string>
+    <string name="override_editor_new_proxy_node" formatted="false">新增代理节点</string>
+    <string name="override_editor_new_rule" formatted="false">新增规则</string>
+    <string name="override_editor_new_sub_rule_group" formatted="false">新增子规则组</string>
+    <string name="override_editor_no_rules" formatted="false">暂无规则</string>
+    <string name="override_editor_object_fallback_title" formatted="false">对象 %d</string>
+    <string name="override_editor_object_field_count" formatted="false">%d 个字段</string>
+    <string name="override_editor_object_field_hint" formatted="false">键值内容支持简单值和 JSON 结构。</string>
+    <string name="override_editor_object_fields" formatted="false">对象 %d 个字段</string>
+    <string name="override_editor_object_json_placeholder" formatted="false">{ \"name\": \"proxy\", \"type\": \"ss\" }</string>
+    <string name="override_editor_object_list_hint" formatted="false">结构化编辑对象列表，字段值支持字符串、数字、布尔和 JSON 片段。</string>
+    <string name="override_editor_one_item_per_line" formatted="false">每行一个条目</string>
+    <string name="override_editor_other_extra_params" formatted="false">其他附加参数，多个值用逗号分隔</string>
+    <string name="override_editor_payload" formatted="false">匹配内容</string>
+    <string name="override_editor_payload_empty" formatted="false">匹配内容不能为空</string>
+    <string name="override_editor_port_empty_hint" formatted="false">留空表示不覆写端口</string>
+    <string name="override_editor_provider_map_hint" formatted="false">结构化编辑 Provider 字典，同名键会覆盖旧值。</string>
+    <string name="override_editor_proxy_group" formatted="false">策略组</string>
+    <string name="override_editor_proxy_group_target" formatted="false">策略组目标</string>
+    <string name="override_editor_proxy_node" formatted="false">代理节点</string>
+    <string name="override_editor_rule_body" formatted="false">规则主体</string>
+    <string name="override_editor_rule_edit" formatted="false">规则编辑</string>
+    <string name="override_editor_rule_placeholder" formatted="false">DOMAIN-SUFFIX,example.com,DIRECT</string>
+    <string name="override_editor_rule_provider_input_hint" formatted="false">输入框是自定义内容；留空时使用下面选中的规则提供者</string>
+    <string name="override_editor_rule_type" formatted="false">类型</string>
+    <string name="override_editor_rule_type_empty" formatted="false">规则类型不能为空</string>
+    <string name="override_editor_rules" formatted="false">规则</string>
+    <string name="override_editor_rules_configured_inline" formatted="false">已配置 %d 条规则</string>
+    <string name="override_editor_save_proxy_group" formatted="false">保存策略组</string>
+    <string name="override_editor_save_proxy_node" formatted="false">保存代理节点</string>
+    <string name="override_editor_save_rule" formatted="false">保存规则</string>
+    <string name="override_editor_select_match_result" formatted="false">选择匹配结果</string>
+    <string name="override_editor_select_proxy_group_member" formatted="false">选择策略组成员</string>
+    <string name="override_editor_select_proxy_group_target" formatted="false">选择策略组目标</string>
+    <string name="override_editor_select_rule_provider" formatted="false">选择规则提供者</string>
+    <string name="override_editor_select_sub_rule_target" formatted="false">选择子规则目标</string>
+    <string name="override_editor_sub_rule_group_hint" formatted="false">每个子规则组包含一个名称和一组规则。</string>
+    <string name="override_editor_sub_rule_name" formatted="false">子规则名称</string>
+    <string name="override_editor_sub_rule_target" formatted="false">子规则目标</string>
+    <string name="override_editor_target_empty" formatted="false">目标不能为空</string>
+    <string name="override_editor_type_empty" formatted="false">类型不能为空</string>
+    <string name="override_editor_unnamed" formatted="false">未命名%s</string>
+    <string name="override_editor_unnamed_provider" formatted="false">未命名 Provider</string>
+    <string name="override_editor_unnamed_proxy_group" formatted="false">未命名策略组</string>
+    <string name="override_editor_unnamed_proxy_node" formatted="false">未命名代理节点</string>
+    <string name="override_editor_unnamed_rule" formatted="false">未命名规则</string>
+    <string name="override_editor_unnamed_sub_rule_group" formatted="false">未命名子规则组</string>
+    <string name="override_empty_hint" formatted="false">点击下方按钮创建新配置，或导入 JSON</string>
+    <string name="override_empty_title" formatted="false">暂无覆写配置</string>
+    <string name="override_export_failed" formatted="false">导出失败：%s</string>
+    <string name="override_export_success" formatted="false">已导出配置：%s</string>
+    <string name="override_form_advanced_json" formatted="false">%s · 高级 JSON</string>
+    <string name="override_form_allow_private_network" formatted="false">允许私有网络</string>
+    <string name="override_form_allowed_ips" formatted="false">允许 IP 段</string>
+    <string name="override_form_api_secret" formatted="false">API 访问密钥</string>
+    <string name="override_form_auto_detect_interface" formatted="false">自动识别网卡</string>
+    <string name="override_form_auto_redirect" formatted="false">自动重定向</string>
+    <string name="override_form_auto_route" formatted="false">自动路由</string>
+    <string name="override_form_auto_update_geo" formatted="false">自动更新 GEO</string>
+    <string name="override_form_basic_policy" formatted="false">基础策略</string>
+    <string name="override_form_bind_address" formatted="false">绑定地址</string>
+    <string name="override_form_cache_limit" formatted="false">缓存上限</string>
+    <string name="override_form_config_persistence" formatted="false">配置持久化</string>
+    <string name="override_form_connection_network" formatted="false">连接与网络</string>
+    <string name="override_form_controller_cors" formatted="false">控制器 CORS</string>
+    <string name="override_form_direct_follow_policy" formatted="false">Direct 遵循 Policy</string>
+    <string name="override_form_disable_icmp_forward" formatted="false">禁用 ICMP 转发</string>
+    <string name="override_form_disallowed_ips" formatted="false">禁止 IP 段</string>
+    <string name="override_form_dns_basic_params" formatted="false">DNS 基础参数</string>
+    <string name="override_form_dns_basic_switch" formatted="false">基础开关</string>
+    <string name="override_form_dns_fake_ip_range" formatted="false">FakeIP 地址段</string>
+    <string name="override_form_dns_hijack" formatted="false">DNS 劫持</string>
+    <string name="override_form_dns_policy_mode" formatted="false">策略模式</string>
+    <string name="override_form_dns_upstream" formatted="false">上游服务器</string>
+    <string name="override_form_dns_upstream_servers" formatted="false">上游服务器</string>
+    <string name="override_form_enable_gso" formatted="false">启用 GSO</string>
+    <string name="override_form_endpoint_independent_nat" formatted="false">独立于端点 NAT</string>
+    <string name="override_form_exclude_package" formatted="false">排除应用</string>
+    <string name="override_form_external_control" formatted="false">外部控制</string>
+    <string name="override_form_external_controller" formatted="false">外部控制器</string>
+    <string name="override_form_external_controller_https" formatted="false">HTTPS 控制器</string>
+    <string name="override_form_external_do_h" formatted="false">外部 DoH 服务</string>
+    <string name="override_form_fake_ip_ipv6_range" formatted="false">Fake-IP IPv6 网段</string>
+    <string name="override_form_fake_ip_mode" formatted="false">Fake-IP 模式</string>
+    <string name="override_form_fake_ip_params" formatted="false">Fake-IP 参数</string>
+    <string name="override_form_fallback_filter" formatted="false">Fallback 过滤</string>
+    <string name="override_form_fallback_params" formatted="false">Fallback 参数</string>
+    <string name="override_form_fallback_switch" formatted="false">Fallback 开关</string>
+    <string name="override_form_filter_list" formatted="false">过滤列表</string>
+    <string name="override_form_geo_resources" formatted="false">GEO 资源开关</string>
+    <string name="override_form_geo_update_interval" formatted="false">GEO 更新间隔</string>
+    <string name="override_form_geodata_mode" formatted="false">Geodata 模式</string>
+    <string name="override_form_geoip_url" formatted="false">GeoIP 地址</string>
+    <string name="override_form_geosite_matcher" formatted="false">Geosite 匹配器</string>
+    <string name="override_form_geosite_url" formatted="false">GeoSite 地址</string>
+    <string name="override_form_global_client_fingerprint" formatted="false">全局客户端指纹</string>
+    <string name="override_form_hours" formatted="false">小时</string>
+    <string name="override_form_http_ports" formatted="false">HTTP 端口</string>
+    <string name="override_form_include_package" formatted="false">包含应用</string>
+    <string name="override_form_ipv6_timeout" formatted="false">IPv6 超时</string>
+    <string name="override_form_items_configured" formatted="false">已配置 %d 项</string>
+    <string name="override_form_lan_access" formatted="false">局域网访问</string>
+    <string name="override_form_lan_address" formatted="false">局域网地址</string>
+    <string name="override_form_mmdb_url" formatted="false">MMDB 地址</string>
+    <string name="override_form_nameserver_policy_section" formatted="false">策略映射</string>
+    <string name="override_form_network_perf_params" formatted="false">网络性能参数</string>
+    <string name="override_form_network_perf_switch" formatted="false">网络性能开关</string>
+    <string name="override_form_not_modify" formatted="false">不修改</string>
+    <string name="override_form_open_advanced_edit" formatted="false">打开高级编辑</string>
+    <string name="override_form_open_advanced_edit_summary" formatted="false">直接编辑原始对象，用于补充结构化表单未覆盖的字段</string>
+    <string name="override_form_outbound_interface" formatted="false">出站接口</string>
+    <string name="override_form_process_mode" formatted="false">进程匹配模式</string>
+    <string name="override_form_proxy_groups" formatted="false">策略组</string>
+    <string name="override_form_proxy_groups_hint" formatted="false">结构化策略组</string>
+    <string name="override_form_proxy_nodes" formatted="false">代理节点</string>
+    <string name="override_form_proxy_nodes_hint" formatted="false">结构化代理条目</string>
+    <string name="override_form_proxy_ports" formatted="false">代理端口</string>
+    <string name="override_form_proxy_providers" formatted="false">代理提供者</string>
+    <string name="override_form_proxy_providers_advanced" formatted="false">需要协议细节、校验或额外字段时再进入高级 JSON</string>
+    <string name="override_form_proxy_providers_hint" formatted="false">结构化 Provider</string>
+    <string name="override_form_proxy_server_nameserver_policy" formatted="false">Proxy Server Nameserver Policy</string>
+    <string name="override_form_quic_ports" formatted="false">QUIC 端口</string>
+    <string name="override_form_route_address" formatted="false">路由网段</string>
+    <string name="override_form_route_exclude_address" formatted="false">排除路由网段</string>
+    <string name="override_form_routing_mark" formatted="false">路由标记</string>
+    <string name="override_form_rule_chain" formatted="false">规则链</string>
+    <string name="override_form_rule_chain_not_set" formatted="false">未设置规则链</string>
+    <string name="override_form_rule_providers" formatted="false">规则提供者</string>
+    <string name="override_form_rule_providers_advanced" formatted="false">需要复杂 Provider 字段时再进入高级 JSON</string>
+    <string name="override_form_rule_providers_hint" formatted="false">结构化 Provider</string>
+    <string name="override_form_run_and_log" formatted="false">运行与日志</string>
+    <string name="override_form_run_and_log_extra" formatted="false">运行与日志补充</string>
+    <string name="override_form_save_fake_ip_mapping" formatted="false">保存 Fake-IP 映射</string>
+    <string name="override_form_save_group_selection" formatted="false">保存策略组选择</string>
+    <string name="override_form_seconds" formatted="false">秒</string>
+    <string name="override_form_skip_and_force" formatted="false">跳过与强制</string>
+    <string name="override_form_skip_auth_ips" formatted="false">跳过鉴权网段</string>
+    <string name="override_form_skip_dst_address" formatted="false">跳过目标地址</string>
+    <string name="override_form_skip_src_address" formatted="false">跳过来源地址</string>
+    <string name="override_form_sniffer_force_domain" formatted="false">强制域名</string>
+    <string name="override_form_sniffer_override" formatted="false">覆写目标</string>
+    <string name="override_form_sniffer_parse_pure_ip" formatted="false">解析纯 IP</string>
+    <string name="override_form_sniffer_ports" formatted="false">端口</string>
+    <string name="override_form_sniffer_skip_domain" formatted="false">跳过域名</string>
+    <string name="override_form_sniffer_switch" formatted="false">开关</string>
+    <string name="override_form_stack" formatted="false">协议栈</string>
+    <string name="override_form_strict_route" formatted="false">严格路由</string>
+    <string name="override_form_structured_edit" formatted="false">%s · 结构化编辑</string>
+    <string name="override_form_sub_rules" formatted="false">子规则</string>
+    <string name="override_form_sub_rules_advanced" formatted="false">复杂子规则结构统一收在高级 JSON 中</string>
+    <string name="override_form_sub_rules_hint" formatted="false">结构化规则组</string>
+    <string name="override_form_tcp_concurrent" formatted="false">TCP 并发</string>
+    <string name="override_form_tls_ports" formatted="false">TLS 端口</string>
+    <string name="override_form_tun_basic_switch" formatted="false">基础开关</string>
+    <string name="override_form_tun_route_and_apps" formatted="false">路由与应用</string>
+    <string name="override_form_unified_delay" formatted="false">统一延迟</string>
+    <string name="override_form_user_auth" formatted="false">用户验证</string>
+    <string name="override_general_allow_lan" formatted="false">允许局域网</string>
+    <string name="override_general_http_port" formatted="false">HTTP 端口</string>
+    <string name="override_general_ipv6" formatted="false">IPv6</string>
+    <string name="override_general_log_level" formatted="false">日志等级</string>
+    <string name="override_general_mixed_port" formatted="false">Mixed 端口</string>
+    <string name="override_general_proxy_mode" formatted="false">代理模式</string>
+    <string name="override_general_redirect_port" formatted="false">Redirect 端口</string>
+    <string name="override_general_socks_port" formatted="false">SOCKS 端口</string>
+    <string name="override_general_tproxy_port" formatted="false">TProxy 端口</string>
+    <string name="override_import_failed" formatted="false">导入失败: %s</string>
+    <string name="override_import_file_error" formatted="false">读取文件失败: %s</string>
+    <string name="override_import_read_error" formatted="false">无法读取导入文件</string>
+    <string name="override_import_success" formatted="false">已从 %s 导入 %d 个配置</string>
+    <string name="override_import_success_default" formatted="false">已导入 %d 个配置</string>
+    <string name="override_label_cache_algorithm" formatted="false">缓存算法</string>
+    <string name="override_label_enable" formatted="false">启用</string>
+    <string name="override_label_fake_ip_range" formatted="false">FakeIP 地址段</string>
+    <string name="override_label_force_dns_mapping" formatted="false">强制 DNS 映射</string>
+    <string name="override_label_force_domain" formatted="false">强制嗅探域名</string>
+    <string name="override_label_http_override" formatted="false">HTTP 覆写</string>
+    <string name="override_label_keep_alive_idle" formatted="false">Keep Alive 空闲阈值</string>
+    <string name="override_label_keep_alive_interval" formatted="false">Keep Alive 间隔</string>
+    <string name="override_label_override_destination" formatted="false">覆写目标地址</string>
+    <string name="override_label_parse_pure_ip" formatted="false">解析纯 IP</string>
+    <string name="override_label_quic_override" formatted="false">QUIC 覆写</string>
+    <string name="override_label_respect_rules" formatted="false">遵循路由规则</string>
+    <string name="override_label_rules_replace" formatted="false">覆盖规则</string>
+    <string name="override_label_skip_domain" formatted="false">跳过嗅探域名</string>
+    <string name="override_label_tls_override" formatted="false">TLS 覆写</string>
+    <string name="override_label_use_system_hosts" formatted="false">使用系统 Hosts</string>
+    <string name="override_modifier_end" formatted="false">后置追加</string>
+    <string name="override_modifier_force" formatted="false">强制覆盖</string>
+    <string name="override_modifier_items_count" formatted="false">%d 项</string>
+    <string name="override_modifier_merge" formatted="false">合并</string>
+    <string name="override_modifier_no_changes" formatted="false">暂无改动</string>
+    <string name="override_modifier_not_modified" formatted="false">未修改</string>
+    <string name="override_modifier_replace" formatted="false">覆盖</string>
+    <string name="override_modifier_start" formatted="false">前置追加</string>
+    <string name="override_proxy_group_field_disable_udp" formatted="false">禁用 UDP</string>
+    <string name="override_proxy_group_field_exclude_filter" formatted="false">排除过滤器</string>
+    <string name="override_proxy_group_field_exclude_type" formatted="false">排除类型</string>
+    <string name="override_proxy_group_field_expected_status" formatted="false">期望状态</string>
+    <string name="override_proxy_group_field_filter" formatted="false">过滤器</string>
+    <string name="override_proxy_group_field_hidden" formatted="false">隐藏</string>
+    <string name="override_proxy_group_field_icon" formatted="false">图标</string>
+    <string name="override_proxy_group_field_include_all" formatted="false">包含全部</string>
+    <string name="override_proxy_group_field_include_all_providers" formatted="false">包含全部 Provider</string>
+    <string name="override_proxy_group_field_include_all_proxies" formatted="false">包含全部代理</string>
+    <string name="override_proxy_group_field_interface_name" formatted="false">接口名称</string>
+    <string name="override_proxy_group_field_interval" formatted="false">间隔</string>
+    <string name="override_proxy_group_field_lazy" formatted="false">懒加载</string>
+    <string name="override_proxy_group_field_max_failed_times" formatted="false">最大失败次数</string>
+    <string name="override_proxy_group_field_proxies" formatted="false">成员</string>
+    <string name="override_proxy_group_field_routing_mark" formatted="false">路由标记</string>
+    <string name="override_proxy_group_field_timeout" formatted="false">超时</string>
+    <string name="override_proxy_group_field_url" formatted="false">URL</string>
+    <string name="override_proxy_group_field_use" formatted="false">使用 Provider</string>
+    <string name="override_proxy_group_field_use_hint" formatted="false">每行一个 Provider 名称</string>
+    <string name="override_rule_empty_warning" formatted="false">规则 #%d 为空</string>
+    <string name="override_rule_invalid_format_warning" formatted="false">规则 #%d 格式可能不正确: %s</string>
+    <string name="override_rule_missing_target_warning" formatted="false">规则 #%d 缺少策略组目标: %s</string>
+    <string name="override_save_apply_failed" formatted="false">覆写已保存，但重新应用到当前配置失败</string>
+    <string name="override_save_failed" formatted="false">保存覆写配置失败</string>
+    <string name="override_save_import_default_name" formatted="false">导入的覆写配置</string>
+    <string name="override_save_import_empty" formatted="false">导入内容不能为空</string>
+    <string name="override_save_preset_not_modifiable" formatted="false">系统预设不可修改</string>
+    <string name="override_section_dns_summary" formatted="false">基础开关、Fake-IP、上游与策略</string>
+    <string name="override_section_dns_title" formatted="false">DNS</string>
+    <string name="override_section_general_summary" formatted="false">运行模式、控制器、持久化与 GEO</string>
+    <string name="override_section_general_title" formatted="false">全局配置</string>
+    <string name="override_section_inbound_summary" formatted="false">端口、鉴权、局域网访问</string>
+    <string name="override_section_inbound_title" formatted="false">入站</string>
+    <string name="override_section_proxies_summary" formatted="false">代理节点与协议对象</string>
+    <string name="override_section_proxies_title" formatted="false">出站代理</string>
+    <string name="override_section_proxy_groups_summary" formatted="false">Proxy Groups 前置、覆盖、后置</string>
+    <string name="override_section_proxy_groups_title" formatted="false">代理组</string>
+    <string name="override_section_proxy_providers_summary" formatted="false">Proxy Providers 合并与覆盖</string>
+    <string name="override_section_proxy_providers_title" formatted="false">代理集合</string>
+    <string name="override_section_rule_providers_summary" formatted="false">Rule Providers 合并与覆盖</string>
+    <string name="override_section_rule_providers_title" formatted="false">规则集合</string>
+    <string name="override_section_rules_summary" formatted="false">规则链与匹配顺序</string>
+    <string name="override_section_rules_title" formatted="false">路由规则</string>
+    <string name="override_section_sniffer_summary" formatted="false">策略开关、协议端口、跳过规则</string>
+    <string name="override_section_sniffer_title" formatted="false">域名嗅探</string>
+    <string name="override_section_sub_rules_summary" formatted="false">Sub Rules 分组与合并</string>
+    <string name="override_section_sub_rules_title" formatted="false">子规则</string>
+    <string name="override_section_tun_summary" formatted="false">入站 Tun、路由与应用范围</string>
+    <string name="override_section_tun_title" formatted="false">Tun</string>
+    <string name="override_status_in_use" formatted="false">使用中</string>
+    <string name="override_status_not_in_use" formatted="false">未使用</string>
+    <string name="override_structured_proxies_empty_hint" formatted="false">暂无代理节点</string>
+    <string name="override_structured_proxies_item_label" formatted="false">代理节点</string>
+    <string name="override_structured_proxies_title" formatted="false">代理节点</string>
+    <string name="override_structured_proxy_groups_empty_hint" formatted="false">暂无策略组</string>
+    <string name="override_structured_proxy_groups_item_label" formatted="false">策略组</string>
+    <string name="override_structured_proxy_groups_title" formatted="false">策略组</string>
+    <string name="override_structured_proxy_providers_item_label" formatted="false">Provider</string>
+    <string name="override_structured_proxy_providers_title" formatted="false">代理提供者</string>
+    <string name="override_structured_rule_providers_item_label" formatted="false">Provider</string>
+    <string name="override_structured_rule_providers_title" formatted="false">规则提供者</string>
+    <string name="override_structured_sub_rules_item_label" formatted="false">子规则组</string>
+    <string name="override_structured_sub_rules_title" formatted="false">子规则</string>
+    <string name="override_title" formatted="false">覆写配置</string>
+    <string name="profiles_page_action_add_profile" formatted="false">添加配置</string>
+    <string name="profiles_page_action_update_all" formatted="false">一键更新所有</string>
+    <string name="profiles_page_button_cancel" formatted="false">取消</string>
+    <string name="profiles_page_button_confirm" formatted="false">确定</string>
+    <string name="profiles_page_delete_dialog_confirm" formatted="false">删除</string>
+    <string name="profiles_page_delete_dialog_message" formatted="false">确定要删除「%s」吗？</string>
+    <string name="profiles_page_delete_dialog_title" formatted="false">删除配置</string>
+    <string name="profiles_page_edit_dialog_title" formatted="false">编辑配置名称</string>
+    <string name="profiles_page_empty_hint" formatted="false">点击右上角添加配置</string>
+    <string name="profiles_page_empty_no_profiles" formatted="false">暂无配置文件</string>
+    <string name="profiles_page_input_new_profile" formatted="false">新配置</string>
+    <string name="profiles_page_input_profile_name" formatted="false">配置名称</string>
+    <string name="profiles_page_input_select_file" formatted="false">点击选择文件</string>
+    <string name="profiles_page_input_subscription_url" formatted="false">订阅链接 (HTTP/HTTPS)</string>
+    <string name="profiles_page_input_subscription_user_agent" formatted="false">User-Agent（留空使用全局设置）</string>
+    <string name="profiles_page_kokoro_account" formatted="false">账号</string>
+    <string name="profiles_page_kokoro_avatar_description" formatted="false">%s 的 osu! 头像</string>
+    <string name="profiles_page_kokoro_bandwidth_limit" formatted="false">流量上限</string>
+    <string name="profiles_page_kokoro_check_failed" formatted="false">无法检查账号</string>
+    <string name="profiles_page_kokoro_check_failed_detail" formatted="false">请检查网络连接，然后重试。</string>
+    <string name="profiles_page_kokoro_checking" formatted="false">正在检查登录状态…</string>
+    <string name="profiles_page_kokoro_decrease_update_hours" formatted="false">缩短配置更新间隔</string>
+    <string name="profiles_page_kokoro_default_profile_name" formatted="false">Kokoro</string>
+    <string name="profiles_page_kokoro_direct" formatted="false">直连</string>
+    <string name="profiles_page_kokoro_disabled" formatted="false">停用</string>
+    <string name="profiles_page_kokoro_enabled" formatted="false">启用</string>
+    <string name="profiles_page_kokoro_expires" formatted="false">到期时间</string>
+    <string name="profiles_page_kokoro_fallback" formatted="false">未匹配流量</string>
+    <string name="profiles_page_kokoro_final_route" formatted="false">最终路由</string>
+    <string name="profiles_page_kokoro_increase_update_hours" formatted="false">延长配置更新间隔</string>
+    <string name="profiles_page_kokoro_invalid_update_hours" formatted="false">更新周期必须是正整数小时</string>
+    <string name="profiles_page_kokoro_isp" formatted="false">网络服务商</string>
+    <string name="profiles_page_kokoro_isp_auto" formatted="false">自动判断</string>
+    <string name="profiles_page_kokoro_isp_cm" formatted="false">中国移动</string>
+    <string name="profiles_page_kokoro_isp_ct" formatted="false">中国电信</string>
+    <string name="profiles_page_kokoro_isp_cu" formatted="false">中国联通</string>
+    <string name="profiles_page_kokoro_isp_other" formatted="false">其他</string>
+    <string name="profiles_page_kokoro_keep_fallback" formatted="false">保留配置原本的 fallback</string>
+    <string name="profiles_page_kokoro_logged_in" formatted="false">已登录</string>
+    <string name="profiles_page_kokoro_logged_in_as" formatted="false">已登录为 %s</string>
+    <string name="profiles_page_kokoro_logged_out" formatted="false">尚未登录</string>
+    <string name="profiles_page_kokoro_login" formatted="false">使用 osu! 登录</string>
+    <string name="profiles_page_kokoro_login_failed" formatted="false">登录失败或已取消</string>
+    <string name="profiles_page_kokoro_login_hint" formatted="false">使用 osu! 登录以加载 Proxy Subscription。</string>
+    <string name="profiles_page_kokoro_login_required" formatted="false">请先登录并选择有效的订阅</string>
+    <string name="profiles_page_kokoro_logout" formatted="false">退出登录</string>
+    <string name="profiles_page_kokoro_mirror" formatted="false">镜像站</string>
+    <string name="profiles_page_kokoro_mode" formatted="false">连接模式</string>
+    <string name="profiles_page_kokoro_no_subscription" formatted="false">此账号没有有效的 Proxy Subscription。</string>
+    <string name="profiles_page_kokoro_origin" formatted="false">原始站</string>
+    <string name="profiles_page_kokoro_plan" formatted="false">方案</string>
+    <string name="profiles_page_kokoro_profile_update" formatted="false">配置更新间隔</string>
+    <string name="profiles_page_kokoro_protocol" formatted="false">协议</string>
+    <string name="profiles_page_kokoro_proxy" formatted="false">代理</string>
+    <string name="profiles_page_kokoro_relay" formatted="false">中继</string>
+    <string name="profiles_page_kokoro_retry" formatted="false">重试</string>
+    <string name="profiles_page_kokoro_routing" formatted="false">路由</string>
+    <string name="profiles_page_kokoro_rule_provider_auto_update" formatted="false">更新规则提供者</string>
+    <string name="profiles_page_kokoro_rule_provider_auto_update_summary" formatted="false">自动更新远程规则集</string>
+    <string name="profiles_page_kokoro_rule_source" formatted="false">规则来源</string>
+    <string name="profiles_page_kokoro_rule_update" formatted="false">远程规则更新</string>
+    <string name="profiles_page_kokoro_secure_token_session" formatted="false">Token 已由 Android Keystore 加密保护。</string>
+    <string name="profiles_page_kokoro_sign_in_from_settings" formatted="false">请先前往“设置 → Kokoro 设置”登录，再添加 Kokoro 订阅。</string>
+    <string name="profiles_page_kokoro_subscription" formatted="false">订阅</string>
+    <string name="profiles_page_kokoro_subscription_auto_update" formatted="false">自动更新配置</string>
+    <string name="profiles_page_kokoro_subscription_auto_update_summary" formatted="false">按照指定周期重新获取配置</string>
+    <string name="profiles_page_kokoro_subscription_number" formatted="false">订阅 %s</string>
+    <string name="profiles_page_kokoro_traffic" formatted="false">流量</string>
+    <string name="profiles_page_kokoro_traffic_used" formatted="false">已用流量</string>
+    <string name="profiles_page_kokoro_unlimited" formatted="false">无限</string>
+    <string name="profiles_page_kokoro_update_custom" formatted="false">自定义</string>
+    <string name="profiles_page_kokoro_update_hours" formatted="false">小时（正整数）</string>
+    <string name="profiles_page_kokoro_update_hours_range" formatted="false">更新间隔（%s–%s 小时）</string>
+    <string name="profiles_page_kokoro_update_hours_value" formatted="false">%s 小时</string>
+    <string name="profiles_page_kokoro_update_off" formatted="false">停用</string>
+    <string name="profiles_page_kokoro_update_on" formatted="false">每小时</string>
+    <string name="profiles_page_kokoro_updates" formatted="false">更新</string>
+    <string name="profiles_page_kokoro_vmess_relay_only" formatted="false">VMess 固定使用中继模式</string>
+    <string name="profiles_page_link_settings_add_link" formatted="false">添加链接</string>
+    <string name="profiles_page_link_settings_close" formatted="false">关闭</string>
+    <string name="profiles_page_link_settings_default_link" formatted="false">默认链接</string>
+    <string name="profiles_page_link_settings_default_link_summary" formatted="false">点击左上角快捷按钮时打开的链接</string>
+    <string name="profiles_page_link_settings_edit_link" formatted="false">编辑链接</string>
+    <string name="profiles_page_link_settings_name" formatted="false">名称</string>
+    <string name="profiles_page_link_settings_open_mode" formatted="false">打开方式</string>
+    <string name="profiles_page_link_settings_open_mode_external" formatted="false">外部浏览器</string>
+    <string name="profiles_page_link_settings_open_mode_in_app" formatted="false">App 内打开</string>
+    <string name="profiles_page_link_settings_title" formatted="false">链接设置</string>
+    <string name="profiles_page_link_settings_url" formatted="false">链接</string>
+    <string name="profiles_page_link_settings_validation_enter_name" formatted="false">请输入名称</string>
+    <string name="profiles_page_link_settings_validation_enter_url" formatted="false">请输入链接</string>
+    <string name="profiles_page_link_settings_validation_invalid_url" formatted="false">请输入有效的链接</string>
+    <string name="profiles_page_message_unknown_file" formatted="false">未知文件</string>
+    <string name="profiles_page_misc_complete" formatted="false">完成</string>
+    <string name="profiles_page_misc_error" formatted="false">错误</string>
+    <string name="profiles_page_progress_downloading" formatted="false">下载中...</string>
+    <string name="profiles_page_qr_scanner_need_camera" formatted="false">需要相机权限才能扫码</string>
+    <string name="profiles_page_qr_scanner_need_permission" formatted="false">需要相机权限</string>
+    <string name="profiles_page_qr_scanner_recognize_error" formatted="false">识别失败：%s</string>
+    <string name="profiles_page_qr_scanner_recognize_failed" formatted="false">未能识别到二维码</string>
+    <string name="profiles_page_qr_scanner_recognize_success" formatted="false">识别成功</string>
+    <string name="profiles_page_qr_scanner_scan_success" formatted="false">扫描成功</string>
+    <string name="profiles_page_qr_scanner_select_from_album" formatted="false">从相册选择二维码图片</string>
+    <string name="profiles_page_settings_dialog_change_link" formatted="false">更改订阅链接</string>
+    <string name="profiles_page_settings_dialog_config_missing" formatted="false">配置不存在：%s</string>
+    <string name="profiles_page_settings_dialog_edit_profile" formatted="false">编辑配置</string>
+    <string name="profiles_page_settings_dialog_edit_settings" formatted="false">编辑设置</string>
+    <string name="profiles_page_settings_dialog_no_description" formatted="false">未设置说明</string>
+    <string name="profiles_page_settings_dialog_open_config" formatted="false">打开配置</string>
+    <string name="profiles_page_settings_dialog_save_failed" formatted="false">保存配置失败</string>
+    <string name="profiles_page_settings_dialog_system_preset" formatted="false">启用覆写配置</string>
+    <string name="profiles_page_settings_dialog_system_preset_summary" formatted="false">启用内置覆写配置</string>
+    <string name="profiles_page_settings_dialog_title" formatted="false">订阅设置</string>
+    <string name="profiles_page_share_dialog_imported_config_missing" formatted="false">导入配置不存在：%s</string>
+    <string name="profiles_page_share_dialog_no_link" formatted="false">该配置没有订阅链接</string>
+    <string name="profiles_page_share_dialog_share_file" formatted="false">分享配置文件</string>
+    <string name="profiles_page_share_dialog_share_link" formatted="false">分享订阅链接</string>
+    <string name="profiles_page_share_dialog_title" formatted="false">分享配置</string>
+    <string name="profiles_page_sheet_add_title" formatted="false">添加配置文件</string>
+    <string name="profiles_page_sheet_edit_title" formatted="false">编辑配置文件</string>
+    <string name="profiles_page_title" formatted="false">配置</string>
+    <string name="profiles_page_type_kokoro" formatted="false">Kokoro 订阅</string>
+    <string name="profiles_page_type_local_file" formatted="false">本地文件</string>
+    <string name="profiles_page_type_qr_scan" formatted="false">扫码添加</string>
+    <string name="profiles_page_type_subscription" formatted="false">订阅链接</string>
+    <string name="profiles_page_type_title" formatted="false">配置类型</string>
+    <string name="profiles_page_validation_enter_url" formatted="false">请输入链接</string>
+    <string name="profiles_page_validation_select_file" formatted="false">请选择文件</string>
+    <string name="profiles_page_validation_yaml_only" formatted="false">仅支持 .yaml 或 .yml 格式的配置文件</string>
+    <string name="profiles_vm_error_profile_not_exist" formatted="false">配置不存在</string>
+    <string name="profiles_vm_message_add_failed" formatted="false">添加配置失败：%s</string>
+    <string name="profiles_vm_message_delete_failed" formatted="false">删除配置失败：%s</string>
+    <string name="profiles_vm_message_import_failed" formatted="false">导入配置失败：%s</string>
+    <string name="profiles_vm_message_profile_added" formatted="false">配置已添加：%s</string>
+    <string name="profiles_vm_message_profile_added_and_activated" formatted="false">配置已添加并启用：%s</string>
+    <string name="profiles_vm_message_profile_deleted" formatted="false">配置已删除</string>
+    <string name="profiles_vm_message_profile_imported" formatted="false">配置已导入：%s</string>
+    <string name="profiles_vm_message_profile_updated" formatted="false">配置已更新：%s</string>
+    <string name="profiles_vm_message_toggle_failed" formatted="false">切换状态失败：%s</string>
+    <string name="profiles_vm_message_update_failed" formatted="false">更新配置失败：%s</string>
+    <string name="profiles_vm_progress_import_complete" formatted="false">导入完成</string>
+    <string name="profiles_vm_progress_import_preparing" formatted="false">准备导入文件...</string>
+    <string name="profiles_vm_progress_preparing" formatted="false">准备下载...</string>
+    <string name="profiles_vm_progress_verifying" formatted="false">正在验证配置...</string>
+    <string name="providers_action_operation" formatted="false">操作</string>
+    <string name="providers_action_update" formatted="false">更新</string>
+    <string name="providers_action_update_all" formatted="false">更新全部</string>
+    <string name="providers_action_upload" formatted="false">上传</string>
+    <string name="providers_empty_no_providers" formatted="false">暂无外部资源</string>
+    <string name="providers_empty_no_providers_hint" formatted="false">当前配置未包含外部资源</string>
+    <string name="providers_empty_not_running" formatted="false">代理未启动</string>
+    <string name="providers_empty_not_running_hint" formatted="false">请先启动代理服务以查看外部资源</string>
+    <string name="providers_info_summary" formatted="false">GeoX 和内核运行时公共文件位于：%s。规则和代理提供者只会写入当前配置的私有目录。</string>
+    <string name="providers_info_title" formatted="false">内核目录</string>
+    <string name="providers_message_all_updated" formatted="false">全部更新完成</string>
+    <string name="providers_message_fetch_failed" formatted="false">获取外部资源失败: %s</string>
+    <string name="providers_message_update_failed" formatted="false">更新失败: %s</string>
+    <string name="providers_message_update_success" formatted="false">%s 更新成功</string>
+    <string name="providers_message_upload_failed" formatted="false">上传失败: %s</string>
+    <string name="providers_message_upload_success" formatted="false">%s 上传成功</string>
+    <string name="providers_provider_path" formatted="false">资源路径：%s</string>
+    <string name="providers_title" formatted="false">外部资源</string>
+    <string name="providers_type_proxy_providers" formatted="false">代理提供者 (%d)</string>
+    <string name="providers_type_rule_providers" formatted="false">规则提供者 (%d)</string>
+    <string name="providers_vehicle_type_compatible" formatted="false">兼容</string>
+    <string name="providers_vehicle_type_file" formatted="false">文件</string>
+    <string name="providers_vehicle_type_http" formatted="false">HTTP</string>
+    <string name="providers_vehicle_type_inline" formatted="false">内联</string>
+    <string name="proxy_action_sort" formatted="false">排序</string>
+    <string name="proxy_action_test" formatted="false">测试</string>
+    <string name="proxy_display_mode_double_detailed" formatted="false">双列详细</string>
+    <string name="proxy_display_mode_double_simple" formatted="false">双列简洁</string>
+    <string name="proxy_display_mode_single_detailed" formatted="false">单列详细</string>
+    <string name="proxy_display_mode_single_simple" formatted="false">单列简洁</string>
+    <string name="proxy_empty_hint" formatted="false">请在配置页面加载配置文件</string>
+    <string name="proxy_empty_no_nodes" formatted="false">暂无节点</string>
+    <string name="proxy_mode_direct" formatted="false">直连</string>
+    <string name="proxy_mode_global" formatted="false">全局</string>
+    <string name="proxy_mode_rule" formatted="false">规则</string>
+    <string name="proxy_mode_switch_failed" formatted="false">切换模式失败：%s</string>
+    <string name="proxy_mode_switched" formatted="false">已切换到：%s 模式</string>
+    <string name="proxy_mode_unknown" formatted="false">未知</string>
+    <string name="proxy_node_count" formatted="false">%d 节点</string>
+    <string name="proxy_node_timeout" formatted="false">超时</string>
+    <string name="proxy_selection_error" formatted="false">切换失败：%s</string>
+    <string name="proxy_selection_failed" formatted="false">切换失败</string>
+    <string name="proxy_selection_switched" formatted="false">已切换到：%s</string>
+    <string name="proxy_sort_mode_by_latency" formatted="false">按延迟排序</string>
+    <string name="proxy_sort_mode_by_name" formatted="false">按名称排序</string>
+    <string name="proxy_sort_mode_default" formatted="false">默认顺序</string>
+    <string name="proxy_testing_all" formatted="false">正在测试所有节点组...</string>
+    <string name="proxy_testing_failed" formatted="false">测试失败：%s</string>
+    <string name="proxy_testing_group" formatted="false">正在测试节点组：%s</string>
+    <string name="proxy_testing_in_progress" formatted="false">正在测试节点</string>
+    <string name="proxy_testing_request_sent" formatted="false">测试请求已发送</string>
+    <string name="proxy_title" formatted="false">代理</string>
+    <string name="proxy_type_compatible" formatted="false">兼容</string>
+    <string name="proxy_type_direct" formatted="false">直连</string>
+    <string name="proxy_type_fallback" formatted="false">回退</string>
+    <string name="proxy_type_load_balance" formatted="false">负载均衡</string>
+    <string name="proxy_type_pass" formatted="false">透传</string>
+    <string name="proxy_type_reject" formatted="false">拒绝</string>
+    <string name="proxy_type_reject_drop" formatted="false">丢弃</string>
+    <string name="proxy_type_relay" formatted="false">中继</string>
+    <string name="proxy_type_selector" formatted="false">选择器</string>
+    <string name="proxy_type_smart" formatted="false">智能</string>
+    <string name="proxy_type_unknown" formatted="false">未知</string>
+    <string name="proxy_type_url_test" formatted="false">UrlTest</string>
+    <string name="service_auto_restart_channel_description" formatted="false">用于自动重启代理服务</string>
+    <string name="service_auto_restart_channel_name" formatted="false">自动重启服务</string>
+    <string name="service_auto_restart_checking" formatted="false">正在检查自动启动...</string>
+    <string name="service_notification_running" formatted="false">运行中</string>
+    <string name="service_notification_speed_format" formatted="false">下行 %s  上行 %s</string>
+    <string name="service_notification_today_traffic_format" formatted="false">今日流量 %s</string>
+    <string name="service_notification_traffic_format" formatted="false">总计：%s</string>
+    <string name="service_notification_unknown_profile" formatted="false">未知配置</string>
+    <string name="service_tile_click_to_open" formatted="false">点击打开应用</string>
+    <string name="service_tile_click_to_start_proxy" formatted="false">启动代理</string>
+    <string name="service_tile_click_to_stop_proxy" formatted="false">停止代理</string>
+    <string name="service_tile_connecting" formatted="false">正在连接...</string>
+    <string name="service_tile_disconnecting" formatted="false">正在断开...</string>
+    <string name="settings_data_settings_app_data_management" formatted="false">应用数据管理</string>
+    <string name="settings_data_settings_app_data_management_summary" formatted="false">清理部分缓存文件</string>
+    <string name="settings_data_settings_export_backup" formatted="false">导出备份</string>
+    <string name="settings_data_settings_export_backup_summary" formatted="false">将用户设置保存为 JSON 文件</string>
+    <string name="settings_data_settings_import_backup" formatted="false">导入备份</string>
+    <string name="settings_data_settings_import_backup_summary" formatted="false">从备份文件恢复用户设置</string>
+    <string name="settings_error_webview_failed" formatted="false">无法打开 WebView：%s</string>
+    <string name="settings_kokoro_custom_rules" formatted="false">自定义规则</string>
+    <string name="settings_kokoro_custom_rules_summary" formatted="false">编辑应用于生成配置的 default 规则</string>
+    <string name="settings_kokoro_summary" formatted="false">账号 · 自定义规则</string>
+    <string name="settings_kokoro_title" formatted="false">Kokoro 设置</string>
+    <string name="settings_more_about" formatted="false">关于</string>
+    <string name="settings_more_about_summary" formatted="false">版本与许可</string>
+    <string name="settings_more_logs" formatted="false">日志</string>
+    <string name="settings_more_logs_summary" formatted="false">运行日志</string>
+    <string name="settings_network_settings_lab" formatted="false">实验室</string>
+    <string name="settings_network_settings_lab_summary" formatted="false">节点测试</string>
+    <string name="settings_network_settings_meta_features" formatted="false">Meta 功能</string>
+    <string name="settings_network_settings_meta_features_summary" formatted="false">Meta 扩展</string>
+    <string name="settings_network_settings_network" formatted="false">网络</string>
+    <string name="settings_network_settings_network_summary" formatted="false">DNS · 端口 · 入站</string>
+    <string name="settings_network_settings_override" formatted="false">覆写</string>
+    <string name="settings_network_settings_override_summary" formatted="false">规则覆写</string>
+    <string name="settings_section_data_settings" formatted="false">数据设置</string>
+    <string name="settings_section_kokoro" formatted="false">Kokoro</string>
+    <string name="settings_section_more" formatted="false">更多</string>
+    <string name="settings_section_network_settings" formatted="false">网络设置</string>
+    <string name="settings_section_ui_settings" formatted="false">界面设置</string>
+    <string name="settings_title" formatted="false">设置</string>
+    <string name="settings_ui_settings_app" formatted="false">应用</string>
+    <string name="settings_ui_settings_app_summary" formatted="false">外观 · 语言 · 主题</string>
+    <string name="traffic_statistics_action_clear" formatted="false">清空统计</string>
+    <string name="traffic_statistics_action_clear_confirm_message" formatted="false">清空后将无法恢复所有流量统计数据。</string>
+    <string name="traffic_statistics_action_clear_success" formatted="false">统计数据已清空</string>
+    <string name="traffic_statistics_chart_daily" formatted="false">按天</string>
+    <string name="traffic_statistics_chart_hourly" formatted="false">4 小时</string>
+    <string name="traffic_statistics_compare_less_than_yesterday" formatted="false">较昨日 %s</string>
+    <string name="traffic_statistics_compare_more_than_yesterday" formatted="false">较昨日 +%s</string>
+    <string name="traffic_statistics_compare_same_as_yesterday" formatted="false">与昨日持平</string>
+    <string name="traffic_statistics_compare_week_stats" formatted="false">近 7 天统计</string>
+    <string name="traffic_statistics_donut_other" formatted="false">其他</string>
+    <string name="traffic_statistics_entry_summary" formatted="false">查看流量使用情况</string>
+    <string name="traffic_statistics_metric_download" formatted="false">下行</string>
+    <string name="traffic_statistics_metric_upload" formatted="false">上行</string>
+    <string name="traffic_statistics_metric_usage_line" formatted="false">下行 %s  上行 %s</string>
+    <string name="traffic_statistics_section_empty_apps" formatted="false">暂无应用流量统计</string>
+    <string name="traffic_statistics_section_top_apps" formatted="false">高流量应用</string>
+    <string name="traffic_statistics_section_traffic" formatted="false">流量</string>
+    <string name="traffic_statistics_summary_today_traffic" formatted="false">今日流量</string>
+    <string name="traffic_statistics_summary_week_traffic" formatted="false">本周流量</string>
+    <string name="traffic_statistics_time_range_today" formatted="false">今日</string>
+    <string name="traffic_statistics_time_range_week" formatted="false">本周</string>
+    <string name="traffic_statistics_title" formatted="false">流量统计</string>
+    <string name="util_error_unknown_error" formatted="false">未知错误</string>
+</resources>

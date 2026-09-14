@@ -38,6 +38,10 @@ object AppLanguageManager {
     @Volatile
     private var activeLocale: Locale = Locale.getDefault()
 
+    fun initialize(context: Context) {
+        MLang.initialize(context)
+    }
+
     fun apply(language: AppLanguage) {
         activeLanguage = language
         val locale = resolveLocale(language)

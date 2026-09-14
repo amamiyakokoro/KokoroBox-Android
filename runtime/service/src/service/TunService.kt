@@ -84,7 +84,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         super.onCreate()
         runCatching {
             initializeServiceGlobal(appContextOrSelf)
-            ServiceLanguageRuntime.applyAppLanguage()
+            ServiceLanguageRuntime.applyAppLanguage(this)
             startupLogStore.append("LOCAL_TUN service: onCreate begin")
 
             notificationManager.createChannel()
