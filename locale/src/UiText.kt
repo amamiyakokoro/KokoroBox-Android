@@ -27,6 +27,8 @@ fun UiText.resolve(resources: Resources): String = when (this) {
     is UiText.Resource -> String.format(
         resources.configuration.locales[0] ?: Locale.getDefault(),
         resources.getString(id),
-        *formatArgs.toTypedArray(),
+        *formatArgs.map { argument ->
+            if (argument is UiText) argument.resolve(resources) else argument
+        }.toTypedArray(),
     )
 }

@@ -24,6 +24,8 @@ package com.amamiyakokoro.box.presentation.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.core.presentation.ContractStateViewModel
 import com.amamiyakokoro.box.core.presentation.LoadableState
 import com.amamiyakokoro.box.core.model.TunnelState
@@ -34,7 +36,6 @@ import com.amamiyakokoro.box.data.store.ProxyDisplaySettingsStore
 import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
 import com.amamiyakokoro.box.runtime.client.ProxyFacade
 import com.amamiyakokoro.box.runtime.client.ProxyGroupSyncPriority
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -146,12 +147,12 @@ class ProxyViewModel(
 
             val result = runCatching {
                 if (targetGroup != null && targetGroupName != null) {
-                    showMessage(MLang.Proxy.Testing.Group.format(targetGroupName))
+                    showMessage(UiText.Resource(LocaleR.string.proxy_testing_group, listOf(targetGroupName)))
                     runGroupHealthCheck(
                         group = targetGroup,
                         testMode = testMode,
                     )
-                    showMessage(MLang.Proxy.Testing.RequestSent)
+                    showMessage(UiText.Resource(LocaleR.string.proxy_testing_request_sent))
                 }
             }
 
@@ -163,7 +164,7 @@ class ProxyViewModel(
 
             result.exceptionOrNull()?.let { error ->
                 if (error is CancellationException) throw error
-                showError(MLang.Proxy.Testing.Failed.format(error.message))
+                showError(UiText.Resource(LocaleR.string.proxy_testing_failed, listOf(error.message.orEmpty())))
             }
         }
     }
@@ -220,9 +221,19 @@ class ProxyViewModel(
             cancelActiveTests()
             runCatching {
                 proxyFacade.switchPreferredTunnelMode(mode)
-                showMessage(MLang.Proxy.Mode.Switched.format(mode.displayName()))
+                showMessage(
+                    UiText.Resource(
+                        LocaleR.string.proxy_mode_switched,
+                        listOf(mode.displayName()),
+                    ),
+                )
             }.onFailure { error ->
-                showError(MLang.Proxy.Mode.SwitchFailed.format(error.message ?: mode.displayName()))
+                showError(
+                    UiText.Resource(
+                        LocaleR.string.proxy_mode_switch_failed,
+                        listOf(error.message ?: mode.displayName()),
+                    ),
+                )
             }
         }
     }
@@ -235,11 +246,11 @@ class ProxyViewModel(
         setLoading(false)
     }
 
-    private fun TunnelState.Mode.displayName(): String = when (this) {
-        TunnelState.Mode.Direct -> MLang.Proxy.Mode.Direct
-        TunnelState.Mode.Global -> MLang.Proxy.Mode.Global
-        TunnelState.Mode.Rule -> MLang.Proxy.Mode.Rule
-        TunnelState.Mode.Script -> "Script"
+    private fun TunnelState.Mode.displayName(): UiText = when (this) {
+        TunnelState.Mode.Direct -> UiText.Resource(LocaleR.string.proxy_mode_direct)
+        TunnelState.Mode.Global -> UiText.Resource(LocaleR.string.proxy_mode_global)
+        TunnelState.Mode.Rule -> UiText.Resource(LocaleR.string.proxy_mode_rule)
+        TunnelState.Mode.Script -> UiText.Dynamic("Script")
     }
 
     fun selectProxy(
@@ -251,13 +262,13 @@ class ProxyViewModel(
             runCatching {
                 val success = proxyFacade.selectProxy(groupName, proxyName)
                 if (success) {
-                    showMessage(MLang.Proxy.Selection.Switched.format(proxyName))
+                    showMessage(UiText.Resource(LocaleR.string.proxy_selection_switched, listOf(proxyName)))
                     onSuccess?.invoke()
                 } else {
-                    showError(MLang.Proxy.Selection.Failed)
+                    showError(UiText.Resource(LocaleR.string.proxy_selection_failed))
                 }
             }.onFailure { error ->
-                showError(MLang.Proxy.Selection.Error.format(error.message))
+                showError(UiText.Resource(LocaleR.string.proxy_selection_error, listOf(error.message.orEmpty())))
             }
         }
     }
@@ -285,16 +296,18 @@ class ProxyViewModel(
         }
     }
 
-    private fun showMessage(message: String) {
-        postMessage(message, ProxyUiEffect.ShowMessage(message))
+    private fun showMessage(message: UiText) {
+        updateState { it.copy(messageText = message, message = null) }
+        tryEmitEffect(ProxyUiEffect.ShowMessage(message))
     }
 
-    private fun showError(error: String) {
-        postError(error, ProxyUiEffect.ShowError(error))
+    private fun showError(error: UiText) {
+        updateState { it.copy(errorText = error, error = null, isLoading = false) }
+        tryEmitEffect(ProxyUiEffect.ShowError(error))
     }
 
     fun clearError() {
-        clearErrorState()
+        updateState { it.copy(error = null, errorText = null) }
     }
 
     private fun ProxyGroupInfo.withLockedDelays(lockedDelays: Map<String, Int>): ProxyGroupInfo {
@@ -317,7 +330,9 @@ class ProxyViewModel(
     data class ProxyUiState(
         override val isLoading: Boolean = false,
         override val message: String? = null,
-        override val error: String? = null
+        override val error: String? = null,
+        val messageText: UiText? = null,
+        val errorText: UiText? = null,
     ) : LoadableState<ProxyUiState> {
         override fun withLoading(loading: Boolean): ProxyUiState = copy(isLoading = loading)
         override fun withError(error: String?): ProxyUiState = copy(error = error)
@@ -325,7 +340,7 @@ class ProxyViewModel(
     }
 
     sealed interface ProxyUiEffect {
-        data class ShowMessage(val message: String) : ProxyUiEffect
-        data class ShowError(val message: String) : ProxyUiEffect
+        data class ShowMessage(val message: UiText) : ProxyUiEffect
+        data class ShowError(val message: UiText) : ProxyUiEffect
     }
 }
