@@ -1009,7 +1009,7 @@
     <string name="profiles_page_button_cancel" formatted="false">Cancel</string>
     <string name="profiles_page_button_confirm" formatted="false">Confirm</string>
     <string name="profiles_page_delete_dialog_confirm" formatted="false">Delete</string>
-    <string name="profiles_page_delete_dialog_message" formatted="false">Are you sure you want to delete %s'?%s??</string>
+    <string name="profiles_page_delete_dialog_message" formatted="false">Are you sure you want to delete “%s”?</string>
     <string name="profiles_page_delete_dialog_title" formatted="false">Delete Profile</string>
     <string name="profiles_page_edit_dialog_title" formatted="false">Edit Profile Name</string>
     <string name="profiles_page_empty_hint" formatted="false">Click top-right to add profile</string>
