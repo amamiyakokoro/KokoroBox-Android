@@ -171,12 +171,12 @@ fun StringListEditorScreen(
         actions = listOf(
             EditorAction(
                 icon = AppMd3Icons.Action.Undo,
-                contentDescription = "Reset",
+                contentDescription = stringResource(LocaleR.string.component_editor_action_reset),
                 onClick = { dialogState = StringListDialogState.Reset },
             ),
             EditorAction(
                 icon = AppMd3Icons.Action.Add,
-                contentDescription = "Add",
+                contentDescription = stringResource(LocaleR.string.component_editor_action_add),
                 onClick = {
                     dialogState = if (isOverrideRuleEditor) {
                         StringListDialogState.AddRule
@@ -328,12 +328,12 @@ fun KeyValueEditorScreen(
         actions = listOf(
             EditorAction(
                 icon = AppMd3Icons.Action.Undo,
-                contentDescription = "Reset",
+                contentDescription = stringResource(LocaleR.string.component_editor_action_reset),
                 onClick = { dialogState = KeyValueDialogState.Reset },
             ),
             EditorAction(
                 icon = AppMd3Icons.Action.Add,
-                contentDescription = "Add",
+                contentDescription = stringResource(LocaleR.string.component_editor_action_add),
                 onClick = { dialogState = KeyValueDialogState.Add },
             ),
         ),

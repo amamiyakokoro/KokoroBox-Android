@@ -249,7 +249,7 @@ fun ProfileCard(
                         .alpha(if (isConfigSaved) 1f else opacity.disabledSecondary),
                     imageVector = AppMd3Icons.Action.Share,
                     tint = actionIconTint.copy(alpha = if (isConfigSaved) 1f else opacity.disabledSecondary),
-                    contentDescription = "Export"
+                    contentDescription = stringResource(LocaleR.string.component_profile_card_export),
                 )
             }
 
@@ -265,7 +265,7 @@ fun ProfileCard(
                     modifier = Modifier.size(spacing.space20),
                     imageVector = AppMd3Icons.Action.Edit,
                     tint = actionIconTint,
-                    contentDescription = "Edit"
+                    contentDescription = stringResource(LocaleR.string.component_profile_card_edit),
                 )
             }
 
@@ -339,7 +339,7 @@ fun ProfileCard(
                                         modifier = Modifier.size(spacing.space20),
                                         imageVector = AppMd3Icons.Action.Sync,
                                         tint = updateTint,
-                                        contentDescription = "Update",
+                                        contentDescription = stringResource(LocaleR.string.component_profile_card_update),
                                     )
                                     Text(
                                         modifier = Modifier.padding(end = componentSizes.textLineCompactSpacing),
@@ -370,7 +370,7 @@ fun ProfileCard(
                         modifier = Modifier.size(spacing.space20),
                         imageVector = AppMd3Icons.Action.Delete,
                         tint = deleteContentColor,
-                        contentDescription = "Delete"
+                        contentDescription = stringResource(LocaleR.string.component_profile_card_delete),
                     )
                     Text(
                         modifier = Modifier.padding(start = spacing.space4, end = componentSizes.textLineCompactSpacing),

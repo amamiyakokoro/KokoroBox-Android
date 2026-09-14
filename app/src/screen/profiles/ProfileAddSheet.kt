@@ -610,7 +610,7 @@ private fun DownloadProgressContent(
             if (complete) {
                 Icon(
                     imageVector = AppMd3Icons.Shell.PackageComplete,
-                    contentDescription = "Complete",
+                    contentDescription = stringResource(LocaleR.string.profiles_page_misc_complete),
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
                         .fillMaxSize()

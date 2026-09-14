@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_app_description" formatted="false">A Material You Android client powered by Mihomo</string>
+    <string name="about_app_icon_description" formatted="false">KokoroBox app icon</string>
     <string name="about_app_version_failed" formatted="false">Failed to load</string>
     <string name="about_app_version_loading" formatted="false">Loading...</string>
     <string name="about_copyright" formatted="false">© 2026 KokoroBox Contributors</string>
@@ -215,8 +216,16 @@
     <string name="component_button_confirm" formatted="false">Confirm</string>
     <string name="component_button_copy" formatted="false">Copy</string>
     <string name="component_button_delete" formatted="false">Delete</string>
+    <string name="component_button_edit" formatted="false">Edit</string>
     <string name="component_button_ok" formatted="false">OK</string>
     <string name="component_config_input_count_items" formatted="false">%d items</string>
+    <string name="component_config_input_map_summary" formatted="false">%d items · %s</string>
+    <string name="component_config_input_modifier_merge" formatted="false">Merge</string>
+    <string name="component_config_input_modifier_merge_helper" formatted="false">Overwrite values for matching keys</string>
+    <string name="component_config_input_modifier_merge_hint" formatted="false">Merge mode only modifies specified keys; unspecified keys remain unchanged.</string>
+    <string name="component_config_input_modifier_replace" formatted="false">Replace</string>
+    <string name="component_config_input_modifier_replace_helper" formatted="false">Replace the entire dictionary</string>
+    <string name="component_config_input_modifier_summary" formatted="false">%s %d</string>
     <string name="component_config_input_port_label" formatted="false">Port (leave empty to not modify)</string>
     <string name="component_editor_action_add" formatted="false">Add</string>
     <string name="component_editor_action_delete" formatted="false">Delete</string>

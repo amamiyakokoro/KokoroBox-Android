@@ -274,10 +274,19 @@ fun StringMapWithModifiersInput(
     var expanded by remember { mutableStateOf(false) }
 
     val notModify = stringResource(LocaleR.string.component_selector_not_modify)
-    val summary = remember(replaceValue, mergeValue, notModify) {
+    val replaceLabel = stringResource(LocaleR.string.component_config_input_modifier_replace)
+    val mergeLabel = stringResource(LocaleR.string.component_config_input_modifier_merge)
+    val modifierSummary = stringResource(LocaleR.string.component_config_input_modifier_summary)
+    val mapSummary = stringResource(LocaleR.string.component_config_input_map_summary)
+    val replaceHelper = stringResource(LocaleR.string.component_config_input_modifier_replace_helper)
+    val mergeHelper = stringResource(LocaleR.string.component_config_input_modifier_merge_helper)
+    val mergeHint = stringResource(LocaleR.string.component_config_input_modifier_merge_hint)
+    val editText = stringResource(LocaleR.string.component_button_edit)
+    val clearText = stringResource(LocaleR.string.component_button_clear)
+    val summary = remember(replaceValue, mergeValue, notModify, replaceLabel, mergeLabel, modifierSummary) {
         buildList {
-            replaceValue?.takeIf { it.isNotEmpty() }?.let { add("Replace ${it.size}") }
-            mergeValue?.takeIf { it.isNotEmpty() }?.let { add("Merge ${it.size}") }
+            replaceValue?.takeIf { it.isNotEmpty() }?.let { add(modifierSummary.format(replaceLabel, it.size)) }
+            mergeValue?.takeIf { it.isNotEmpty() }?.let { add(modifierSummary.format(mergeLabel, it.size)) }
         }.joinToString(" · ").ifEmpty { notModify }
     }
 
@@ -310,13 +319,17 @@ fun StringMapWithModifiersInput(
                 ) {
                     ModifierModeCard(
                         modifier = Modifier.weight(1f),
-                        title = "Replace",
-                        summary = buildMapModeSummary(replaceValue),
-                        helperText = "Replace entire dictionary",
+                        title = replaceLabel,
+                        summary = replaceValue?.takeIf { it.isNotEmpty() }?.let {
+                            mapSummary.format(it.size, it.entries.first().key)
+                        } ?: notModify,
+                        helperText = replaceHelper,
+                        editText = editText,
+                        clearText = clearText,
                         onEdit = {
                             onEditMap(
                                 MapMergeStrategy.Replace,
-                                "$title (Replace)",
+                                "$title ($replaceLabel)",
                                 keyPlaceholder,
                                 valuePlaceholder,
                                 replaceValue,
@@ -331,13 +344,17 @@ fun StringMapWithModifiersInput(
                     )
                     ModifierModeCard(
                         modifier = Modifier.weight(1f),
-                        title = "Merge",
-                        summary = buildMapModeSummary(mergeValue),
-                        helperText = "Overwrites values for matching keys",
+                        title = mergeLabel,
+                        summary = mergeValue?.takeIf { it.isNotEmpty() }?.let {
+                            mapSummary.format(it.size, it.entries.first().key)
+                        } ?: notModify,
+                        helperText = mergeHelper,
+                        editText = editText,
+                        clearText = clearText,
                         onEdit = {
                             onEditMap(
                                 MapMergeStrategy.Merge,
-                                "$title (Merge)",
+                                "$title ($mergeLabel)",
                                 keyPlaceholder,
                                 valuePlaceholder,
                                 mergeValue,
@@ -353,7 +370,7 @@ fun StringMapWithModifiersInput(
                 }
                 Spacer(modifier = Modifier.height(UiDp.dp10))
                 Text(
-                    text = "Merge mode only modifies specified keys; unmodified keys remain unchanged.",
+                    text = mergeHint,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -367,6 +384,8 @@ private fun ModifierModeCard(
     title: String,
     summary: String,
     helperText: String,
+    editText: String,
+    clearText: String,
     onEdit: () -> Unit,
     onClear: (() -> Unit)?,
     modifier: Modifier = Modifier,
@@ -398,30 +417,16 @@ private fun ModifierModeCard(
                 modifier = Modifier.weight(1f),
                 onClick = onEdit,
             ) {
-                Text("Edit")
+                Text(editText)
             }
             if (onClear != null) {
                 Button(
                     modifier = Modifier.weight(1f),
                     onClick = onClear,
                 ) {
-                    Text("Clear")
+                    Text(clearText)
                 }
             }
         }
-    }
-}
-
-private fun buildListModeSummary(value: List<String>?): String {
-    return when {
-        value.isNullOrEmpty() -> "Not set"
-        else -> "Total ${value.size} items · ${value.first()}"
-    }
-}
-
-private fun buildMapModeSummary(value: Map<String, String>?): String {
-    return when {
-        value.isNullOrEmpty() -> "Not set"
-        else -> "Total ${value.size} items · ${value.entries.first().key}"
     }
 }

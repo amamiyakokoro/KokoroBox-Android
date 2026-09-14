@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_app_description" formatted="false">基于 Mihomo 的 Material You Android 代理客户端</string>
+    <string name="about_app_icon_description" formatted="false">KokoroBox 应用图标</string>
     <string name="about_app_version_failed" formatted="false">加载失败</string>
     <string name="about_app_version_loading" formatted="false">加载中...</string>
     <string name="about_copyright" formatted="false">© 2026 KokoroBox 贡献者</string>
@@ -215,8 +216,16 @@
     <string name="component_button_confirm" formatted="false">确定</string>
     <string name="component_button_copy" formatted="false">复制</string>
     <string name="component_button_delete" formatted="false">删除</string>
+    <string name="component_button_edit" formatted="false">编辑</string>
     <string name="component_button_ok" formatted="false">确定</string>
     <string name="component_config_input_count_items" formatted="false">%d 项</string>
+    <string name="component_config_input_map_summary" formatted="false">%d 项 · %s</string>
+    <string name="component_config_input_modifier_merge" formatted="false">合并</string>
+    <string name="component_config_input_modifier_merge_helper" formatted="false">覆盖相同键的值</string>
+    <string name="component_config_input_modifier_merge_hint" formatted="false">合并模式只修改指定的键；未指定的键保持不变。</string>
+    <string name="component_config_input_modifier_replace" formatted="false">替换</string>
+    <string name="component_config_input_modifier_replace_helper" formatted="false">替换整个字典</string>
+    <string name="component_config_input_modifier_summary" formatted="false">%s %d</string>
     <string name="component_config_input_port_label" formatted="false">端口号 (留空表示不修改)</string>
     <string name="component_editor_action_add" formatted="false">添加</string>
     <string name="component_editor_action_delete" formatted="false">删除</string>

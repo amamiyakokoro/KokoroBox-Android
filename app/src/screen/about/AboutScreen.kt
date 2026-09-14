@@ -125,7 +125,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     appIcon?.let {
                         Image(
                             bitmap = it,
-                            contentDescription = "KokoroBox app icon",
+                            contentDescription = stringResource(LocaleR.string.about_app_icon_description),
                             modifier = Modifier
                                 .size(UiDp.dp120)
                                 .clip(RoundedCornerShape(UiDp.dp24)),

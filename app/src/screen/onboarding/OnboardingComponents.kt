@@ -192,7 +192,7 @@ internal fun HeroStartButton(
         )
         Icon(
             imageVector = ShellIcons.NavigateForward,
-            contentDescription = "Start",
+            contentDescription = stringResource(LocaleR.string.onboarding_navigation_next),
             tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.size(componentSizes.settingsIconGlyphSize),
         )
