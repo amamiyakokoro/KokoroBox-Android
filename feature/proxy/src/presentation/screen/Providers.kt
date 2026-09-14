@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.model.Provider
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.resolve
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.CenteredText
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
@@ -100,14 +101,14 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
 
     LaunchedEffect(uiState.message) {
         uiState.message?.let {
-            context.toast(it)
+            context.toast(it.resolve(context.resources))
             viewModel.clearMessage()
         }
     }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
-            context.toast(it, Toast.LENGTH_LONG, copyable = true)
+            context.toast(it.resolve(context.resources), Toast.LENGTH_LONG, copyable = true)
             viewModel.clearError()
         }
     }
