@@ -50,7 +50,8 @@ import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -137,7 +138,7 @@ fun HomePager(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.Home.Title)
+            TopBar(title = stringResource(LocaleR.string.home_title))
         },
         floatingActionButton = {
             if (useFabProxyControl) {
@@ -157,9 +158,9 @@ fun HomePager(
                             AppMd3Icons.Shell.StartProxy
                         },
                         contentDescription = if (isRunning) {
-                            MLang.Home.Control.Stop
+                            stringResource(LocaleR.string.home_control_stop)
                         } else {
-                            MLang.Home.Control.Start
+                            stringResource(LocaleR.string.home_control_start)
                         },
                     )
                 }
@@ -190,9 +191,9 @@ fun HomePager(
                         proxyMode = proxyMode,
                         isEnabled = controlState.canInteract && !useFabProxyControl,
                         idleStatusText = if (useFabProxyControl) {
-                            MLang.Home.Status.TapFabToStart
+                            stringResource(LocaleR.string.home_status_tap_fab_to_start)
                         } else {
-                            MLang.Home.Status.TapToStart
+                            stringResource(LocaleR.string.home_status_tap_to_start)
                         },
                         onClick = onProxyToggle,
                     )

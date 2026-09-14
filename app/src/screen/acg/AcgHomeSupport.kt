@@ -44,11 +44,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.Sizes
 import com.amamiyakokoro.box.presentation.theme.Opacity
@@ -58,7 +60,6 @@ import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.miuix.YumeMiuixIcon as Icon
 import com.amamiyakokoro.box.miuix.YumeMiuixText as Text
 import com.amamiyakokoro.box.miuix.YumeMiuixTheme as MiuixTheme
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlin.math.abs
 
 private val acgSpacing = Spacing()
@@ -321,10 +322,11 @@ internal data class AcgSidebarIconItem(
     val onClick: () -> Unit,
 )
 
+@Composable
 internal fun ProxyMode.toAcgDisplayName(): String = when (this) {
-    ProxyMode.Tun -> MLang.Home.ProxyMode.Vpn
-    ProxyMode.RootTun -> MLang.Home.ProxyMode.Tun
-    ProxyMode.Http -> MLang.Home.ProxyMode.Http
+    ProxyMode.Tun -> stringResource(LocaleR.string.home_proxy_mode_vpn)
+    ProxyMode.RootTun -> stringResource(LocaleR.string.home_proxy_mode_tun)
+    ProxyMode.Http -> stringResource(LocaleR.string.home_proxy_mode_http)
 }
 
 internal data class AcgDurationPair(

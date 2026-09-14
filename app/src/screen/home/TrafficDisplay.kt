@@ -57,7 +57,8 @@ import com.amamiyakokoro.box.domain.model.TrafficData
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.AppTheme
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 fun TrafficDisplay(
@@ -155,7 +156,7 @@ private fun ProfileModeBadge(
             horizontalArrangement = Arrangement.spacedBy(spacing.space8)
         ) {
             Text(
-                text = profileName ?: MLang.Home.Traffic.NoProfile,
+                text = profileName ?: stringResource(LocaleR.string.home_traffic_no_profile),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -294,9 +295,9 @@ private fun ProxyTypeCapsule(proxyMode: ProxyMode) {
             )
             Text(
                 text = when (proxyMode) {
-                    ProxyMode.Tun -> MLang.Home.ProxyMode.Vpn
-                    ProxyMode.RootTun -> MLang.Home.ProxyMode.Tun
-                    ProxyMode.Http -> MLang.Home.ProxyMode.Http
+                    ProxyMode.Tun -> stringResource(LocaleR.string.home_proxy_mode_vpn)
+                    ProxyMode.RootTun -> stringResource(LocaleR.string.home_proxy_mode_tun)
+                    ProxyMode.Http -> stringResource(LocaleR.string.home_proxy_mode_http)
                 },
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
@@ -361,9 +362,9 @@ private fun ProxyStatusCapsule(
                 Text(
                     text = when (state) {
                         HomeProxyControlState.Idle -> idleText
-                        HomeProxyControlState.Connecting -> MLang.Home.Status.Connecting
-                        HomeProxyControlState.Running -> MLang.Home.Status.Running
-                        HomeProxyControlState.Disconnecting -> MLang.Home.Status.Disconnecting
+                        HomeProxyControlState.Connecting -> stringResource(LocaleR.string.home_status_connecting)
+                        HomeProxyControlState.Running -> stringResource(LocaleR.string.home_status_running)
+                        HomeProxyControlState.Disconnecting -> stringResource(LocaleR.string.home_status_disconnecting)
                     },
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontSize = 12.sp,

@@ -34,7 +34,8 @@ import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.util.extractFlaggedName
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 fun NodeInfoDisplay(
@@ -62,7 +63,7 @@ fun NodeInfoDisplay(
                 .padding(end = spacing.space16)
         ) {
             Text(
-                text = MLang.Home.NodeInfo.Node,
+                text = stringResource(LocaleR.string.home_node_info_node),
                 style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -89,7 +90,7 @@ fun NodeInfoDisplay(
                 }
             } else {
                 Text(
-                    text = MLang.Home.NodeInfo.Unknown,
+                    text = stringResource(LocaleR.string.home_node_info_unknown),
                     style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.height(INFO_TEXT_HEIGHT)
@@ -102,7 +103,7 @@ fun NodeInfoDisplay(
             modifier = Modifier.width(componentSizes.nodeDelayColumnWidth)
         ) {
             Text(
-                text = MLang.Home.NodeInfo.Delay,
+                text = stringResource(LocaleR.string.home_node_info_delay),
                 style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -123,7 +124,7 @@ private fun PingValue(ping: Int?) {
             semanticColors.latency.moderate
         }
         Text(
-            text = MLang.Home.NodeInfo.DelayValue.format(ping),
+            text = stringResource(LocaleR.string.home_node_info_delay_value).format(ping),
             style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 20.sp),
             color = color,
             modifier = Modifier.height(INFO_TEXT_HEIGHT)

@@ -51,7 +51,8 @@ import com.amamiyakokoro.box.data.gateway.IpInfo
 import com.amamiyakokoro.box.data.gateway.IpMonitoringState
 import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 private val INFO_VALUE_CORNER_RADIUS = RoundedCornerShape(UiDp.dp10)
 private val INFO_VALUE_MAX_WIDTH = UiDp.dp220
@@ -68,7 +69,7 @@ fun IpInfoDisplay(
     when {
         externalIp != null -> {
             IpInfoRow(
-                label = MLang.Home.IpInfo.ExitIp,
+                label = stringResource(LocaleR.string.home_ip_info_exit_ip),
                 value = buildDisplayIpValue(
                     ipAddress = externalIp.ip,
                     isIpVisible = isIpVisible
@@ -83,7 +84,7 @@ fun IpInfoDisplay(
 
         else -> {
             IpInfoRow(
-                label = MLang.Home.IpInfo.ExitIp,
+                label = stringResource(LocaleR.string.home_ip_info_exit_ip),
                 value = "--",
                 valueColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 countryCode = null,

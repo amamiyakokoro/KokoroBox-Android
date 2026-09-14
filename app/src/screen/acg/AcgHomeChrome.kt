@@ -78,7 +78,8 @@ import com.amamiyakokoro.box.miuix.YumeMiuixLayerBackdrop as LayerBackdrop
 import com.amamiyakokoro.box.miuix.YumeMiuixText as Text
 import com.amamiyakokoro.box.miuix.YumeMiuixTheme as MiuixTheme
 import com.amamiyakokoro.box.miuix.yumeMiuixTextureBlur as textureBlur
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 @Composable
 internal fun AcgSidebarDecoration(
@@ -192,7 +193,7 @@ internal fun AcgProfileModeBadge(
             horizontalArrangement = Arrangement.spacedBy(spacing.space8),
         ) {
             MdText(
-                text = profileName ?: MLang.Home.Traffic.NoProfile,
+                text = profileName ?: stringResource(LocaleR.string.home_traffic_no_profile),
                 modifier = Modifier.weight(weight = 1f, fill = false),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = 12.sp,
@@ -380,10 +381,10 @@ internal fun AcgLaunchButton(
                 ) { state ->
                     Text(
                         text = when (state) {
-                            HomeProxyControlState.Idle -> MLang.Home.Control.Start
-                            HomeProxyControlState.Connecting -> MLang.Home.Status.Connecting
-                            HomeProxyControlState.Running -> MLang.Home.Control.Stop
-                            HomeProxyControlState.Disconnecting -> MLang.Home.Status.Disconnecting
+                            HomeProxyControlState.Idle -> stringResource(LocaleR.string.home_control_start)
+                            HomeProxyControlState.Connecting -> stringResource(LocaleR.string.home_status_connecting)
+                            HomeProxyControlState.Running -> stringResource(LocaleR.string.home_control_stop)
+                            HomeProxyControlState.Disconnecting -> stringResource(LocaleR.string.home_status_disconnecting)
                         },
                         color = contentColor,
                         style = MiuixTheme.textStyles.body1,
@@ -414,7 +415,7 @@ internal fun AcgTrafficStrip(
             contentAlignment = Alignment.CenterStart,
         ) {
             AcgTrafficItem(
-                label = MLang.Home.Traffic.UpShort,
+                label = stringResource(LocaleR.string.home_traffic_up_short),
                 speed = uploadSpeed,
             )
         }
@@ -423,7 +424,7 @@ internal fun AcgTrafficStrip(
             contentAlignment = Alignment.CenterEnd,
         ) {
             AcgTrafficItem(
-                label = MLang.Home.Traffic.DownShort,
+                label = stringResource(LocaleR.string.home_traffic_down_short),
                 speed = downloadSpeed,
             )
         }
@@ -482,7 +483,7 @@ internal fun AcgHomeInfoPanel(
     val resolvedExitCountryCode = externalIp?.countryCode?.let(LocaleUtil::normalizeRegionCode)
     val resolvedPing = serverPing
         ?.takeIf { it in 1..1000 }
-        ?.let { ping -> MLang.Home.NodeInfo.DelayValue.format(ping) }
+        ?.let { ping -> stringResource(LocaleR.string.home_node_info_delay_value).format(ping) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -518,7 +519,7 @@ internal fun AcgHomeInfoPanel(
             )
         } else if (resolvedExitIp != null) {
             AcgInfoBlock(
-                value = MLang.Home.IpInfo.ExitIp,
+                value = stringResource(LocaleR.string.home_ip_info_exit_ip),
                 supportingValue = resolvedExitIp,
                 modifier = Modifier
                     .weight(1f)

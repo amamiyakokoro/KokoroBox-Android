@@ -54,7 +54,8 @@ import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
-import dev.oom_wg.purejoy.mlang.MLang
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import kotlinx.coroutines.launch
 
 @Composable
@@ -81,9 +82,9 @@ fun ProxyControlButton(
     ) {
         if (profilesLoaded) {
             if (!hasProfiles) {
-                HintText(MLang.Home.Control.HintAddProfile)
+                HintText(stringResource(LocaleR.string.home_control_hint_add_profile))
             } else if (!hasEnabledProfile) {
-                HintText(MLang.Home.Control.HintEnableProfile)
+                HintText(stringResource(LocaleR.string.home_control_hint_enable_profile))
             }
         }
 
