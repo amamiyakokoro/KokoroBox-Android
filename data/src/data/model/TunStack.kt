@@ -25,5 +25,6 @@ package com.amamiyakokoro.box.data.model
 enum class TunStack {
     System,
     GVisor,
-    Mixed
+    Mixed,
+    Mips,
 }

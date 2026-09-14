@@ -580,7 +580,7 @@ private fun CommonTunServiceOptions(
         PreferenceEnumItem(
             title = stringResource(LocaleR.string.network_settings_proxy_options_tun_stack_title),
             currentValue = state.tunStack,
-            items = listOf("System", "GVisor", "Mixed"),
+            items = listOf("System", "GVisor", "Mixed", "MIPS"),
             values = TunStack.entries,
             onValueChange = actions.onTunStackChange,
         )
