@@ -23,6 +23,8 @@ package com.amamiyakokoro.box.feature.meta.presentation.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.data.model.AppTrafficUsage
 import com.amamiyakokoro.box.data.model.DailyTrafficSummary
 import com.amamiyakokoro.box.data.model.StatisticsTimeRange
@@ -31,7 +33,6 @@ import com.amamiyakokoro.box.data.store.TrafficStatisticsStore
 import com.amamiyakokoro.box.data.controller.AppIdentityResolver
 import com.amamiyakokoro.box.presentation.component.TrafficDonutSlice
 import com.amamiyakokoro.box.presentation.theme.AppColors
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -94,7 +95,7 @@ class TrafficStatisticsViewModel(
                 add(
                     TrafficDonutSlice(
                         key = usage.appKey,
-                        label = usage.appName,
+                        label = UiText.Dynamic(usage.appName),
                         value = usage.totalBytes,
                         color = colorForAppKey(usage.appKey),
                     ),
@@ -105,7 +106,7 @@ class TrafficStatisticsViewModel(
                 add(
                     TrafficDonutSlice(
                         key = OTHER_SLICE_KEY,
-                        label = MLang.TrafficStatistics.Donut.Other,
+                        label = UiText.Resource(LocaleR.string.traffic_statistics_donut_other),
                         value = overflowBytes,
                         color = appColors.traffic.other,
                     ),
@@ -116,7 +117,7 @@ class TrafficStatisticsViewModel(
                 add(
                     TrafficDonutSlice(
                         key = usage.appKey,
-                        label = usage.appName,
+                        label = UiText.Dynamic(usage.appName),
                         value = usage.totalBytes,
                         color = appColors.traffic.unattributed,
                     ),
@@ -127,7 +128,7 @@ class TrafficStatisticsViewModel(
                 add(
                     TrafficDonutSlice(
                         key = usage.appKey,
-                        label = usage.appName,
+                        label = UiText.Dynamic(usage.appName),
                         value = usage.totalBytes,
                         color = appColors.traffic.unknown,
                     ),

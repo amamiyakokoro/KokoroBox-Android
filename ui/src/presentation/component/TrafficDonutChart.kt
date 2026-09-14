@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -55,7 +56,7 @@ import kotlin.math.sqrt
 
 data class TrafficDonutSlice(
     val key: String,
-    val label: String,
+    val label: UiText,
     val value: Long,
     val color: Color,
 )

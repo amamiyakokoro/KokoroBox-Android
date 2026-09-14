@@ -19,6 +19,7 @@
  */
 
 package com.amamiyakokoro.box.feature.meta.presentation.component
+import android.content.res.Resources
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,13 +30,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.core.model.ConnectionInfo
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.PreferenceListItem
 import com.amamiyakokoro.box.presentation.theme.AppTheme
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.jsonPrimitive
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -83,7 +86,7 @@ fun ConnectionCard(
         }
     }
 
-    val relativeTime = formatRelativeTime(connectionInfo.start)
+    val relativeTime = formatRelativeTime(connectionInfo.start, LocalContext.current.resources)
     val summaryText = remember(sourceIP, sourcePort, destinationIp, destinationPort) {
         val source = listOf(sourceIP, sourcePort).filter(String::isNotBlank).joinToString(":")
         val destination = listOf(destinationIp, destinationPort).filter(String::isNotBlank).joinToString(":")
@@ -127,7 +130,10 @@ fun ConnectionCard(
                     }
 
                     if (connectionInfo.chains.isNotEmpty()) {
-                        ConnectionTagChip(label = MLang.Connection.ChainCount.format(connectionInfo.chains.size))
+                        ConnectionTagChip(
+                            label = stringResource(LocaleR.string.connection_chain_count)
+                                .format(connectionInfo.chains.size),
+                        )
                     }
 
                     if (relativeTime.isNotEmpty()) {
@@ -162,7 +168,7 @@ private fun ConnectionTagChip(
     )
 }
 
-private fun formatRelativeTime(start: String): String {
+private fun formatRelativeTime(start: String, resources: Resources): String {
     if (start.isEmpty()) return ""
 
     return try {
@@ -176,13 +182,14 @@ private fun formatRelativeTime(start: String): String {
         val days = hours / 24
 
         when {
-            seconds < 60 -> MLang.Connection.RelativeTime.JustNow
-            minutes < 60 -> MLang.Connection.RelativeTime.MinutesAgo.format(minutes)
-            hours < 24 -> MLang.Connection.RelativeTime.HoursAgo.format(hours)
-            days < 7 -> MLang.Connection.RelativeTime.DaysAgo.format(days)
+            seconds < 60 -> resources.getString(LocaleR.string.connection_relative_time_just_now)
+            minutes < 60 -> resources.getString(LocaleR.string.connection_relative_time_minutes_ago).format(minutes)
+            hours < 24 -> resources.getString(LocaleR.string.connection_relative_time_hours_ago).format(hours)
+            days < 7 -> resources.getString(LocaleR.string.connection_relative_time_days_ago).format(days)
             else -> {
                 val date = java.time.LocalDateTime.ofInstant(startTime, java.time.ZoneId.systemDefault())
-                MLang.Connection.RelativeTime.Date.format(date.monthValue, date.dayOfMonth)
+                resources.getString(LocaleR.string.connection_relative_time_date)
+                    .format(date.monthValue, date.dayOfMonth)
             }
         }
     } catch (e: Exception) {

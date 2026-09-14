@@ -37,15 +37,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.core.model.ConnectionInfo
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.common.util.formatBytes
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -153,26 +154,26 @@ private fun ConnectionInfoSection(
                 size = sizes.connectionLeadingIconSize,
                 bitmapSize = CONNECTION_LEADING_ICON_BITMAP_SIZE,
             )
-            SectionTitle(MLang.Connection.Detail.Section.Info)
+            SectionTitle(stringResource(LocaleR.string.connection_detail_section_info))
         }
 
-        InfoRow(label = MLang.Connection.Detail.Label.Protocol, value = state.network.uppercase())
+        InfoRow(label = stringResource(LocaleR.string.connection_detail_label_protocol), value = state.network.uppercase())
         if (state.process.isNotEmpty()) {
-            InfoRow(label = MLang.Connection.Detail.Label.Process, value = state.process)
+            InfoRow(label = stringResource(LocaleR.string.connection_detail_label_process), value = state.process)
         }
-        InfoRow(label = MLang.Connection.Detail.Label.SourceAddress, value = state.sourceAddress)
+        InfoRow(label = stringResource(LocaleR.string.connection_detail_label_source_address), value = state.sourceAddress)
         if (state.destinationAddress.isNotEmpty()) {
-            InfoRow(label = MLang.Connection.Detail.Label.DestinationAddress, value = state.destinationAddress)
+            InfoRow(label = stringResource(LocaleR.string.connection_detail_label_destination_address), value = state.destinationAddress)
         }
-        InfoRow(label = MLang.Connection.Detail.Label.Duration, value = state.duration)
+        InfoRow(label = stringResource(LocaleR.string.connection_detail_label_duration), value = state.duration)
 
         InfoRow(
-            label = MLang.Connection.Detail.Label.Upload,
+            label = stringResource(LocaleR.string.connection_detail_label_upload),
             value = formatBytes(upload),
             valueColor = appColors.protocol.tcp,
         )
         InfoRow(
-            label = MLang.Connection.Detail.Label.Download,
+            label = stringResource(LocaleR.string.connection_detail_label_download),
             value = formatBytes(download),
             valueColor = appColors.protocol.udp,
         )
@@ -235,9 +236,9 @@ private fun InterruptConnectionButton(
     ) {
         Text(
             text = if (isInterrupting) {
-                MLang.Connection.Detail.Action.Interrupting
+                stringResource(LocaleR.string.connection_detail_action_interrupting)
             } else {
-                MLang.Connection.Detail.Action.Interrupt
+                stringResource(LocaleR.string.connection_detail_action_interrupt)
             },
             color = destructiveActionColors.contentColor,
         )
@@ -304,11 +305,11 @@ private fun RuleInfoSection(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.space12),
     ) {
-        SectionTitle(MLang.Connection.Detail.Section.Rule)
+        SectionTitle(stringResource(LocaleR.string.connection_detail_section_rule))
 
-        InfoRow(label = MLang.Connection.Detail.Label.Type, value = rule)
+        InfoRow(label = stringResource(LocaleR.string.connection_detail_label_type), value = rule)
         if (rulePayload.isNotEmpty()) {
-            InfoRow(label = MLang.Connection.Detail.Label.Content, value = rulePayload)
+            InfoRow(label = stringResource(LocaleR.string.connection_detail_label_content), value = rulePayload)
         }
     }
 }
