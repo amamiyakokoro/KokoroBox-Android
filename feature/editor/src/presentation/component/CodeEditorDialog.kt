@@ -23,14 +23,15 @@ package com.amamiyakokoro.box.feature.editor.presentation.component
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.feature.editor.presentation.editor.CodeEditor
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.feature.editor.presentation.editor.rememberConfiguredCodeEditorState
 import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
 import com.amamiyakokoro.box.presentation.component.AppDialog
 import com.amamiyakokoro.box.presentation.component.DialogButtonRow
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
@@ -85,8 +86,8 @@ fun CodeEditorDialog(
                         onValueChange(editorState.content.takeIf { it.isNotBlank() })
                         onDismiss()
                     },
-                    cancelText = MLang.Component.Button.Cancel,
-                    confirmText = MLang.Component.Button.Confirm,
+                    cancelText = stringResource(LocaleR.string.component_button_cancel),
+                    confirmText = stringResource(LocaleR.string.component_button_confirm),
                 )
             }
         }
@@ -117,7 +118,7 @@ fun YamlEditorDialog(
 fun JsonEditorDialog(
     show: Boolean,
     title: String,
-    subtitle: String? = MLang.Editor.Common.JsonSubtitle,
+    subtitle: String? = null,
     value: String?,
     onValueChange: (String?) -> Unit,
     onDismiss: () -> Unit = {},
@@ -125,7 +126,7 @@ fun JsonEditorDialog(
     CodeEditorDialog(
         show = show,
         title = title,
-        subtitle = subtitle,
+        subtitle = subtitle ?: stringResource(LocaleR.string.editor_common_json_subtitle),
         value = value,
         language = LanguageScope.Json,
         onValueChange = onValueChange,

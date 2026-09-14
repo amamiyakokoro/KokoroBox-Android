@@ -22,6 +22,7 @@
 
 package com.amamiyakokoro.box.feature.editor.presentation.editor
 
+import android.content.res.Resources
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,6 +32,7 @@ import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
 import io.github.rosemoe.sora.widget.CodeEditor
 
 class CodeEditorState(
+    private val resources: Resources,
     initialContent: String = "",
     val language: LanguageScope = LanguageScope.Yaml,
     val readOnly: Boolean = false,
@@ -130,7 +132,7 @@ class CodeEditorState(
 
         when (language) {
             LanguageScope.Json -> {
-                editor.diagnostics = JsonDiagnosticsProvider.analyze(content)
+                editor.diagnostics = JsonDiagnosticsProvider.analyze(content, resources)
             }
             LanguageScope.Yaml,
             LanguageScope.Text -> {

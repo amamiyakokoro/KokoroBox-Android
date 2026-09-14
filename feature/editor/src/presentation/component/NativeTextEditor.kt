@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.amamiyakokoro.box.feature.editor.presentation.editor.CodeEditor
 import com.amamiyakokoro.box.feature.editor.presentation.editor.CodeEditorState
 import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
@@ -38,8 +39,10 @@ fun NativeTextEditor(
     syntaxHighlightingEnabled: Boolean = true,
 ) {
     val editorLanguage = if (syntaxHighlightingEnabled) language else LanguageScope.Text
-    val editorState = remember(editorLanguage, readOnly) {
+    val resources = LocalContext.current.resources
+    val editorState = remember(editorLanguage, readOnly, resources) {
         CodeEditorState(
+            resources = resources,
             initialContent = value,
             language = editorLanguage,
             readOnly = readOnly,

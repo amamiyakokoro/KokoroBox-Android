@@ -22,7 +22,8 @@
 
 package com.amamiyakokoro.box.feature.editor.presentation.diagnostic
 
-import dev.oom_wg.purejoy.mlang.MLang
+import android.content.res.Resources
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticDetail
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticRegion
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticsContainer
@@ -33,7 +34,7 @@ import timber.log.Timber
 
 object JsonDiagnosticsProvider {
 
-    fun analyze(content: String): DiagnosticsContainer {
+    fun analyze(content: String, resources: Resources): DiagnosticsContainer {
         val container = DiagnosticsContainer()
 
         if (content.isBlank()) {
@@ -56,8 +57,8 @@ object JsonDiagnosticsProvider {
                             DiagnosticRegion.SEVERITY_ERROR,
                             0,
                             DiagnosticDetail(
-                                briefMessage = MLang.Editor.Diagnostic.JsonFormatError,
-                                detailedMessage = MLang.Editor.Diagnostic.JsonMustStartWithObjectOrArray
+                                briefMessage = resources.getString(LocaleR.string.editor_diagnostic_json_format_error),
+                                detailedMessage = resources.getString(LocaleR.string.editor_diagnostic_json_must_start_with_object_or_array),
                             )
                         )
                     )
@@ -65,7 +66,7 @@ object JsonDiagnosticsProvider {
             }
         } catch (e: JSONException) {
 
-            val diagnostic = parseJsonException(e, content)
+            val diagnostic = parseJsonException(e, content, resources)
             if (diagnostic != null) {
                 container.addDiagnostic(diagnostic)
             }
@@ -76,7 +77,7 @@ object JsonDiagnosticsProvider {
         return container
     }
 
-    private fun parseJsonException(e: JSONException, content: String): DiagnosticRegion? {
+    private fun parseJsonException(e: JSONException, content: String, resources: Resources): DiagnosticRegion? {
         val message = e.message ?: return null
 
         val indexPattern = "character (\\d+)".toRegex()
@@ -93,23 +94,24 @@ object JsonDiagnosticsProvider {
             DiagnosticRegion.SEVERITY_ERROR,
             0,
             DiagnosticDetail(
-                briefMessage = MLang.Editor.Diagnostic.JsonSyntaxError,
-                detailedMessage = formatErrorMessage(message)
+                briefMessage = resources.getString(LocaleR.string.editor_diagnostic_json_syntax_error),
+                detailedMessage = formatErrorMessage(message, resources),
             )
         )
     }
 
-    private fun formatErrorMessage(message: String): String {
+    private fun formatErrorMessage(message: String, resources: Resources): String {
         return when {
-            message.contains("Unterminated") -> MLang.Editor.Diagnostic.Unterminated
+            message.contains("Unterminated") -> resources.getString(LocaleR.string.editor_diagnostic_unterminated)
             message.contains("Expected") -> {
 
                 val expectedPattern = "Expected (\\S+)".toRegex()
-                val expected = expectedPattern.find(message)?.groupValues?.get(1) ?: MLang.Editor.Diagnostic.Unknown
-                MLang.Editor.Diagnostic.Expected.format(expected)
+                val expected = expectedPattern.find(message)?.groupValues?.get(1)
+                    ?: resources.getString(LocaleR.string.editor_diagnostic_unknown)
+                resources.getString(LocaleR.string.editor_diagnostic_expected).format(expected)
             }
-            message.contains("No value") -> MLang.Editor.Diagnostic.NoValue
-            message.contains("Duplicate") -> MLang.Editor.Diagnostic.DuplicateKey
+            message.contains("No value") -> resources.getString(LocaleR.string.editor_diagnostic_no_value)
+            message.contains("Duplicate") -> resources.getString(LocaleR.string.editor_diagnostic_duplicate_key)
             else -> message
         }
     }

@@ -344,7 +344,7 @@
     <string name="editor_diagnostic_duplicate_key" formatted="false">Duplicate key</string>
     <string name="editor_diagnostic_expected" formatted="false">Expected %s</string>
     <string name="editor_diagnostic_json_format_error" formatted="false">JSON format error</string>
-    <string name="editor_diagnostic_json_must_start_with_object_or_array" formatted="false">JSON must start with {' or '['{ or '[' or ['[</string>
+    <string name="editor_diagnostic_json_must_start_with_object_or_array" formatted="false">JSON must start with “{” or “[”</string>
     <string name="editor_diagnostic_json_syntax_error" formatted="false">JSON syntax error</string>
     <string name="editor_diagnostic_no_value" formatted="false">Missing value</string>
     <string name="editor_diagnostic_unknown" formatted="false">Unknown</string>

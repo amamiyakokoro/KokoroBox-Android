@@ -22,6 +22,7 @@ package com.amamiyakokoro.box.feature.editor.presentation.editor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.amamiyakokoro.box.feature.editor.presentation.language.LanguageScope
 
 @Composable
@@ -30,8 +31,10 @@ fun rememberConfiguredCodeEditorState(
     language: LanguageScope,
     readOnly: Boolean = false,
 ): CodeEditorState {
-    return remember(initialContent, language, readOnly) {
+    val resources = LocalContext.current.resources
+    return remember(initialContent, language, readOnly, resources) {
         CodeEditorState(
+            resources = resources,
             initialContent = initialContent,
             language = language,
             readOnly = readOnly,

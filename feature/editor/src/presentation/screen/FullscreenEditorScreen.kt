@@ -37,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.feature.editor.presentation.component.NativeTextEditor
 import com.amamiyakokoro.box.feature.editor.presentation.format.CodeFormatter
@@ -47,13 +49,12 @@ import com.amamiyakokoro.box.presentation.component.TopBar
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Suppress("unused")
 @Composable
 fun FullscreenEditorScreen(
     navigator: DestinationsNavigator,
-    title: String = MLang.Editor.Common.EditConfigTitle,
+    title: String? = null,
     initialContent: String = "",
     language: LanguageScope = LanguageScope.Yaml,
     onSave: (String) -> Unit = {},
@@ -79,7 +80,7 @@ fun FullscreenEditorScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopBar(
-                title = title,
+                title = title ?: stringResource(LocaleR.string.editor_common_edit_config_title),
                 actions = {
                     IconButton(
                         modifier = Modifier.padding(end = UiDp.dp12),
@@ -87,22 +88,22 @@ fun FullscreenEditorScreen(
                             val formatted = CodeFormatter.format(content, language)
                             if (formatted != null && formatted != content) {
                                 content = formatted
-                                context.toast(MLang.Editor.Toast.FormatSuccess)
+                                context.toast(context.getString(LocaleR.string.editor_toast_format_success))
                             } else {
-                                context.toast(MLang.Editor.Toast.FormatFailedOrUnchanged)
+                                context.toast(context.getString(LocaleR.string.editor_toast_format_failed_or_unchanged))
                             }
                         },
                     ) {
                         Icon(
                             imageVector = AppMd3Icons.Editor.Format,
-                            contentDescription = MLang.Editor.Action.Format
+                            contentDescription = stringResource(LocaleR.string.editor_action_format)
                         )
                     }
 
                     IconButton(
                         onClick = {
                             if (!CodeFormatter.validate(content, language)) {
-                                context.toast(MLang.Editor.Toast.SyntaxError)
+                                context.toast(context.getString(LocaleR.string.editor_toast_syntax_error))
                                 return@IconButton
                             }
                             runCatching {
@@ -110,13 +111,13 @@ fun FullscreenEditorScreen(
                             }.onSuccess {
                                 navigator.navigateUp()
                             }.onFailure {
-                                context.toast(it.message ?: MLang.Editor.Toast.SaveFailed)
+                                context.toast(it.message ?: context.getString(LocaleR.string.editor_toast_save_failed))
                             }
                         },
                     ) {
                         Icon(
                             imageVector = AppMd3Icons.Editor.Save,
-                            contentDescription = MLang.Editor.Action.Save
+                            contentDescription = stringResource(LocaleR.string.editor_action_save)
                         )
                     }
                 }
@@ -140,8 +141,8 @@ fun FullscreenEditorScreen(
 
     AppDialog(
         show = showDiscardDialog.value,
-        title = MLang.Editor.Dialog.UnsavedChangesTitle,
-        summary = MLang.Editor.Dialog.UnsavedChangesMessage,
+        title = stringResource(LocaleR.string.editor_dialog_unsaved_changes_title),
+        summary = stringResource(LocaleR.string.editor_dialog_unsaved_changes_message),
         onDismissRequest = { showDiscardDialog.value = false }
     ) {
         DialogButtonRow(
@@ -150,8 +151,8 @@ fun FullscreenEditorScreen(
                 showDiscardDialog.value = false
                 navigator.navigateUp()
             },
-            cancelText = MLang.Component.Button.Cancel,
-            confirmText = MLang.Editor.Action.Discard
+            cancelText = stringResource(LocaleR.string.component_button_cancel),
+            confirmText = stringResource(LocaleR.string.editor_action_discard),
         )
     }
 }

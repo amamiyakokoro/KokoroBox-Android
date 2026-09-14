@@ -36,6 +36,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.feature.editor.presentation.component.NativeTextEditor
 import com.amamiyakokoro.box.feature.editor.presentation.format.CodeFormatter
@@ -44,12 +46,11 @@ import com.amamiyakokoro.box.presentation.component.SmallTopBar
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun ConfigPreviewScreen(
     navigator: DestinationsNavigator,
-    title: String = MLang.Editor.Common.ConfigPreviewTitle,
+    title: String? = null,
     initialContent: String = "",
     language: LanguageScope = LanguageScope.Yaml,
     onSave: ((String) -> Unit)? = null,
@@ -70,10 +71,10 @@ fun ConfigPreviewScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             SmallTopBar(
-                title = title,
+                title = title ?: stringResource(LocaleR.string.editor_common_config_preview_title),
                 navigationIcon = {
                     IconButton(onClick = { navigator.navigateUp() }) {
-                        Icon(AppMd3Icons.Navigation.Back, contentDescription = MLang.Component.Navigation.Back)
+                        Icon(AppMd3Icons.Navigation.Back, contentDescription = stringResource(LocaleR.string.component_navigation_back))
                     }
                 },
                 actions = {
@@ -86,7 +87,7 @@ fun ConfigPreviewScreen(
                             }
                         }
                     ) {
-                        Icon(AppMd3Icons.Editor.FormatStructured, contentDescription = MLang.Editor.Action.Format)
+                        Icon(AppMd3Icons.Editor.FormatStructured, contentDescription = stringResource(LocaleR.string.editor_action_format))
                     }
                     IconButton(
                         onClick = {
@@ -96,12 +97,12 @@ fun ConfigPreviewScreen(
                             }.onSuccess {
                                 navigator.navigateUp()
                             }.onFailure {
-                                context.toast(it.message ?: MLang.Editor.Toast.SaveFailed)
+                                context.toast(it.message ?: context.getString(LocaleR.string.editor_toast_save_failed))
                             }
                         },
                         enabled = canSave
                     ) {
-                        Icon(AppMd3Icons.Editor.Save, contentDescription = MLang.Editor.Action.Save)
+                        Icon(AppMd3Icons.Editor.Save, contentDescription = stringResource(LocaleR.string.editor_action_save))
                     }
                 }
             )

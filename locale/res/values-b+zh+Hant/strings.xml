@@ -344,7 +344,7 @@
     <string name="editor_diagnostic_duplicate_key" formatted="false">重複的鍵</string>
     <string name="editor_diagnostic_expected" formatted="false">期望 %s</string>
     <string name="editor_diagnostic_json_format_error" formatted="false">JSON 格式錯誤</string>
-    <string name="editor_diagnostic_json_must_start_with_object_or_array" formatted="false">JSON 必須以 {' 或 '[' 開頭{ 或 '[' 開頭 或 [' 開頭[ 開頭 開頭</string>
+    <string name="editor_diagnostic_json_must_start_with_object_or_array" formatted="false">JSON 必須以「{」或「[」開頭</string>
     <string name="editor_diagnostic_json_syntax_error" formatted="false">JSON 語法錯誤</string>
     <string name="editor_diagnostic_no_value" formatted="false">缺少值</string>
     <string name="editor_diagnostic_unknown" formatted="false">未知</string>
