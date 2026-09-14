@@ -38,19 +38,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
 import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
 import com.amamiyakokoro.box.presentation.component.Md3ELoading
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -107,8 +108,10 @@ internal fun NodeGroupCard(
             title = currentProxy?.title,
         )
     }
-    val currentNodeName = remember(currentNode.displayName, group.now) {
-        currentNode.displayName.ifBlank { group.now.trim() }.ifBlank { MLang.Proxy.Mode.Direct }
+    val direct = stringResource(LocaleR.string.proxy_mode_direct)
+    val currentNodeName = remember(currentNode.displayName, group.now, direct) {
+        currentNode.displayName.ifBlank { group.now.trim() }
+            .ifBlank { direct }
     }
     val currentDelay = remember(currentProxy) { currentProxy?.delay }
     val badge = remember(group.type) { groupBadge(group.type) }

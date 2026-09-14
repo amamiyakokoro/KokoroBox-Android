@@ -37,8 +37,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetAction
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetIconAction
@@ -50,7 +52,6 @@ import com.amamiyakokoro.box.presentation.screen.rememberProxyGroupSelectionStat
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -136,14 +137,14 @@ fun ProxySheetContent(
 
     AppActionBottomSheet(
         show = showSheet.value,
-        title = selectedGroup?.name ?: MLang.Proxy.Title,
+        title = selectedGroup?.name ?: stringResource(LocaleR.string.proxy_title),
         backgroundColor = MiuixTheme.colorScheme.surface,
         startAction = {
             if (selectedGroup != null) {
                 AppBottomSheetIconAction(
                     action = AppBottomSheetAction(
                         icon = MiuixIcons.Back,
-                        contentDescription = MLang.Component.Navigation.Back,
+                        contentDescription = stringResource(LocaleR.string.component_navigation_back),
                         onClick = groupSelection.clearSelection,
                     ),
                 )
@@ -152,7 +153,7 @@ fun ProxySheetContent(
                     AppBottomSheetIconAction(
                         action = AppBottomSheetAction(
                             icon = AppMd3Icons.Action.Sort,
-                            contentDescription = MLang.Proxy.Action.Sort,
+                            contentDescription = stringResource(LocaleR.string.proxy_action_sort),
                             onClick = { showSortPopup.value = true },
                         ),
                     )
@@ -169,7 +170,7 @@ fun ProxySheetContent(
             AppBottomSheetIconAction(
                 action = AppBottomSheetAction(
                     icon = AppMd3Icons.Action.SpeedTest,
-                    contentDescription = MLang.Proxy.Action.Test,
+                    contentDescription = stringResource(LocaleR.string.proxy_action_test),
                     onClick = {
                         if (selectedGroup == null) {
                             triggerTopDelayTest()

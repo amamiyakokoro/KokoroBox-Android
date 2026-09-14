@@ -36,11 +36,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.model.Provider
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.CenteredText
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
@@ -51,7 +53,6 @@ import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPa
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.viewmodel.ProvidersViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.Icon
@@ -68,11 +69,12 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Composable
 private fun Provider.VehicleType.localizedDisplayName(): String = when (this) {
-    Provider.VehicleType.HTTP -> MLang.Providers.VehicleType.Http
-    Provider.VehicleType.File -> MLang.Providers.VehicleType.File
-    Provider.VehicleType.Inline -> MLang.Providers.VehicleType.Inline
-    Provider.VehicleType.Compatible -> MLang.Providers.VehicleType.Compatible
+    Provider.VehicleType.HTTP -> stringResource(LocaleR.string.providers_vehicle_type_http)
+    Provider.VehicleType.File -> stringResource(LocaleR.string.providers_vehicle_type_file)
+    Provider.VehicleType.Inline -> stringResource(LocaleR.string.providers_vehicle_type_inline)
+    Provider.VehicleType.Compatible -> stringResource(LocaleR.string.providers_vehicle_type_compatible)
 }
 
 private data class ProviderSection(
@@ -113,13 +115,15 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
     val updatableProviders = remember(providers) {
         providers.filter { it.vehicleType == Provider.VehicleType.HTTP }
     }
-    val sections = remember(providers) {
+    val proxyProvidersTitle = stringResource(LocaleR.string.providers_type_proxy_providers)
+    val ruleProvidersTitle = stringResource(LocaleR.string.providers_type_rule_providers)
+    val sections = remember(providers, proxyProvidersTitle, ruleProvidersTitle) {
         val (proxyProviders, ruleProviders) = providers.partition { it.type == Provider.Type.Proxy }
         buildList {
             if (proxyProviders.isNotEmpty()) {
                 add(
                     ProviderSection(
-                        title = MLang.Providers.Type.ProxyProviders.format(proxyProviders.size),
+                        title = proxyProvidersTitle.format(proxyProviders.size),
                         providers = proxyProviders,
                     )
                 )
@@ -127,7 +131,7 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
             if (ruleProviders.isNotEmpty()) {
                 add(
                     ProviderSection(
-                        title = MLang.Providers.Type.RuleProviders.format(ruleProviders.size),
+                        title = ruleProvidersTitle.format(ruleProviders.size),
                         providers = ruleProviders,
                     )
                 )
@@ -139,7 +143,7 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(
-                title = MLang.Providers.Title,
+                title = stringResource(LocaleR.string.providers_title),
                 scrollBehavior = scrollBehavior,
                 actions = {
                     if (isRunning && updatableProviders.isNotEmpty()) {
@@ -148,7 +152,7 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
                         ) {
                             Icon(
                                 imageVector = AppMd3Icons.Action.Sync,
-                                contentDescription = MLang.Providers.Action.UpdateAll
+                                contentDescription = stringResource(LocaleR.string.providers_action_update_all)
                             )
                         }
                     }
@@ -158,13 +162,13 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
     ) { innerPadding ->
         if (!isRunning) {
             CenteredText(
-                firstLine = MLang.Providers.Empty.NotRunning,
-                secondLine = MLang.Providers.Empty.NotRunningHint
+                firstLine = stringResource(LocaleR.string.providers_empty_not_running),
+                secondLine = stringResource(LocaleR.string.providers_empty_not_running_hint)
             )
         } else if (providers.isEmpty() && !uiState.isLoading) {
             CenteredText(
-                firstLine = MLang.Providers.Empty.NoProviders,
-                secondLine = MLang.Providers.Empty.NoProvidersHint
+                firstLine = stringResource(LocaleR.string.providers_empty_no_providers),
+                secondLine = stringResource(LocaleR.string.providers_empty_no_providers_hint)
             )
         } else {
             val mainLikePadding = rememberStandalonePageMainPadding()
@@ -264,11 +268,11 @@ private fun ProviderCard(
                                 modifier = Modifier.size(UiDp.dp20),
                                 imageVector = MiuixIcons.Edit,
                                 tint = updateTint,
-                                contentDescription = MLang.Providers.Action.Operation,
+                                contentDescription = stringResource(LocaleR.string.providers_action_operation),
                             )
                             Text(
                                 modifier = Modifier.padding(end = UiDp.dp3),
-                                text = MLang.Providers.Action.Operation,
+                                text = stringResource(LocaleR.string.providers_action_operation),
                                 color = updateTint,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 15.sp
@@ -276,7 +280,10 @@ private fun ProviderCard(
                         }
                     }
 
-                    val popupItems = listOf(MLang.Providers.Action.Update, MLang.Providers.Action.Upload)
+                    val popupItems = listOf(
+                        stringResource(LocaleR.string.providers_action_update),
+                        stringResource(LocaleR.string.providers_action_upload),
+                    )
 
                     WindowListPopup  (
                         show = showPopup.value,

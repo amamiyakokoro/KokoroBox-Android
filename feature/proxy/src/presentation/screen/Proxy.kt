@@ -67,11 +67,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.core.model.TunnelState
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.ProxySortMode
 import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
@@ -88,7 +90,6 @@ import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.LocalSpacing
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -206,7 +207,7 @@ fun ProxyPager(
     Scaffold(
         topBar = {
             ProxyTopBar(
-                title = MLang.Proxy.Title,
+                title = stringResource(LocaleR.string.proxy_title),
                 scrollBehavior = groupScrollBehavior,
                 onNavigateToProviders = onNavigateToProviders,
                 onTestDelay = if (effectiveSelectedGroupName != null) onTestDelayAction else null,
@@ -283,19 +284,19 @@ private fun ProxyTopBar(
                     modifier = Modifier.padding(end = UiDp.dp12),
                     onClick = onTestDelay,
                 ) {
-                    Icon(AppMd3Icons.Action.SpeedTest, contentDescription = MLang.Proxy.Action.Test)
+                    Icon(AppMd3Icons.Action.SpeedTest, contentDescription = stringResource(LocaleR.string.proxy_action_test))
                 }
             }
             if (onNavigateToProviders != null) {
                 IconButton(onClick = onNavigateToProviders) {
-                    Icon(AppMd3Icons.Proxy.Profiles, contentDescription = MLang.Providers.Title)
+                    Icon(AppMd3Icons.Proxy.Profiles, contentDescription = stringResource(LocaleR.string.providers_title))
                 }
             }
             Box {
                 MdIconButton(onClick = { onShowSortPopupChange(true) }) {
                     MdIcon(
                         imageVector = AppMd3Icons.Action.Sort,
-                        contentDescription = MLang.Proxy.Action.Sort,
+                        contentDescription = stringResource(LocaleR.string.proxy_action_sort),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
@@ -423,8 +424,8 @@ private fun ProxySurfboardContent(
                 if (selectedGroup == null) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         CenteredText(
-                            firstLine = MLang.Proxy.Empty.NoNodes,
-                            secondLine = MLang.Proxy.Empty.Hint,
+                            firstLine = stringResource(LocaleR.string.proxy_empty_no_nodes),
+                            secondLine = stringResource(LocaleR.string.proxy_empty_hint),
                         )
                     }
                 } else {
@@ -577,10 +578,11 @@ private fun ProxyModeSelector(
 }
 }
 
+@Composable
 private fun TunnelState.Mode.displayName(): String = when (this) {
-    TunnelState.Mode.Direct -> MLang.Proxy.Mode.Direct
-    TunnelState.Mode.Global -> MLang.Proxy.Mode.Global
-    TunnelState.Mode.Rule -> MLang.Proxy.Mode.Rule
+    TunnelState.Mode.Direct -> stringResource(LocaleR.string.proxy_mode_direct)
+    TunnelState.Mode.Global -> stringResource(LocaleR.string.proxy_mode_global)
+    TunnelState.Mode.Rule -> stringResource(LocaleR.string.proxy_mode_rule)
     TunnelState.Mode.Script -> "Script"
 }
 
@@ -648,7 +650,7 @@ private fun ProxyGroupTabs(
         ) {
             Icon(
                 imageVector = AppMd3Icons.Navigation.DownAngle,
-                contentDescription = MLang.Proxy.Title,
+                contentDescription = stringResource(LocaleR.string.proxy_title),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
                     .size(UiDp.dp20)
@@ -659,7 +661,7 @@ private fun ProxyGroupTabs(
 
     AppActionBottomSheet(
         show = showAllGroups,
-        title = MLang.Proxy.Title,
+        title = stringResource(LocaleR.string.proxy_title),
         onDismissRequest = { showAllGroups = false },
         contentScrollEnabled = false,
         contentHandlesBottomInset = true,

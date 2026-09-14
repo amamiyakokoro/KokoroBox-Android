@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,12 +64,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.appPressSink
-import dev.oom_wg.purejoy.mlang.MLang
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -76,11 +77,11 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 @Composable
 internal fun nodeLatencyLabel(delay: Int?): Pair<String, Color>? = when {
     delay == null -> null
-    delay < 0 -> MLang.Proxy.Node.Timeout to AppTheme.colors.latency.timeout
+    delay < 0 -> stringResource(LocaleR.string.proxy_node_timeout) to AppTheme.colors.latency.timeout
     delay == 0 -> null
-    delay in 1..300 -> MLang.Home.NodeInfo.DelayValue.format(delay) to AppTheme.colors.latency.fast
-    delay in 301..1000 -> MLang.Home.NodeInfo.DelayValue.format(delay) to AppTheme.colors.latency.moderate
-    delay in 1001..3000 -> MLang.Home.NodeInfo.DelayValue.format(delay) to AppTheme.colors.latency.slow
+    delay in 1..300 -> stringResource(LocaleR.string.home_node_info_delay_value).format(delay) to AppTheme.colors.latency.fast
+    delay in 301..1000 -> stringResource(LocaleR.string.home_node_info_delay_value).format(delay) to AppTheme.colors.latency.moderate
+    delay in 1001..3000 -> stringResource(LocaleR.string.home_node_info_delay_value).format(delay) to AppTheme.colors.latency.slow
     else -> null
 }
 
@@ -213,7 +214,7 @@ internal fun RotatingRefreshIcon(
     isRotating: Boolean,
     modifier: Modifier = Modifier,
     tint: Color = MiuixTheme.colorScheme.primary,
-    contentDescription: String? = MLang.Proxy.Action.Test,
+    contentDescription: String? = null,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "node_delay_test_rotation")
     val rotation by infiniteTransition.animateFloat(
@@ -227,7 +228,7 @@ internal fun RotatingRefreshIcon(
 
     Icon(
         imageVector = AppMd3Icons.Action.Refresh,
-        contentDescription = contentDescription,
+        contentDescription = contentDescription ?: stringResource(LocaleR.string.proxy_action_test),
         tint = tint,
         modifier = if (isRotating) modifier.rotate(rotation) else modifier,
     )
@@ -374,7 +375,7 @@ internal fun NodeCard(
                         } else {
                             Icon(
                                 imageVector = AppMd3Icons.Proxy.CloudTest,
-                                contentDescription = MLang.Proxy.Action.Test,
+                                contentDescription = stringResource(LocaleR.string.proxy_action_test),
                                 tint = palette.supportingColor,
                                 modifier = Modifier
                                     .size(spacing.space18)
