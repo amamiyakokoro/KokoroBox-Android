@@ -21,7 +21,7 @@ case "$CHOICE" in
     ;;
   meta|Meta)
     REPO_URL="https://github.com/MetaCubeX/mihomo.git"
-    BRANCH_NAME="v1.19.30"
+    BRANCH_NAME="v1.19.31"
     VERSION_SUFFIX=""
     ;;
   smart|Smart)
