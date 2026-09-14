@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_app_description" formatted="false">基於 Mihomo 的 Material You Android 代理用戶端</string>
-    <string name="about_app_version_failed" formatted="false">Failed to load</string>
-    <string name="about_app_version_loading" formatted="false">Loading...</string>
+    <string name="about_app_version_failed" formatted="false">載入失敗</string>
+    <string name="about_app_version_loading" formatted="false">載入中...</string>
     <string name="about_copyright" formatted="false">© 2026 KokoroBox 貢獻者</string>
-    <string name="about_license_agpl_description" formatted="false">This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License.</string>
+    <string name="about_license_agpl_description" formatted="false">本程式是自由軟體：您可以依照 GNU Affero 通用公共授權條款的規定重新散布和/或修改本程式。</string>
     <string name="about_license_agpl_name" formatted="false">GNU Affero General Public License v3.0</string>
     <string name="about_license_check_update" formatted="false">檢查更新</string>
     <string name="about_license_check_update_summary" formatted="false">手動檢查 GitHub Release 更新</string>
     <string name="about_license_libraries" formatted="false">引用庫</string>
-    <string name="about_license_libraries_summary" formatted="false">View all third-party libraries used in this app</string>
+    <string name="about_license_libraries_summary" formatted="false">查看本應用程式使用的所有第三方引用庫</string>
     <string name="about_section_license" formatted="false">許可證</string>
     <string name="about_section_project_links" formatted="false">專案連結</string>
     <string name="about_title" formatted="false">關於</string>

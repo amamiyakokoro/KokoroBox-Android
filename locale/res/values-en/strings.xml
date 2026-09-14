@@ -20,7 +20,7 @@
     <string name="about_update_download" formatted="false">Download APK</string>
     <string name="about_update_downloading" formatted="false">Downloading update…</string>
     <string name="about_update_in_app_download" formatted="false">Download and update</string>
-    <string name="about_update_in_app_download_summary" formatted="false">The APK will be downloaded, verified, and handed to Androids installer.s installer.</string>
+    <string name="about_update_in_app_download_summary" formatted="false">The APK will be downloaded, verified, and handed to Android’s package installer.</string>
     <string name="about_update_install_permission_required" formatted="false">Allow KokoroBox to install updates, then continue.</string>
     <string name="about_update_installed" formatted="false">Update installation completed.</string>
     <string name="about_update_invalid_response" formatted="false">GitHub returned unsupported release information. Please try again later.</string>
@@ -119,7 +119,7 @@
     <string name="app_settings_behavior_update_channel_title" formatted="false">Update Channel</string>
     <string name="app_settings_behavior_update_install_method_root" formatted="false">Root</string>
     <string name="app_settings_behavior_update_install_method_shizuku" formatted="false">Shizuku</string>
-    <string name="app_settings_behavior_update_install_method_summary" formatted="false">Advanced: System is recommended. Shizuku and Root bypass Androids install confirmation.s install confirmation.</string>
+    <string name="app_settings_behavior_update_install_method_summary" formatted="false">Advanced: System installation is recommended. Shizuku and Root may bypass Android’s installation confirmation.</string>
     <string name="app_settings_behavior_update_install_method_system" formatted="false">System</string>
     <string name="app_settings_behavior_update_install_method_title" formatted="false">Update Installation Method</string>
     <string name="app_settings_button_apply" formatted="false">Apply</string>
@@ -127,8 +127,8 @@
     <string name="app_settings_experimental_acg_home_title" formatted="false">ACG Experimental Home</string>
     <string name="app_settings_experimental_acg_sidebar_expanded_summary" formatted="false">Open the left info sidebar by default on the ACG home page</string>
     <string name="app_settings_experimental_acg_sidebar_expanded_title" formatted="false">Expand ACG Sidebar by Default</string>
-    <string name="app_settings_experimental_health_check_concurrency_summary" formatted="false">当前选项：%s</string>
-    <string name="app_settings_experimental_health_check_concurrency_title" formatted="false">测速并发数</string>
+    <string name="app_settings_experimental_health_check_concurrency_summary" formatted="false">Current option: %s</string>
+    <string name="app_settings_experimental_health_check_concurrency_title" formatted="false">Health Check Concurrency</string>
     <string name="app_settings_experimental_reset_wallpaper_success" formatted="false">Default wallpaper restored</string>
     <string name="app_settings_experimental_reset_wallpaper_summary" formatted="false">Restore the built-in default wallpaper and reset crop position and wallpaper color seed</string>
     <string name="app_settings_experimental_reset_wallpaper_title" formatted="false">Reset ACG Wallpaper</string>
@@ -1156,7 +1156,7 @@
     <string name="providers_empty_no_providers_hint" formatted="false">Current profile doesnt contain external resourcest contain external resources</string>
     <string name="providers_empty_not_running" formatted="false">Proxy not running</string>
     <string name="providers_empty_not_running_hint" formatted="false">Please start proxy service to view external resources</string>
-    <string name="providers_info_summary" formatted="false">Geo assets and shared runtime files live in: %s. Rule and proxy providers are always written into the active profiles private directory.s private directory.</string>
+    <string name="providers_info_summary" formatted="false">Geo assets and shared runtime files live in: %s. Rule and proxy providers are always written into the active profile’s private directory.</string>
     <string name="providers_info_title" formatted="false">Core Directory</string>
     <string name="providers_message_all_updated" formatted="false">All updated</string>
     <string name="providers_message_fetch_failed" formatted="false">Failed to fetch resources: %s</string>
@@ -1273,7 +1273,7 @@
     <string name="traffic_statistics_section_empty_apps" formatted="false">No app traffic statistics</string>
     <string name="traffic_statistics_section_top_apps" formatted="false">Top Apps</string>
     <string name="traffic_statistics_section_traffic" formatted="false">Traffic</string>
-    <string name="traffic_statistics_summary_today_traffic" formatted="false">Todays Traffics Traffic</string>
+    <string name="traffic_statistics_summary_today_traffic" formatted="false">Today’s Traffic</string>
     <string name="traffic_statistics_summary_week_traffic" formatted="false">This Weeks Traffics Traffic</string>
     <string name="traffic_statistics_time_range_today" formatted="false">Today</string>
     <string name="traffic_statistics_time_range_week" formatted="false">This Week</string>
