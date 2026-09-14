@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.amamiyakokoro.box.runtime.service.R as ServiceR
 import dev.oom_wg.purejoy.mlang.MLang
 
 /** Delivers a deferred PackageInstaller confirmation through an explicit user notification. */
@@ -26,7 +27,7 @@ class AppUpdateInstallNotifier(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
         )
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(context.applicationInfo.icon)
+            .setSmallIcon(ServiceR.drawable.ic_notification_furin)
             .setContentTitle(MLang.About.License.CheckUpdate)
             .setContentText(MLang.About.Update.WaitingForInstallConfirmation)
             .setStyle(
@@ -54,7 +55,7 @@ class AppUpdateInstallNotifier(
         NotificationManagerCompat.from(context).notify(
             NOTIFICATION_ID + 1,
             NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(context.applicationInfo.icon)
+                .setSmallIcon(ServiceR.drawable.ic_notification_furin)
                 .setContentTitle("${MLang.About.Update.Available}: $tag")
                 .setContentText(MLang.About.License.CheckUpdateSummary)
                 .setContentIntent(contentIntent)
