@@ -36,11 +36,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.amamiyakokoro.box.common.util.VpnUtils
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.model.RootTunDnsMode
 import com.amamiyakokoro.box.data.model.AccessControlMode
 import com.amamiyakokoro.box.data.model.ProxyMode
@@ -62,7 +64,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AccessControlScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -78,6 +79,7 @@ fun NetworkSettingsScreen(
     val accessControlMode by viewModel.accessControlMode.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val vpnDenied = stringResource(LocaleR.string.network_settings_error_vpn_denied)
 
     LaunchedEffect(viewModel, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -93,14 +95,14 @@ fun NetworkSettingsScreen(
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             viewModel.onProxyModeChange(ProxyMode.Tun)
         } else {
-            context.toast(MLang.NetworkSettings.Error.VpnDenied)
+            context.toast(vpnDenied)
         }
     }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            TopBar(title = MLang.NetworkSettings.Title)
+            TopBar(title = stringResource(LocaleR.string.network_settings_title))
         },
     ) { innerPadding ->
         val mainLikePadding = rememberStandalonePageMainPadding()
@@ -145,16 +147,16 @@ private fun NetworkVpnServiceSection(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    Title(MLang.NetworkSettings.Section.VpnService)
+    Title(stringResource(LocaleR.string.network_settings_section_vpn_service))
     Card {
         PreferenceEnumItem(
-            title = MLang.NetworkSettings.VpnService.RouteTrafficTitle,
-            summary = MLang.NetworkSettings.VpnService.RouteTrafficSummary,
+            title = stringResource(LocaleR.string.network_settings_vpn_service_route_traffic_title),
+            summary = stringResource(LocaleR.string.network_settings_vpn_service_route_traffic_summary),
             currentValue = configuredMode,
             items = listOf(
-                MLang.NetworkSettings.VpnService.SystemProxy,
-                MLang.NetworkSettings.VpnService.VpnMode,
-                MLang.NetworkSettings.VpnService.RootTunMode,
+                stringResource(LocaleR.string.network_settings_vpn_service_system_proxy),
+                stringResource(LocaleR.string.network_settings_vpn_service_vpn_mode),
+                stringResource(LocaleR.string.network_settings_vpn_service_root_tun_mode),
             ),
             values = listOf(
                 ProxyMode.Http,
@@ -210,7 +212,7 @@ private fun NetworkServiceOptionsSection(
         )
     }
 
-    Title(MLang.NetworkSettings.Section.VpnOptions)
+    Title(stringResource(LocaleR.string.network_settings_section_vpn_options))
     Card {
         when (uiState.configuredMode) {
             ProxyMode.Tun -> {
@@ -260,24 +262,24 @@ private fun NetworkProxyOptionsSection(
     showAccessControlMode: Boolean,
     onAccessControlModeChange: (AccessControlMode) -> Unit,
 ) {
-    Title(MLang.NetworkSettings.Section.ProxyOptions)
+    Title(stringResource(LocaleR.string.network_settings_section_proxy_options))
     Card {
         if (showAccessControlMode) {
             PreferenceEnumItem(
-                title = MLang.NetworkSettings.ProxyOptions.AccessControlModeTitle,
+                title = stringResource(LocaleR.string.network_settings_proxy_options_access_control_mode_title),
                 currentValue = accessControlMode,
                 items = listOf(
-                    MLang.NetworkSettings.ProxyOptions.AllowAll,
-                    MLang.NetworkSettings.ProxyOptions.AllowSelected,
-                    MLang.NetworkSettings.ProxyOptions.RejectSelected,
+                    stringResource(LocaleR.string.network_settings_proxy_options_allow_all),
+                    stringResource(LocaleR.string.network_settings_proxy_options_allow_selected),
+                    stringResource(LocaleR.string.network_settings_proxy_options_reject_selected),
                 ),
                 values = AccessControlMode.entries,
                 onValueChange = onAccessControlModeChange,
             )
         }
         PreferenceArrowItem(
-            title = MLang.NetworkSettings.ProxyOptions.ManageAccessControlTitle,
-            summary = MLang.NetworkSettings.ProxyOptions.ManageAccessControlSummary,
+            title = stringResource(LocaleR.string.network_settings_proxy_options_manage_access_control_title),
+            summary = stringResource(LocaleR.string.network_settings_proxy_options_manage_access_control_summary),
             onClick = {
                 navigator.navigate(AccessControlScreenDestination)
             },
@@ -288,16 +290,16 @@ private fun NetworkProxyOptionsSection(
 @Composable
 private fun NetworkHttpSettingsSection(viewModel: NetworkSettingsViewModel) {
     val customUserAgent by viewModel.customUserAgent.state.collectAsStateWithLifecycle()
-    val customUserAgentSummary = remember(customUserAgent) {
-        customUserAgent.ifEmpty { MLang.NetworkSettings.Network.CustomUserAgentSummaryDefault }
+    val customUserAgentSummary = customUserAgent.ifEmpty {
+        stringResource(LocaleR.string.network_settings_network_custom_user_agent_summary_default)
     }
     val showEditUserAgent = remember { mutableStateOf(false) }
     val userAgentTextField = remember { mutableStateOf(TextFieldValue()) }
 
-    Title(MLang.NetworkSettings.Section.Network)
+    Title(stringResource(LocaleR.string.network_settings_section_network))
     Card {
         PreferenceValueItem(
-            title = MLang.NetworkSettings.Network.CustomUserAgentTitle,
+            title = stringResource(LocaleR.string.network_settings_network_custom_user_agent_title),
             summary = customUserAgentSummary,
             onClick = {
                 userAgentTextField.value = TextFieldValue(customUserAgent)
@@ -308,7 +310,7 @@ private fun NetworkHttpSettingsSection(viewModel: NetworkSettingsViewModel) {
 
     TextEditBottomSheet(
         show = showEditUserAgent,
-        title = MLang.NetworkSettings.Network.UserAgentDialogTitle,
+        title = stringResource(LocaleR.string.network_settings_network_user_agent_dialog_title),
         textFieldValue = userAgentTextField,
         onConfirm = viewModel::applyCustomUserAgent,
     )
@@ -318,11 +320,11 @@ private fun NetworkHttpSettingsSection(viewModel: NetworkSettingsViewModel) {
 private fun NetworkExperimentalSettingsSection(viewModel: NetworkSettingsViewModel) {
     val antiPollutionDns by viewModel.antiPollutionDns.state.collectAsStateWithLifecycle()
 
-    Title(MLang.NetworkSettings.Section.Experimental)
+    Title(stringResource(LocaleR.string.network_settings_section_experimental))
     Card {
         PreferenceSwitchItem(
-            title = MLang.NetworkSettings.Experimental.AntiPollutionDnsTitle,
-            summary = MLang.NetworkSettings.Experimental.AntiPollutionDnsSummary,
+            title = stringResource(LocaleR.string.network_settings_experimental_anti_pollution_dns_title),
+            summary = stringResource(LocaleR.string.network_settings_experimental_anti_pollution_dns_summary),
             checked = antiPollutionDns,
             onCheckedChange = viewModel::onAntiPollutionDnsChange,
         )
@@ -339,14 +341,14 @@ private fun TunServiceOptions(
         actions = actions.common,
         extraOptions = {
             PreferenceSwitchItem(
-                title = MLang.NetworkSettings.VpnOptions.AllowBypassTitle,
-                summary = MLang.NetworkSettings.VpnOptions.AllowBypassSummary,
+                title = stringResource(LocaleR.string.network_settings_vpn_options_allow_bypass_title),
+                summary = stringResource(LocaleR.string.network_settings_vpn_options_allow_bypass_summary),
                 checked = state.allowBypass,
                 onCheckedChange = actions.onAllowBypassChange,
             )
             PreferenceSwitchItem(
-                title = MLang.NetworkSettings.VpnOptions.SystemProxyTitle,
-                summary = MLang.NetworkSettings.VpnOptions.SystemProxySummary,
+                title = stringResource(LocaleR.string.network_settings_vpn_options_system_proxy_title),
+                summary = stringResource(LocaleR.string.network_settings_vpn_options_system_proxy_summary),
                 checked = state.systemProxy,
                 onCheckedChange = actions.onSystemProxyChange,
             )
@@ -421,13 +423,13 @@ private fun RootTunIdentityOptions(
     onEditMtu: () -> Unit,
 ) {
     PreferenceArrowItem(
-        title = MLang.NetworkSettings.RootTun.IfNameTitle,
-        summary = rootTunIfNameDraft.ifBlank { MLang.NetworkSettings.RootTun.IfNameSummary },
+        title = stringResource(LocaleR.string.network_settings_root_tun_if_name_title),
+        summary = rootTunIfNameDraft.ifBlank { stringResource(LocaleR.string.network_settings_root_tun_if_name_summary) },
         onClick = onEditIfName,
     )
     PreferenceArrowItem(
-        title = MLang.NetworkSettings.RootTun.MtuTitle,
-        summary = rootTunMtuDraft.ifBlank { MLang.NetworkSettings.RootTun.MtuSummary },
+        title = stringResource(LocaleR.string.network_settings_root_tun_mtu_title),
+        summary = rootTunMtuDraft.ifBlank { stringResource(LocaleR.string.network_settings_root_tun_mtu_summary) },
         onClick = onEditMtu,
     )
 }
@@ -444,30 +446,30 @@ private fun RootTunRoutingOptions(
     onRootTunDnsModeChange: (RootTunDnsMode) -> Unit,
 ) {
     PreferenceSwitchItem(
-        title = MLang.NetworkSettings.RootTun.AutoRouteTitle,
-        summary = MLang.NetworkSettings.RootTun.AutoRouteSummary,
+        title = stringResource(LocaleR.string.network_settings_root_tun_auto_route_title),
+        summary = stringResource(LocaleR.string.network_settings_root_tun_auto_route_summary),
         checked = rootTunAutoRoute,
         onCheckedChange = onRootTunAutoRouteChange,
     )
     PreferenceSwitchItem(
-        title = MLang.NetworkSettings.RootTun.StrictRouteTitle,
-        summary = MLang.NetworkSettings.RootTun.StrictRouteSummary,
+        title = stringResource(LocaleR.string.network_settings_root_tun_strict_route_title),
+        summary = stringResource(LocaleR.string.network_settings_root_tun_strict_route_summary),
         checked = rootTunStrictRoute,
         onCheckedChange = onRootTunStrictRouteChange,
     )
     PreferenceSwitchItem(
-        title = MLang.NetworkSettings.RootTun.AutoRedirectTitle,
-        summary = MLang.NetworkSettings.RootTun.AutoRedirectSummary,
+        title = stringResource(LocaleR.string.network_settings_root_tun_auto_redirect_title),
+        summary = stringResource(LocaleR.string.network_settings_root_tun_auto_redirect_summary),
         checked = rootTunAutoRedirect,
         onCheckedChange = onRootTunAutoRedirectChange,
     )
     PreferenceEnumItem(
-        title = MLang.NetworkSettings.RootTun.DnsModeTitle,
-        summary = MLang.NetworkSettings.RootTun.DnsModeSummary,
+        title = stringResource(LocaleR.string.network_settings_root_tun_dns_mode_title),
+        summary = stringResource(LocaleR.string.network_settings_root_tun_dns_mode_summary),
         currentValue = rootTunDnsMode,
         items = listOf(
-            MLang.NetworkSettings.RootTun.DnsModeRedirHost,
-            MLang.NetworkSettings.RootTun.DnsModeFakeIp,
+            stringResource(LocaleR.string.network_settings_root_tun_dns_mode_redir_host),
+            stringResource(LocaleR.string.network_settings_root_tun_dns_mode_fake_ip),
         ),
         values = RootTunDnsMode.entries,
         onValueChange = onRootTunDnsModeChange,
@@ -489,13 +491,13 @@ private fun RootTunFakeIpOptions(
     ) {
         Column {
             PreferenceArrowItem(
-                title = MLang.NetworkSettings.RootTun.FakeIpRangeTitle,
-                summary = rootTunFakeIpRangeDraft.ifBlank { MLang.NetworkSettings.RootTun.FakeIpRangeSummary },
+                title = stringResource(LocaleR.string.network_settings_root_tun_fake_ip_range_title),
+                summary = rootTunFakeIpRangeDraft.ifBlank { stringResource(LocaleR.string.network_settings_root_tun_fake_ip_range_summary) },
                 onClick = onEditFakeIpRange,
             )
             PreferenceArrowItem(
-                title = MLang.NetworkSettings.RootTun.FakeIpRange6Title,
-                summary = rootTunFakeIpRange6Draft.ifBlank { MLang.NetworkSettings.RootTun.FakeIpRange6Summary },
+                title = stringResource(LocaleR.string.network_settings_root_tun_fake_ip_range6_title),
+                summary = rootTunFakeIpRange6Draft.ifBlank { stringResource(LocaleR.string.network_settings_root_tun_fake_ip_range6_summary) },
                 onClick = onEditFakeIpRange6,
             )
         }
@@ -511,7 +513,7 @@ private fun RootTunEditDialogs(
 ) {
     when (editDialog) {
         RootTunEditDialogState.IfName -> RootTunTextEditDialog(
-            title = MLang.NetworkSettings.RootTun.IfNameTitle,
+            title = stringResource(LocaleR.string.network_settings_root_tun_if_name_title),
             value = state.rootTunIfNameDraft,
             onValueChange = actions.onRootTunIfNameDraftChange,
             onDismiss = onDismiss,
@@ -519,7 +521,7 @@ private fun RootTunEditDialogs(
         )
 
         RootTunEditDialogState.Mtu -> RootTunTextEditDialog(
-            title = MLang.NetworkSettings.RootTun.MtuTitle,
+            title = stringResource(LocaleR.string.network_settings_root_tun_mtu_title),
             value = state.rootTunMtuDraft,
             onValueChange = actions.onRootTunMtuDraftChange,
             onDismiss = onDismiss,
@@ -531,7 +533,7 @@ private fun RootTunEditDialogs(
         )
 
         RootTunEditDialogState.FakeIpRange -> RootTunTextEditDialog(
-            title = MLang.NetworkSettings.RootTun.FakeIpRangeTitle,
+            title = stringResource(LocaleR.string.network_settings_root_tun_fake_ip_range_title),
             value = state.rootTunFakeIpRangeDraft,
             onValueChange = actions.onRootTunFakeIpRangeDraftChange,
             onDismiss = onDismiss,
@@ -539,7 +541,7 @@ private fun RootTunEditDialogs(
         )
 
         RootTunEditDialogState.FakeIpRange6 -> RootTunTextEditDialog(
-            title = MLang.NetworkSettings.RootTun.FakeIpRange6Title,
+            title = stringResource(LocaleR.string.network_settings_root_tun_fake_ip_range6_title),
             value = state.rootTunFakeIpRange6Draft,
             onValueChange = actions.onRootTunFakeIpRange6DraftChange,
             onDismiss = onDismiss,
@@ -558,25 +560,25 @@ private fun CommonTunServiceOptions(
 ) {
     Column {
         PreferenceSwitchItem(
-            title = MLang.NetworkSettings.VpnOptions.BypassPrivateTitle,
-            summary = MLang.NetworkSettings.VpnOptions.BypassPrivateSummary,
+            title = stringResource(LocaleR.string.network_settings_vpn_options_bypass_private_title),
+            summary = stringResource(LocaleR.string.network_settings_vpn_options_bypass_private_summary),
             checked = state.bypassPrivateNetwork,
             onCheckedChange = actions.onBypassPrivateNetworkChange,
         )
         PreferenceSwitchItem(
-            title = MLang.NetworkSettings.VpnOptions.DnsHijackTitle,
-            summary = MLang.NetworkSettings.VpnOptions.DnsHijackSummary,
+            title = stringResource(LocaleR.string.network_settings_vpn_options_dns_hijack_title),
+            summary = stringResource(LocaleR.string.network_settings_vpn_options_dns_hijack_summary),
             checked = state.dnsHijack,
             onCheckedChange = actions.onDnsHijackChange,
         )
         PreferenceSwitchItem(
-            title = MLang.NetworkSettings.VpnOptions.EnableIpv6Title,
-            summary = MLang.NetworkSettings.VpnOptions.EnableIpv6Summary,
+            title = stringResource(LocaleR.string.network_settings_vpn_options_enable_ipv6_title),
+            summary = stringResource(LocaleR.string.network_settings_vpn_options_enable_ipv6_summary),
             checked = state.enableIPv6,
             onCheckedChange = actions.onEnableIPv6Change,
         )
         PreferenceEnumItem(
-            title = MLang.NetworkSettings.ProxyOptions.TunStackTitle,
+            title = stringResource(LocaleR.string.network_settings_proxy_options_tun_stack_title),
             currentValue = state.tunStack,
             items = listOf("System", "GVisor", "Mixed"),
             values = TunStack.entries,
