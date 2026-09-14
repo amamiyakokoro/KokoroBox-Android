@@ -27,6 +27,8 @@ import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.presentation.AndroidContractStateViewModel
 import com.amamiyakokoro.box.core.presentation.LoadableState
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.core.util.AutoStartSessionGate
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
@@ -44,7 +46,6 @@ import com.amamiyakokoro.box.runtime.client.RuntimeStateMapper
 import com.amamiyakokoro.box.service.root.RootAccessSupport
 import com.amamiyakokoro.box.service.runtime.entity.Profile
 import com.amamiyakokoro.box.service.runtime.state.RuntimePhase
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -203,8 +204,8 @@ class HomeViewModel(
                     _uiState.update {
                         it.copy(
                             isStartingProxy = state == HomeProxyControlState.Connecting,
-                            loadingProgress = if (state == HomeProxyControlState.Connecting) {
-                                MLang.Home.Message.Preparing
+                            loadingProgressText = if (state == HomeProxyControlState.Connecting) {
+                                UiText.Resource(LocaleR.string.home_message_preparing)
                             } else {
                                 null
                             },
@@ -275,7 +276,7 @@ class HomeViewModel(
                 .distinctUntilChanged()
                 .collect { (phase, lastError, _) ->
                     if (phase == RuntimePhase.Failed && !lastError.isNullOrBlank()) {
-                        showError(lastError)
+                        showError(UiText.Dynamic(lastError))
                     }
                 }
         }
@@ -323,18 +324,23 @@ class HomeViewModel(
 
             val activeProfile = profilesRepository.queryActiveProfile()
             if (activeProfile == null) {
-                showError(MLang.Home.Message.ConfigSwitchFailed.format(MLang.ProfilesVM.Error.ProfileNotExist))
+                showError(
+                    UiText.Resource(
+                        LocaleR.string.home_message_config_switch_failed,
+                        listOf(UiText.Resource(LocaleR.string.profiles_vm_error_profile_not_exist)),
+                    ),
+                )
                 return
             }
 
             profilesRepository.updateProfile(activeProfile.uuid)
 
             profilesRepository.setActiveProfile(activeProfile.uuid)
-            showMessage(MLang.Home.Message.ConfigSwitched)
+            showMessage(UiText.Resource(LocaleR.string.home_message_config_switched))
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             Timber.e(e, "Failed to reload profile")
-            showError(MLang.Home.Message.ConfigSwitchFailed.format(e.message))
+            showError(UiText.Resource(LocaleR.string.home_message_config_switch_failed, listOf(e.message.orEmpty())))
         } finally {
             applyLoading(false)
         }
@@ -349,9 +355,9 @@ class HomeViewModel(
         if (currentControlState != HomeProxyControlState.Idle) {
             showMessage(
                 if (_pendingTransition.value == PendingTransition.AwaitingPermission) {
-                    MLang.Home.Message.WaitingForVpnPermission
+                    UiText.Resource(LocaleR.string.home_message_waiting_for_vpn_permission)
                 } else {
-                    MLang.Home.Message.ControlBusy.format(currentControlState.label)
+                    UiText.Resource(LocaleR.string.home_message_control_busy, listOf(currentControlState.label))
                 },
             )
             return
@@ -371,21 +377,21 @@ class HomeViewModel(
 
     fun startCurrentOrRecommendedProxy() {
         if (!profilesLoaded.value) {
-            showMessage(MLang.Home.Control.HintProfilesLoading)
+            showMessage(UiText.Resource(LocaleR.string.home_control_hint_profiles_loading))
             return
         }
 
         val targetProfile = recommendedProfile.value
         when {
             profiles.value.isEmpty() -> {
-                showMessage(MLang.Home.Control.HintAddProfile)
+                showMessage(UiText.Resource(LocaleR.string.home_control_hint_add_profile))
                 return
             }
 
             targetProfile == null || profiles.value.none { profile ->
                 profile.uuid == targetProfile.uuid && profile.active
             } -> {
-                showMessage(MLang.Home.Control.HintEnableProfile)
+                showMessage(UiText.Resource(LocaleR.string.home_control_hint_enable_profile))
                 return
             }
         }
@@ -422,7 +428,12 @@ class HomeViewModel(
         clearPendingStart()
         _pendingTransition.value = PendingTransition.None
         Timber.e(error, "Failed to launch VPN permission request")
-        showError(MLang.Home.Message.StartFailed.format(error.message ?: "VPN permission request failed"))
+        showError(
+            UiText.Resource(
+                LocaleR.string.home_message_start_failed,
+                listOf(error.message ?: "VPN permission request failed"),
+            ),
+        )
     }
 
     suspend fun stopProxy() {
@@ -439,7 +450,7 @@ class HomeViewModel(
             if (e is CancellationException) throw e
             _pendingTransition.value = PendingTransition.None
             Timber.e(e, "Failed to stop proxy")
-            showError(MLang.Home.Message.StopFailed.format(e.message))
+            showError(UiText.Resource(LocaleR.string.home_message_stop_failed, listOf(e.message.orEmpty())))
         }
     }
 
@@ -475,10 +486,18 @@ class HomeViewModel(
     }
 
     private fun applyLoading(loading: Boolean) = super.setLoading(loading)
-    private fun showMessage(message: String) = postMessage(message, HomeUiEffect.ShowMessage(message))
-    private fun showError(error: String) = postError(error, HomeUiEffect.ShowError(error))
-    fun consumeMessage() = clearMessageState()
-    fun consumeError() = clearErrorState()
+    private fun showMessage(message: UiText) {
+        updateState { it.copy(messageText = message, message = null) }
+        tryEmitEffect(HomeUiEffect.ShowMessage(message))
+    }
+
+    private fun showError(error: UiText) {
+        updateState { it.copy(errorText = error, error = null, isLoading = false) }
+        tryEmitEffect(HomeUiEffect.ShowError(error))
+    }
+
+    fun consumeMessage() = updateState { it.copy(message = null, messageText = null) }
+    fun consumeError() = updateState { it.copy(error = null, errorText = null) }
 
     private suspend fun startProxyInternal(request: PendingStartRequest) {
         val startedAt = System.currentTimeMillis()
@@ -491,7 +510,7 @@ class HomeViewModel(
                 if (!rootStatus.canStartRootTun) {
                     clearPendingStart()
                     _pendingTransition.value = PendingTransition.None
-                    showError(rootStatus.rootTunBlockedMessage(getApplication()))
+                    showError(UiText.Dynamic(rootStatus.rootTunBlockedMessage(getApplication())))
                     return
                 }
             }
@@ -515,7 +534,7 @@ class HomeViewModel(
             clearPendingStart()
             _pendingTransition.value = PendingTransition.None
             Timber.e(e, "Failed to start proxy")
-            showError(MLang.Home.Message.StartFailed.format(e.message))
+            showError(UiText.Resource(LocaleR.string.home_message_start_failed, listOf(e.message.orEmpty())))
         }
     }
 
@@ -523,12 +542,12 @@ class HomeViewModel(
         pendingStartRequest = null
     }
 
-    private val HomeProxyControlState.label: String
+    private val HomeProxyControlState.label: UiText
         get() = when (this) {
-            HomeProxyControlState.Idle -> MLang.Home.Status.TapToStart
-            HomeProxyControlState.Connecting -> MLang.Home.Status.Connecting
-            HomeProxyControlState.Running -> MLang.Home.Status.Running
-            HomeProxyControlState.Disconnecting -> MLang.Home.Status.Disconnecting
+            HomeProxyControlState.Idle -> UiText.Resource(LocaleR.string.home_status_tap_to_start)
+            HomeProxyControlState.Connecting -> UiText.Resource(LocaleR.string.home_status_connecting)
+            HomeProxyControlState.Running -> UiText.Resource(LocaleR.string.home_status_running)
+            HomeProxyControlState.Disconnecting -> UiText.Resource(LocaleR.string.home_status_disconnecting)
         }
 
     private fun resolveControlState(
@@ -564,9 +583,11 @@ class HomeViewModel(
     data class HomeUiState(
         override val isLoading: Boolean = false,
         val isStartingProxy: Boolean = false,
-        val loadingProgress: String? = null,
+        val loadingProgressText: UiText? = null,
         override val message: String? = null,
-        override val error: String? = null
+        override val error: String? = null,
+        val messageText: UiText? = null,
+        val errorText: UiText? = null,
     ) : LoadableState<HomeUiState> {
         override fun withLoading(loading: Boolean): HomeUiState = copy(isLoading = loading)
         override fun withError(error: String?): HomeUiState = copy(error = error)
@@ -574,7 +595,7 @@ class HomeViewModel(
     }
 
     sealed interface HomeUiEffect {
-        data class ShowMessage(val message: String) : HomeUiEffect
-        data class ShowError(val message: String) : HomeUiEffect
+        data class ShowMessage(val message: UiText) : HomeUiEffect
+        data class ShowError(val message: UiText) : HomeUiEffect
     }
 }

@@ -52,6 +52,7 @@ import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.resolve
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -96,16 +97,16 @@ fun HomePager(
         onPauseOrDispose { }
     }
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            context.toast(it, Toast.LENGTH_LONG, copyable = true)
+    LaunchedEffect(uiState.errorText) {
+        uiState.errorText?.let {
+            context.toast(it.resolve(context.resources), Toast.LENGTH_LONG, copyable = true)
             homeViewModel.consumeError()
         }
     }
 
-    LaunchedEffect(uiState.message) {
-        uiState.message?.let {
-            context.toast(it, Toast.LENGTH_SHORT)
+    LaunchedEffect(uiState.messageText) {
+        uiState.messageText?.let {
+            context.toast(it.resolve(context.resources), Toast.LENGTH_SHORT)
             homeViewModel.consumeMessage()
         }
     }
