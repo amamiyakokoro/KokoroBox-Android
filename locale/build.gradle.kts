@@ -188,7 +188,6 @@ android {
             kotlin.directories.apply {
                 clear()
                 add("src")
-                add("build/generated/fytxt/kotlin/commonMain/kotlin")
             }
         }
     }
@@ -202,12 +201,4 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:${gropify.dep.version.composeBom}")
     implementation(composeBom)
     implementation("androidx.compose.runtime:runtime")
-}
-
-tasks.matching { it.name.startsWith("compile") && it.name.endsWith("Kotlin") }.configureEach {
-    dependsOn(generateFYTxt)
-}
-
-tasks.matching { it.name == "preBuild" }.configureEach {
-    dependsOn(generateFYTxt)
 }
