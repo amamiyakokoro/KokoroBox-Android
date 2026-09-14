@@ -37,9 +37,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.R
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
@@ -53,7 +55,6 @@ import com.mikepenz.aboutlibraries.ui.compose.util.strippedLicenseContent
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 
 private data class LibraryDisplayGroup(
     val primary: Library,
@@ -102,7 +103,7 @@ fun OpenSourceLicensesScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.OpenSourceLicenses.Title,
+                title = stringResource(LocaleR.string.open_source_licenses_title),
             )
         },
     ) { innerPadding ->
@@ -263,7 +264,7 @@ private fun LicenseBottomSheet(
                         insideMargin = PaddingValues(spacing.space16),
                     ) {
                         Text(
-                            text = MLang.OpenSourceLicenses.LicenseSheet.NoContent,
+                            text = stringResource(LocaleR.string.open_source_licenses_license_sheet_no_content),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

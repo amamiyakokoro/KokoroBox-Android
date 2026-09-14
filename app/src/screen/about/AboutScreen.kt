@@ -45,11 +45,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import com.amamiyakokoro.box.BuildConfig
 import com.amamiyakokoro.box.common.util.openUrl
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.Title
 import com.amamiyakokoro.box.presentation.component.combinePaddingValues
@@ -61,7 +63,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.OpenSourceLicensesScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,7 +96,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
             TopAppBar(
                 title = {
                     Text(
-                        text = MLang.About.Title,
+                        text = stringResource(LocaleR.string.about_title),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
@@ -153,19 +154,19 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                 Card {
                     YumeMd3PreferenceItem(
                         title = "KokoroBox",
-                        summary = MLang.About.App.Description,
+                        summary = stringResource(LocaleR.string.about_app_description),
                     )
                     YumeMd3PreferenceItem(
-                        title = MLang.About.License.CheckUpdate,
-                        summary = if (updateState.checking) MLang.About.Update.Checking
-                            else MLang.About.License.CheckUpdateSummary,
+                        title = stringResource(LocaleR.string.about_license_check_update),
+                        summary = if (updateState.checking) stringResource(LocaleR.string.about_update_checking)
+                            else stringResource(LocaleR.string.about_license_check_update_summary),
                         enabled = !updateState.checking,
                         onClick = updateViewModel::check,
                         trailingContent = { ChevronText() },
                     )
                 }
 
-                Title(MLang.About.Section.ProjectLinks)
+                Title(stringResource(LocaleR.string.about_section_project_links))
                 Card {
                     AboutLinkItem(
                         title = "KokoroBox",
@@ -181,17 +182,17 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     )
                 }
 
-                Title(MLang.About.Section.License)
+                Title(stringResource(LocaleR.string.about_section_license))
                 Card {
                     YumeMd3PreferenceItem(
-                        title = MLang.About.License.Libraries,
-                        summary = MLang.About.License.LibrariesSummary,
+                        title = stringResource(LocaleR.string.about_license_libraries),
+                        summary = stringResource(LocaleR.string.about_license_libraries_summary),
                         onClick = { navigator.navigate(OpenSourceLicensesScreenDestination) },
                         trailingContent = { ChevronText() },
                     )
                     YumeMd3PreferenceItem(
-                        title = MLang.About.License.AgplName,
-                        summary = MLang.About.License.AgplDescription,
+                        title = stringResource(LocaleR.string.about_license_agpl_name),
+                        summary = stringResource(LocaleR.string.about_license_agpl_description),
                         showDivider = false,
                     )
                 }
@@ -205,7 +206,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = MLang.About.Copyright,
+                        text = stringResource(LocaleR.string.about_copyright),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

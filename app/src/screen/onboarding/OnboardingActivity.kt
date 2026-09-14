@@ -37,16 +37,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.amamiyakokoro.box.data.store.AppSettingsStore
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.colorFromArgb
 import com.amamiyakokoro.box.presentation.theme.colorToArgbLong
 import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import com.amamiyakokoro.box.screen.settings.component.ThemeColorPickerSheet
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
@@ -155,9 +156,9 @@ private fun OnboardingPagerScreen(
             OnboardingStep.Permissions -> {
                 ProvisionDetailShell(
                     previewIcon = AppMd3Icons.Onboarding.Permission,
-                    title = MLang.Onboarding.Permission.Title,
-                    subtitle = MLang.Onboarding.Permission.Subtitle,
-                    primaryText = MLang.Onboarding.Navigation.Next,
+                    title = stringResource(LocaleR.string.onboarding_permission_title),
+                    subtitle = stringResource(LocaleR.string.onboarding_permission_subtitle),
+                    primaryText = stringResource(LocaleR.string.onboarding_navigation_next),
                     primaryEnabled = true,
                     onPrimaryClick = {
                         navigateTo(OnboardingStep.Terms.ordinal)
@@ -173,9 +174,9 @@ private fun OnboardingPagerScreen(
             OnboardingStep.Terms -> {
                 ProvisionDetailShell(
                     previewIcon = AppMd3Icons.Onboarding.Privacy,
-                    title = MLang.Onboarding.Privacy.Title,
-                    subtitle = MLang.Onboarding.Privacy.Subtitle,
-                    primaryText = MLang.Onboarding.Navigation.Next,
+                    title = stringResource(LocaleR.string.onboarding_privacy_title),
+                    subtitle = stringResource(LocaleR.string.onboarding_privacy_subtitle),
+                    primaryText = stringResource(LocaleR.string.onboarding_navigation_next),
                     primaryEnabled = privacyState.accepted,
                     onPrimaryClick = {
                         if (privacyState.accepted) {
@@ -199,9 +200,9 @@ private fun OnboardingPagerScreen(
             OnboardingStep.Personalize -> {
                 ProvisionDetailShell(
                     previewIcon = AppMd3Icons.Onboarding.Theme,
-                    title = MLang.Onboarding.Personalize.Title,
-                    subtitle = MLang.Onboarding.Personalize.Subtitle,
-                    primaryText = MLang.Onboarding.Navigation.Next,
+                    title = stringResource(LocaleR.string.onboarding_personalize_title),
+                    subtitle = stringResource(LocaleR.string.onboarding_personalize_subtitle),
+                    primaryText = stringResource(LocaleR.string.onboarding_navigation_next),
                     primaryEnabled = true,
                     onPrimaryClick = {
                         navigateTo(OnboardingStep.Finish.ordinal)

@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.TextLinkStyles
@@ -49,11 +50,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.screen.settings.component.ThemeColorPickerItem
 import com.amamiyakokoro.box.screen.settings.component.ThemeModeSelectorItem
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.delay
 
 @Composable
@@ -145,7 +146,7 @@ internal fun ProvisionDetailShell(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
                 SecondaryFooterAction(
-                    text = MLang.Onboarding.Navigation.Back,
+                    text = stringResource(LocaleR.string.onboarding_navigation_back),
                     onClick = onBack,
                     modifier = Modifier.weight(1f),
                 )
@@ -198,16 +199,16 @@ private fun DetailScrollableContent(
 @Composable
 internal fun PermissionContent(state: PermissionState) {
     val notificationSummary = when {
-        state.notificationGranted -> MLang.Onboarding.Permission.Common.Granted
+        state.notificationGranted -> stringResource(LocaleR.string.onboarding_permission_common_granted)
         android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU ->
-            MLang.Onboarding.Permission.Notification.SummaryNeed
-        else -> MLang.Onboarding.Permission.Notification.SummaryNotRequired
+            stringResource(LocaleR.string.onboarding_permission_notification_summary_need)
+        else -> stringResource(LocaleR.string.onboarding_permission_notification_summary_not_required)
     }
 
     DetailGroup {
         PermissionRow(
             icon = AppMd3Icons.Onboarding.Notification,
-            title = MLang.Onboarding.Permission.Notification.Title,
+            title = stringResource(LocaleR.string.onboarding_permission_notification_title),
             summary = notificationSummary,
             granted = state.notificationGranted,
             onClick = {
@@ -223,11 +224,11 @@ internal fun PermissionContent(state: PermissionState) {
         DetailDivider()
         PermissionRow(
             icon = AppMd3Icons.Onboarding.AppList,
-            title = MLang.Onboarding.Permission.AppList.Title,
+            title = stringResource(LocaleR.string.onboarding_permission_app_list_title),
             summary = if (state.appListGranted) {
-                MLang.Onboarding.Permission.Common.Granted
+                stringResource(LocaleR.string.onboarding_permission_common_granted)
             } else {
-                MLang.Onboarding.Permission.AppList.SummaryNeed
+                stringResource(LocaleR.string.onboarding_permission_app_list_summary_need)
             },
             granted = state.appListGranted,
             onClick = {
@@ -253,11 +254,22 @@ internal fun TermsContent(
         )
     }
     val linkStyles = remember(linkStyle) { TextLinkStyles(style = linkStyle) }
-    val annotatedText = remember(linkStyles, onPrivacySheetRequest) {
+    val richTextLead = stringResource(LocaleR.string.onboarding_privacy_rich_text_lead)
+    val richTextPrefix = stringResource(LocaleR.string.onboarding_privacy_rich_text_prefix)
+    val policyLink = stringResource(LocaleR.string.onboarding_privacy_policy_link)
+    val richTextSuffix = stringResource(LocaleR.string.onboarding_privacy_rich_text_suffix)
+    val annotatedText = remember(
+        linkStyles,
+        onPrivacySheetRequest,
+        richTextLead,
+        richTextPrefix,
+        policyLink,
+        richTextSuffix,
+    ) {
         buildAnnotatedString {
-            append(MLang.Onboarding.Privacy.RichTextLead)
+            append(richTextLead)
             append(" ")
-            append(MLang.Onboarding.Privacy.RichTextPrefix)
+            append(richTextPrefix)
             withLink(
                 LinkAnnotation.Clickable(
                     tag = LinkPolicyTag,
@@ -266,10 +278,10 @@ internal fun TermsContent(
                 )
             ) {
                 withStyle(linkStyle) {
-                    append(MLang.Onboarding.Privacy.PolicyLink)
+                    append(policyLink)
                 }
             }
-            append(MLang.Onboarding.Privacy.RichTextSuffix)
+            append(richTextSuffix)
         }
     }
 
@@ -300,7 +312,7 @@ internal fun TermsContent(
                     verticalArrangement = Arrangement.spacedBy(UiDp.dp4),
                 ) {
                     Text(
-                        text = MLang.Onboarding.Privacy.Accept.Title,
+                        text = stringResource(LocaleR.string.onboarding_privacy_accept_title),
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -350,8 +362,8 @@ internal fun FinishHeroShell(
         Spacer(modifier = Modifier.height(UiDp.dp32))
 
         DetailHeadline(
-            title = MLang.Onboarding.Finish.Title,
-            subtitle = MLang.Onboarding.Finish.Subtitle,
+            title = stringResource(LocaleR.string.onboarding_finish_title),
+            subtitle = stringResource(LocaleR.string.onboarding_finish_subtitle),
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -361,7 +373,7 @@ internal fun FinishHeroShell(
             offsetY = (-36).dp,
         ) {
             PrimaryFooterAction(
-                text = MLang.Onboarding.Navigation.Enter,
+                text = stringResource(LocaleR.string.onboarding_navigation_enter),
                 enabled = enabled,
                 onClick = onPrimaryClick,
                 modifier = Modifier.fillMaxWidth(),

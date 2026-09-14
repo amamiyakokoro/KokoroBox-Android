@@ -2,6 +2,7 @@ package com.amamiyakokoro.box.screen.about
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
@@ -15,14 +16,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.BuildConfig
 import com.amamiyakokoro.box.common.util.openUrl
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
 import com.amamiyakokoro.box.data.integration.update.ReleaseVersion
 import com.amamiyakokoro.box.data.integration.update.isNewerThan
 import com.amamiyakokoro.box.integration.update.AppUpdateInstallState
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun AppUpdateDialog(
@@ -38,20 +40,20 @@ fun AppUpdateDialog(
     val newer = release?.isNewerThan(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) == true
     val canInstallInApp = release?.hasVerifiedInAppAsset() == true
     val busy = installState.isBusy()
-    val message = installState.messageOrNull() ?: when (result) {
+    val message = installState.messageOrNull(context.resources) ?: when (result) {
         is ReleaseCheck.Published -> when {
-            currentVersion == null -> MLang.About.Update.UnknownVersion
-            newer -> "${MLang.About.Update.Available}: ${result.tag}"
-            else -> MLang.About.Update.UpToDate
+            currentVersion == null -> stringResource(LocaleR.string.about_update_unknown_version)
+            newer -> "${stringResource(LocaleR.string.about_update_available)}: ${result.tag}"
+            else -> stringResource(LocaleR.string.about_update_up_to_date)
         }
-        ReleaseCheck.Failure.NoRelease -> MLang.About.Update.NoRelease
-        ReleaseCheck.Failure.RateLimited -> MLang.About.Update.RateLimited
-        ReleaseCheck.Failure.Network -> MLang.About.Update.NetworkError
-        ReleaseCheck.Failure.InvalidResponse -> MLang.About.Update.InvalidResponse
+        ReleaseCheck.Failure.NoRelease -> stringResource(LocaleR.string.about_update_no_release)
+        ReleaseCheck.Failure.RateLimited -> stringResource(LocaleR.string.about_update_rate_limited)
+        ReleaseCheck.Failure.Network -> stringResource(LocaleR.string.about_update_network_error)
+        ReleaseCheck.Failure.InvalidResponse -> stringResource(LocaleR.string.about_update_invalid_response)
     }
     AlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
-        title = { Text(MLang.About.License.CheckUpdate) },
+        title = { Text(stringResource(LocaleR.string.about_license_check_update)) },
         text = {
             Column {
                 Text(message)
@@ -75,7 +77,8 @@ fun AppUpdateDialog(
                 if (installState is AppUpdateInstallState.Idle && newer) {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        if (canInstallInApp) MLang.About.Update.InAppDownloadSummary else MLang.About.Update.NoApk,
+                        if (canInstallInApp) stringResource(LocaleR.string.about_update_in_app_download_summary)
+                        else stringResource(LocaleR.string.about_update_no_apk),
                     )
                 }
             }
@@ -92,15 +95,15 @@ fun AppUpdateDialog(
                                 ),
                             )
                         },
-                    ) { Text(MLang.About.Update.OpenInstallSettings) }
+                    ) { Text(stringResource(LocaleR.string.about_update_open_install_settings)) }
                 }
 
                 installState is AppUpdateInstallState.ReadyToInstall -> {
-                    TextButton(onClick = onContinueInstall) { Text(MLang.About.Update.ContinueInstall) }
+                    TextButton(onClick = onContinueInstall) { Text(stringResource(LocaleR.string.about_update_continue_install)) }
                 }
 
                 installState is AppUpdateInstallState.Failed && release != null && canInstallInApp -> {
-                    TextButton(onClick = { onDownloadAndInstall(release) }) { Text(MLang.About.Update.Retry) }
+                    TextButton(onClick = { onDownloadAndInstall(release) }) { Text(stringResource(LocaleR.string.about_update_retry)) }
                 }
 
                 newer && !busy -> {
@@ -114,29 +117,29 @@ fun AppUpdateDialog(
                                 openUrl(context, release.apkUrl ?: release.releaseUrl)
                                 onDismiss()
                             } catch (_: ActivityNotFoundException) {
-                                Toast.makeText(context, MLang.About.Update.NoBrowser, Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, context.getString(LocaleR.string.about_update_no_browser), Toast.LENGTH_LONG).show()
                             }
                         },
                     ) {
                         Text(
-                            if (canInstallInApp) MLang.About.Update.InAppDownload
-                            else if (release.apkUrl != null) MLang.About.Update.Download
-                            else MLang.About.Update.OpenRelease,
+                            if (canInstallInApp) stringResource(LocaleR.string.about_update_in_app_download)
+                            else if (release.apkUrl != null) stringResource(LocaleR.string.about_update_download)
+                            else stringResource(LocaleR.string.about_update_open_release),
                         )
                     }
                 }
 
-                !busy -> TextButton(onClick = onDismiss) { Text(MLang.About.Update.Ok) }
+                !busy -> TextButton(onClick = onDismiss) { Text(stringResource(LocaleR.string.about_update_ok)) }
             }
         },
         dismissButton = {
             when (installState) {
                 is AppUpdateInstallState.InstallPermissionRequired -> {
-                    TextButton(onClick = onContinueInstall) { Text(MLang.About.Update.ContinueInstall) }
+                    TextButton(onClick = onContinueInstall) { Text(stringResource(LocaleR.string.about_update_continue_install)) }
                 }
                 is AppUpdateInstallState.ReadyToInstall,
                 is AppUpdateInstallState.Failed, -> {
-                    if (!busy) TextButton(onClick = onDismiss) { Text(MLang.About.Update.Ok) }
+                    if (!busy) TextButton(onClick = onDismiss) { Text(stringResource(LocaleR.string.about_update_ok)) }
                 }
                 AppUpdateInstallState.Installed,
                 AppUpdateInstallState.Idle, -> Unit
@@ -157,14 +160,14 @@ private fun AppUpdateInstallState.isBusy(): Boolean = when (this) {
     else -> false
 }
 
-private fun AppUpdateInstallState.messageOrNull(): String? = when (this) {
-    is AppUpdateInstallState.Downloading -> MLang.About.Update.Downloading
-    is AppUpdateInstallState.Verifying -> MLang.About.Update.Verifying
+private fun AppUpdateInstallState.messageOrNull(resources: Resources): String? = when (this) {
+    is AppUpdateInstallState.Downloading -> resources.getString(LocaleR.string.about_update_downloading)
+    is AppUpdateInstallState.Verifying -> resources.getString(LocaleR.string.about_update_verifying)
     is AppUpdateInstallState.ReadyToInstall,
-    is AppUpdateInstallState.Installing, -> MLang.About.Update.PreparingInstall
-    is AppUpdateInstallState.InstallPermissionRequired -> MLang.About.Update.InstallPermissionRequired
-    is AppUpdateInstallState.WaitingForUserConfirmation -> MLang.About.Update.WaitingForInstallConfirmation
-    AppUpdateInstallState.Installed -> MLang.About.Update.Installed
-    is AppUpdateInstallState.Failed -> MLang.About.Update.UpdateFailed
+    is AppUpdateInstallState.Installing, -> resources.getString(LocaleR.string.about_update_preparing_install)
+    is AppUpdateInstallState.InstallPermissionRequired -> resources.getString(LocaleR.string.about_update_install_permission_required)
+    is AppUpdateInstallState.WaitingForUserConfirmation -> resources.getString(LocaleR.string.about_update_waiting_for_install_confirmation)
+    AppUpdateInstallState.Installed -> resources.getString(LocaleR.string.about_update_installed)
+    is AppUpdateInstallState.Failed -> resources.getString(LocaleR.string.about_update_update_failed)
     AppUpdateInstallState.Idle -> null
 }

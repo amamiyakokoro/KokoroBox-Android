@@ -34,10 +34,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.R
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable
@@ -45,17 +46,18 @@ internal fun PrivacyPolicySheet(show: MutableState<Boolean>) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    val policyText = remember {
+    val loadFailed = stringResource(LocaleR.string.onboarding_sheet_load_failed)
+    val policyText = remember(loadFailed) {
         runCatching {
             context.resources.openRawResource(R.raw.privacy_policy)
                 .bufferedReader()
                 .use { it.readText() }
-        }.getOrElse { MLang.Onboarding.Sheet.LoadFailed }
+        }.getOrElse { loadFailed }
     }
 
     AppActionBottomSheet(
         show = show.value,
-        title = MLang.Onboarding.Sheet.PrivacyPolicyTitle,
+        title = stringResource(LocaleR.string.onboarding_sheet_privacy_policy_title),
         onDismissRequest = { show.value = false },
     ) {
         Column(
