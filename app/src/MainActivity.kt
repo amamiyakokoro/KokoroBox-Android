@@ -147,6 +147,8 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
+            val appLanguage by appSettingsViewModel.appLanguage.state.collectAsStateWithLifecycle()
+            val languageAtActivityCreation = remember { appLanguage }
             val themeMode = appSettingsViewModel.themeMode.state.collectAsStateWithLifecycle().value
             val colorTheme = appSettingsViewModel.colorTheme.state.collectAsStateWithLifecycle().value
             val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsStateWithLifecycle().value
@@ -175,6 +177,16 @@ class MainActivity : FragmentActivity() {
                 activity = this@MainActivity,
                 biometricUnlockEnabled = biometricUnlockEnabled,
             )
+
+            LaunchedEffect(appLanguage) {
+                if (appLanguage != languageAtActivityCreation) {
+                    // MainActivity is a FragmentActivity rather than an AppCompatActivity,
+                    // so AppCompatDelegate cannot recreate it after a locale change.
+                    // Recreating runs attachBaseContext() again with the new locale while
+                    // preserving the navigation state through the Activity saved state.
+                    this@MainActivity.recreate()
+                }
+            }
 
             LaunchedEffect(excludeFromRecents) {
                 this@MainActivity.applyExcludeFromRecents(excludeFromRecents)
