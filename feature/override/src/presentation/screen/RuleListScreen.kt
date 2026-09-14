@@ -29,13 +29,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -53,7 +54,11 @@ fun OverrideRuleListEditorScreen(
     ) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val title = OverrideStructuredEditorStore.ruleEditorTitle.ifBlank { MLang.Override.Editor.Rules }
+    val rulesLabel = stringResource(LocaleR.string.override_editor_rules)
+    val newRuleLabel = stringResource(LocaleR.string.override_editor_new_rule)
+    val editRuleLabel = stringResource(LocaleR.string.override_editor_edit_rule)
+    val unnamedRuleLabel = stringResource(LocaleR.string.override_editor_unnamed_rule)
+    val title = OverrideStructuredEditorStore.ruleEditorTitle.ifBlank { rulesLabel }
     val availableModes = OverrideStructuredEditorStore.ruleEditorAvailableModes
     var showResetDialog by remember { mutableStateOf(false) }
     val addFabController = rememberOverrideFabController()
@@ -88,9 +93,9 @@ fun OverrideRuleListEditorScreen(
                 controller = addFabController,
                 visible = showAddFab,
                 imageVector = AppMd3Icons.Action.Add,
-                contentDescription = MLang.Override.Editor.NewRule,
+                contentDescription = newRuleLabel,
                 onClick = {
-                    onOpenRuleDraftEditor(MLang.Override.Editor.NewRule, null) { createdDraft ->
+                    onOpenRuleDraftEditor(newRuleLabel, null) { createdDraft ->
                         val latestValues = OverrideStructuredEditorStore.ruleEditorDraftValues
                         val mode = OverrideStructuredEditorStore.ruleEditorSelectedMode
                         val updatedValues = latestValues.update(
@@ -109,7 +114,7 @@ fun OverrideRuleListEditorScreen(
                     if (isDeleteMode) {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Cancel,
-                            contentDescription = MLang.Override.Editor.CancelDelete,
+                            contentDescription = stringResource(LocaleR.string.override_editor_cancel_delete),
                             spacedFromNext = true,
                             onClick = {
                                 isDeleteMode = false
@@ -118,7 +123,7 @@ fun OverrideRuleListEditorScreen(
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.DeleteSelectedRules,
+                            contentDescription = stringResource(LocaleR.string.override_editor_delete_selected_rules),
                             destructive = true,
                             onClick = {
                                 if (selectedUiIds.isNotEmpty()) {
@@ -137,14 +142,14 @@ fun OverrideRuleListEditorScreen(
                     } else {
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Undo,
-                            contentDescription = MLang.Override.Editor.ClearMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_clear_mode),
                             spacedFromNext = true,
                             destructive = true,
                             onClick = { showResetDialog = true },
                         )
                         OverrideTopBarAction(
                             icon = AppMd3Icons.Action.Delete,
-                            contentDescription = MLang.Override.Editor.EnterDeleteMode,
+                            contentDescription = stringResource(LocaleR.string.override_editor_enter_delete_mode),
                             destructive = true,
                             onClick = {
                                 isDeleteMode = true
@@ -167,7 +172,7 @@ fun OverrideRuleListEditorScreen(
             item(key = "modifier-card") {
                 Card {
                     YumeMd3DropdownPreference(
-                        title = MLang.Override.Editor.Mode.Title,
+                        title = stringResource(LocaleR.string.override_editor_mode_title),
                         items = availableModes.map(OverrideListEditorMode::label),
                         selectedIndex = selectedModeIndex,
                         onSelectedIndexChange = { index ->
@@ -191,7 +196,7 @@ fun OverrideRuleListEditorScreen(
                 ) { index ->
                     val ruleDraft = currentRules[index]
                     val ruleTitle = formatRuleDraft(ruleDraft).ifBlank {
-                        ruleDraft.type.ifBlank { MLang.Override.Editor.UnnamedRule }
+                        ruleDraft.type.ifBlank { unnamedRuleLabel }
                     }
                     ReorderableItem(
                         state = reorderState,
@@ -208,7 +213,7 @@ fun OverrideRuleListEditorScreen(
                                 } else {
                                     val ruleUiId = ruleDraft.uiId
                                     val editMode = selectedMode
-                                    onOpenRuleDraftEditor(MLang.Override.Editor.EditRule, ruleDraft) { updatedDraft ->
+                                    onOpenRuleDraftEditor(editRuleLabel, ruleDraft) { updatedDraft ->
                                         val latestValues = OverrideStructuredEditorStore.ruleEditorDraftValues
                                         val updatedValues = latestValues.update(
                                             editMode,
@@ -243,8 +248,8 @@ fun OverrideRuleListEditorScreen(
 
     AppDialog(
             show = showResetDialog,
-            title = MLang.Override.Editor.ClearDialog.Title.format(MLang.Override.Editor.Rules),
-            summary = MLang.Override.Editor.ClearDialog.Summary.format(MLang.Override.Editor.Rules),
+            title = stringResource(LocaleR.string.override_editor_clear_dialog_title).format(rulesLabel),
+            summary = stringResource(LocaleR.string.override_editor_clear_dialog_summary).format(rulesLabel),
             onDismissRequest = { showResetDialog = false },
         ) {
             DialogButtonRow(
@@ -256,8 +261,8 @@ fun OverrideRuleListEditorScreen(
                     val mode = OverrideStructuredEditorStore.ruleEditorSelectedMode
                     applyRuleValues(OverrideStructuredEditorStore.ruleEditorDraftValues.update(mode, emptyList()))
                 },
-                cancelText = MLang.Override.Dialog.Button.Cancel,
-                confirmText = MLang.Override.Editor.Clear,
+                cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+                confirmText = stringResource(LocaleR.string.override_editor_clear),
                 confirmDestructive = true,
             )
         }
@@ -289,7 +294,7 @@ private fun ReorderableCollectionItemScope.RuleListCard(
             ) {
                 AppIcon(
                     imageVector = AppMd3Icons.Action.List,
-                    contentDescription = MLang.Override.Editor.DragToSort,
+                    contentDescription = stringResource(LocaleR.string.override_editor_drag_to_sort),
                     
                 )
                 Column(
@@ -312,7 +317,7 @@ private fun ReorderableCollectionItemScope.RuleListCard(
                     } else {
                         AppIcon(
                             imageVector = AppMd3Icons.Navigation.Forward,
-                            contentDescription = MLang.Override.Editor.EditRule,
+                            contentDescription = stringResource(LocaleR.string.override_editor_edit_rule),
                             
                         )
                     }
