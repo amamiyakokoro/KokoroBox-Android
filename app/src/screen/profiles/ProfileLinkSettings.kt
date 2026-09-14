@@ -43,8 +43,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.amamiyakokoro.box.data.store.LinkOpenMode
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.store.ProfileLink
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppFormDialog
@@ -55,7 +57,6 @@ import com.amamiyakokoro.box.presentation.component.md3.YumeMd3TextButton
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 internal fun LinkSettingsDialog(
@@ -74,8 +75,8 @@ internal fun LinkSettingsDialog(
     val componentSizes = AppTheme.sizes
 
     val openModeOptions = listOf(
-        MLang.ProfilesPage.LinkSettings.OpenModeInApp,
-        MLang.ProfilesPage.LinkSettings.OpenModeExternal
+        stringResource(LocaleR.string.profiles_page_link_settings_open_mode_in_app),
+        stringResource(LocaleR.string.profiles_page_link_settings_open_mode_external),
     )
     val openModeIndex = when (linkOpenMode) {
         LinkOpenMode.IN_APP -> 0
@@ -91,7 +92,7 @@ internal fun LinkSettingsDialog(
     AppActionBottomSheet(
         show = show.value,
         modifier = Modifier,
-        title = MLang.ProfilesPage.LinkSettings.Title,
+        title = stringResource(LocaleR.string.profiles_page_link_settings_title),
         onDismissRequest = {
             show.value = false
         },
@@ -103,9 +104,9 @@ internal fun LinkSettingsDialog(
                     .padding(bottom = spacing.space16),
                 verticalArrangement = Arrangement.spacedBy(UiDp.dp12)
             ) {
-                SectionCard(title = MLang.ProfilesPage.LinkSettings.OpenMode) {
+                SectionCard(title = stringResource(LocaleR.string.profiles_page_link_settings_open_mode)) {
                     PreferenceEnumItem(
-                        title = MLang.ProfilesPage.LinkSettings.OpenMode,
+                        title = stringResource(LocaleR.string.profiles_page_link_settings_open_mode),
                         currentValue = linkOpenMode,
                         items = openModeOptions,
                         values = listOf(LinkOpenMode.IN_APP, LinkOpenMode.EXTERNAL_BROWSER),
@@ -114,10 +115,10 @@ internal fun LinkSettingsDialog(
                 }
 
                 if (links.isNotEmpty()) {
-                    SectionCard(title = MLang.ProfilesPage.LinkSettings.DefaultLink) {
+                    SectionCard(title = stringResource(LocaleR.string.profiles_page_link_settings_default_link)) {
                         PreferenceEnumItem(
-                            title = MLang.ProfilesPage.LinkSettings.DefaultLink,
-                            summary = MLang.ProfilesPage.LinkSettings.DefaultLinkSummary,
+                            title = stringResource(LocaleR.string.profiles_page_link_settings_default_link),
+                            summary = stringResource(LocaleR.string.profiles_page_link_settings_default_link_summary),
                             currentValue = links.getOrNull(defaultLinkIndex)?.id ?: "",
                             items = links.map { it.name },
                             values = links.map { it.id },
@@ -127,7 +128,7 @@ internal fun LinkSettingsDialog(
                 }
 
                 if (links.isNotEmpty()) {
-                    SectionCard(title = MLang.ProfilesPage.LinkSettings.Title) {
+                    SectionCard(title = stringResource(LocaleR.string.profiles_page_link_settings_title)) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             links.forEachIndexed { index, link ->
                                 Row(
@@ -155,7 +156,7 @@ internal fun LinkSettingsDialog(
                                         onClick = { onDeleteLink(link.id) }) {
                                         Icon(
                                             imageVector = AppMd3Icons.Action.Delete,
-                                            contentDescription = "Delete",
+                                            contentDescription = stringResource(LocaleR.string.component_editor_action_delete),
                                             tint = MaterialTheme.colorScheme.error
                                         )
                                     }
@@ -178,7 +179,7 @@ internal fun LinkSettingsDialog(
                     horizontalArrangement = Arrangement.spacedBy(spacing.space12)
                 ) {
                     YumeMd3TextButton(
-                        text = MLang.ProfilesPage.LinkSettings.Close,
+                        text = stringResource(LocaleR.string.profiles_page_link_settings_close),
                         onClick = { show.value = false },
                         modifier = Modifier.weight(1f)
                     )
@@ -190,7 +191,7 @@ internal fun LinkSettingsDialog(
                             contentColor = MaterialTheme.colorScheme.onPrimary,
                         )
                     ) {
-                        Text(MLang.ProfilesPage.LinkSettings.AddLink)
+                        Text(stringResource(LocaleR.string.profiles_page_link_settings_add_link))
                     }
                 }
             }
@@ -211,6 +212,9 @@ internal fun AddLinkDialog(
     var error by remember { mutableStateOf("") }
     var currentName by remember { mutableStateOf(linkName) }
     var currentUrl by remember { mutableStateOf(linkUrl) }
+    val enterNameError = stringResource(LocaleR.string.profiles_page_link_settings_validation_enter_name)
+    val enterUrlError = stringResource(LocaleR.string.profiles_page_link_settings_validation_enter_url)
+    val invalidUrlError = stringResource(LocaleR.string.profiles_page_link_settings_validation_invalid_url)
 
     LaunchedEffect(show.value, linkToEdit) {
         if (show.value) {
@@ -227,13 +231,17 @@ internal fun AddLinkDialog(
 
     AppFormDialog(
         show = show.value,
-        title = if (linkToEdit != null) MLang.ProfilesPage.LinkSettings.EditLink else MLang.ProfilesPage.LinkSettings.AddLink,
+        title = if (linkToEdit != null) {
+            stringResource(LocaleR.string.profiles_page_link_settings_edit_link)
+        } else {
+            stringResource(LocaleR.string.profiles_page_link_settings_add_link)
+        },
         onDismissRequest = onDismiss,
         onConfirm = {
             error = when {
-                currentName.isBlank() -> MLang.ProfilesPage.LinkSettings.Validation.EnterName
-                currentUrl.isBlank() -> MLang.ProfilesPage.LinkSettings.Validation.EnterUrl
-                !currentUrl.startsWith("http", ignoreCase = true) -> MLang.ProfilesPage.LinkSettings.Validation.InvalidUrl
+                currentName.isBlank() -> enterNameError
+                currentUrl.isBlank() -> enterUrlError
+                !currentUrl.startsWith("http", ignoreCase = true) -> invalidUrlError
                 else -> ""
             }
             if (error.isEmpty()) {
@@ -243,8 +251,8 @@ internal fun AddLinkDialog(
             }
         },
         error = error.ifBlank { null },
-        cancelText = MLang.ProfilesPage.Button.Cancel,
-        confirmText = MLang.ProfilesPage.Button.Confirm,
+        cancelText = stringResource(LocaleR.string.profiles_page_button_cancel),
+        confirmText = stringResource(LocaleR.string.profiles_page_button_confirm),
     ) {
         YumeMd3OutlinedTextField(
             value = currentName,
@@ -252,7 +260,7 @@ internal fun AddLinkDialog(
                 currentName = it
                 error = ""
             },
-            label = MLang.ProfilesPage.LinkSettings.Name,
+            label = stringResource(LocaleR.string.profiles_page_link_settings_name),
             modifier = Modifier.fillMaxWidth(),
         )
         YumeMd3OutlinedTextField(
@@ -261,7 +269,7 @@ internal fun AddLinkDialog(
                 currentUrl = it
                 error = ""
             },
-            label = MLang.ProfilesPage.LinkSettings.Url,
+            label = stringResource(LocaleR.string.profiles_page_link_settings_url),
             modifier = Modifier.fillMaxWidth(),
         )
     }
