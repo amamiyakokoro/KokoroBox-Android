@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
@@ -34,7 +36,6 @@ import com.amamiyakokoro.box.presentation.util.OverrideProxyDraft
 import com.amamiyakokoro.box.presentation.util.OverrideProxyTypePresets
 import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Scaffold
 
 @Composable
@@ -42,8 +43,11 @@ fun OverrideProxyDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
     val listState = rememberLazyListState()
-    val title = remember {
-        OverrideStructuredEditorStore.proxyDraftEditorTitle.ifBlank { MLang.Override.Editor.ProxyNode }
+    val nameLabel = stringResource(LocaleR.string.override_draft_name)
+    val nameRequiredMessage = stringResource(LocaleR.string.override_draft_name_required)
+    val typeEmptyMessage = stringResource(LocaleR.string.override_editor_type_empty)
+    val title = OverrideStructuredEditorStore.proxyDraftEditorTitle.ifBlank {
+        stringResource(LocaleR.string.override_editor_proxy_node)
     }
     val initialValue = remember { OverrideStructuredEditorStore.proxyDraftEditorValue }
     val saveFabController = rememberOverrideFabController()
@@ -81,14 +85,14 @@ fun OverrideProxyDraftEditorScreen(
                 controller = saveFabController,
                 visible = true,
                 imageVector = AppMd3Icons.Action.Save,
-                contentDescription = MLang.Override.Editor.SaveProxyNode,
+                contentDescription = stringResource(LocaleR.string.override_editor_save_proxy_node),
                 onClick = {
                     if (name.trim().isBlank()) {
-                        errorText = MLang.Override.Draft.NameRequired
+                        errorText = nameRequiredMessage
                         return@OverrideAnimatedFab
                     }
                     if (type.trim().isBlank()) {
-                        errorText = MLang.Override.Editor.TypeEmpty
+                        errorText = typeEmptyMessage
                         return@OverrideAnimatedFab
                     }
                     OverrideStructuredEditorStore.submitProxyDraft(
@@ -130,10 +134,10 @@ fun OverrideProxyDraftEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
                 ) {
-                    OverrideSection(MLang.Override.Editor.BasicConnection) {
+                    OverrideSection(stringResource(LocaleR.string.override_editor_basic_connection)) {
                         OverrideSelectorCard {
                             YumeMd3DropdownPreference(
-                                title = MLang.Override.Editor.RuleType,
+                                title = stringResource(LocaleR.string.override_editor_rule_type),
                                 items = OverrideProxyTypePresets,
                                 selectedIndex = selectedPresetIndex,
                                 onSelectedIndexChange = { index ->
@@ -151,8 +155,8 @@ fun OverrideProxyDraftEditorScreen(
                                     name = it
                                     errorText = null
                                 },
-                                label = MLang.Override.Draft.Name,
-                                errorText = errorText?.takeIf { it.contains(MLang.Override.Draft.Name) },
+                                label = nameLabel,
+                                errorText = errorText?.takeIf { it.contains(nameLabel) },
                             )
                             OverrideFormField(
                                 value = server,
@@ -163,11 +167,11 @@ fun OverrideProxyDraftEditorScreen(
                                 value = portText,
                                 onValueChange = { portText = it.filter(Char::isDigit) },
                                 label = "port",
-                                supportText = MLang.Override.Editor.PortEmptyHint,
+                                supportText = stringResource(LocaleR.string.override_editor_port_empty_hint),
                             )
                         }
                     }
-                    OverridePlainFormSection(MLang.Override.Editor.NetworkAndRoute) {
+                    OverridePlainFormSection(stringResource(LocaleR.string.override_editor_network_and_route)) {
                         OverrideFormField(
                             value = ipVersion,
                             onValueChange = { ipVersion = it },
@@ -189,7 +193,7 @@ fun OverrideProxyDraftEditorScreen(
                             label = "dialer-proxy",
                         )
                     }
-                    OverrideCardSection(MLang.Override.Structured.Proxies.Title) {
+                    OverrideCardSection(stringResource(LocaleR.string.override_structured_proxies_title)) {
                         NullableBooleanSelector(
                             title = "udp",
                             value = udp,
@@ -206,9 +210,9 @@ fun OverrideProxyDraftEditorScreen(
                             onValueChange = { mptcp = it },
                         )
                     }
-                    OverrideSection(MLang.Override.Draft.ExtraFields) {
+                    OverrideSection(stringResource(LocaleR.string.override_draft_extra_fields)) {
                         OverrideExtraFieldsCard(
-                            title = MLang.Override.Draft.ExtraFields,
+                            title = stringResource(LocaleR.string.override_draft_extra_fields),
                             fields = extraFields,
                             onAddClick = {
                                 editingExtraKey = null
@@ -229,7 +233,10 @@ fun OverrideProxyDraftEditorScreen(
         }
         OverrideExtraFieldDialog(
             show = showExtraFieldDialog,
-            title = if (editingExtraKey == null) MLang.Override.Draft.AddExtraField else MLang.Override.Draft.EditExtraField,
+            title = stringResource(
+                if (editingExtraKey == null) LocaleR.string.override_draft_add_extra_field
+                else LocaleR.string.override_draft_edit_extra_field,
+            ),
             initialValue = editingExtraKey?.let(extraFields::toExtraFieldDraft),
             onConfirm = { draft: OverrideExtraFieldDraft ->
                 extraFields = extraFields.updateExtraField(editingExtraKey, draft)
