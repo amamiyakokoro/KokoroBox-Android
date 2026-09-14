@@ -26,11 +26,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.doubleOrNull
@@ -52,14 +53,14 @@ fun OverrideExtraFieldsCard(
             PreferenceListItem(
                 title = title,
                 summary = if (fields.isEmpty()) {
-                    MLang.Override.Draft.ClickToAddExtraField
+                    stringResource(LocaleR.string.override_draft_click_to_add_extra_field)
                 } else {
-                    MLang.Override.Draft.ExtraFieldsConfigured.format(fields.size)
+                    stringResource(LocaleR.string.override_draft_extra_fields_configured).format(fields.size)
                 },
                 endActions = {
                     OverrideCardActionIconButton(
                         imageVector = AppMd3Icons.Action.Add,
-                        contentDescription = MLang.Override.Draft.AddExtraField,
+                        contentDescription = stringResource(LocaleR.string.override_draft_add_extra_field),
                         onClick = onAddClick,
                         tone = OverrideActionTone.Primary,
                     )
@@ -76,7 +77,7 @@ fun OverrideExtraFieldsCard(
                         endActions = {
                             OverrideCardActionIconButton(
                                 imageVector = AppMd3Icons.Action.Delete,
-                                contentDescription = MLang.Override.Draft.DeleteExtraField,
+                                contentDescription = stringResource(LocaleR.string.override_draft_delete_extra_field),
                                 onClick = { onDeleteClick(entry.key) },
                                 tone = OverrideActionTone.Danger,
                             )
@@ -100,6 +101,8 @@ fun OverrideExtraFieldDialog(
         return
     }
 
+    val keyNameEmptyMessage = stringResource(LocaleR.string.override_draft_key_name_empty)
+    val valueTypeMismatchMessage = stringResource(LocaleR.string.override_draft_value_type_mismatch)
     var keyText by remember(show, initialValue) { mutableStateOf(initialValue?.key.orEmpty()) }
     var valueText by remember(show, initialValue) { mutableStateOf(initialValue?.value.orEmpty()) }
     var selectedType by remember(show, initialValue) {
@@ -120,22 +123,22 @@ fun OverrideExtraFieldDialog(
                 value = valueText.trim(),
             )
             if (normalizedDraft.key.isBlank()) {
-                errorText = MLang.Override.Draft.KeyNameEmpty
+                errorText = keyNameEmptyMessage
                 return@AppFormDialog
             }
             val parsedValue = extraFieldDraftToJsonElement(normalizedDraft)
             if (parsedValue == null) {
-                errorText = MLang.Override.Draft.ValueTypeMismatch
+                errorText = valueTypeMismatchMessage
                 return@AppFormDialog
             }
             onConfirm(normalizedDraft)
         },
         error = errorText,
-        cancelText = MLang.Override.Dialog.Button.Cancel,
-        confirmText = MLang.Override.Editor.Confirm,
+        cancelText = stringResource(LocaleR.string.override_dialog_button_cancel),
+        confirmText = stringResource(LocaleR.string.override_editor_confirm),
     ) {
         YumeMd3DropdownPreference(
-            title = MLang.Override.Draft.ValueType,
+            title = stringResource(LocaleR.string.override_draft_value_type),
             items = valueTypeItems,
             selectedIndex = selectedTypeIndex,
             onSelectedIndexChange = { index ->
@@ -149,7 +152,7 @@ fun OverrideExtraFieldDialog(
                 keyText = it
                 errorText = null
             },
-            label = MLang.Override.Editor.KeyName,
+            label = stringResource(LocaleR.string.override_editor_key_name),
             modifier = Modifier.fillMaxWidth(),
         )
         if (selectedType != OverrideExtraFieldValueType.Null) {
@@ -160,12 +163,12 @@ fun OverrideExtraFieldDialog(
                     errorText = null
                 },
                 label = when (selectedType) {
-                    OverrideExtraFieldValueType.String -> MLang.Override.Draft.StringValue
+                    OverrideExtraFieldValueType.String -> stringResource(LocaleR.string.override_draft_string_value)
                     OverrideExtraFieldValueType.Boolean -> "true / false"
-                    OverrideExtraFieldValueType.Int -> MLang.Override.Draft.IntValue
-                    OverrideExtraFieldValueType.Double -> MLang.Override.Draft.DoubleValue
+                    OverrideExtraFieldValueType.Int -> stringResource(LocaleR.string.override_draft_int_value)
+                    OverrideExtraFieldValueType.Double -> stringResource(LocaleR.string.override_draft_double_value)
                     OverrideExtraFieldValueType.Null -> ""
-                    OverrideExtraFieldValueType.JsonFragment -> MLang.Override.Draft.JsonFragment
+                    OverrideExtraFieldValueType.JsonFragment -> stringResource(LocaleR.string.override_draft_json_fragment)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
