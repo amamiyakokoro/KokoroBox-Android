@@ -31,8 +31,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.data.model.OverrideConfig
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.ProfileBinding
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
@@ -47,7 +49,6 @@ import com.amamiyakokoro.box.presentation.component.PreferenceSwitchItem
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.service.runtime.entity.Profile
-import dev.oom_wg.purejoy.mlang.MLang
 
 private const val PROFILE_SETTINGS_MIN_HEIGHT_FRACTION = 0.5f
 private const val PROFILE_SETTINGS_MAX_HEIGHT_FRACTION = 0.7f
@@ -64,12 +65,12 @@ internal fun EditProfileNameDialog(
 
     AppTextFieldDialog(
         show = show,
-        title = MLang.ProfilesPage.EditDialog.Title,
+        title = stringResource(LocaleR.string.profiles_page_edit_dialog_title),
         value = editName,
         onValueChange = { editName = it },
         onDismissRequest = onDismiss,
         onConfirm = { onConfirm(editName) },
-        label = MLang.ProfilesPage.Input.ProfileName,
+        label = stringResource(LocaleR.string.profiles_page_input_profile_name),
         singleLine = true,
     )
 }
@@ -85,9 +86,9 @@ internal fun DeleteConfirmDialog(
     AppDialog(
         show = show,
         modifier = Modifier,
-        title = MLang.ProfilesPage.DeleteDialog.Title,
+        title = stringResource(LocaleR.string.profiles_page_delete_dialog_title),
         titleColor = AppDialogDefaults.titleColor(),
-        summary = MLang.ProfilesPage.DeleteDialog.Message.format(profileName),
+        summary = stringResource(LocaleR.string.profiles_page_delete_dialog_message).format(profileName),
         summaryColor = AppDialogDefaults.summaryColor(),
         backgroundColor = AppDialogDefaults.backgroundColor(),
         enableWindowDim = true,
@@ -100,8 +101,8 @@ internal fun DeleteConfirmDialog(
             DialogButtonRow(
                 onCancel = onDismiss,
                 onConfirm = onConfirm,
-                cancelText = MLang.ProfilesPage.Button.Cancel,
-                confirmText = MLang.ProfilesPage.DeleteDialog.Confirm,
+                cancelText = stringResource(LocaleR.string.profiles_page_button_cancel),
+                confirmText = stringResource(LocaleR.string.profiles_page_delete_dialog_confirm),
                 confirmDestructive = true,
             )
         })
@@ -121,7 +122,7 @@ internal fun ShareOptionsDialog(
     AppDialog(
         show = show,
         modifier = Modifier,
-        title = MLang.ProfilesPage.ShareDialog.Title,
+        title = stringResource(LocaleR.string.profiles_page_share_dialog_title),
         titleColor = AppDialogDefaults.titleColor(),
         summary = null,
         summaryColor = AppDialogDefaults.summaryColor(),
@@ -141,20 +142,20 @@ internal fun ShareOptionsDialog(
                         onClick = { onShareLink(profile) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text(MLang.ProfilesPage.ShareDialog.ShareLink)
+                        Text(stringResource(LocaleR.string.profiles_page_share_dialog_share_link))
                     }
                 }
                 OutlinedButton(
                     onClick = { onShareFile(profile) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(MLang.ProfilesPage.ShareDialog.ShareFile)
+                    Text(stringResource(LocaleR.string.profiles_page_share_dialog_share_file))
                 }
                 OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(MLang.ProfilesPage.Button.Cancel)
+                    Text(stringResource(LocaleR.string.profiles_page_button_cancel))
                 }
             }
         })
@@ -247,17 +248,17 @@ internal fun ProfileSettingsDialog(
     AppActionBottomSheet(
         show = show,
         modifier = Modifier,
-        title = MLang.ProfilesPage.SettingsDialog.Title,
+        title = stringResource(LocaleR.string.profiles_page_settings_dialog_title),
         startAction = {
             AppBottomSheetCloseAction(
                 onClick = onDismiss,
-                contentDescription = MLang.ProfilesPage.Button.Cancel,
+                contentDescription = stringResource(LocaleR.string.profiles_page_button_cancel),
             )
         },
         endAction = {
             AppBottomSheetConfirmAction(
                 onClick = saveSettings,
-                contentDescription = MLang.ProfilesPage.Button.Confirm,
+                contentDescription = stringResource(LocaleR.string.profiles_page_button_confirm),
             )
         },
         onDismissRequest = onDismiss,
@@ -280,7 +281,7 @@ internal fun ProfileSettingsDialog(
                 YumeMd3OutlinedTextField(
                     value = editName,
                     onValueChange = { editName = it },
-                    label = MLang.ProfilesPage.Input.ProfileName,
+                    label = stringResource(LocaleR.string.profiles_page_input_profile_name),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -296,7 +297,7 @@ internal fun ProfileSettingsDialog(
                         YumeMd3OutlinedTextField(
                             value = editSource,
                             onValueChange = { editSource = it },
-                            label = MLang.ProfilesPage.SettingsDialog.ChangeLink,
+                            label = stringResource(LocaleR.string.profiles_page_settings_dialog_change_link),
                             modifier = Modifier.fillMaxWidth(),
                             maxLines = 2,
                         )
@@ -306,7 +307,7 @@ internal fun ProfileSettingsDialog(
                         YumeMd3OutlinedTextField(
                             value = editUserAgent,
                             onValueChange = { editUserAgent = it },
-                            label = MLang.ProfilesPage.Input.SubscriptionUserAgent,
+                            label = stringResource(LocaleR.string.profiles_page_input_subscription_user_agent),
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
@@ -315,8 +316,8 @@ internal fun ProfileSettingsDialog(
 
                 Card {
                     PreferenceSwitchItem(
-                        title = MLang.ProfilesPage.SettingsDialog.SystemPreset,
-                        summary = MLang.ProfilesPage.SettingsDialog.SystemPresetSummary,
+                        title = stringResource(LocaleR.string.profiles_page_settings_dialog_system_preset),
+                        summary = stringResource(LocaleR.string.profiles_page_settings_dialog_system_preset_summary),
                         checked = systemPresetSelected,
                         onCheckedChange = { systemPresetSelected = it },
                     )
@@ -329,7 +330,8 @@ internal fun ProfileSettingsDialog(
                                 val isSelected = config.id in pendingSelectedUserOverrideIds
                                 PreferenceListItem(
                                     title = config.name,
-                                    summary = config.description?.takeIf { it.isNotBlank() } ?: MLang.ProfilesPage.SettingsDialog.NoDescription,
+                                    summary = config.description?.takeIf { it.isNotBlank() }
+                                        ?: stringResource(LocaleR.string.profiles_page_settings_dialog_no_description),
                                     endActions = {
                                         Checkbox(
                                             checked = isSelected,
