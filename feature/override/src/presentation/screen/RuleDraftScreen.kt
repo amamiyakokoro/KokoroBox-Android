@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
@@ -35,7 +37,6 @@ import com.amamiyakokoro.box.presentation.util.OverrideStructuredEditorStore
 import com.amamiyakokoro.box.presentation.util.rememberCurrentReferenceCatalog
 import com.amamiyakokoro.box.presentation.util.supportsRuleExtra
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import androidx.compose.material3.Scaffold
 
 @Composable
@@ -43,7 +44,15 @@ fun OverrideRuleDraftEditorScreen(
     navigator: DestinationsNavigator,
 ) {
     val listState = rememberLazyListState()
-    val title = OverrideStructuredEditorStore.ruleDraftEditorTitle.ifBlank { MLang.Override.Editor.RuleEdit }
+    val ruleTypeLabel = stringResource(LocaleR.string.override_editor_rule_type)
+    val payloadLabel = stringResource(LocaleR.string.override_editor_payload)
+    val matchResultLabel = stringResource(LocaleR.string.override_editor_match_result)
+    val ruleTypeEmptyMessage = stringResource(LocaleR.string.override_editor_rule_type_empty)
+    val payloadEmptyMessage = stringResource(LocaleR.string.override_editor_payload_empty)
+    val targetEmptyMessage = stringResource(LocaleR.string.override_editor_target_empty)
+    val title = OverrideStructuredEditorStore.ruleDraftEditorTitle.ifBlank {
+        stringResource(LocaleR.string.override_editor_rule_edit)
+    }
     val initialValue = remember { OverrideStructuredEditorStore.ruleDraftEditorValue }
     val saveFabController = rememberOverrideFabController()
 
@@ -94,10 +103,13 @@ fun OverrideRuleDraftEditorScreen(
     val selectedRuleProviderValue = normalizedPayloadInput
         .takeIf { candidate -> candidate.isNotBlank() && candidate in ruleProviderCandidates }
         ?: selectedRuleProvider.trim()
-    val targetLabel = if (isSubRuleTarget) MLang.Override.Editor.SubRuleTarget else MLang.Override.Editor.ProxyGroupTarget
-    val typeErrorText = errorText?.takeIf { it.contains(MLang.Override.Editor.RuleType) }
-    val payloadErrorText = errorText?.takeIf { it.contains(MLang.Override.Editor.Payload) }
-    val targetErrorText = errorText?.takeIf { it.contains(MLang.Override.Draft.Name) || it.contains(MLang.Override.Editor.MatchResult) }
+    val targetLabel = stringResource(
+        if (isSubRuleTarget) LocaleR.string.override_editor_sub_rule_target
+        else LocaleR.string.override_editor_proxy_group_target,
+    )
+    val typeErrorText = errorText?.takeIf { it == ruleTypeEmptyMessage }
+    val payloadErrorText = errorText?.takeIf { it == payloadEmptyMessage }
+    val targetErrorText = errorText?.takeIf { it == targetEmptyMessage }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -111,7 +123,7 @@ fun OverrideRuleDraftEditorScreen(
                 controller = saveFabController,
                 visible = true,
                 imageVector = AppMd3Icons.Action.Save,
-                contentDescription = MLang.Override.Editor.SaveRule,
+                contentDescription = stringResource(LocaleR.string.override_editor_save_rule),
                 onClick = {
                     val normalizedType = ruleType.trim().uppercase()
                     val normalizedPayload = payload.trim()
@@ -130,15 +142,15 @@ fun OverrideRuleDraftEditorScreen(
                         .toMutableList()
 
                     if (normalizedType.isBlank()) {
-                        errorText = MLang.Override.Editor.RuleTypeEmpty
+                        errorText = ruleTypeEmptyMessage
                         return@OverrideAnimatedFab
                     }
                     if (!normalizedType.equals("MATCH", ignoreCase = true) && resolvedPayload.isBlank()) {
-                        errorText = MLang.Override.Editor.PayloadEmpty
+                        errorText = payloadEmptyMessage
                         return@OverrideAnimatedFab
                     }
                     if (normalizedTarget.isBlank()) {
-                        errorText = MLang.Override.Editor.TargetEmpty
+                        errorText = targetEmptyMessage
                         return@OverrideAnimatedFab
                     }
                     if (canUseExtraSwitches) {
@@ -179,10 +191,10 @@ fun OverrideRuleDraftEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(OverrideSectionSpacing),
                 ) {
-                    OverrideSection(MLang.Override.Editor.RuleBody) {
+                    OverrideSection(stringResource(LocaleR.string.override_editor_rule_body)) {
                         OverrideSelectorCard {
                             YumeMd3DropdownPreference(
-                                title = MLang.Override.Editor.RuleType,
+                                title = ruleTypeLabel,
                                 items = OverrideRuleTypePresets,
                                 selectedIndex = selectedPresetIndex,
                                 onSelectedIndexChange = { index ->
@@ -196,7 +208,7 @@ fun OverrideRuleDraftEditorScreen(
                         if (isRuleSetType) {
                             OverrideSelectorCard {
                                 PreferenceArrowItem(
-                                    title = MLang.Override.Form.RuleProviders,
+                                    title = stringResource(LocaleR.string.override_form_rule_providers),
                                     onClick = {
                                         showRuleProviderSelector = true
                                         errorText = null
@@ -213,11 +225,11 @@ fun OverrideRuleDraftEditorScreen(
                                         payload = it
                                         errorText = null
                                     },
-                                    label = MLang.Override.Editor.Payload,
+                                    label = payloadLabel,
                                     supportText = if (isRuleSetType) {
-                                        MLang.Override.Editor.RuleProviderInputHint
+                                        stringResource(LocaleR.string.override_editor_rule_provider_input_hint)
                                     } else {
-                                        MLang.Override.Editor.LogicalRuleHint
+                                        stringResource(LocaleR.string.override_editor_logical_rule_hint)
                                     },
                                     errorText = payloadErrorText,
                                 )
@@ -225,7 +237,7 @@ fun OverrideRuleDraftEditorScreen(
                         }
                         OverrideSelectorCard {
                             PreferenceArrowItem(
-                                title = if (ruleType.equals("MATCH", ignoreCase = true)) MLang.Override.Editor.MatchResult else targetLabel,
+                                title = if (ruleType.equals("MATCH", ignoreCase = true)) matchResultLabel else targetLabel,
                                 onClick = {
                                     showTargetSelector = true
                                     errorText = null
@@ -241,7 +253,7 @@ fun OverrideRuleDraftEditorScreen(
                         }
                     }
                     if (canUseExtraSwitches) {
-                        OverrideCardSection(MLang.Override.Structured.Proxies.Title) {
+                        OverrideCardSection(stringResource(LocaleR.string.override_structured_proxies_title)) {
                             RuleExtraSwitchRow(
                                 title = "src",
                                 checked = useSrc,
@@ -254,15 +266,15 @@ fun OverrideRuleDraftEditorScreen(
                             )
                         }
                     }
-                    OverridePlainFormSection(MLang.Override.Editor.AdditionalParams) {
+                    OverridePlainFormSection(stringResource(LocaleR.string.override_editor_additional_params)) {
                         OverrideFormField(
                             value = extraText,
                             onValueChange = {
                                 extraText = it
                                 errorText = null
                             },
-                            label = MLang.Override.Editor.OtherExtraParams,
-                            supportText = MLang.Override.Editor.ExtraParamsHint,
+                            label = stringResource(LocaleR.string.override_editor_other_extra_params),
+                            supportText = stringResource(LocaleR.string.override_editor_extra_params_hint),
                         )
                     }
                     Spacer(modifier = Modifier.height(OverrideSectionBottomSpacing))
@@ -271,15 +283,24 @@ fun OverrideRuleDraftEditorScreen(
         }
         OverrideSingleValueSelectionSheet(
             show = showTargetSelector,
-            title = if (ruleType.equals("MATCH", ignoreCase = true)) MLang.Override.Editor.SelectMatchResult else MLang.Override.Editor.SelectSubRuleTarget,
+            title = stringResource(
+                if (ruleType.equals("MATCH", ignoreCase = true)) LocaleR.string.override_editor_select_match_result
+                else LocaleR.string.override_editor_select_sub_rule_target,
+            ),
             value = target,
             groups = listOf(
                 OverrideSelectionGroup(
-                    title = if (isSubRuleTarget) MLang.Override.Structured.SubRules.Title else MLang.Override.Editor.ProxyGroup,
+                    title = stringResource(
+                        if (isSubRuleTarget) LocaleR.string.override_structured_sub_rules_title
+                        else LocaleR.string.override_editor_proxy_group,
+                    ),
                     items = targetCandidates,
                 ),
             ),
-            customInputLabel = if (ruleType.equals("MATCH", ignoreCase = true)) MLang.Override.Editor.CustomMatchResult else MLang.Override.Editor.CustomSubRuleTarget,
+            customInputLabel = stringResource(
+                if (ruleType.equals("MATCH", ignoreCase = true)) LocaleR.string.override_editor_custom_match_result
+                else LocaleR.string.override_editor_custom_sub_rule_target,
+            ),
             onDismiss = { showTargetSelector = false },
             onConfirm = { selectedValue ->
                 target = selectedValue
@@ -289,11 +310,11 @@ fun OverrideRuleDraftEditorScreen(
         )
         OverrideSingleValueSelectionSheet(
             show = showRuleProviderSelector,
-            title = MLang.Override.Editor.SelectRuleProvider,
+            title = stringResource(LocaleR.string.override_editor_select_rule_provider),
             value = selectedRuleProviderValue,
             groups = listOf(
                 OverrideSelectionGroup(
-                    title = MLang.Override.Form.RuleProviders,
+                    title = stringResource(LocaleR.string.override_form_rule_providers),
                     items = ruleProviderCandidates,
                 ),
             ),
