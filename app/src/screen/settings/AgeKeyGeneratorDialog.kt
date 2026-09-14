@@ -22,12 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.Clash
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
 import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.theme.AppTheme
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,7 +47,11 @@ fun AgeKeyGeneratorSheet(
 
     AppActionBottomSheet(
         show = show,
-        title = if (hybrid) MLang.MetaFeature.AgeKey.HybridTitle else MLang.MetaFeature.AgeKey.X25519Title,
+        title = if (hybrid) {
+            stringResource(LocaleR.string.meta_feature_age_key_hybrid_title)
+        } else {
+            stringResource(LocaleR.string.meta_feature_age_key_x25519_title)
+        },
         onDismissRequest = onDismiss,
         startAction = {
             AppBottomSheetCloseAction(onClick = onDismiss)
@@ -59,14 +64,14 @@ fun AgeKeyGeneratorSheet(
             YumeMd3OutlinedTextField(
                 value = secretKey,
                 onValueChange = { secretKey = it },
-                label = MLang.MetaFeature.AgeKey.SecretKey,
+                label = stringResource(LocaleR.string.meta_feature_age_key_secret_key),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
             YumeMd3OutlinedTextField(
                 value = publicKey,
                 onValueChange = { publicKey = it },
-                label = MLang.MetaFeature.AgeKey.PublicKey,
+                label = stringResource(LocaleR.string.meta_feature_age_key_public_key),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -86,7 +91,7 @@ fun AgeKeyGeneratorSheet(
                     enabled = secretKey.isNotBlank() && !generating,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(MLang.MetaFeature.AgeKey.DerivePublicKey)
+                    Text(stringResource(LocaleR.string.meta_feature_age_key_derive_public_key))
                 }
                 TextButton(
                     onClick = {
@@ -106,7 +111,7 @@ fun AgeKeyGeneratorSheet(
                     enabled = !generating,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(MLang.MetaFeature.AgeKey.Generate)
+                    Text(stringResource(LocaleR.string.meta_feature_age_key_generate))
                 }
             }
         }

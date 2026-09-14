@@ -56,9 +56,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalDensity
 import androidx.core.net.toUri
 import com.amamiyakokoro.box.common.util.toast
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.calculateWallpaperViewportLayout
 import com.amamiyakokoro.box.presentation.theme.DEFAULT_ACG_WALLPAPER_THEME_SEED_ARGB
 import com.github.panpf.sketch.rememberAsyncImagePainter
@@ -69,7 +71,6 @@ import com.github.panpf.sketch.util.screenSize
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import org.koin.androidx.compose.koinViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -86,6 +87,7 @@ fun AcgWallpaperCropScreen(
 ) {
     val viewModel = koinViewModel<AppSettingsViewModel>()
     val context = LocalContext.current
+    val unknownError = stringResource(LocaleR.string.util_error_unknown_error)
     var biasX by remember(wallpaperUri, initialBiasX) {
         mutableFloatStateOf(initialBiasX.coerceIn(-1f, 1f))
     }
@@ -217,12 +219,12 @@ fun AcgWallpaperCropScreen(
                         )
                         navigator.popBackStack()
                     }.onFailure { throwable ->
-                        context.toast(throwable.message ?: MLang.Util.Error.UnknownError)
+                        context.toast(throwable.message ?: unknownError)
                     }
                 },
             ) {
                 Text(
-                    text = MLang.AppSettings.Button.Apply,
+                    text = stringResource(LocaleR.string.app_settings_button_apply),
                     color = MaterialTheme.colorScheme.onPrimary,
                 )
             }

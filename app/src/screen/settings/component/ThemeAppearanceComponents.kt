@@ -30,9 +30,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.miuix.YumeMiuixColorPicker
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.AppBottomSheetCloseAction
@@ -43,7 +45,6 @@ import androidx.compose.material3.Icon as MaterialIcon
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.colorFromArgb
 import com.amamiyakokoro.box.presentation.theme.colorToArgbLong
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 internal fun ThemeModeAndColorItems(
@@ -68,13 +69,13 @@ internal fun ThemeModeSelectorItem(
     onThemeModeChange: (ThemeMode) -> Unit,
 ) {
     EnumSelector(
-        title = MLang.AppSettings.Interface.ThemeModeTitle,
-        summary = MLang.AppSettings.Interface.ThemeModeSummary,
+        title = stringResource(LocaleR.string.app_settings_interface_theme_mode_title),
+        summary = stringResource(LocaleR.string.app_settings_interface_theme_mode_summary),
         currentValue = themeMode,
         items = listOf(
-            MLang.AppSettings.Interface.ThemeModeSystem,
-            MLang.AppSettings.Interface.ThemeModeLight,
-            MLang.AppSettings.Interface.ThemeModeDark,
+            stringResource(LocaleR.string.app_settings_interface_theme_mode_system),
+            stringResource(LocaleR.string.app_settings_interface_theme_mode_light),
+            stringResource(LocaleR.string.app_settings_interface_theme_mode_dark),
         ),
         values = ThemeMode.entries,
         onValueChange = onThemeModeChange,
@@ -109,8 +110,8 @@ internal fun ThemeColorPickerItem(
     }
 
     PreferenceListItem(
-        title = MLang.AppSettings.Interface.ColorThemeTitle,
-        summary = MLang.AppSettings.Interface.ColorThemeCustomSummary.format(
+        title = stringResource(LocaleR.string.app_settings_interface_color_theme_title),
+        summary = stringResource(LocaleR.string.app_settings_interface_color_theme_custom_summary).format(
             formatThemeSeedHex(themeSeedColorArgb)
         ),
         onClick = {
@@ -175,7 +176,7 @@ internal fun ThemeColorPickerSheet(
     AppActionBottomSheet(
         show = show,
         modifier = Modifier,
-        title = MLang.AppSettings.Interface.ColorThemePickerTitle,
+        title = stringResource(LocaleR.string.app_settings_interface_color_theme_picker_title),
         onDismissRequest = onDismissRequest,
         enableNestedScroll = true,
         renderInRootScaffold = renderInRootScaffold,
@@ -205,7 +206,7 @@ internal fun ThemeColorPickerSheet(
                 OutlinedTextField(
                     value = editingThemeSeedHex,
                     onValueChange = onEditingThemeSeedHexChange,
-                    label = { Text(MLang.AppSettings.Interface.ColorThemeCodeLabel) },
+                    label = { Text(stringResource(LocaleR.string.app_settings_interface_color_theme_code_label)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = UiDp.dp8),

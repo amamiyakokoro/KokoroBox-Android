@@ -19,6 +19,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,7 +39,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.KokoroCustomRulesScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -82,10 +83,13 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
-                title = MLang.Settings.Kokoro.Title,
+                title = stringResource(LocaleR.string.settings_kokoro_title),
                 actions = {
                     IconButton(onClick = viewModel::refreshAccount) {
-                        Icon(AppMd3Icons.Action.Refresh, MLang.MetaFeature.CustomRules.Refresh)
+                        Icon(
+                            AppMd3Icons.Action.Refresh,
+                            stringResource(LocaleR.string.meta_feature_custom_rules_refresh),
+                        )
                     }
                 },
             )
@@ -94,7 +98,7 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
         ScreenLazyColumn(
             innerPadding = combinePaddingValues(innerPadding, rememberStandalonePageMainPadding()),
         ) {
-            item("account-title") { Title(MLang.ProfilesPage.Kokoro.Account) }
+            item("account-title") { Title(stringResource(LocaleR.string.profiles_page_kokoro_account)) }
             item("account") {
                 KokoroAccountCard(
                     authState = authState,
@@ -103,12 +107,12 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
                     onRetry = viewModel::refreshAccount,
                 )
             }
-            item("rules-title") { Title(MLang.MetaFeature.CustomRules.Rules) }
+            item("rules-title") { Title(stringResource(LocaleR.string.meta_feature_custom_rules_rules)) }
             item("custom-rules") {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     PreferenceArrowItem(
-                        title = MLang.Settings.Kokoro.CustomRules,
-                        summary = MLang.Settings.Kokoro.CustomRulesSummary,
+                        title = stringResource(LocaleR.string.settings_kokoro_custom_rules),
+                        summary = stringResource(LocaleR.string.settings_kokoro_custom_rules_summary),
                         enabled = authState is KokoroAuthState.Authenticated,
                         onClick = {
                             navigator.navigate(KokoroCustomRulesScreenDestination) {
