@@ -31,11 +31,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.App
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.AppDialog
 import com.amamiyakokoro.box.service.runtime.entity.Profile
-import dev.oom_wg.purejoy.mlang.MLang
 import java.io.File
 
 internal fun openProfileConfigPreview(
@@ -68,7 +69,12 @@ internal fun openProfileConfigPreview(
                 configFile.writeText(updatedContent)
             }
                 .getOrElse {
-                    throw IllegalStateException(it.message ?: MLang.ProfilesPage.SettingsDialog.SaveFailed, it)
+                    throw IllegalStateException(
+                        it.message ?: App.instance.getString(
+                            LocaleR.string.profiles_page_settings_dialog_save_failed,
+                        ),
+                        it,
+                    )
                 }
         }
     } else {
@@ -88,7 +94,7 @@ internal fun ProfileEditOptionsDialog(
 ) {
     AppDialog(
         show = show,
-        title = MLang.ProfilesPage.SettingsDialog.EditProfile,
+        title = stringResource(LocaleR.string.profiles_page_settings_dialog_edit_profile),
         onDismissRequest = onDismiss,
         onDismissFinished = onDismissFinished,
     ) {
@@ -99,7 +105,7 @@ internal fun ProfileEditOptionsDialog(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onOpenConfig,
             ) {
-                Text(MLang.ProfilesPage.SettingsDialog.OpenConfig)
+                Text(stringResource(LocaleR.string.profiles_page_settings_dialog_open_config))
             }
 
             Button(
@@ -111,7 +117,7 @@ internal fun ProfileEditOptionsDialog(
                 ),
             ) {
                 Text(
-                    text = MLang.ProfilesPage.SettingsDialog.EditSettings,
+                    text = stringResource(LocaleR.string.profiles_page_settings_dialog_edit_settings),
                     color = MaterialTheme.colorScheme.onPrimary,
                 )
             }
