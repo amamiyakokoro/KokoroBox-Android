@@ -30,7 +30,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 object BiometricHelper {
     private const val BIOMETRIC_ONLY_AUTHENTICATORS = BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -70,18 +70,18 @@ object BiometricHelper {
         val status = getAuthenticationStatus(activity)
         return when {
             status == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED && !hasDeviceCredential(activity) ->
-                MLang.AppSettings.Privacy.BiometricUnavailableNoDeviceCredential
+                activity.getString(LocaleR.string.app_settings_privacy_biometric_unavailable_no_device_credential)
 
             status == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
-                MLang.AppSettings.Privacy.BiometricUnavailableNoneEnrolled
+                activity.getString(LocaleR.string.app_settings_privacy_biometric_unavailable_none_enrolled)
 
             status == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                MLang.AppSettings.Privacy.BiometricUnavailableNoHardware
+                activity.getString(LocaleR.string.app_settings_privacy_biometric_unavailable_no_hardware)
 
             status == BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                MLang.AppSettings.Privacy.BiometricUnavailableHwUnavailable
+                activity.getString(LocaleR.string.app_settings_privacy_biometric_unavailable_hw_unavailable)
 
-            else -> MLang.AppSettings.Privacy.BiometricUnavailableMessage
+            else -> activity.getString(LocaleR.string.app_settings_privacy_biometric_unavailable_message)
         }
     }
 
@@ -103,7 +103,7 @@ object BiometricHelper {
         activity: FragmentActivity,
         title: String,
         subtitle: String? = null,
-        negativeButtonText: String = MLang.Component.Button.Cancel,
+        negativeButtonText: String? = null,
         onSuccess: () -> Unit,
         onFailure: () -> Unit = {},
         onError: (Int, String) -> Unit = { _, _ -> },
@@ -148,7 +148,9 @@ object BiometricHelper {
             else -> {
                 promptInfoBuilder
                     .setAllowedAuthenticators(BIOMETRIC_ONLY_AUTHENTICATORS)
-                    .setNegativeButtonText(negativeButtonText)
+                    .setNegativeButtonText(
+                        negativeButtonText ?: activity.getString(LocaleR.string.component_button_cancel),
+                    )
             }
         }
 

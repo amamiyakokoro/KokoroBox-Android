@@ -10,8 +10,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.runtime.service.R as ServiceR
-import dev.oom_wg.purejoy.mlang.MLang
 
 /** Delivers a deferred PackageInstaller confirmation through an explicit user notification. */
 class AppUpdateInstallNotifier(
@@ -28,11 +28,11 @@ class AppUpdateInstallNotifier(
         )
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(ServiceR.drawable.ic_notification_furin)
-            .setContentTitle(MLang.About.License.CheckUpdate)
-            .setContentText(MLang.About.Update.WaitingForInstallConfirmation)
+            .setContentTitle(context.getString(LocaleR.string.about_license_check_update))
+            .setContentText(context.getString(LocaleR.string.about_update_waiting_for_install_confirmation))
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText(MLang.About.Update.WaitingForInstallConfirmation),
+                    .bigText(context.getString(LocaleR.string.about_update_waiting_for_install_confirmation)),
             )
             .setContentIntent(contentIntent)
             .setAutoCancel(true)
@@ -56,8 +56,8 @@ class AppUpdateInstallNotifier(
             NOTIFICATION_ID + 1,
             NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(ServiceR.drawable.ic_notification_furin)
-                .setContentTitle("${MLang.About.Update.Available}: $tag")
-                .setContentText(MLang.About.License.CheckUpdateSummary)
+                .setContentTitle("${context.getString(LocaleR.string.about_update_available)}: $tag")
+                .setContentText(context.getString(LocaleR.string.about_license_check_update_summary))
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
@@ -77,7 +77,7 @@ class AppUpdateInstallNotifier(
         manager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
-                MLang.About.License.CheckUpdate,
+                context.getString(LocaleR.string.about_license_check_update),
                 NotificationManager.IMPORTANCE_HIGH,
             ),
         )

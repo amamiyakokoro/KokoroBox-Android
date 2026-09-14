@@ -41,11 +41,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.common.util.ToastDialogBridge
 import com.amamiyakokoro.box.common.util.ToastDialogEvent
 import com.amamiyakokoro.box.common.util.NoticePresentation
 import com.amamiyakokoro.box.presentation.theme.AppTheme
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun ToastDialogHost() {
@@ -67,7 +68,8 @@ fun ToastDialogHost() {
 
     eventSnapshot?.let { snapshot ->
         val localizedTitle = snapshot.title.ifBlank {
-            if (snapshot.copyable) MLang.Component.Message.Error else MLang.Component.Message.Hint
+            if (snapshot.copyable) stringResource(LocaleR.string.component_message_error)
+            else stringResource(LocaleR.string.component_message_hint)
         }
         AppDialog(
             show = showDialog.value,
@@ -93,7 +95,7 @@ fun ToastDialogHost() {
                                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 clipboard.setPrimaryClip(ClipData.newPlainText(localizedTitle, snapshot.message))
                             },
-                        ) { Text(MLang.Component.Button.Copy) }
+                        ) { Text(stringResource(LocaleR.string.component_button_copy)) }
                     }
                     Box(
                         modifier = Modifier
@@ -107,7 +109,7 @@ fun ToastDialogHost() {
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = MLang.Component.Button.Ok,
+                            text = stringResource(LocaleR.string.component_button_ok),
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyLarge,
                         )

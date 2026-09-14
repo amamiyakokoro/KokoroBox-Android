@@ -29,11 +29,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.FragmentActivity
 import com.amamiyakokoro.box.common.util.BiometricHelper
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Stable
 data class StartupBiometricGateState(
@@ -84,8 +85,8 @@ fun rememberStartupBiometricGateState(
         biometricErrorMessage = null
         BiometricHelper.authenticate(
             activity = activity,
-            title = MLang.AppSettings.Privacy.BiometricPromptTitle,
-            negativeButtonText = MLang.AppSettings.Privacy.BiometricExitButton,
+            title = activity.getString(LocaleR.string.app_settings_privacy_biometric_prompt_title),
+            negativeButtonText = activity.getString(LocaleR.string.app_settings_privacy_biometric_exit_button),
             onSuccess = {
                 isAuthenticated = true
                 isAuthenticating = false
@@ -97,7 +98,7 @@ fun rememberStartupBiometricGateState(
                     activity.finishAndRemoveTask()
                 } else {
                     biometricErrorMessage = errString.ifBlank {
-                        MLang.AppSettings.Privacy.BiometricUnavailableMessage
+                        activity.getString(LocaleR.string.app_settings_privacy_biometric_unavailable_message)
                     }
                 }
             },
@@ -138,13 +139,14 @@ fun StartupBiometricContent(
             verticalArrangement = Arrangement.spacedBy(UiDp.dp16),
         ) {
             Text(
-                text = MLang.AppSettings.Privacy.BiometricPromptTitle,
+                text = stringResource(LocaleR.string.app_settings_privacy_biometric_prompt_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
             )
             Text(
-                text = biometricErrorMessage ?: MLang.AppSettings.Privacy.BiometricPromptMessage,
+                text = biometricErrorMessage
+                    ?: stringResource(LocaleR.string.app_settings_privacy_biometric_prompt_message),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
@@ -158,14 +160,14 @@ fun StartupBiometricContent(
                         modifier = Modifier.weight(1f),
                         onClick = onRetry,
                     ) {
-                        Text(MLang.AppSettings.Privacy.BiometricRetryButton)
+                        Text(stringResource(LocaleR.string.app_settings_privacy_biometric_retry_button))
                     }
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = onExit,
                     ) {
                         Text(
-                            text = MLang.AppSettings.Privacy.BiometricExitButton,
+                            text = stringResource(LocaleR.string.app_settings_privacy_biometric_exit_button),
                             color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }

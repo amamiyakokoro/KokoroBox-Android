@@ -46,6 +46,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -56,10 +57,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.takeOrElse
 import androidx.compose.ui.zIndex
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.Sizes
 import com.amamiyakokoro.box.presentation.theme.Spacing
-import dev.oom_wg.purejoy.mlang.MLang
 
 @Composable
 fun SearchStatus.TopAppBarAnim(
@@ -335,7 +336,7 @@ private fun SearchPagerCancelButton(
         exit = shrinkHorizontally() + slideOutHorizontally(targetOffsetX = { it }),
     ) {
         Text(
-            text = MLang.Component.Button.Cancel,
+            text = stringResource(LocaleR.string.component_button_cancel),
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
@@ -463,7 +464,7 @@ private fun SearchBarLeadingIcon(
 ) {
     Icon(
         imageVector = AppMd3Icons.Action.Search,
-        contentDescription = MLang.Component.Editor.Action.Search,
+        contentDescription = stringResource(LocaleR.string.component_editor_action_search),
         modifier = Modifier
             .size(componentSizes.searchIconTouchTarget)
             .padding(start = spacing.space16, end = spacing.space8),
@@ -485,7 +486,7 @@ private fun SearchBarClearButton(
     ) {
         Icon(
             imageVector = AppMd3Icons.Action.Close,
-            contentDescription = MLang.Component.Button.Clear,
+            contentDescription = stringResource(LocaleR.string.component_button_clear),
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .size(componentSizes.searchIconTouchTarget)
@@ -541,7 +542,7 @@ private fun SearchBarCollapsed(
             ) {
                 Icon(
                     imageVector = AppMd3Icons.Action.Search,
-                    contentDescription = MLang.Component.Editor.Action.Search,
+                    contentDescription = stringResource(LocaleR.string.component_editor_action_search),
                     modifier = Modifier
                         .size(componentSizes.searchIconTouchTarget)
                         .padding(start = spacing.space16, end = spacing.space8),

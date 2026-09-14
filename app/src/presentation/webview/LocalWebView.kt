@@ -36,12 +36,13 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.amamiyakokoro.box.BuildConfig
 import com.amamiyakokoro.box.WebViewActivity
-import dev.oom_wg.purejoy.mlang.MLang
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 import androidx.compose.material3.Text
 
 private object NoOpWebViewClient : WebViewClient()
@@ -105,7 +106,7 @@ fun LocalWebView(
             modifier = modifier.windowInsetsPadding(WindowInsets.safeDrawing),
             contentAlignment = Alignment.Center
         ) {
-            Text(MLang.Component.WebView.InvalidUrl)
+            Text(stringResource(LocaleR.string.component_web_view_invalid_url))
         }
         return
     }
