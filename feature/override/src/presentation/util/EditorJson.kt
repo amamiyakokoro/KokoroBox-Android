@@ -22,7 +22,6 @@
 
 package com.amamiyakokoro.box.presentation.util
 
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.*
 
 val OverrideEditorJson = Json {
@@ -258,15 +257,20 @@ fun extraFieldDraftToJsonElement(draft: OverrideExtraFieldDraft): JsonElement? {
     }
 }
 
-fun summarizeExtraFieldValue(element: JsonElement): String {
+fun summarizeExtraFieldValue(
+    element: JsonElement,
+    emptyStringLabel: String,
+    arrayItemsTemplate: String,
+    objectFieldsTemplate: String,
+): String {
     return when (element) {
         JsonNull -> "Null"
         is JsonPrimitive -> when {
-            element.isString -> element.content.ifBlank { MLang.Override.Editor.EmptyString }
+            element.isString -> element.content.ifBlank { emptyStringLabel }
             else -> element.content
         }
 
-        is JsonArray -> MLang.Override.Editor.ArrayItems.format(element.size)
-        is JsonObject -> MLang.Override.Editor.ObjectFields.format(element.size)
+        is JsonArray -> arrayItemsTemplate.format(element.size)
+        is JsonObject -> objectFieldsTemplate.format(element.size)
     }
 }

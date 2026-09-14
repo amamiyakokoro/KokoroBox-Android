@@ -21,6 +21,8 @@
 package com.amamiyakokoro.box.presentation.viewmodel
 
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
+import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.data.controller.ActiveProfileOverrideReloader
@@ -30,7 +32,6 @@ import com.amamiyakokoro.box.data.model.OverrideMetadata
 import com.amamiyakokoro.box.presentation.util.OverrideSaveEvent
 import com.amamiyakokoro.box.presentation.util.OverrideSaveState
 import com.amamiyakokoro.box.presentation.util.encodeOverrideConfigForDiff
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -239,7 +240,11 @@ internal class OverrideEditSessionCoordinator(
                 if (updateSaveState) {
                     _saveState.value = OverrideSaveState.Idle
                 }
-                _events.tryEmit(OverrideSaveEvent.Failed(MLang.Override.Save.PresetNotModifiable))
+                _events.tryEmit(
+                    OverrideSaveEvent.Failed(
+                        UiText.Resource(LocaleR.string.override_save_preset_not_modifiable),
+                    ),
+                )
                 return
             }
             configRepo.save(config)
@@ -255,13 +260,20 @@ internal class OverrideEditSessionCoordinator(
                 if (runtimeSynced) {
                     _events.emit(OverrideSaveEvent.Saved(config.id))
                 } else {
-                    _events.emit(OverrideSaveEvent.Failed(MLang.Override.Save.ApplyFailed))
+                    _events.emit(
+                        OverrideSaveEvent.Failed(
+                            UiText.Resource(LocaleR.string.override_save_apply_failed),
+                        ),
+                    )
                 }
             }
         } catch (e: Exception) {
             Timber.tag(loggerTag).e(e, "Failed to update config")
             _events.emit(
-                OverrideSaveEvent.Failed(e.message ?: MLang.Override.Save.Failed),
+                OverrideSaveEvent.Failed(
+                    e.message?.let(UiText::Dynamic)
+                        ?: UiText.Resource(LocaleR.string.override_save_failed),
+                ),
             )
         } finally {
             if (updateSaveState) {

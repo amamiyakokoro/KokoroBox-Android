@@ -24,6 +24,7 @@ package com.amamiyakokoro.box.presentation.util
 
 import androidx.annotation.StringRes
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.locale.UiText
 
 enum class OverrideEditorSection(
     @StringRes val titleRes: Int,
@@ -54,7 +55,7 @@ sealed interface OverrideSaveEvent {
     ) : OverrideSaveEvent
 
     data class Failed(
-        val message: String,
+        val message: UiText,
     ) : OverrideSaveEvent
 }
 
@@ -71,5 +72,5 @@ data class OverrideEditorOverview(
     val mergeCount: Int,
     val forceCount: Int,
     val sectionSummaries: Map<OverrideEditorSection, OverrideSectionSummary>,
-    val warnings: List<String>,
+    val warnings: List<UiText>,
 )

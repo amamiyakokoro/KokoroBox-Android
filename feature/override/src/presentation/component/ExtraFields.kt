@@ -46,6 +46,9 @@ fun OverrideExtraFieldsCard(
     onDeleteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val emptyStringLabel = stringResource(LocaleR.string.override_editor_empty_string)
+    val arrayItemsTemplate = stringResource(LocaleR.string.override_editor_array_items)
+    val objectFieldsTemplate = stringResource(LocaleR.string.override_editor_object_fields)
     Card(modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -72,7 +75,12 @@ fun OverrideExtraFieldsCard(
                 fields.entries.forEach { entry ->
                     PreferenceListItem(
                         title = entry.key,
-                        summary = "${resolveValueTypeLabel(entry.value)} · ${summarizeExtraFieldValue(entry.value)}",
+                        summary = "${resolveValueTypeLabel(entry.value)} · ${summarizeExtraFieldValue(
+                            entry.value,
+                            emptyStringLabel,
+                            arrayItemsTemplate,
+                            objectFieldsTemplate,
+                        )}",
                         onClick = { onEditClick(entry.key, entry.value) },
                         endActions = {
                             OverrideCardActionIconButton(
