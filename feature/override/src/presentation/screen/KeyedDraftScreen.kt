@@ -33,7 +33,6 @@ import com.amamiyakokoro.box.presentation.component.*
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.util.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import dev.oom_wg.purejoy.mlang.MLang
 import kotlinx.serialization.json.*
 import androidx.compose.material3.Scaffold
 
@@ -143,7 +142,8 @@ fun OverrideKeyedObjectDraftEditorScreen(
     var showHealthCheckExtraFieldDialog by remember { mutableStateOf(false) }
     var showOverrideExtraFieldDialog by remember { mutableStateOf(false) }
     var errorText by remember { mutableStateOf<String?>(null) }
-    val keyLabel = MLang.Override.Draft.Name
+    val keyLabel = stringResource(LocaleR.string.override_draft_name)
+    val nameRequiredMessage = stringResource(LocaleR.string.override_draft_name_required)
 
     DisposableEffect(Unit) {
         onDispose {
@@ -157,10 +157,10 @@ fun OverrideKeyedObjectDraftEditorScreen(
                 controller = saveFabController,
                 visible = true,
                 imageVector = AppMd3Icons.Action.Save,
-                contentDescription = MLang.Override.Draft.Save + editorTypeItemLabel,
+                contentDescription = stringResource(LocaleR.string.override_draft_save) + editorTypeItemLabel,
                 onClick = {
                     if (key.trim().isBlank()) {
-                        errorText = MLang.Override.Draft.NameRequired
+                        errorText = nameRequiredMessage
                         return@OverrideAnimatedFab
                     }
                     OverrideStructuredEditorStore.submitKeyedObjectDraft(
@@ -234,7 +234,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
             onScrollDirectionChanged = saveFabController::onScrollDirectionChanged,
         ) {
             item {
-                OverridePlainFormSection(MLang.Override.Draft.BasicIdentity) {
+                OverridePlainFormSection(stringResource(LocaleR.string.override_draft_basic_identity)) {
                     OverrideFormField(
                         value = key,
                         onValueChange = {
@@ -242,7 +242,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                             errorText = null
                         },
                         label = keyLabel,
-                        errorText = errorText?.takeIf { it.contains(MLang.Override.Draft.Name) },
+                        errorText = errorText?.takeIf { it == nameRequiredMessage },
                     )
                     OverrideFormField(
                         value = type,
@@ -257,7 +257,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                 }
             }
             item {
-                OverridePlainFormSection(MLang.Override.Draft.CoreSource) {
+                OverridePlainFormSection(stringResource(LocaleR.string.override_draft_core_source)) {
                     OverrideFormField(
                         value = path,
                         onValueChange = { path = it },
@@ -286,7 +286,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                 }
             }
             item {
-                OverridePlainFormSection(MLang.Override.Draft.NetworkAuth) {
+                OverridePlainFormSection(stringResource(LocaleR.string.override_draft_network_auth)) {
                     OverrideFormField(
                         value = behavior,
                         onValueChange = { behavior = it },
@@ -306,7 +306,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                         value = headerText,
                         onValueChange = { headerText = it },
                         label = "header",
-                        supportText = MLang.Override.Draft.HeaderHint,
+                        supportText = stringResource(LocaleR.string.override_draft_header_hint),
                         modifier = Modifier.height(UiDp.dp120),
                         maxLines = 8,
                     )
@@ -338,7 +338,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                     }
                 }
                 item {
-                    OverrideCardSection(MLang.Override.Draft.HealthCheckSwitch) {
+                    OverrideCardSection(stringResource(LocaleR.string.override_draft_health_check_switch)) {
                         NullableBooleanSelector(
                             title = "health-check.enable",
                             value = healthCheckEnable,
@@ -352,9 +352,9 @@ fun OverrideKeyedObjectDraftEditorScreen(
                     }
                 }
                 item {
-                    OverrideSection(MLang.Override.Draft.HealthCheckFields) {
+                    OverrideSection(stringResource(LocaleR.string.override_draft_health_check_fields)) {
                         OverrideExtraFieldsCard(
-                            title = MLang.Override.Draft.HealthCheckFields,
+                            title = stringResource(LocaleR.string.override_draft_health_check_fields),
                             fields = healthCheckExtraFields,
                             onAddClick = {
                                 editingHealthCheckExtraKey = null
@@ -415,7 +415,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                     }
                 }
                 item {
-                    OverrideCardSection(MLang.Override.Draft.OverrideSwitch) {
+                    OverrideCardSection(stringResource(LocaleR.string.override_draft_override_switch)) {
                         NullableBooleanSelector(
                             title = "override.tfo",
                             value = overrideTfo,
@@ -444,9 +444,9 @@ fun OverrideKeyedObjectDraftEditorScreen(
                     }
                 }
                 item {
-                    OverrideSection(MLang.Override.Draft.OverrideFields) {
+                    OverrideSection(stringResource(LocaleR.string.override_draft_override_fields)) {
                         OverrideExtraFieldsCard(
-                            title = MLang.Override.Draft.OverrideFields,
+                            title = stringResource(LocaleR.string.override_draft_override_fields),
                             fields = providerOverrideExtraFields,
                             onAddClick = {
                                 editingOverrideExtraKey = null
@@ -488,7 +488,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                     }
                 }
                 item {
-                    OverrideCardSection(MLang.Override.Draft.HealthCheckSwitch) {
+                    OverrideCardSection(stringResource(LocaleR.string.override_draft_health_check_switch)) {
                         NullableBooleanSelector(
                             title = "health-check.enable",
                             value = healthCheckEnable,
@@ -503,7 +503,7 @@ fun OverrideKeyedObjectDraftEditorScreen(
                 }
             }
             item {
-                OverrideCardSection(MLang.Override.Draft.BooleanOptions) {
+                OverrideCardSection(stringResource(LocaleR.string.override_draft_boolean_options)) {
                     NullableBooleanSelector(
                         title = "enable",
                         value = enable,
@@ -517,9 +517,9 @@ fun OverrideKeyedObjectDraftEditorScreen(
                 }
             }
             item {
-                OverrideSection(MLang.Override.Draft.ExtraFields) {
+                OverrideSection(stringResource(LocaleR.string.override_draft_extra_fields)) {
                     OverrideExtraFieldsCard(
-                        title = MLang.Override.Draft.ExtraFields,
+                        title = stringResource(LocaleR.string.override_draft_extra_fields),
                         fields = extraFields,
                         onAddClick = {
                             editingExtraKey = null
@@ -541,7 +541,10 @@ fun OverrideKeyedObjectDraftEditorScreen(
         }
         OverrideExtraFieldDialog(
             show = showExtraFieldDialog,
-            title = if (editingExtraKey == null) MLang.Override.Draft.AddExtraField else MLang.Override.Draft.EditExtraField,
+            title = stringResource(
+                if (editingExtraKey == null) LocaleR.string.override_draft_add_extra_field
+                else LocaleR.string.override_draft_edit_extra_field,
+            ),
             initialValue = editingExtraKey?.let(extraFields::toExtraFieldDraft),
             onConfirm = { draft: OverrideExtraFieldDraft ->
                 extraFields = extraFields.updateExtraField(editingExtraKey, draft)
@@ -556,9 +559,9 @@ fun OverrideKeyedObjectDraftEditorScreen(
         OverrideExtraFieldDialog(
             show = showHealthCheckExtraFieldDialog,
             title = if (editingHealthCheckExtraKey == null) {
-                MLang.Override.Draft.AddHealthCheckField
+                stringResource(LocaleR.string.override_draft_add_health_check_field)
             } else {
-                MLang.Override.Draft.EditHealthCheckField
+                stringResource(LocaleR.string.override_draft_edit_health_check_field)
             },
             initialValue = editingHealthCheckExtraKey?.let(healthCheckExtraFields::toExtraFieldDraft),
             onConfirm = { draft: OverrideExtraFieldDraft ->
@@ -577,9 +580,9 @@ fun OverrideKeyedObjectDraftEditorScreen(
         OverrideExtraFieldDialog(
             show = showOverrideExtraFieldDialog,
             title = if (editingOverrideExtraKey == null) {
-                MLang.Override.Draft.AddOverrideField
+                stringResource(LocaleR.string.override_draft_add_override_field)
             } else {
-                MLang.Override.Draft.EditOverrideField
+                stringResource(LocaleR.string.override_draft_edit_override_field)
             },
             initialValue = editingOverrideExtraKey?.let(providerOverrideExtraFields::toExtraFieldDraft),
             onConfirm = { draft: OverrideExtraFieldDraft ->
