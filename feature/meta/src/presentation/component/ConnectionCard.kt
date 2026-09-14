@@ -30,7 +30,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
@@ -86,7 +86,7 @@ fun ConnectionCard(
         }
     }
 
-    val relativeTime = formatRelativeTime(connectionInfo.start, LocalContext.current.resources)
+    val relativeTime = formatRelativeTime(connectionInfo.start, LocalResources.current)
     val summaryText = remember(sourceIP, sourcePort, destinationIp, destinationPort) {
         val source = listOf(sourceIP, sourcePort).filter(String::isNotBlank).joinToString(":")
         val destination = listOf(destinationIp, destinationPort).filter(String::isNotBlank).joinToString(":")

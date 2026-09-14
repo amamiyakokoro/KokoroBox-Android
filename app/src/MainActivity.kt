@@ -39,7 +39,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.Density
 import androidx.lifecycle.lifecycleScope
 import androidx.fragment.app.FragmentActivity
@@ -148,7 +150,6 @@ class MainActivity : FragmentActivity() {
         setContent {
             val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
             val appLanguage by appSettingsViewModel.appLanguage.state.collectAsStateWithLifecycle()
-            val languageAtActivityCreation = remember { appLanguage }
             val themeMode = appSettingsViewModel.themeMode.state.collectAsStateWithLifecycle().value
             val colorTheme = appSettingsViewModel.colorTheme.state.collectAsStateWithLifecycle().value
             val themeSeedColorArgb = appSettingsViewModel.themeSeedColorArgb.state.collectAsStateWithLifecycle().value
@@ -178,16 +179,6 @@ class MainActivity : FragmentActivity() {
                 biometricUnlockEnabled = biometricUnlockEnabled,
             )
 
-            LaunchedEffect(appLanguage) {
-                if (appLanguage != languageAtActivityCreation) {
-                    // MainActivity is a FragmentActivity rather than an AppCompatActivity,
-                    // so AppCompatDelegate cannot recreate it after a locale change.
-                    // Recreating runs attachBaseContext() again with the new locale while
-                    // preserving the navigation state through the Activity saved state.
-                    this@MainActivity.recreate()
-                }
-            }
-
             LaunchedEffect(excludeFromRecents) {
                 this@MainActivity.applyExcludeFromRecents(excludeFromRecents)
             }
@@ -201,56 +192,66 @@ class MainActivity : FragmentActivity() {
                 AppUpdateWorkScheduler.sync(this@MainActivity, automaticUpdateCheckEnabled)
             }
 
-            ProvideAndroidPlatformTheme {
-                val systemDensity = LocalDensity.current
-                val scaledDensity = remember(systemDensity, pageScale) {
-                    Density(systemDensity.density * pageScale, systemDensity.fontScale)
-                }
-                CompositionLocalProvider(LocalDensity provides scaledDensity) {
-                    YumeTheme(
-                        themeMode = themeMode,
-                        colorTheme = colorTheme,
-                        themeSeedColorArgb = effectiveThemeSeedColorArgb,
-                        invertOnPrimaryColors = invertOnPrimaryColors,
-                    ) {
-                        if (!biometricGateState.isAuthenticated) {
-                            Surface(
-                                modifier = Modifier.fillMaxSize(),
-                                color = MaterialTheme.colorScheme.surface,
-                            ) {
-                                StartupBiometricContent(
-                                    isAuthenticating = biometricGateState.isAuthenticating,
-                                    biometricErrorMessage = biometricGateState.biometricErrorMessage,
-                                    onRetry = biometricGateState.retryAuthentication,
-                                    onExit = { finishAndRemoveTask() },
-                                )
-                            }
-                        } else {
-                            val navController = rememberNavController()
-
-                            Surface(
-                                modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
-                            ) {
-                                AppSnackbarSurface(Modifier.fillMaxSize()) {
-                                    DestinationsNavHost(
-                                        navGraph = NavGraphs.root,
-                                        navController = navController,
-                                        defaultTransitions = NavigationTransitions.defaultStyle,
+            val systemConfiguration = LocalConfiguration.current
+            val localizedContext = remember(appLanguage, systemConfiguration) {
+                AppLanguageManager.localizedContext(this@MainActivity, appLanguage)
+            }
+            CompositionLocalProvider(
+                LocalConfiguration provides localizedContext.resources.configuration,
+                LocalResources provides localizedContext.resources,
+            ) {
+                ProvideAndroidPlatformTheme {
+                    val systemDensity = LocalDensity.current
+                    val scaledDensity = remember(systemDensity, pageScale) {
+                        Density(systemDensity.density * pageScale, systemDensity.fontScale)
+                    }
+                    CompositionLocalProvider(LocalDensity provides scaledDensity) {
+                        YumeTheme(
+                            themeMode = themeMode,
+                            colorTheme = colorTheme,
+                            themeSeedColorArgb = effectiveThemeSeedColorArgb,
+                            invertOnPrimaryColors = invertOnPrimaryColors,
+                        ) {
+                            if (!biometricGateState.isAuthenticated) {
+                                Surface(
+                                    modifier = Modifier.fillMaxSize(),
+                                    color = MaterialTheme.colorScheme.surface,
+                                ) {
+                                    StartupBiometricContent(
+                                        isAuthenticating = biometricGateState.isAuthenticating,
+                                        biometricErrorMessage = biometricGateState.biometricErrorMessage,
+                                        onRetry = biometricGateState.retryAuthentication,
+                                        onExit = { finishAndRemoveTask() },
                                     )
-                                    ToastDialogHost()
                                 }
-                            }
-                            availableUpdate?.let { release ->
-                                AppUpdateDialog(
-                                    result = release,
-                                    installState = updateInstallState,
-                                    onDownloadAndInstall = appUpdateManager::downloadAndPrepare,
-                                    onContinueInstall = appUpdateManager::installPreparedUpdate,
-                                    onDismiss = {
-                                        appUpdateManager.dismiss()
-                                        automaticAppUpdateChecker.dismiss()
-                                    },
-                                )
+                            } else {
+                                val navController = rememberNavController()
+
+                                Surface(
+                                    modifier = Modifier.fillMaxSize(),
+                                    color = MaterialTheme.colorScheme.surface,
+                                ) {
+                                    AppSnackbarSurface(Modifier.fillMaxSize()) {
+                                        DestinationsNavHost(
+                                            navGraph = NavGraphs.root,
+                                            navController = navController,
+                                            defaultTransitions = NavigationTransitions.defaultStyle,
+                                        )
+                                        ToastDialogHost()
+                                    }
+                                }
+                                availableUpdate?.let { release ->
+                                    AppUpdateDialog(
+                                        result = release,
+                                        installState = updateInstallState,
+                                        onDownloadAndInstall = appUpdateManager::downloadAndPrepare,
+                                        onContinueInstall = appUpdateManager::installPreparedUpdate,
+                                        onDismiss = {
+                                            appUpdateManager.dismiss()
+                                            automaticAppUpdateChecker.dismiss()
+                                        },
+                                    )
+                                }
                             }
                         }
                     }

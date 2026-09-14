@@ -24,8 +24,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import com.amamiyakokoro.box.data.model.AppLanguage
 import java.util.Locale
 
@@ -34,30 +32,21 @@ object AppLanguageManager {
     @Volatile
     private var activeLanguage: AppLanguage = AppLanguage.System
 
-    @Volatile
-    private var activeLocale: Locale = Locale.getDefault()
-
     fun apply(language: AppLanguage) {
         activeLanguage = language
         val locale = resolveLocale(language)
-        activeLocale = locale
-
-        AppCompatDelegate.setApplicationLocales(
-            when (language) {
-                AppLanguage.System -> LocaleListCompat.getEmptyLocaleList()
-                AppLanguage.Zh -> LocaleListCompat.forLanguageTags("zh-Hans")
-                AppLanguage.ZhTw -> LocaleListCompat.forLanguageTags("zh-Hant-TW")
-                AppLanguage.En -> LocaleListCompat.forLanguageTags("en")
-            },
-        )
 
         Locale.setDefault(locale)
         LocaleUtil.setCurrentLocale(locale)
     }
 
     fun wrap(base: Context): Context {
+        return localizedContext(base, activeLanguage)
+    }
+
+    fun localizedContext(base: Context, language: AppLanguage): Context {
         val configuration = Configuration(base.resources.configuration)
-        applyLocale(configuration, activeLocale)
+        applyLocale(configuration, resolveLocale(language))
         return base.createConfigurationContext(configuration)
     }
 
