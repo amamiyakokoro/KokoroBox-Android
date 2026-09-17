@@ -87,8 +87,17 @@ internal class ProxyRuntimeControl(
                     Intent(clashRequestStopAction()).setPackage(appContext.packageName),
                 )
             }
-            appContext.stopService(Intent(appContext, TunService::class.java))
-            appContext.stopService(Intent(appContext, ClashService::class.java))
+        }
+    }
+
+    suspend fun forceStopLocalRuntime(mode: ProxyMode) {
+        withContext(Dispatchers.IO) {
+            val serviceClass = when (mode) {
+                ProxyMode.Tun -> TunService::class.java
+                ProxyMode.Http -> ClashService::class.java
+                ProxyMode.RootTun -> return@withContext
+            }
+            appContext.stopService(Intent(appContext, serviceClass))
         }
     }
 }

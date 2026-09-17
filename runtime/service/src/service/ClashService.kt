@@ -62,6 +62,9 @@ class ClashService : BaseService() {
     private var notificationJob: Job? = null
     private lateinit var runtime: SessionRuntime
     private var reloadJob: Job? = null
+    private var stopJob: Job? = null
+    @Volatile
+    private var terminalEventReported = false
 
     private val runtimeEventsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -75,14 +78,7 @@ class ClashService : BaseService() {
                 }
 
                 Intents.ACTION_CLASH_REQUEST_STOP -> {
-                    reason = intent.getStringExtra(Intents.EXTRA_STOP_REASON)
-                    reloadJob?.cancel()
-                    reloadJob = null
-                    StatusProvider.markRuntimeStopping(ProxyMode.Http)
-                    if (this@ClashService::runtime.isInitialized) {
-                        runtime.requestStop(reason)
-                    }
-                    stopSelf()
+                    scheduleStop(intent.getStringExtra(Intents.EXTRA_STOP_REASON))
                 }
             }
         }
@@ -119,6 +115,7 @@ class ClashService : BaseService() {
 
                     override fun onStopped(reason: String?) {
                         this@ClashService.reason = reason
+                        terminalEventReported = true
                         StatusProvider.markRuntimeIdle(ProxyMode.Http)
                         sendClashStopped(reason)
                     }
@@ -135,6 +132,7 @@ class ClashService : BaseService() {
 
                     override fun reportFailure(error: String) {
                         reason = error
+                        terminalEventReported = true
                         startupLogStore.append("LOCAL_HTTP failed=$error")
                         StatusProvider.markRuntimeFailed(ProxyMode.Http)
                         sendClashStopped(error)
@@ -157,6 +155,7 @@ class ClashService : BaseService() {
                     check(result.success) { result.error ?: "http runtime start failed" }
                 }.onFailure { error ->
                     reason = error.message ?: "http runtime start failed"
+                    terminalEventReported = true
                     startupLogStore.append("LOCAL_HTTP failed=$reason")
                     StatusProvider.markRuntimeFailed(ProxyMode.Http)
                     sendClashStopped(reason)
@@ -165,6 +164,7 @@ class ClashService : BaseService() {
             }
         }.onFailure { error ->
             reason = error.message ?: "http runtime start failed"
+            terminalEventReported = true
             startupLogStore.append("LOCAL_HTTP failed=$reason")
             StatusProvider.markRuntimeFailed(ProxyMode.Http)
             sendClashStopped(reason)
@@ -195,8 +195,11 @@ class ClashService : BaseService() {
             runtime.destroy()
         }
 
-        StatusProvider.markRuntimeIdle(ProxyMode.Http)
-        sendClashStopped(reason)
+        if (!terminalEventReported) {
+            terminalEventReported = true
+            StatusProvider.markRuntimeIdle(ProxyMode.Http)
+            sendClashStopped(reason)
+        }
         startupLogStore.append("LOCAL_HTTP destroy")
         Log.i("ClashService destroyed: ${reason ?: "successfully"}")
 
@@ -223,7 +226,34 @@ class ClashService : BaseService() {
         }
     }
 
+    private fun scheduleStop(stopReason: String?) {
+        if (stopJob?.isActive == true) return
+
+        reason = stopReason
+        reloadJob?.cancel()
+        reloadJob = null
+        StatusProvider.markRuntimeStopping(ProxyMode.Http)
+
+        if (!this::runtime.isInitialized) {
+            stopSelf()
+            return
+        }
+
+        runtime.requestStop(stopReason)
+        stopJob = launch {
+            val result = runtime.stop(stopReason)
+            if (!result.success && !terminalEventReported) {
+                reason = result.error ?: "http runtime stop failed"
+                terminalEventReported = true
+                StatusProvider.markRuntimeFailed(ProxyMode.Http)
+                sendClashStopped(reason)
+            }
+            stopSelf()
+        }
+    }
+
     private fun scheduleReload() {
+        if (stopJob?.isActive == true) return
         reloadJob?.cancel()
         reloadJob = launch {
             startupLogStore.append("LOCAL_HTTP spec: reload create begin")

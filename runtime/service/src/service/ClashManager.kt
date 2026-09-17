@@ -153,20 +153,10 @@ class ClashManager(private val context: Context) : IClashManager,
     }
 
     override fun requestStop() {
-        runCatching {
-            context.sendBroadcastSelf(Intent(Intents.ACTION_CLASH_REQUEST_STOP))
-        }
-
-        runCatching {
-            context.stopService(Intent(context, TunService::class.java))
-            context.stopService(Intent(context, ClashService::class.java))
-        }
-
-        runCatching {
-            Clash.stopHttp()
-            Clash.stopTun()
-            Clash.reset()
-        }
+        // The active service owns the runtime and must be the only component that tears it down.
+        // Stopping/resetting the native core here races with SessionRuntime.destroy() in the
+        // service lifecycle and can leave the UI waiting forever for the terminal state event.
+        context.sendBroadcastSelf(Intent(Intents.ACTION_CLASH_REQUEST_STOP))
     }
 
     override suspend fun healthCheck(group: String) {

@@ -84,6 +84,8 @@ class ProxyFacade(
         const val PROXY_SELECT_FULL_REFRESH_DELAY_MS = 400L
         const val ROOT_TUN_BOOTSTRAP_ATTEMPTS = 20
         const val ROOT_TUN_BOOTSTRAP_DELAY_MS = 300L
+        const val LOCAL_STOP_REQUEST_TIMEOUT_MS = 3_000L
+        const val LOCAL_STOP_COMPLETION_TIMEOUT_MS = 5_000L
         const val GLOBAL_GROUP_NAME = "GLOBAL"
     }
 
@@ -737,6 +739,12 @@ class ProxyFacade(
 
         runCatching {
             runtimeControl.stop(owner)
+            if (owner == RuntimeOwner.LocalTun || owner == RuntimeOwner.LocalHttp) {
+                awaitLocalRuntimeStopped(
+                    owner = owner,
+                    previousSnapshot = previousSnapshot,
+                )
+            }
         }.onFailure {
             publishRuntimeSnapshot(previousSnapshot)
             throw it
@@ -754,6 +762,61 @@ class ProxyFacade(
         clearRuntimeState(resetGroups = false)
         publishRuntimeSnapshot(RuntimeStateMapper.idleSnapshot(targetMode, generation = generation))
         scope.launch { refreshPreviewStateSafely() }
+    }
+
+    private suspend fun awaitLocalRuntimeStopped(
+        owner: RuntimeOwner,
+        previousSnapshot: RuntimeSnapshot,
+    ) {
+        val mode = localModeForOwner(owner) ?: return
+        if (awaitRuntimeTerminal(LOCAL_STOP_REQUEST_TIMEOUT_MS)) return
+
+        StatusProvider.reconcilePersistedRuntimeState()
+        val phaseAfterRequest = StatusProvider.queryRuntimePhase(mode)
+        if (phaseAfterRequest != LocalRuntimePhase.Stopping) {
+            Timber.w(
+                "Local runtime did not acknowledge stop request in %dms; forcing service stop: mode=%s phase=%s",
+                LOCAL_STOP_REQUEST_TIMEOUT_MS,
+                mode,
+                phaseAfterRequest,
+            )
+            runtimeControl.forceStopLocalRuntime(mode)
+        } else {
+            Timber.w(
+                "Local runtime acknowledged stop but teardown is still running: mode=%s",
+                mode,
+            )
+        }
+
+        if (awaitRuntimeTerminal(LOCAL_STOP_COMPLETION_TIMEOUT_MS)) return
+
+        StatusProvider.reconcilePersistedRuntimeState()
+        val persistedPhase = StatusProvider.queryRuntimePhase(mode)
+        val serviceAlive = StatusProvider.isLocalRuntimeServiceAlive(mode)
+        if (!serviceAlive || persistedPhase == LocalRuntimePhase.Idle) {
+            StatusProvider.markRuntimeIdle(mode)
+            handleRuntimeStopped(reason = null)
+            return
+        }
+
+        val message = "Timed out stopping ${mode.name} runtime"
+        publishRuntimeSnapshot(
+            previousSnapshot.copy(
+                lastError = message,
+                generation = nextGeneration(),
+            ),
+        )
+        throw IllegalStateException(message)
+    }
+
+    private suspend fun awaitRuntimeTerminal(timeoutMillis: Long): Boolean {
+        return withTimeoutOrNull(timeoutMillis) {
+            runtimeSnapshot.first { snapshot ->
+                snapshot.owner == RuntimeOwner.None ||
+                    snapshot.phase == RuntimePhase.Idle ||
+                    snapshot.phase == RuntimePhase.Failed
+            }
+        } != null
     }
 
     private fun startTrafficPolling() {

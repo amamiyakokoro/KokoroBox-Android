@@ -60,6 +60,9 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
     private var notificationJob: Job? = null
     private lateinit var runtime: SessionRuntime
     private var reloadJob: Job? = null
+    private var stopJob: Job? = null
+    @Volatile
+    private var terminalEventReported = false
 
     private val runtimeEventsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -71,14 +74,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
                     notificationManager.refreshNow()
                 }
                 Intents.ACTION_CLASH_REQUEST_STOP -> {
-                    reason = intent.getStringExtra(Intents.EXTRA_STOP_REASON)
-                    reloadJob?.cancel()
-                    reloadJob = null
-                    StatusProvider.markRuntimeStopping(ProxyMode.Tun)
-                    if (this@TunService::runtime.isInitialized) {
-                        runtime.requestStop(reason)
-                    }
-                    stopSelf()
+                    scheduleStop(intent.getStringExtra(Intents.EXTRA_STOP_REASON))
                 }
             }
         }
@@ -116,6 +112,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
 
                     override fun onStopped(reason: String?) {
                         this@TunService.reason = reason
+                        terminalEventReported = true
                         StatusProvider.markRuntimeIdle(ProxyMode.Tun)
                         sendClashStopped(reason)
                     }
@@ -132,6 +129,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
 
                     override fun reportFailure(error: String) {
                         reason = error
+                        terminalEventReported = true
                         startupLogStore.append("LOCAL_TUN failed=$error")
                         StatusProvider.markRuntimeFailed(ProxyMode.Tun)
                         sendClashStopped(error)
@@ -154,6 +152,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
                     check(result.success) { result.error ?: "tun runtime start failed" }
                 }.onFailure { error ->
                     reason = error.message ?: "tun runtime start failed"
+                    terminalEventReported = true
                     startupLogStore.append("LOCAL_TUN failed=$reason")
                     StatusProvider.markRuntimeFailed(ProxyMode.Tun)
                     sendClashStopped(reason)
@@ -162,6 +161,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
             }
         }.onFailure { error ->
             reason = error.message ?: "tun runtime start failed"
+            terminalEventReported = true
             startupLogStore.append("LOCAL_TUN failed=$reason")
             StatusProvider.markRuntimeFailed(ProxyMode.Tun)
             sendClashStopped(reason)
@@ -188,8 +188,11 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
             runtime.destroy()
         }
 
-        StatusProvider.markRuntimeIdle(ProxyMode.Tun)
-        sendClashStopped(reason)
+        if (!terminalEventReported) {
+            terminalEventReported = true
+            StatusProvider.markRuntimeIdle(ProxyMode.Tun)
+            sendClashStopped(reason)
+        }
         startupLogStore.append("LOCAL_TUN destroy")
         Log.i("TunService destroyed: ${reason ?: "successfully"}")
 
@@ -217,7 +220,37 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         }
     }
 
+    private fun scheduleStop(stopReason: String?) {
+        if (stopJob?.isActive == true) return
+
+        reason = stopReason
+        reloadJob?.cancel()
+        reloadJob = null
+        StatusProvider.markRuntimeStopping(ProxyMode.Tun)
+
+        if (!this::runtime.isInitialized) {
+            stopSelf()
+            return
+        }
+
+        // SessionRuntime operations are serialized by a native-facing lock. Waiting for that lock
+        // on the service main thread can cause an ANR, so finish teardown on the service scope and
+        // only stop the Android service after the runtime has reached a terminal state.
+        runtime.requestStop(stopReason)
+        stopJob = launch {
+            val result = runtime.stop(stopReason)
+            if (!result.success && !terminalEventReported) {
+                reason = result.error ?: "tun runtime stop failed"
+                terminalEventReported = true
+                StatusProvider.markRuntimeFailed(ProxyMode.Tun)
+                sendClashStopped(reason)
+            }
+            stopSelf()
+        }
+    }
+
     private fun scheduleReload() {
+        if (stopJob?.isActive == true) return
         reloadJob?.cancel()
         reloadJob = launch {
             startupLogStore.append("LOCAL_TUN spec: reload create begin")

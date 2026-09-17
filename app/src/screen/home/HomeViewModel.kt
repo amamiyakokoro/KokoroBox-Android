@@ -437,7 +437,12 @@ class HomeViewModel(
     }
 
     suspend fun stopProxy() {
-        if (!controlState.value.canInteract || controlState.value != HomeProxyControlState.Running) return
+        if (_pendingTransition.value != PendingTransition.None ||
+            !controlState.value.canInteract ||
+            controlState.value != HomeProxyControlState.Running
+        ) {
+            return
+        }
 
         _pendingTransition.value = PendingTransition.Stopping
 
