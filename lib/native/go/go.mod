@@ -142,5 +142,3 @@ require (
 	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/tools v0.44.0 // indirect
 )
-
-replace github.com/metacubex/mihomo => ../../mihomo/mihomo

@@ -79,6 +79,8 @@ Thumbs.db
 /docs/config/
 /docs/amper
 /lib/mihomo/mihomo/
+/go.work
+/go.work.sum
 /.codex/environments/environment.toml
 /docs/code-review/
 /docs/code-review/

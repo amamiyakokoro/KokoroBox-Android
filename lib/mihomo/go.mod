@@ -142,5 +142,3 @@ require (
 )
 
 replace cfa => ../native/go
-
-replace github.com/metacubex/mihomo => ./mihomo

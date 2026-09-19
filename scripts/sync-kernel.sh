@@ -94,6 +94,16 @@ sync_repo() {
   git clone --branch "$BRANCH_NAME" --single-branch "$REPO_URL" "$MIHOMO_DIR"
 }
 
+generate_go_workspace() {
+  echo "Generating $PROJECT_ROOT/go.work"
+  (
+    cd "$PROJECT_ROOT"
+    rm -f go.work go.work.sum
+    go work init ./lib/mihomo ./lib/native/go
+    go work edit -replace=github.com/metacubex/mihomo=./lib/mihomo/mihomo
+  )
+}
+
 run_tidy() {
   if [ ! -f "$1/go.mod" ]; then
     echo "Skipping tidy for $1 (no go.mod found)"
@@ -108,6 +118,7 @@ run_tidy() {
 
 update_kernel_properties
 sync_repo
+generate_go_workspace
 run_tidy "$GOLANG_ROOT"
 run_tidy "$GOLANG_MAIN"
 
