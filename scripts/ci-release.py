@@ -157,6 +157,13 @@ def sync_kernel():
         "git", "clone", "--depth", "1", "--single-branch", "--branch",
         config["external.mihomo.branch"], config["external.mihomo.repo"], str(destination),
     ], check=True)
+    subprocess.run([
+        "go", "work", "init", "./lib/mihomo", "./lib/native/go",
+    ], check=True)
+    subprocess.run([
+        "go", "work", "edit",
+        f"-replace=github.com/metacubex/mihomo=./{destination.as_posix()}",
+    ], check=True)
 
 
 def find_release_apk(config):

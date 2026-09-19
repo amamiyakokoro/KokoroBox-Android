@@ -342,8 +342,7 @@ class GoBuilder(private val config: ProjectConfig, private val ndkTools: NdkTool
             "CC" to ndkTools.getClangPath(abi),
             "CXX" to ndkTools.getClangPath(abi),
             "CGO_CFLAGS" to "-fPIC",
-            "CGO_LDFLAGS" to "-fPIC -llog -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384",
-            "GOWORK" to "off"
+            "CGO_LDFLAGS" to "-fPIC -llog -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
         ) + if (abi == "armeabi-v7a") mapOf("GOARM" to "7") else emptyMap()
     }
 

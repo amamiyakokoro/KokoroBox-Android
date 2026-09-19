@@ -139,6 +139,28 @@ class ReleaseTests(unittest.TestCase):
                     ci.metadata("v0.5.5")
                 output.assert_any_call("sdk", expected)
 
+    def test_sync_kernel_creates_workspace_for_cloned_source(self):
+        Path("kernel.properties").write_text(
+            "external.mihomo.repo=https://example.com/mihomo.git\n"
+            "external.mihomo.branch=v1.19.31\n"
+            "external.mihomo.dir=lib/mihomo/mihomo\n"
+        )
+        with patch.object(ci.subprocess, "run") as run:
+            ci.sync_kernel()
+        self.assertEqual(run.call_args_list, [
+            unittest.mock.call([
+                "git", "clone", "--depth", "1", "--single-branch", "--branch",
+                "v1.19.31", "https://example.com/mihomo.git", "lib/mihomo/mihomo",
+            ], check=True),
+            unittest.mock.call([
+                "go", "work", "init", "./lib/mihomo", "./lib/native/go",
+            ], check=True),
+            unittest.mock.call([
+                "go", "work", "edit",
+                "-replace=github.com/metacubex/mihomo=./lib/mihomo/mihomo",
+            ], check=True),
+        ])
+
     def make_apk(self, missing_lib=False, extra_abi=False, nested=False):
         directory = Path("app/build/outputs/apk/release/arm64-v8a" if nested
                          else "app/build/outputs/apk/release")
