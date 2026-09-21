@@ -92,7 +92,7 @@ jobs:
           java-version: "25"
 
       - name: Setup Kotlin
-        uses: fwilhe2/setup-kotlin@51a059ff08b95e2b83aa952b5b46b696d5b615a0 # pinned main
+        uses: fwilhe2/setup-kotlin@d8da77aba9278576c536dc13051a980a16085022 # pinned main
 
       - name: Setup Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
