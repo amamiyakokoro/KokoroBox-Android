@@ -29,6 +29,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.VpnService
 import com.amamiyakokoro.box.core.model.LogMessage
+import com.amamiyakokoro.box.core.util.runCatchingCancellable
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.service.common.constants.Intents
 import com.amamiyakokoro.box.service.common.log.Log
@@ -144,7 +145,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
             registerRuntimeReceiver()
             startupLogStore.append("LOCAL_TUN service: receiver registered")
             launch {
-                runCatching {
+                runCatchingCancellable {
                     startupLogStore.append("LOCAL_TUN spec: create begin")
                     val spec = SessionRuntimeSpecFactory(appContextOrSelf).createTunSpec()
                     startupLogStore.append("LOCAL_TUN spec: create done profile=${spec.profileUuid} overrides=${spec.overridePaths.size}")
@@ -254,7 +255,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         reloadJob?.cancel()
         reloadJob = launch {
             startupLogStore.append("LOCAL_TUN spec: reload create begin")
-            val spec = runCatching {
+            val spec = runCatchingCancellable {
                 SessionRuntimeSpecFactory(appContextOrSelf).createTunSpec()
             }.getOrElse { error ->
                 reason = error.message

@@ -26,6 +26,7 @@ import android.content.Context
 import com.amamiyakokoro.box.core.model.*
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.core.util.runCatchingCancellable
 import com.amamiyakokoro.box.runtime.client.root.RootTunController
 import com.amamiyakokoro.box.service.common.util.appContextOrSelf
 import com.amamiyakokoro.box.service.remote.IClashManager
@@ -43,6 +44,10 @@ class RuntimeClashManager(
     context: Context,
     private val local: IClashManager,
 ) : IClashManager {
+    private companion object {
+        const val ROOT_CALL_TIMEOUT_MILLIS = 10_000L
+    }
+
     private val appContext = context.appContextOrSelf
     private val rootTunStateStore by lazy { RootTunStateStore(appContext) }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -51,7 +56,7 @@ class RuntimeClashManager(
 
     override fun queryTunnelState(): TunnelState {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.queryTunnelState(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.queryTunnelState(appContext) } },
             localCall = { local.queryTunnelState() },
             fallbackOnRootFailure = false,
         )
@@ -59,7 +64,7 @@ class RuntimeClashManager(
 
     override fun setTunnelMode(mode: TunnelState.Mode): Boolean {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.setTunnelMode(appContext, mode) } },
+            rootCall = { rootBlockingCall { RootTunController.setTunnelMode(appContext, mode) } },
             localCall = { local.setTunnelMode(mode) },
             fallbackOnRootFailure = false,
         )
@@ -67,7 +72,7 @@ class RuntimeClashManager(
 
     override fun queryTrafficNow(): Long {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.queryTrafficNow(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.queryTrafficNow(appContext) } },
             localCall = { local.queryTrafficNow() },
             fallbackOnRootFailure = false,
         )
@@ -75,7 +80,7 @@ class RuntimeClashManager(
 
     override fun queryTrafficTotal(): Long {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.queryTrafficTotal(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.queryTrafficTotal(appContext) } },
             localCall = { local.queryTrafficTotal() },
             fallbackOnRootFailure = false,
         )
@@ -83,7 +88,7 @@ class RuntimeClashManager(
 
     override fun queryConnections(): ConnectionSnapshot {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.queryConnections(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.queryConnections(appContext) } },
             localCall = { local.queryConnections() },
             fallbackOnRootFailure = false,
         )
@@ -100,7 +105,7 @@ class RuntimeClashManager(
     override fun queryAllProxyGroups(excludeNotSelectable: Boolean): List<ProxyGroup> {
         return queryWithRuntime(
             rootCall = {
-                runBlocking {
+                rootBlockingCall {
                     RootTunController.queryAllProxyGroups(appContext, excludeNotSelectable)
                 }
             },
@@ -112,7 +117,7 @@ class RuntimeClashManager(
     override fun queryProxyGroupNames(excludeNotSelectable: Boolean): List<String> {
         return queryWithRuntime(
             rootCall = {
-                runBlocking {
+                rootBlockingCall {
                     RootTunController.queryProxyGroupNames(appContext, excludeNotSelectable)
                 }
             },
@@ -124,7 +129,7 @@ class RuntimeClashManager(
     override fun queryProxyGroup(name: String, proxySort: ProxySort): ProxyGroup {
         return queryWithRuntime(
             rootCall = {
-                runBlocking {
+                rootBlockingCall {
                     RootTunController.queryProxyGroup(appContext, name, proxySort)
                 }
             },
@@ -135,7 +140,7 @@ class RuntimeClashManager(
 
     override fun queryConfiguration(): UiConfiguration {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.queryConfiguration(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.queryConfiguration(appContext) } },
             localCall = { local.queryConfiguration() },
             fallbackOnRootFailure = false,
         )
@@ -143,7 +148,7 @@ class RuntimeClashManager(
 
     override fun queryProviders(): ProviderList {
         val providers = queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.queryProviders(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.queryProviders(appContext) } },
             localCall = { local.queryProviders().toList() },
             fallbackOnRootFailure = false,
         )
@@ -152,7 +157,7 @@ class RuntimeClashManager(
 
     override fun patchSelector(group: String, name: String): Boolean {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.patchSelector(appContext, group, name) } },
+            rootCall = { rootBlockingCall { RootTunController.patchSelector(appContext, group, name) } },
             localCall = { local.patchSelector(group, name) },
             fallbackOnRootFailure = false,
         )
@@ -160,7 +165,7 @@ class RuntimeClashManager(
 
     override fun closeConnection(id: String): Boolean {
         return queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.closeConnection(appContext, id) } },
+            rootCall = { rootBlockingCall { RootTunController.closeConnection(appContext, id) } },
             localCall = { local.closeConnection(id) },
             fallbackOnRootFailure = false,
         )
@@ -168,7 +173,7 @@ class RuntimeClashManager(
 
     override fun closeAllConnections() {
         queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.closeAllConnections(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.closeAllConnections(appContext) } },
             localCall = { local.closeAllConnections() },
             fallbackOnRootFailure = false,
         )
@@ -204,7 +209,7 @@ class RuntimeClashManager(
 
     override fun requestStop() {
         queryWithRuntime(
-            rootCall = { runBlocking { RootTunController.requestStop(appContext) } },
+            rootCall = { rootBlockingCall { RootTunController.requestStop(appContext) } },
             localCall = { local.requestStop() },
             fallbackOnRootFailure = false,
         )
@@ -218,7 +223,7 @@ class RuntimeClashManager(
                 rootLogJob = scope.launch {
                     previousJob?.cancelAndJoin()
                     rootLogSeq = 0L
-                    runCatching { RootTunController.setLogCollectionEnabled(appContext, false) }
+                    runCatchingCancellable { RootTunController.setLogCollectionEnabled(appContext, false) }
                         .onFailure { error -> Timber.d(error, "Root runtime log shutdown skipped") }
                 }
                 return
@@ -226,7 +231,7 @@ class RuntimeClashManager(
             rootLogJob = scope.launch {
                 previousJob?.cancelAndJoin()
                 rootLogSeq = 0L
-                val enabled = runCatching {
+                val enabled = runCatchingCancellable {
                     RootTunController.setLogCollectionEnabled(appContext, true)
                 }.onFailure { error ->
                     Timber.d(error, "Root runtime log startup skipped")
@@ -235,7 +240,7 @@ class RuntimeClashManager(
 
                 try {
                     PollingTimers.ticks(PollingTimerSpecs.RuntimeRootLogPolling).collect {
-                        runCatching {
+                        runCatchingCancellable {
                             val chunk = RootTunController.queryRecentLogs(appContext, rootLogSeq)
                             if (chunk.items.isNotEmpty()) {
                                 chunk.items.forEach { raw ->
@@ -262,7 +267,7 @@ class RuntimeClashManager(
             val previousJob = rootLogJob
             rootLogJob = scope.launch {
                 previousJob?.cancelAndJoin()
-                runCatching { RootTunController.setLogCollectionEnabled(appContext, false) }
+                runCatchingCancellable { RootTunController.setLogCollectionEnabled(appContext, false) }
             }
             rootLogSeq = 0L
             local.setLogObserver(observer)
@@ -273,6 +278,23 @@ class RuntimeClashManager(
         val status = rootTunStateStore.snapshot()
         return status.state.isActive || status.runtimeReady
     }
+
+    suspend fun close() {
+        val job = rootLogJob
+        rootLogJob = null
+        job?.cancelAndJoin()
+        rootLogSeq = 0L
+        local.setLogObserver(null)
+        withContext(NonCancellable + Dispatchers.IO) {
+            runCatching { RootTunController.setLogCollectionEnabled(appContext, false) }
+        }
+        scope.cancel()
+    }
+
+    private fun <T> rootBlockingCall(block: suspend () -> T): T =
+        runBlocking(Dispatchers.IO) {
+            withTimeout(ROOT_CALL_TIMEOUT_MILLIS) { block() }
+        }
 
     private inline fun <T> queryWithRuntime(
         rootCall: () -> T,
@@ -285,6 +307,7 @@ class RuntimeClashManager(
         return try {
             rootCall()
         } catch (error: Throwable) {
+            if (error is CancellationException) throw error
             handleRootRuntimeFailure(error)
             if (fallbackOnRootFailure) localCall() else throw error
         }
@@ -301,6 +324,7 @@ class RuntimeClashManager(
         return try {
             rootCall()
         } catch (error: Throwable) {
+            if (error is CancellationException) throw error
             handleRootRuntimeFailure(error)
             if (fallbackOnRootFailure) localCall() else throw error
         }

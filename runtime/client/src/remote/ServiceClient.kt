@@ -41,6 +41,7 @@ object ServiceClient {
     private val mutex = Mutex()
     private var initialized = false
     private var localClashManager: ClashManager? = null
+    private var runtimeClashManager: RuntimeClashManager? = null
     private var clashManager: IClashManager? = null
     private var profileManager: IProfileManager? = null
 
@@ -57,19 +58,23 @@ object ServiceClient {
                 try {
                     initializeServiceGlobal(appContext)
                     val localManager = ClashManager(appContext)
+                    val runtimeManager = RuntimeClashManager(appContext, localManager)
                     localClashManager = localManager
-                    clashManager = RuntimeClashManager(appContext, localManager)
+                    runtimeClashManager = runtimeManager
+                    clashManager = runtimeManager
                     profileManager = ProfileManager(appContext)
                     initialized = true
                     Timber.d(
                         "ServiceClient gateway initialized in pid=${android.os.Process.myPid()}, process=${currentProcessName(appContext)}, cost=${System.currentTimeMillis() - startedAt}ms"
                     )
                 } catch (e: Exception) {
-                    if (e is CancellationException) throw e
                     initialized = false
+                    runtimeClashManager?.close()
+                    runtimeClashManager = null
                     localClashManager = null
                     clashManager = null
                     profileManager = null
+                    if (e is CancellationException) throw e
                     Timber.e(e, "Failed to initialize local service gateway")
                     throw e
                 }
@@ -78,10 +83,16 @@ object ServiceClient {
     }
 
     suspend fun disconnect() {
-        localClashManager = null
-        clashManager = null
-        profileManager = null
-        initialized = false
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                runtimeClashManager?.close()
+                runtimeClashManager = null
+                localClashManager = null
+                clashManager = null
+                profileManager = null
+                initialized = false
+            }
+        }
     }
 
     suspend fun clash(): IClashManager {

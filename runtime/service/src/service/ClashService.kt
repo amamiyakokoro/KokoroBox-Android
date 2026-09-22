@@ -30,6 +30,7 @@ import android.content.IntentFilter
 import android.os.Binder
 import android.os.IBinder
 import com.amamiyakokoro.box.core.model.LogMessage
+import com.amamiyakokoro.box.core.util.runCatchingCancellable
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.service.common.constants.Intents
 import com.amamiyakokoro.box.service.common.log.Log
@@ -147,7 +148,7 @@ class ClashService : BaseService() {
             registerRuntimeReceiver()
             startupLogStore.append("LOCAL_HTTP service: receiver registered")
             launch {
-                runCatching {
+                runCatchingCancellable {
                     startupLogStore.append("LOCAL_HTTP spec: create begin")
                     val spec = SessionRuntimeSpecFactory(appContextOrSelf).createHttpSpec()
                     startupLogStore.append("LOCAL_HTTP spec: create done profile=${spec.profileUuid} overrides=${spec.overridePaths.size}")
@@ -257,7 +258,7 @@ class ClashService : BaseService() {
         reloadJob?.cancel()
         reloadJob = launch {
             startupLogStore.append("LOCAL_HTTP spec: reload create begin")
-            val spec = runCatching {
+            val spec = runCatchingCancellable {
                 SessionRuntimeSpecFactory(appContextOrSelf).createHttpSpec()
             }.getOrElse { error ->
                 reason = error.message

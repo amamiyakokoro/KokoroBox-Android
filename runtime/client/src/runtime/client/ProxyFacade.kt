@@ -34,6 +34,7 @@ import com.amamiyakokoro.box.core.model.*
 import com.amamiyakokoro.box.core.util.PollingTimerSpec
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.core.util.runCatchingCancellable
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.data.store.MMKVProvider
 import com.amamiyakokoro.box.data.store.NetworkSettingsStore
@@ -297,7 +298,7 @@ class ProxyFacade(
 
     private fun launchPreviewWarmup(): Job {
         return scope.launch {
-            runCatching { refreshProxyGroups() }
+            runCatchingCancellable { refreshProxyGroups() }
                 .onFailure { error -> Timber.d(error, "Warm up proxy groups skipped") }
         }
     }
@@ -336,7 +337,7 @@ class ProxyFacade(
                 ),
             )
 
-            runCatching {
+            runCatchingCancellable {
                 runtimeControl.start(targetOwner, mode)
             }.onFailure { error ->
                 clearRuntimeState(resetGroups = false)
@@ -557,7 +558,7 @@ class ProxyFacade(
     }
 
     suspend fun reloadCurrentProfile(): Result<Unit> {
-        return runCatching {
+        return runCatchingCancellable {
             val profileManager = ServiceClient.profile()
             val currentProfile = profileManager.queryActive()
             if (currentProfile != null) {
@@ -585,9 +586,9 @@ class ProxyFacade(
             val requestedMode = proxyDisplaySettingsStorage.proxyMode.value
             var missingLocalRuntime = false
             val groups = withContext(Dispatchers.IO) {
-                runCatching {
+                runCatchingCancellable {
                     if (!snapshot.running) {
-                        return@runCatching queryPreviewProxyGroups()
+                        return@runCatchingCancellable queryPreviewProxyGroups()
                     }
 
                     if (snapshot.owner == RuntimeOwner.RootTun && !isRootSessionActive()) {
@@ -648,7 +649,7 @@ class ProxyFacade(
         refreshProxyGroupsMutex.withLock {
             val snapshot = _runtimeSnapshot.value
             val updatedGroup = withContext(Dispatchers.IO) {
-                runCatching {
+                runCatchingCancellable {
                     if (snapshot.owner == RuntimeOwner.RootTun && !isRootSessionActive()) {
                         error("RootTun runtime not ready")
                     }
@@ -684,7 +685,7 @@ class ProxyFacade(
             }
 
             else -> {
-                runCatching {
+                runCatchingCancellable {
                     // Preview state is also refreshed while idle, before any service event has
                     // initialized the local profile gateway.
                     connectCurrentBackend()
@@ -737,7 +738,7 @@ class ProxyFacade(
             ),
         )
 
-        runCatching {
+        runCatchingCancellable {
             runtimeControl.stop(owner)
             if (owner == RuntimeOwner.LocalTun || owner == RuntimeOwner.LocalHttp) {
                 awaitLocalRuntimeStopped(
@@ -833,7 +834,7 @@ class ProxyFacade(
                             return@collect
                         }
 
-                        runCatching {
+                        runCatchingCancellable {
                             queryTrafficNow()
                             if (tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
                                 queryTrafficTotal()
@@ -967,7 +968,7 @@ class ProxyFacade(
             return RootTunStatus()
         }
 
-        return runCatching {
+        return runCatchingCancellable {
             RootTunController.queryStatus(appContext)
         }.onSuccess { status ->
             rootTunStateStore.updateStatus(status)
@@ -1038,7 +1039,7 @@ class ProxyFacade(
     private suspend fun applyPreferredTunnelModeSafely() {
         val preferredMode = proxyDisplaySettingsStorage.proxyMode.value
         _preferredTunnelMode.value = preferredMode
-        runCatching {
+        runCatchingCancellable {
             if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
                 RootTunController.setTunnelMode(appContext, preferredMode)
             } else {
@@ -1098,12 +1099,12 @@ class ProxyFacade(
         if (_runtimeSnapshot.value.phase != RuntimePhase.Running) {
             return
         }
-        runCatching { refreshAll() }
+        runCatchingCancellable { refreshAll() }
             .onFailure { error -> Timber.d(error, "Refresh runtime data skipped") }
     }
 
     private suspend fun refreshPreviewStateSafely() {
-        runCatching {
+        runCatchingCancellable {
             refreshCurrentProfile()
             refreshProxyGroups()
         }.onFailure { error ->
@@ -1162,7 +1163,7 @@ class ProxyFacade(
         if (_runtimeSnapshot.value.phase != RuntimePhase.Running) {
             return
         }
-        runCatching { refreshProxyGroups() }
+        runCatchingCancellable { refreshProxyGroups() }
             .onFailure { error -> Timber.d(error, "Runtime proxy group sync skipped") }
     }
 
@@ -1170,7 +1171,7 @@ class ProxyFacade(
         if (groupName.isBlank()) return
         scope.launch {
             awaitDelay(delayMillis, "runtime_proxy_group_refresh_$groupName")
-            runCatching { refreshProxyGroup(groupName) }
+            runCatchingCancellable { refreshProxyGroup(groupName) }
                 .onFailure { error -> Timber.d(error, "Deferred proxy group refresh skipped: %s", groupName) }
         }
     }
@@ -1200,7 +1201,7 @@ class ProxyFacade(
         name: String,
         sort: ProxySort = ProxySort.Default,
     ): ProxyGroupInfo? {
-        return runCatching {
+        return runCatchingCancellable {
             if (snapshot.owner == RuntimeOwner.RootTun) {
                 toProxyGroupInfo(RootTunController.queryProxyGroup(appContext, name, sort))
             } else {
@@ -1211,7 +1212,7 @@ class ProxyFacade(
     }
 
     private suspend fun closeRuntimeConnectionsSafely() {
-        runCatching {
+        runCatchingCancellable {
             if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
                 RootTunController.closeAllConnections(appContext)
             } else {
@@ -1224,15 +1225,15 @@ class ProxyFacade(
     }
 
     private suspend fun currentRootTunStatus(): RootTunStatus {
-        return runCatching { RootTunController.queryStatus(appContext) }
+        return runCatchingCancellable { RootTunController.queryStatus(appContext) }
             .getOrElse { rootTunStateStore.snapshot() }
     }
 
     private suspend fun reconcileRootTunRuntimeStateSafely() {
-        runCatching {
+        runCatchingCancellable {
             val persistedStatus = rootTunStateStore.snapshot()
             if (!shouldAttachRootTunForegroundService(persistedStatus)) {
-                return@runCatching
+                return@runCatchingCancellable
             }
             ensureRootTunServiceAttached(persistedStatus)
             val status = RootTunController.queryStatus(appContext)
@@ -1274,7 +1275,7 @@ class ProxyFacade(
                     return@launch
                 }
 
-                val status = runCatching {
+                val status = runCatchingCancellable {
                     ensureRootTunServiceAttached(persistedStatus)
                     RootTunController.queryStatus(appContext)
                 }.getOrNull()
@@ -1343,7 +1344,7 @@ class ProxyFacade(
             ),
         )
         stopTrafficPolling()
-        runCatching { queryPreviewProxyGroups() }
+        runCatchingCancellable { queryPreviewProxyGroups() }
             .onSuccess { groups ->
                 publishProxyGroups(groups, cacheForPreview = true, mode = proxyDisplaySettingsStorage.proxyMode.value)
             }
@@ -1372,7 +1373,7 @@ class ProxyFacade(
     }
 
     private suspend fun refreshRootCurrentProfile(status: RootTunStatus) {
-        runCatching {
+        runCatchingCancellable {
             connectCurrentBackend()
             val profile = status.profileUuid
                 ?.takeIf { it.isNotBlank() }

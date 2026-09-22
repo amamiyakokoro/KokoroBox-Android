@@ -23,6 +23,7 @@ package com.amamiyakokoro.box.runtime.client
 import android.content.Context
 import android.content.Intent
 import com.amamiyakokoro.box.data.model.ProxyMode
+import com.amamiyakokoro.box.core.util.runCatchingCancellable
 import com.amamiyakokoro.box.remote.ServiceClient
 import com.amamiyakokoro.box.runtime.client.root.RootTunController
 import com.amamiyakokoro.box.service.ClashService
@@ -79,7 +80,7 @@ internal class ProxyRuntimeControl(
 
     private suspend fun stopLocalRuntime() {
         withContext(Dispatchers.IO) {
-            runCatching {
+            runCatchingCancellable {
                 ServiceClient.connect(appContext)
                 ServiceClient.clash().requestStop()
             }.onFailure {
