@@ -1,10 +1,7 @@
-HSPLcom/amamiyakokoro/box/**;->**(**)**
-HSPLcom/amamiyakokoro/box/feature/**;->**(**)**
-HSPLcom/amamiyakokoro/box/presentation/**;->**(**)**
-HSPLcom/amamiyakokoro/box/screen/**;->**(**)**
-HSPLandroidx/compose/**;->**(**)**
-HSPLtop/yukonga/miuix/**;->**(**)**
-HSPLcom/ramcosta/composedestinations/**;->**(**)**
-Lcom/amamiyakokoro/box/App;
-Lcom/amamiyakokoro/box/MainActivity;
-Lcom/amamiyakokoro/box/MainScreenKt;
+HSPLcom/amamiyakokoro/box/App;->**(**)**
+HSPLcom/amamiyakokoro/box/MainActivity;->**(**)**
+HSPLcom/amamiyakokoro/box/MainScreenKt;->**(**)**
+HPLcom/amamiyakokoro/box/screen/home/**;->**(**)**
+HPLcom/amamiyakokoro/box/runtime/client/ProxyFacade;->**(**)**
+HPLcom/amamiyakokoro/box/remote/ServiceClient;->**(**)**
+HPLcom/amamiyakokoro/box/presentation/theme/**;->**(**)**
