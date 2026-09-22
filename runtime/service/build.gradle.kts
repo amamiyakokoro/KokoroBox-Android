@@ -37,14 +37,14 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":runtime:api"))
 
-    implementation("androidx.core:core-ktx:${gropify.dep.version.coreKtx}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
+    implementation("androidx.core:core-ktx:${libs.versions.coreKtx.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${libs.versions.coroutines.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.serializationJson.get()}")
 
-    implementation("com.tencent:mmkv:${gropify.dep.version.mmkv}")
+    implementation("com.tencent:mmkv:${libs.versions.mmkv.get()}")
 
-    implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
-    implementation("com.squareup.okhttp3:okhttp:${gropify.dep.version.okhttp}")
+    implementation("com.jakewharton.timber:timber:${libs.versions.timber.get()}")
+    implementation("com.squareup.okhttp3:okhttp:${libs.versions.okhttp.get()}")
     implementation("com.github.topjohnwu.libsu:core:6.0.0")
     implementation("com.github.topjohnwu.libsu:service:6.0.0")
 }

@@ -41,11 +41,11 @@ extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
-    val composeBom = platform("androidx.compose:compose-bom:${gropify.dep.version.composeBom}")
+    val composeBom = platform("androidx.compose:compose-bom:${libs.versions.composeBom.get()}")
     implementation(composeBom)
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui")
-    implementation("androidx.core:core-ktx:${gropify.dep.version.coreKtx}")
-    implementation("com.android.tools.build:apksig:${gropify.dep.version.apksig}")
-    implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
+    implementation("androidx.core:core-ktx:${libs.versions.coreKtx.get()}")
+    implementation("com.android.tools.build:apksig:${libs.versions.apksig.get()}")
+    implementation("com.jakewharton.timber:timber:${libs.versions.timber.get()}")
 }

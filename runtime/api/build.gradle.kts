@@ -30,7 +30,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":locale"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.serializationJson.get()}")
 
-    implementation("com.tencent:mmkv:${gropify.dep.version.mmkv}")
+    implementation("com.tencent:mmkv:${libs.versions.mmkv.get()}")
 }

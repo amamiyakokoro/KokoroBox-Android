@@ -29,7 +29,6 @@
 - [XZ for Java](https://github.com/tukaani-project/xz-java)
 - [Shapes](https://github.com/Kyant0/Shapes)
 - [MetaCubeX meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)
-- [Gropify](https://github.com/HighCapable/Gropify)
 - [Lucide](https://github.com/lucide-icons/lucide)
 - [Circle Flags](https://github.com/HatScripts/circle-flags) — bundled MIT-licensed SVG assets from commit `379588b5da95482d6bbf10bd45644a35b0609ea6`
 - [PureJoy-FYL](https://github.com/OOM-WG/PureJoy-FYL)

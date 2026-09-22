@@ -25,7 +25,7 @@ plugins {
 
 
 android {
-    namespace = gropify.project.namespace.core
+    namespace = "${providers.gradleProperty("project.namespace.base").get()}.core"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
@@ -41,10 +41,10 @@ extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel:${gropify.dep.version.lifecycle}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${gropify.dep.version.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
-    implementation("androidx.annotation:annotation-jvm:${gropify.dep.version.annotationJvm}")
-    implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:${libs.versions.lifecycle.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${libs.versions.coroutines.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${libs.versions.coroutines.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.serializationJson.get()}")
+    implementation("androidx.annotation:annotation-jvm:${libs.versions.annotationJvm.get()}")
+    implementation("com.jakewharton.timber:timber:${libs.versions.timber.get()}")
 }

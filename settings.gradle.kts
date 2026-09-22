@@ -75,39 +75,6 @@ dependencyResolutionManagement {
     }
 }
 
-plugins {
-    id("com.highcapable.gropify") version "1.0.2"
-}
-
-gropify {
-    isEnabled = true
-    global {
-        common {
-            isEnabled = true
-            useTypeAutoConversion = true
-            useValueInterpolation = true
-            existsPropertyFiles("gradle.properties", addDefault = false)
-            excludeKeys(
-                "signing.store.password",
-                "signing.key.password",
-                "signing.store.file",
-                "signing.key.alias",
-            )
-        }
-        android {
-            generateDirPath = "build/generated/gropify"
-            sourceSetName = "main"
-            packageName = "com.amamiyakokoro.box.generated"
-            useKotlin = true
-            isRestrictedAccessEnabled = false
-            isIsolationEnabled = true
-        }
-    }
-    projects(":core") {
-        android { isEnabled = false }
-    }
-}
-
 include(
     ":core",
     ":platform",

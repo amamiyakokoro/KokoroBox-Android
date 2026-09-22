@@ -37,13 +37,13 @@ dependencies {
     implementation(project(":locale"))
     implementation(project(":runtime:api"))
 
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${gropify.dep.version.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${gropify.dep.version.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${gropify.dep.version.serializationJson}")
-    implementation("com.squareup.okhttp3:okhttp:${gropify.dep.version.okhttp}")
-    implementation("com.jakewharton.timber:timber:${gropify.dep.version.timber}")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${libs.versions.coroutines.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${libs.versions.coroutines.get()}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.serializationJson.get()}")
+    implementation("com.squareup.okhttp3:okhttp:${libs.versions.okhttp.get()}")
+    implementation("com.jakewharton.timber:timber:${libs.versions.timber.get()}")
     implementation("org.tukaani:xz:1.12")
-    implementation("io.insert-koin:koin-core:${gropify.dep.version.koin}")
+    implementation("io.insert-koin:koin-core:${libs.versions.koin.get()}")
 
-    implementation("com.tencent:mmkv:${gropify.dep.version.mmkv}")
+    implementation("com.tencent:mmkv:${libs.versions.mmkv.get()}")
 }
