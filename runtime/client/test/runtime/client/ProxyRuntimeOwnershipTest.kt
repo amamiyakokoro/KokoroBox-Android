@@ -23,6 +23,36 @@ import org.junit.Test
 
 class ProxyRuntimeOwnershipTest {
     @Test
+    fun rootRuntimeAlwaysWinsOwnerDetection() {
+        val owner = ProxyRuntimeOwnership.detectOwner(
+            rootStatus = RootTunStatus(state = RootTunState.Running, runtimeReady = true),
+            isLocalSessionActive = { true },
+        )
+
+        assertEquals(RuntimeOwner.RootTun, owner)
+    }
+
+    @Test
+    fun localTunWinsWhenBothLocalModesHaveStaleActiveState() {
+        val owner = ProxyRuntimeOwnership.detectOwner(
+            rootStatus = RootTunStatus(),
+            isLocalSessionActive = { it == ProxyMode.Tun || it == ProxyMode.Http },
+        )
+
+        assertEquals(RuntimeOwner.LocalTun, owner)
+    }
+
+    @Test
+    fun noPersistedRuntimeProducesNoOwner() {
+        val owner = ProxyRuntimeOwnership.detectOwner(
+            rootStatus = RootTunStatus(),
+            isLocalSessionActive = { false },
+        )
+
+        assertEquals(RuntimeOwner.None, owner)
+    }
+
+    @Test
     fun runningLocalRuntimeMarksCompiledConfigurationReady() {
         val snapshot = ProxyRuntimeOwnership.activeSnapshot(
             owner = RuntimeOwner.LocalTun,
@@ -75,5 +105,45 @@ class ProxyRuntimeOwnershipTest {
         )
 
         assertTrue(snapshot.configReady)
+    }
+
+    @Test
+    fun stoppingRootRuntimeCannotRemainReportedAsRunning() {
+        val snapshot = ProxyRuntimeOwnership.activeSnapshot(
+            owner = RuntimeOwner.RootTun,
+            configuredMode = ProxyMode.RootTun,
+            rootStatus = RootTunStatus(
+                state = RootTunState.Stopping,
+                runtimeReady = true,
+            ),
+        )
+
+        assertEquals(RuntimePhase.Stopping, snapshot.phase)
+        assertFalse(snapshot.running)
+        assertFalse(snapshot.configReady)
+    }
+
+    @Test
+    fun failedRootRuntimePreservesFailureForTheUi() {
+        val snapshot = ProxyRuntimeOwnership.activeSnapshot(
+            owner = RuntimeOwner.RootTun,
+            configuredMode = ProxyMode.RootTun,
+            rootStatus = RootTunStatus(
+                state = RootTunState.Failed,
+                lastError = "permission denied",
+            ),
+        )
+
+        assertEquals(RuntimePhase.Failed, snapshot.phase)
+        assertEquals("permission denied", snapshot.lastError)
+        assertFalse(snapshot.running)
+    }
+
+    @Test
+    fun modeAndOwnerMappingsAreSymmetric() {
+        ProxyMode.entries.forEach { mode ->
+            val owner = ProxyRuntimeOwnership.ownerForMode(mode)
+            assertEquals(mode, ProxyRuntimeOwnership.modeForOwner(owner, ProxyMode.Tun))
+        }
     }
 }
