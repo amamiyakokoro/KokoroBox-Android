@@ -383,9 +383,7 @@ dependencies {
     implementation("io.github.panpf.sketch4:sketch-compose:${libs.versions.sketch4.get()}")
     implementation("io.github.panpf.sketch4:sketch-http:${libs.versions.sketch4.get()}")
     implementation("io.github.panpf.sketch4:sketch-animated-gif:${libs.versions.sketch4.get()}")
-    implementation("io.github.panpf.sketch4:sketch-animated-heif:${libs.versions.sketch4.get()}")
     implementation("io.github.panpf.sketch4:sketch-animated-webp:${libs.versions.sketch4.get()}")
-    implementation("io.github.panpf.sketch4:sketch-animated-gif-koral:${libs.versions.sketch4.get()}")
 
     implementation("sh.calvin.reorderable:reorderable:${libs.versions.reorderable.get()}")
     implementation("com.mikepenz:aboutlibraries-core:${libs.versions.aboutLibraries.get()}")

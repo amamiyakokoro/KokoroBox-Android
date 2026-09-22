@@ -53,8 +53,6 @@ dependencies {
     implementation("io.github.panpf.sketch4:sketch-compose:${libs.versions.sketch4.get()}")
     implementation("io.github.panpf.sketch4:sketch-http:${libs.versions.sketch4.get()}")
     implementation("io.github.panpf.sketch4:sketch-svg:${libs.versions.sketch4.get()}")
-    implementation("io.github.panpf.sketch4:sketch-animated-gif:${libs.versions.sketch4.get()}")
-    implementation("io.github.panpf.sketch4:sketch-animated-webp:${libs.versions.sketch4.get()}")
     implementation("io.github.panpf.sketch4:sketch-compose-resources:${libs.versions.sketch4.get()}")
     implementation("dev.chrisbanes.haze:haze:${libs.versions.haze.get()}")
     implementation("io.github.kyant0:shapes:1.2.1")
