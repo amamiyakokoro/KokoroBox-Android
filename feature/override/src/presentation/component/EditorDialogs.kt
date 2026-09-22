@@ -168,8 +168,8 @@ fun StringMapEditorDialog(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     if (entries.size > 1) {
-                        entries.removeLast()
-                        itemKeys.removeLast()
+                        entries.removeAt(entries.lastIndex)
+                        itemKeys.removeAt(itemKeys.lastIndex)
                     } else {
                         entries[0] = "" to ""
                     }

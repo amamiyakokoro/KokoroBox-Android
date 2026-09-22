@@ -23,6 +23,7 @@
 package com.amamiyakokoro.box.remote
 
 import android.content.Context
+import android.os.Build
 import com.amamiyakokoro.box.service.ClashManager
 import com.amamiyakokoro.box.service.ProfileManager
 import com.amamiyakokoro.box.service.common.util.appContextOrSelf
@@ -61,7 +62,7 @@ object ServiceClient {
                     profileManager = ProfileManager(appContext)
                     initialized = true
                     Timber.d(
-                        "ServiceClient gateway initialized in pid=${android.os.Process.myPid()}, process=${android.app.Application.getProcessName()}, cost=${System.currentTimeMillis() - startedAt}ms"
+                        "ServiceClient gateway initialized in pid=${android.os.Process.myPid()}, process=${currentProcessName(appContext)}, cost=${System.currentTimeMillis() - startedAt}ms"
                     )
                 } catch (e: Exception) {
                     if (e is CancellationException) throw e
@@ -92,4 +93,16 @@ object ServiceClient {
     }
 
     fun isConnected(): Boolean = initialized && clashManager != null && profileManager != null
+
+    private fun currentProcessName(context: Context): String =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            android.app.Application.getProcessName()
+        } else {
+            runCatching {
+                java.io.File("/proc/self/cmdline")
+                    .readText()
+                    .trimEnd('\u0000')
+                    .takeIf(String::isNotBlank)
+            }.getOrNull() ?: context.packageName
+        }
 }
