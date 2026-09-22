@@ -56,6 +56,7 @@ fun ConfigPreviewScreen(
     onSave: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
+    val saveFailedMessage = stringResource(LocaleR.string.editor_toast_save_failed)
 
     val formattedContent = remember(initialContent, language) {
         if (language == LanguageScope.Json) {
@@ -97,7 +98,7 @@ fun ConfigPreviewScreen(
                             }.onSuccess {
                                 navigator.navigateUp()
                             }.onFailure {
-                                context.toast(it.message ?: context.getString(LocaleR.string.editor_toast_save_failed))
+                                context.toast(it.message ?: saveFailedMessage)
                             }
                         },
                         enabled = canSave

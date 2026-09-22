@@ -60,6 +60,10 @@ fun FullscreenEditorScreen(
     onSave: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
+    val formatSuccessMessage = stringResource(LocaleR.string.editor_toast_format_success)
+    val formatFailedMessage = stringResource(LocaleR.string.editor_toast_format_failed_or_unchanged)
+    val syntaxErrorMessage = stringResource(LocaleR.string.editor_toast_syntax_error)
+    val saveFailedMessage = stringResource(LocaleR.string.editor_toast_save_failed)
     val showDiscardDialog = remember { mutableStateOf(false) }
     var content by remember(initialContent, language) { mutableStateOf(initialContent) }
     val isModified = content != initialContent
@@ -88,9 +92,9 @@ fun FullscreenEditorScreen(
                             val formatted = CodeFormatter.format(content, language)
                             if (formatted != null && formatted != content) {
                                 content = formatted
-                                context.toast(context.getString(LocaleR.string.editor_toast_format_success))
+                                context.toast(formatSuccessMessage)
                             } else {
-                                context.toast(context.getString(LocaleR.string.editor_toast_format_failed_or_unchanged))
+                                context.toast(formatFailedMessage)
                             }
                         },
                     ) {
@@ -103,7 +107,7 @@ fun FullscreenEditorScreen(
                     IconButton(
                         onClick = {
                             if (!CodeFormatter.validate(content, language)) {
-                                context.toast(context.getString(LocaleR.string.editor_toast_syntax_error))
+                                context.toast(syntaxErrorMessage)
                                 return@IconButton
                             }
                             runCatching {
@@ -111,7 +115,7 @@ fun FullscreenEditorScreen(
                             }.onSuccess {
                                 navigator.navigateUp()
                             }.onFailure {
-                                context.toast(it.message ?: context.getString(LocaleR.string.editor_toast_save_failed))
+                                context.toast(it.message ?: saveFailedMessage)
                             }
                         },
                     ) {
