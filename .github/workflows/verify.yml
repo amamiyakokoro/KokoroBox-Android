@@ -39,7 +39,21 @@ jobs:
           packages: ""
 
       - name: Install Android platform
-        run: sdkmanager "platforms;android-37" "build-tools;37.0.0"
+        shell: bash
+        run: |
+          sdk_major="$(sed -n 's/^android\.compileSdk=//p' gradle.properties)"
+          if [[ ! "$sdk_major" =~ ^[0-9]+$ ]]; then
+            echo "Invalid android.compileSdk: $sdk_major" >&2
+            exit 1
+          fi
+
+          if (( sdk_major >= 37 )); then
+            sdk_package="${sdk_major}.0"
+          else
+            sdk_package="$sdk_major"
+          fi
+
+          sdkmanager "platforms;android-$sdk_package" "build-tools;37.0.0"
 
       - name: Verify native bridge namespace
         run: ./gradlew app:verifyBridgeJniNamespace
