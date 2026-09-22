@@ -49,7 +49,7 @@ fun CountryFlagCircle(
     size: Dp = UiDp.dp18,
 ) {
     val semanticColors = AppTheme.colors
-    val flagUrl = remember(countryCode) { LocaleUtil.normalizeFlagUrl(countryCode) }
+    val flagAssetUri = remember(countryCode) { LocaleUtil.normalizeFlagAssetUri(countryCode) }
     val context = LocalContext.current
 
     Box(
@@ -59,15 +59,17 @@ fun CountryFlagCircle(
             .background(semanticColors.neutralPlaceholderBackground),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                request = ImageRequest(context, flagUrl),
-                alignment = Alignment.Center,
+        if (flagAssetUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    request = ImageRequest(context, flagAssetUri),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                ),
+                contentDescription = stringResource(LocaleR.string.component_flag_content_description).format(countryCode),
+                modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,
-            ),
-            contentDescription = stringResource(LocaleR.string.component_flag_content_description).format(countryCode),
-            modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.Crop,
-        )
+            )
+        }
     }
 }

@@ -42,11 +42,11 @@ object LocaleUtil {
         return countryCode
     }
 
-    fun normalizeFlagUrl(
-        countryCode: String,
-        baseUrl: String = "https://hatscripts.github.io/circle-flags/flags/"
-    ): String {
+    fun normalizeFlagAssetUri(countryCode: String): String? {
         val normalizedCode = countryCode.lowercase(Locale.ROOT)
-        return "${baseUrl}${normalizedCode}.svg"
+        if (normalizedCode.length != 2 || normalizedCode.any { it !in 'a'..'z' }) {
+            return null
+        }
+        return "file:///android_asset/circle-flags/$normalizedCode.svg"
     }
 }
