@@ -55,11 +55,13 @@ object PollingTimerSpecs {
     val RuntimeTrafficPollingFast = PollingTimerSpec("runtime_traffic_polling_fast", 1_000L, 0L)
     val RuntimeTrafficPollingForeground =
         PollingTimerSpec("runtime_traffic_polling_foreground", 3_000L, 3_000L)
-    val RuntimeTrafficPollingScreenOff = PollingTimerSpec("runtime_traffic_polling_screen_off", 30_000L, 30_000L)
+    // Screen-off values are only used by background persistence and notifications. Keeping these
+    // at one-minute granularity avoids waking the process twice as often for data the user cannot see.
+    val RuntimeTrafficPollingScreenOff = PollingTimerSpec("runtime_traffic_polling_screen_off", 60_000L, 60_000L)
     // Notification traffic is informational; keep it fresh without duplicating the UI's live polling.
     val ForegroundNotificationRefresh = PollingTimerSpec("foreground_notification_refresh", 10_000L, 10_000L)
     val ForegroundNotificationRefreshScreenOff =
-        PollingTimerSpec("foreground_notification_refresh_screen_off", 30_000L, 30_000L)
+        PollingTimerSpec("foreground_notification_refresh_screen_off", 60_000L, 60_000L)
     val RootTunStatusPolling = PollingTimerSpec("root_tun_status_polling", 2_000L, 0L)
     val RuntimeProxyGroupSyncFast = PollingTimerSpec("runtime_proxy_group_sync_fast", 1_000L, 0L)
     val RuntimeRootLogPolling = PollingTimerSpec("runtime_root_log_polling", 300L, 0L)
@@ -70,7 +72,7 @@ object PollingTimerSpecs {
     // Per-app attribution requires a full connections snapshot; it is intentionally less frequent
     // than the live traffic display to avoid repeated IPC and metadata resolution.
     val TrafficStatsCollection = PollingTimerSpec("traffic_stats_collection", 30_000L, 0L)
-    val TrafficStatsCollectionScreenOff = PollingTimerSpec("traffic_stats_collection_screen_off", 60_000L, 60_000L)
+    val TrafficStatsCollectionScreenOff = PollingTimerSpec("traffic_stats_collection_screen_off", 120_000L, 120_000L)
     val ProxyHealthcheckRefresh = PollingTimerSpec("proxy_healthcheck_refresh", 1_500L, 1_500L)
     val ProxyTestingSortHold = PollingTimerSpec("proxy_testing_sort_hold", 2_200L, 2_200L)
     val ProxySwitchFeedback = PollingTimerSpec("proxy_switch_feedback", 500L, 500L)
