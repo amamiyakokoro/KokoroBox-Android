@@ -30,6 +30,20 @@ jobs:
           distribution: temurin
           java-version: "25"
 
+      - name: Setup Kotlin
+        uses: fwilhe2/setup-kotlin@d8da77aba9278576c536dc13051a980a16085022 # pinned main
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: lib/native/go/go.mod
+          cache: false
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # pinned stable
+        with:
+          targets: aarch64-linux-android
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
@@ -38,12 +52,17 @@ jobs:
         with:
           packages: ""
 
-      - name: Install Android platform
+      - name: Install native and Android build tools
         shell: bash
         run: |
           sdk_major="$(sed -n 's/^android\.compileSdk=//p' gradle.properties)"
+          ndk_version="$(sed -n 's/^android\.ndkVersion=//p' gradle.properties)"
           if [[ ! "$sdk_major" =~ ^[0-9]+$ ]]; then
             echo "Invalid android.compileSdk: $sdk_major" >&2
+            exit 1
+          fi
+          if [[ -z "$ndk_version" ]]; then
+            echo "Missing android.ndkVersion" >&2
             exit 1
           fi
 
@@ -53,7 +72,31 @@ jobs:
             sdk_package="$sdk_major"
           fi
 
-          sdkmanager "platforms;android-$sdk_package" "build-tools;37.0.0"
+          sdkmanager \
+            "platforms;android-$sdk_package" \
+            "build-tools;37.0.0" \
+            "ndk;$ndk_version" \
+            "cmake;3.22.1"
+          cargo install cargo-ndk --locked
+
+      - name: Checkout configured Mihomo release
+        run: python3 scripts/ci-release.py sync-kernel
+
+      - name: Build native runtime and Geo assets
+        shell: bash
+        env:
+          ABI_APP_LIST: arm64-v8a
+        run: |
+          ndk_version="$(sed -n 's/^android\.ndkVersion=//p' gradle.properties)"
+          export NDK_VERSION="$ndk_version"
+          export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/$ndk_version"
+          kotlin scripts/native-build.main.kts --all
+          test -s jniLibs/arm64-v8a/libclash.so
+          test -s jniLibs/arm64-v8a/liboverride.so
+          test -s jniLibs/arm64-v8a/libbridge.so
+          test -s build/generated/assets/geo/geoip.metadb.xz
+          test -s build/generated/assets/geo/geosite.dat.xz
+          test -s build/generated/assets/geo/ASN.mmdb.xz
 
       - name: Verify native bridge namespace
         run: ./gradlew app:verifyBridgeJniNamespace
