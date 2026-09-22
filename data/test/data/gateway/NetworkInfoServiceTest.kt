@@ -15,6 +15,7 @@ class NetworkInfoServiceTest {
         val client = OkHttpClient.Builder().addInterceptor { chain ->
             val request = chain.request()
             assertEquals("application/json", request.header("Accept"))
+            assertEquals("KokoroBox-Android", request.header("User-Agent"))
             Response.Builder()
                 .request(request)
                 .protocol(Protocol.HTTP_1_1)
@@ -50,5 +51,37 @@ class NetworkInfoServiceTest {
 
         assertEquals(IpInfo("203.0.113.2", "JP", "JP"), service.getExternalIp())
         assertNull(NetworkInfoService(client, emptyList()).getExternalIp())
+    }
+
+    @Test
+    fun rejectsHttpErrorsInvalidAddressesAndOversizedBodies() = runBlocking {
+        val client = OkHttpClient.Builder().addInterceptor { chain ->
+            val response = when (chain.request().url.host) {
+                "error.example" -> 503 to """
+                    {"ip":"203.0.113.3","country_code":"TW"}
+                """.trimIndent()
+                "hostname.example" -> 200 to """{"ip":"example.com","country_code":"TW"}"""
+                "oversized.example" -> 200 to " ".repeat(65 * 1024)
+                else -> 200 to """{"ip":"2001:db8::1","country_code":"jp"}"""
+            }
+            Response.Builder()
+                .request(chain.request())
+                .protocol(Protocol.HTTP_1_1)
+                .code(response.first)
+                .message("response")
+                .body(response.second.toResponseBody())
+                .build()
+        }.build()
+        val service = NetworkInfoService(
+            client,
+            listOf(
+                "https://error.example/json",
+                "https://hostname.example/json",
+                "https://oversized.example/json",
+                "https://valid.example/json",
+            ),
+        )
+
+        assertEquals(IpInfo("2001:db8::1", "JP"), service.getExternalIp())
     }
 }

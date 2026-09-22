@@ -40,6 +40,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.net.Inet6Address
+import java.net.InetAddress
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 @Serializable
@@ -51,8 +54,10 @@ data class IpInfo(
 ) {
     fun normalized(): IpInfo = copy(
         ip = ip.trim(),
-        countryCode = countryCode?.trim()?.takeIf { it.isNotEmpty() }
-            ?: country?.trim()?.takeIf { it.length == 2 },
+        countryCode = (countryCode ?: country)
+            ?.trim()
+            ?.uppercase(Locale.ROOT)
+            ?.takeIf(::isValidCountryCode),
         country = country?.trim(),
     )
 }
@@ -74,6 +79,7 @@ class NetworkInfoService(
         .build(),
     private val externalIpEndpoints: List<String> = EXTERNAL_IP_ENDPOINTS,
     private val context: Context? = null,
+    private val userAgent: String = DEFAULT_USER_AGENT,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -103,12 +109,19 @@ class NetworkInfoService(
             val request = Request.Builder()
                 .url(endpoint)
                 .header("Accept", "application/json")
-                .header("User-Agent", "KokoroBox/${System.getProperty("http.agent").orEmpty()}")
+                .header("User-Agent", userAgent)
                 .build()
             val info = httpClient.newCall(request).execute().use { response ->
-                json.decodeFromString<IpInfo>(response.body.string()).normalized()
+                if (!response.isSuccessful) return@use null
+                val body = response.body
+                val declaredLength = body.contentLength()
+                if (declaredLength > MAX_RESPONSE_BYTES) return@use null
+                val source = body.source()
+                source.request(MAX_RESPONSE_BYTES + 1L)
+                if (source.buffer.size > MAX_RESPONSE_BYTES) return@use null
+                json.decodeFromString<IpInfo>(source.readUtf8()).normalized()
             }
-            info.takeIf { it.ip.isNotBlank() }
+            info?.takeIf { isValidIpAddress(it.ip) }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             null
@@ -175,6 +188,25 @@ class NetworkInfoService(
 
     private companion object {
         const val NETWORK_CHANGE_DEBOUNCE_MS = 750L
+        const val MAX_RESPONSE_BYTES = 64L * 1024L
+        const val DEFAULT_USER_AGENT = "KokoroBox-Android"
+    }
+}
+
+private fun isValidCountryCode(value: String): Boolean =
+    value.length == 2 && value.all { it in 'A'..'Z' }
+
+private fun isValidIpAddress(value: String): Boolean {
+    if (value.contains(':')) {
+        if (value.any { it !in "0123456789abcdefABCDEF:." }) return false
+        return runCatching { InetAddress.getByName(value) is Inet6Address }.getOrDefault(false)
+    }
+    val parts = value.split('.')
+    return parts.size == 4 && parts.all { part ->
+        part.isNotEmpty() &&
+            part.length <= 3 &&
+            part.all(Char::isDigit) &&
+            part.toIntOrNull()?.let { it in 0..255 } == true
     }
 }
 

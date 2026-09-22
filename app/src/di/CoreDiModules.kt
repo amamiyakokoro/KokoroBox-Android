@@ -23,6 +23,7 @@
 package com.amamiyakokoro.box.di
 
 import android.content.Intent
+import com.amamiyakokoro.box.BuildConfig
 import com.amamiyakokoro.box.data.controller.AccessControlController
 import com.amamiyakokoro.box.data.controller.AcgWallpaperStorage
 import com.amamiyakokoro.box.data.controller.AppSettingsController
@@ -126,7 +127,12 @@ val appDataRuntimeModule = module {
         )
     }
     single { LogStore(androidApplication(), get()) }
-    single { NetworkInfoService(context = androidContext()) }
+    single {
+        NetworkInfoService(
+            context = androidContext(),
+            userAgent = "KokoroBox-Android/${BuildConfig.VERSION_NAME}",
+        )
+    }
     single {
         val profilesRepository = get<ProfilesRepository>()
         RuntimeOverrideController(
