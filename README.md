@@ -11,7 +11,7 @@ A Material 3 Android client for [Mihomo](https://github.com/MetaCubeX/mihomo), w
 > [!IMPORTANT]
 > KokoroBox supports **arm64-v8a** devices running Android 8.0 (API 26) or newer.
 
-## Highlights
+## Features
 
 - Rule, Global, Direct, VPN, and optional Root TUN modes
 - Local, remote, QR-code, and authenticated Kokoro subscription profiles
@@ -23,30 +23,21 @@ A Material 3 Android client for [Mihomo](https://github.com/MetaCubeX/mihomo), w
 
 Download the latest signed APK from [GitHub Releases](https://github.com/amamiyakokoro/KokoroBox-Android/releases/latest).
 
-The application ID is `com.amamiyakokoro.box`. Existing YumeBox installations and data are not replaced or migrated.
+KokoroBox uses the application ID `com.amamiyakokoro.box`; it does not replace or migrate YumeBox data.
 
 ## Build
 
-Requirements: JDK 24+, Android SDK 37, and NDK `29.0.14206865`.
+Requirements: JDK 25, Android SDK 37, NDK `29.0.14206865`, CMake, Kotlin CLI, Go, Rust, and `cargo-ndk`.
 
 ```bash
 git clone https://github.com/amamiyakokoro/KokoroBox-Android.git
 cd KokoroBox-Android
+python3 scripts/ci-release.py sync-kernel
+kotlin scripts/native-build.main.kts --all
 ./gradlew :app:assembleDebug
 ```
 
-To rebuild native components, install Kotlin command-line tools, Go, Rust, and `cargo-ndk`, then run:
-
-```bash
-./scripts/sync-kernel.sh meta
-kotlin scripts/native-build.main.kts --all
-```
-
-Build an arm64 release APK with:
-
-```bash
-./gradlew assembleReleaseArm64V8a
-```
+For an arm64 release APK, run `./gradlew assembleReleaseArm64V8a` after the same native build steps. See [release build instructions](docs/ReleaseCI.md) for signing and publishing.
 
 Never commit a keystore or `signing.properties`.
 
