@@ -1,7 +1,6 @@
 # Kokoro Android OAuth integration
 
-KokoroBox uses backend-mediated osu! OAuth with mandatory **PKCE S256**.
-There is no plain-PKCE or non-PKCE fallback, including on HTTP 400 or 422.
+KokoroBox uses backend-mediated osu! OAuth with mandatory **PKCE S256**. HTTP 400 or 422 never triggers a non-S256 fallback.
 
 ## Fixed configuration
 
@@ -16,10 +15,7 @@ The backend allowlist must include this exact value:
 APP_REDIRECT_URIS=kokoro://oauth/callback
 ```
 
-This shared callback remains unchanged across platforms. This repository implements
-the Android client only; it does not implement desktop instance handoff or Apple
-URL registration. Do not substitute App Links, Universal Links, platform-specific
-schemes or loopback URLs. The client does not contain backend or osu! client secrets.
+Keep this shared callback across platforms. Do not substitute another URL or include backend or osu! client secrets.
 
 ## Login and storage lifecycle
 
@@ -55,7 +51,7 @@ GET /api/app/auth/login
   &code_challenge_method=S256
 ```
 
-The verifier never appears in the browser URL.
+The verifier stays out of the browser URL.
 
 ## Callback handling
 
@@ -97,9 +93,7 @@ If the process dies after consuming the callback but before saving tokens, start
 new login. If it dies while the browser is open, the encrypted pending record can
 be restored until its expiry.
 
-Closing the system browser without a callback cannot be reliably distinguished
-from an ongoing login. That pending attempt remains bounded by its expiry and is
-replaced on the next login; an explicit error callback or logout clears it.
+Closing the browser without a callback leaves the pending attempt until expiry or the next login; an error callback or logout clears it.
 
 ## Tokens and refresh
 
@@ -120,13 +114,7 @@ encrypted sessions.
 
 ## Logging and security boundaries
 
-The authentication HTTP client has no body logger, analytics or crash-reporting
-interceptor. Do not add one that captures login/callback URLs, token bodies or
-response bodies. Callback errors logged by `MainActivity` are generic, without the
-URI or throwable. URI/JSON parsing errors are replaced with sanitized errors;
-credential models redact `toString()`. No verifier, authorization code, tokens or
-full callback should enter telemetry. Subscription UUIDs/external URLs remain
-sensitive independently of PKCE.
+The authentication HTTP client has no body logger, analytics, or crash-reporting interceptor. `MainActivity` logs generic callback errors; parsing errors are sanitized and credential `toString()` values are redacted. Keep verifiers, codes, tokens, full callbacks, subscription UUIDs, and external URLs out of telemetry.
 
 Custom schemes may still be claimed by other installed apps. PKCE prevents an app
 that intercepts only the authorization code from exchanging it without the original
@@ -138,14 +126,7 @@ verifier; it does not guarantee exclusive OS delivery or prevent denial of servi
 ./gradlew :data:testDebugUnitTest :app:assembleDebug :app:lintDebug
 ```
 
-`KokoroOAuthTest` and `KokoroSessionTest` cover the
-[RFC 7636 Appendix B vector](https://www.rfc-editor.org/rfc/rfc7636#appendix-B),
-unpadded encoding, independent randomness, exact URL/JSON fields, forged callbacks,
-missing/incorrect/duplicate/expired state, replay/concurrent delivery, denial,
-missing verifier, serialized pending-login restoration, isolated consecutive
-logins, token 400/422 without downgrade, response redaction and refresh rotation/
-single-flight. HTTP is replaced with a recording test transport; no real credentials
-or production requests are needed. The RFC vector exists only in test code.
+`KokoroOAuthTest` and `KokoroSessionTest` cover the [RFC 7636 vector](https://www.rfc-editor.org/rfc/rfc7636#appendix-B), login and callback validation, replay, denial, pending-login restoration, 400/422 handling, redaction, and refresh. HTTP uses a recording test transport; test values are synthetic.
 
 ## Required device checks
 

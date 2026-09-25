@@ -1,8 +1,6 @@
 # Kokoro Custom Rules
 
-KokoroBox manages server-side Custom Rules through `https://amamiyakoko.ro/api/app/custom-rules`.
-Every request uses the existing Kokoro App bearer session; no user ID, subscription UUID, or backend
-secret is accepted from the UI.
+KokoroBox manages server-side Custom Rules through `https://amamiyakoko.ro/api/app/custom-rules` using the existing Bearer session. The UI supplies no user ID, subscription UUID, or backend secret.
 
 ## Client behavior
 
@@ -21,17 +19,13 @@ callback URLs, rule payloads, and response bodies are not logged.
 
 ## Conflict and failure handling
 
-An HTTP `409` is never retried automatically. KokoroBox reloads the remote `default` set and asks the
-user to either use the remote rules or keep the local draft. Keeping the draft adopts the newly read
-revision, but still requires a separate explicit Save action before anything is overwritten.
+On `409`, KokoroBox reloads `default` and asks the user to use remote rules or keep the local draft. Keeping the draft adopts the new revision but requires another explicit Save.
 
 Before each save, the client reloads `options` and validates the complete draft. A `422` refreshes
 capabilities and leaves the draft intact. A `404` reloads the default set. A `429` is surfaced without an
 automatic write retry.
 
-If a write times out, the client first performs a fresh GET. An identical ordered rule list is treated as
-a successful save; otherwise the outcome is shown as unknown and enters the same user-mediated conflict
-flow. The client never blindly replays an uncertain or stale write.
+After a write timeout, a fresh GET confirms success only if the ordered rules match. Otherwise the user resolves the unknown outcome; the client does not replay the write.
 
 ## Rule validation
 

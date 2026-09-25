@@ -44,37 +44,27 @@ certificate fingerprint is uploaded alongside the APK, never the private key.
 
 See [GitHub's secrets guide](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets).
 
-## Build an existing tag, including v0.5.5
+## Build an existing tag
 
-1. Push the new workflow and helper to `dev` (the repository's default branch).
-2. Open **Actions → Release APK → Run workflow**.
-3. Select the updated `dev` branch for the workflow definition.
-4. Enter `v0.5.5` in **release_tag**.
-5. Leave **publish_release** off for an artifact-only build, or turn it on to
-   upload the verified APK to a GitHub Release.
+1. Open **Actions → Release APK → Run workflow** and select `dev` for the workflow definition.
+2. Enter an existing `vMAJOR.MINOR.PATCH` tag in **release_tag**.
+3. Leave **publish_release** off for an artifact-only build, or enable it to publish the verified APK.
 
 Automation is taken from the selected workflow branch, but **all app/native sources
 are checked out from the entered tag**. The workflow checks that the tag exists,
 the checkout commit matches it and `project.version.name` matches the version.
 It will not label the latest `dev` source as an older release.
 
-The existing `v0.5.5` tag points to `38ad867a`, before the About-screen and ACG
-spacing fixes. Rebuilding it does not include those later fixes. Use a new version
-and tag to release newer changes; do not move an already distributed tag.
-
-Re-running an old failed workflow run uses that run's old definition. Use a **new
-manual run** from the updated branch to pick up this signing workflow. GitHub must
-have the workflow on the default branch for manual dispatch to be available.
+Use a new version and tag for new changes; do not move a distributed tag. Re-running an old workflow run uses its old definition, so start a new manual run on `dev` after workflow changes.
 
 ## Build and publish future releases automatically
 
-Update `project.version.name` and `project.version.code` in `gradle.properties`,
-commit them together with the intended changes, then push the branch and tag:
+Update `project.version.name` and `project.version.code` in `gradle.properties`, commit the release, then push `dev` and its new tag (replace `1.2.3` below with the release version):
 
 ```sh
 git push origin dev
-git tag -a v0.5.6 -m "KokoroBox v0.5.6"
-git push origin v0.5.6
+git tag -a v1.2.3 -m "KokoroBox v1.2.3"
+git push origin v1.2.3
 ```
 
 Pushing a new `vMAJOR.MINOR.PATCH` tag containing this workflow automatically builds
@@ -84,15 +74,12 @@ files. Publishing only runs after the build job succeeds. Ordinary branch pushes
 do not publish a release. This does not upload to Google Play or require Google
 Play service-account credentials.
 
-Existing tags are not triggered retroactively by updating `dev`. To publish an
-existing tag such as `v0.5.5`, start a new manual run on `dev` and enable
-**publish_release**. Leave it off when you only want to test the build/signing flow.
+Updating `dev` does not trigger existing tags; use a manual run with **publish_release** for those.
 
-After success, download the artifact named `KokoroBox-v0.5.5-arm64-release` from the
-run summary. It contains:
+After success, download the `KokoroBox-<version>-arm64-release` artifact. It contains:
 
 ```text
-KokoroBox-v0.5.5-arm64-v8a-release.apk
+KokoroBox-<version>-arm64-v8a-release.apk
 SHA256SUMS
 SIGNING-CERT-SHA256.txt
 ```
