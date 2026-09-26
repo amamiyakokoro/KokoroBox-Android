@@ -531,15 +531,13 @@ object ProfileProcessor {
 
                     val committed = profileLock.withLock {
                         currentCoroutineContext().ensureActive()
-                        if (ImportedDao.exists(snapshot.imported.uuid)) {
-                            targetDir.deleteRecursively()
-                            stagingDir.copyRecursively(targetDir, overwrite = true)
-
+                        val current = ImportedDao.queryByUUID(snapshot.imported.uuid)
+                        if (current != null) {
                             val finalName = if (snapshot.imported.type == Profile.Type.Url) {
                                 resolveSubscriptionName(snapshot.imported.name, snapshot.imported.source, subInfo)
                             } else snapshot.imported.name
 
-                            val updated = snapshot.imported.copy(
+                            val downloaded = snapshot.imported.copy(
                                 name = finalName,
                                 lastUpdateAttemptAt = System.currentTimeMillis(),
                                 lastUpdateFailed = false,
@@ -551,6 +549,10 @@ object ProfileProcessor {
                                 total = subInfo?.total ?: snapshot.imported.total,
                                 expire = subInfo?.expire ?: snapshot.imported.expire,
                             )
+                            val updated = mergeProfileUpdate(snapshot.imported, current, downloaded)
+                                ?: throw ProfileUpdateSupersededException()
+                            targetDir.deleteRecursively()
+                            stagingDir.copyRecursively(targetDir, overwrite = true)
                             ImportedDao.update(updated)
 
                             context.sendProfileChanged(snapshot.imported.uuid)
@@ -567,7 +569,13 @@ object ProfileProcessor {
                 } catch (e: Exception) {
                     withContext(NonCancellable) {
                         profileLock.withLock {
-                            ImportedDao.queryByUUID(uuid)?.let { current ->
+                            // A download for old settings must not mark the new settings as failed
+                            // or remove a newly edited profile that has no committed config yet.
+                            val current = ImportedDao.queryByUUID(uuid)
+                            if (current != null && !hasSameProfileDownloadSettings(snapshot.imported, current)) {
+                                return@withLock
+                            }
+                            current?.let {
                                 ImportedDao.update(current.copy(
                                     lastUpdateAttemptAt = System.currentTimeMillis(),
                                     lastUpdateFailed = true,
@@ -585,6 +593,17 @@ object ProfileProcessor {
                 } finally {
                     stagingDir.deleteRecursively()
                 }
+            }
+        }
+    }
+
+    suspend fun patch(context: Context, uuid: UUID, transform: (Imported) -> Imported) {
+        withContext(Dispatchers.IO) {
+            profileLock.withLock {
+                val current = ImportedDao.queryByUUID(uuid)
+                    ?: throw java.io.FileNotFoundException("profile $uuid not found")
+                ImportedDao.update(transform(current))
+                context.sendProfileChanged(uuid)
             }
         }
     }

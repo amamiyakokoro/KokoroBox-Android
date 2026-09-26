@@ -119,18 +119,15 @@ class ProfileManager(private val context: Context) : IProfileManager,
         interval: Long,
         userAgent: String,
     ) {
-        val imported = ImportedDao.queryByUUID(uuid)
-            ?: throw FileNotFoundException("profile $uuid not found")
-
-        val updated = imported.copy(
-            name = name,
-            source = source,
-            interval = interval,
-            userAgent = normalizeUserAgent(userAgent),
-        )
-
-        ImportedDao.update(updated)
-        context.sendProfileChanged(uuid)
+        val normalizedUserAgent = normalizeUserAgent(userAgent)
+        ProfileProcessor.patch(context, uuid) { current ->
+            current.copy(
+                name = name,
+                source = source,
+                interval = interval,
+                userAgent = normalizedUserAgent,
+            )
+        }
     }
 
     override suspend fun update(uuid: UUID, callback: IFetchObserver?) {
