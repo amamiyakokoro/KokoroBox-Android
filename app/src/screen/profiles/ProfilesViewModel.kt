@@ -39,6 +39,7 @@ import com.amamiyakokoro.box.runtime.client.ProfilesRepository
 import com.amamiyakokoro.box.service.remote.IFetchObserver
 import com.amamiyakokoro.box.service.runtime.entity.Profile
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +88,6 @@ class ProfilesViewModel(
         _kokoroSubscriptionOptions.asStateFlow()
 
     private val updateJobs = mutableMapOf<UUID, Job>()
-    private val profileConfigBackups = mutableMapOf<UUID, ProfileConfigBackup>()
     private val canceledProfileUpdateIds = mutableSetOf<UUID>()
 
     init {
@@ -317,12 +317,7 @@ class ProfilesViewModel(
 
     fun updateProfile(uuid: UUID) {
         if (uuid in _updatingProfileIds.value) return
-        val updateJob = viewModelScope.launch {
-            val backup = captureProfileConfigBackup(uuid)
-            var restoreBackupOnExit = false
-            profileConfigBackups[uuid] = backup
-            canceledProfileUpdateIds.remove(uuid)
-            _updatingProfileIds.update { it + uuid }
+        val updateJob = viewModelScope.launch(start = CoroutineStart.LAZY) {
             try {
                 applyLoading(true)
                 _downloadProgress.value = DownloadProgress(
@@ -350,38 +345,33 @@ class ProfilesViewModel(
                     Timber.i("Profile updated: $uuid")
                 }
             } catch (e: Exception) {
-                restoreBackupOnExit = true
                 if (e is CancellationException) {
                     Timber.d("Profile update cancelled: $uuid")
+                    throw e
                 } else {
                     Timber.e(e, "Failed to update profile")
                     showError(UiText.Resource(LocaleR.string.profiles_vm_message_update_failed, listOf(e.message.orEmpty())))
                     _downloadProgress.value = null
                 }
             } finally {
-                if (uuid in canceledProfileUpdateIds || restoreBackupOnExit) {
-                    restoreProfileConfigBackup(uuid)
-                    canceledProfileUpdateIds.remove(uuid)
-                    refreshProfiles()
+                if (canceledProfileUpdateIds.remove(uuid)) {
+                    _downloadProgress.value = null
                 }
                 updateJobs.remove(uuid)
-                profileConfigBackups.remove(uuid)
                 _updatingProfileIds.update { it - uuid }
                 applyLoading(false)
             }
         }
         updateJobs[uuid] = updateJob
+        _updatingProfileIds.update { it + uuid }
+        updateJob.start()
     }
 
     fun cancelProfileUpdateAndRestore(uuid: UUID) {
-        if (uuid !in _updatingProfileIds.value && uuid !in profileConfigBackups) return
+        if (uuid !in _updatingProfileIds.value) return
         canceledProfileUpdateIds.add(uuid)
         updateJobs[uuid]?.cancel()
-        _updatingProfileIds.update { it - uuid }
-        viewModelScope.launch {
-            restoreProfileConfigBackup(uuid)
-            refreshProfiles()
-        }
+        // Keep the update marked busy until service-side staging has been cleaned up.
     }
 
     fun patchProfile(uuid: UUID, name: String, source: String, interval: Long, userAgent: String) {
@@ -544,25 +534,6 @@ class ProfilesViewModel(
         super.setLoading(loading)
     }
 
-    private suspend fun captureProfileConfigBackup(uuid: UUID): ProfileConfigBackup = withContext(Dispatchers.IO) {
-        val configFile = profileConfigFile(uuid)
-        ProfileConfigBackup(
-            existed = configFile.exists(),
-            bytes = if (configFile.exists()) configFile.readBytes() else null,
-        )
-    }
-
-    private suspend fun restoreProfileConfigBackup(uuid: UUID) = withContext(Dispatchers.IO) {
-        val backup = profileConfigBackups[uuid] ?: return@withContext
-        val configFile = profileConfigFile(uuid)
-        if (backup.existed) {
-            configFile.parentFile?.mkdirs()
-            configFile.writeBytes(backup.bytes ?: ByteArray(0))
-        } else {
-            configFile.delete()
-        }
-    }
-
     private suspend fun profileConfigExists(uuid: UUID): Boolean = withContext(Dispatchers.IO) {
         profileConfigFile(uuid).exists()
     }
@@ -586,11 +557,6 @@ class ProfilesViewModel(
         data class ShowError(val message: UiText) : ProfilesUiEffect
     }
 }
-
-private data class ProfileConfigBackup(
-    val existed: Boolean,
-    val bytes: ByteArray?,
-)
 
 data class ProfilesUiState(
     override val isLoading: Boolean = false,

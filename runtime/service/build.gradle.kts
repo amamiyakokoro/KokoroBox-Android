@@ -23,14 +23,19 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-android {
+extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
     namespace = "com.amamiyakokoro.box.runtime.service"
+    sourceSets.getByName("test").kotlin.directories.apply {
+        clear()
+        add("test")
+    }
     buildFeatures {
         aidl = true
     }
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation(project(":core"))
     implementation(project(":platform"))
     implementation(project(":locale"))

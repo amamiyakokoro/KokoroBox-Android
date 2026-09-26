@@ -44,6 +44,8 @@ import com.amamiyakokoro.box.core.util.ProfileUpdatePolicy
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -435,7 +437,7 @@ object ProfileProcessor {
         callback: IFetchObserver?,
         onlyIfDue: Boolean = false,
     ) {
-        withContext(Dispatchers.IO + NonCancellable) {
+        withContext(Dispatchers.IO) {
             processLock.withLock {
                 val targetDir = context.importedDir.resolve(uuid.toString())
                 val stagingDir = context.cacheDir.resolve("profile-staging").resolve(uuid.toString())
@@ -474,58 +476,61 @@ object ProfileProcessor {
                 }
 
                 var cb = callback
-                var subInfo: SubscriptionInfo? = null
+                val deferKokoroProviderDownloads =
+                    snapshot.imported.type == Profile.Type.Url &&
+                        !snapshot.hasCommittedRuntime &&
+                        KokoroApi.isManagedSubscriptionUrl(snapshot.imported.source)
 
                 try {
-                    if (snapshot.imported.type == Profile.Type.Url) {
-                        subInfo = fetchUrlSubscription(
-                            context,
-                            stagingDir,
-                            snapshot.imported.source,
-                            snapshot.imported.userAgent,
-                        ) { progress ->
+                    val subInfo = awaitProfilePreparation {
+                        val subscriptionInfo = if (snapshot.imported.type == Profile.Type.Url) {
+                            fetchUrlSubscription(
+                                context,
+                                stagingDir,
+                                snapshot.imported.source,
+                                snapshot.imported.userAgent,
+                            ) { progress ->
+                                try {
+                                    cb?.updateStatus(
+                                        com.amamiyakokoro.box.core.model.FetchStatus(
+                                            action = com.amamiyakokoro.box.core.model.FetchStatus.Action.FetchConfiguration,
+                                            args = emptyList(),
+                                            progress = progress,
+                                            max = 100
+                                        )
+                                    )
+                                } catch (_: Exception) {
+                                    cb = null
+                                }
+                            }
+                        } else null
+
+                        // URL profiles have already been downloaded above, including the authenticated
+                        // Kokoro endpoint. Do not let the native validator fetch the source again: its
+                        // HTTP client cannot attach the App bearer token and would overwrite config.yaml
+                        // with the 401 response body before validation.
+                        val requiresNativeFetch = snapshot.imported.type != Profile.Type.Url
+                        StartupTaskCoordinator.awaitGeoInitialization()
+                        Clash.fetchAndValid(
+                            path = stagingDir,
+                            url = snapshot.imported.source,
+                            force = requiresNativeFetch,
+                            downloadProviders = !deferKokoroProviderDownloads,
+                        ) {
                             try {
                                 cb?.updateStatus(
-                                    com.amamiyakokoro.box.core.model.FetchStatus(
-                                        action = com.amamiyakokoro.box.core.model.FetchStatus.Action.FetchConfiguration,
-                                        args = emptyList(),
-                                        progress = progress,
-                                        max = 100
-                                    )
+                                    it
                                 )
-                            } catch (_: Exception) {
+                            } catch (e: Exception) {
                                 cb = null
+                                Log.w("Report fetch status: $e", e)
                             }
-                        }
+                        }.await()
+                        subscriptionInfo
                     }
 
-                    // URL profiles have already been downloaded above, including the authenticated
-                    // Kokoro endpoint. Do not let the native validator fetch the source again: its
-                    // HTTP client cannot attach the App bearer token and would overwrite config.yaml
-                    // with the 401 response body before validation.
-                    val requiresNativeFetch = snapshot.imported.type != Profile.Type.Url
-                    val deferKokoroProviderDownloads =
-                        snapshot.imported.type == Profile.Type.Url &&
-                            !snapshot.hasCommittedRuntime &&
-                            KokoroApi.isManagedSubscriptionUrl(snapshot.imported.source)
-                    StartupTaskCoordinator.awaitGeoInitialization()
-                    Clash.fetchAndValid(
-                        path = stagingDir,
-                        url = snapshot.imported.source,
-                        force = requiresNativeFetch,
-                        downloadProviders = !deferKokoroProviderDownloads,
-                    ) {
-                        try {
-                            cb?.updateStatus(
-                                it
-                            )
-                        } catch (e: Exception) {
-                            cb = null
-                            Log.w("Report fetch status: $e", e)
-                        }
-                    }.await()
-
                     val committed = profileLock.withLock {
+                        currentCoroutineContext().ensureActive()
                         if (ImportedDao.exists(snapshot.imported.uuid)) {
                             targetDir.deleteRecursively()
                             stagingDir.copyRecursively(targetDir, overwrite = true)
@@ -560,18 +565,20 @@ object ProfileProcessor {
                         KokoroProviderPrefetchJobService.cancel(context, snapshot.imported.uuid)
                     }
                 } catch (e: Exception) {
-                    profileLock.withLock {
-                        ImportedDao.queryByUUID(uuid)?.let { current ->
-                            ImportedDao.update(current.copy(
-                                lastUpdateAttemptAt = System.currentTimeMillis(),
-                                lastUpdateFailed = true,
-                            ))
-                        }
-                        if (!snapshot.hasExistingConfig && ImportedDao.exists(snapshot.imported.uuid)) {
-                            ImportedDao.remove(snapshot.imported.uuid)
-                            SelectionDao.clear(snapshot.imported.uuid)
-                            targetDir.deleteRecursively()
-                            context.sendProfileChanged(snapshot.imported.uuid)
+                    withContext(NonCancellable) {
+                        profileLock.withLock {
+                            ImportedDao.queryByUUID(uuid)?.let { current ->
+                                ImportedDao.update(current.copy(
+                                    lastUpdateAttemptAt = System.currentTimeMillis(),
+                                    lastUpdateFailed = true,
+                                ))
+                            }
+                            if (!snapshot.hasExistingConfig && ImportedDao.exists(snapshot.imported.uuid)) {
+                                ImportedDao.remove(snapshot.imported.uuid)
+                                SelectionDao.clear(snapshot.imported.uuid)
+                                targetDir.deleteRecursively()
+                                context.sendProfileChanged(snapshot.imported.uuid)
+                            }
                         }
                     }
                     throw e
