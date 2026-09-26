@@ -50,27 +50,16 @@ fun rememberStartupBiometricGateState(
     biometricUnlockEnabled: Boolean,
 ): StartupBiometricGateState {
     var isAuthenticated by remember(biometricUnlockEnabled) { mutableStateOf(!biometricUnlockEnabled) }
-    var isAuthenticating by remember { mutableStateOf(false) }
-    var biometricErrorMessage by remember { mutableStateOf<String?>(null) }
-    var retryNonce by remember { mutableStateOf(0) }
+    var isAuthenticating by remember(biometricUnlockEnabled) { mutableStateOf(false) }
+    var biometricErrorMessage by remember(biometricUnlockEnabled) { mutableStateOf<String?>(null) }
+    var retryNonce by remember(biometricUnlockEnabled) { mutableStateOf(0) }
 
-    LaunchedEffect(biometricUnlockEnabled) {
-        if (!biometricUnlockEnabled) {
-            isAuthenticated = true
-            isAuthenticating = false
-            biometricErrorMessage = null
-        } else {
-            isAuthenticated = false
-            biometricErrorMessage = null
-            retryNonce += 1
-        }
-    }
-
+    // Authentication callbacks only update the displayed state. A failed attempt must wait
+    // for an explicit retry, rather than relaunching when isAuthenticating becomes false.
     LaunchedEffect(
+        activity,
         biometricUnlockEnabled,
         retryNonce,
-        isAuthenticated,
-        isAuthenticating,
     ) {
         if (!biometricUnlockEnabled || isAuthenticated || isAuthenticating) {
             return@LaunchedEffect
