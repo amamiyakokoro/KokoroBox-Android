@@ -37,16 +37,18 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.io.File
 
-class OverrideConfigStore(
-    private val context: Context,
+class OverrideConfigStore internal constructor(
+    filesDir: File,
 ) : OverrideConfigProvider {
+    constructor(context: Context) : this(context.filesDir)
+
     companion object {
         const val INTERNAL_RUNTIME_PREFIX = "__runtime__"
 
         fun isInternalRuntimeConfig(id: String): Boolean = id.startsWith(INTERNAL_RUNTIME_PREFIX)
     }
 
-    private val overridesDir = File(context.filesDir, "overrides")
+    private val overridesDir = File(filesDir, "overrides")
     private val configsDir = File(overridesDir, "configs")
     private val obsoleteStandaloneRoutingFile = File(overridesDir, "internal/custom-routing.json")
     private val metadataFile = File(overridesDir, "metadata.json")
@@ -287,6 +289,13 @@ class OverrideConfigStore(
 
     suspend fun importUserConfigBackup(entries: List<OverrideConfigBackupEntry>) = withContext(Dispatchers.IO) {
         if (entries.isEmpty()) return@withContext
+        // Validate the entire backup before writing any config or metadata.
+        val destinations = entries.associate { entry ->
+            require(entry.id.matches(Regex("[A-Za-z0-9_-]+"))) { "Invalid override config ID" }
+            val destination = configsDir.resolve("${entry.id}.json").canonicalFile
+            require(destination.parentFile == configsDir.canonicalFile) { "Invalid override config path" }
+            entry.id to destination
+        }
         configsDir.mkdirs()
         val metadataIndex = loadMetadataIndex()
         val updatedConfigs = metadataIndex.configs.toMutableMap()
@@ -301,7 +310,7 @@ class OverrideConfigStore(
                 json.decodeFromString(ConfigurationOverride.serializer(), entry.content)
             }.getOrNull() ?: return@forEach
             val configContent = encodeConfigContent(decodedConfig)
-            configsDir.resolve("${entry.id}.json").writeText(configContent)
+            destinations.getValue(entry.id).writeText(configContent)
             val metadata = OverrideMetadata(
                 id = entry.id,
                 name = entry.name.ifBlank { entry.id },
