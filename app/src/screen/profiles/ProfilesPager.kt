@@ -22,6 +22,8 @@
 package com.amamiyakokoro.box.screen.profiles
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.theme.appPressSink
 import android.annotation.SuppressLint
@@ -67,14 +69,15 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun ProfilesPager(
     mainInnerPadding: PaddingValues,
     lazyListState: LazyListState,
+    dataLifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val navigator = LocalNavigator.current
     val profilesViewModel = koinViewModel<ProfilesViewModel>()
     val homeViewModel = koinViewModel<HomeViewModel>()
-    val profiles by profilesViewModel.profiles.collectAsStateWithLifecycle()
-    val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsStateWithLifecycle()
+    val profiles by profilesViewModel.profiles.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
+    val updatingProfileIds by profilesViewModel.updatingProfileIds.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
     val kokoroSubscriptionOptions by profilesViewModel.kokoroSubscriptionOptions.collectAsStateWithLifecycle()
-    val isRunning by homeViewModel.isRunning.collectAsStateWithLifecycle()
+    val isRunning by homeViewModel.isRunning.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
 
     val overrideConfigViewModel = koinViewModel<OverrideConfigViewModel>()
     val bindingProvider: ProfileBindingProvider = koinInject()

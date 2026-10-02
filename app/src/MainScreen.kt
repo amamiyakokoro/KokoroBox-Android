@@ -201,6 +201,7 @@ fun MainScreen(
                     MainPagerPageLifecycle(isActive = page == settledMainPage) {
                         MainRootPageContent(
                             page = page,
+                            dataLifecycleOwner = lifecycleOwner,
                             mainInnerPadding = mainInnerPaddingForPage(page),
                             acgMainUiEnabled = acgMainUiEnabled,
                             acgWallpaperUri = acgWallpaperUri,
@@ -236,8 +237,10 @@ fun MainScreen(
 /**
  * HorizontalPager keeps all four root pages composed. Without a page-scoped lifecycle,
  * lifecycle-aware flow collection still treats every hidden page as STARTED because they
- * all inherit the Activity lifecycle. Cap hidden pages at CREATED so their UI collectors,
- * animations, and page-only sync jobs stop while service-owned runtime collection continues.
+ * all inherit the Activity lifecycle. Cap hidden pages at CREATED so their animations and
+ * page-only sync jobs stop. Proxy and profile content explicitly collect with the parent
+ * lifecycle to prepare hidden pages while the main screen is visible; those data collectors
+ * still stop when the main screen leaves the foreground.
  */
 @Composable
 private fun MainPagerPageLifecycle(
@@ -297,6 +300,7 @@ private class MainPagerPageLifecycleOwner : LifecycleOwner {
 @Composable
 private fun MainRootPageContent(
     page: Int,
+    dataLifecycleOwner: LifecycleOwner,
     mainInnerPadding: PaddingValues,
     acgMainUiEnabled: Boolean,
     acgWallpaperUri: String,
@@ -333,6 +337,7 @@ private fun MainRootPageContent(
 
         1 -> ProxyPager(
             mainInnerPadding = mainInnerPadding,
+            dataLifecycleOwner = dataLifecycleOwner,
             onNavigateToProviders = {
                 navigator.navigate(ProvidersScreenDestination) {
                     launchSingleTop = true
@@ -346,6 +351,7 @@ private fun MainRootPageContent(
         2 -> ProfilesPager(
             mainInnerPadding = mainInnerPadding,
             lazyListState = profilesListState,
+            dataLifecycleOwner = dataLifecycleOwner,
         )
         3 -> SettingPager(
             mainInnerPadding = mainInnerPadding,

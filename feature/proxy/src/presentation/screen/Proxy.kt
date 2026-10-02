@@ -22,6 +22,8 @@ package com.amamiyakokoro.box.presentation.screen
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
@@ -106,15 +108,16 @@ fun ProxyPager(
     isPageActive: Boolean,
     isProxyRunning: Boolean,
     onProxyStartRequested: (() -> Unit)? = null,
+    dataLifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val proxyViewModel = koinViewModel<ProxyViewModel>()
-    val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsStateWithLifecycle()
+    val proxyGroups by proxyViewModel.sortedProxyGroups.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
     val testingGroupNames by proxyViewModel.testingGroupNames.collectAsStateWithLifecycle()
     val testingProxyNames by proxyViewModel.testingProxyNames.collectAsStateWithLifecycle()
-    val sortMode by proxyViewModel.sortMode.collectAsStateWithLifecycle()
-    val tunnelMode by proxyViewModel.tunnelMode.collectAsStateWithLifecycle()
+    val sortMode by proxyViewModel.sortMode.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
+    val tunnelMode by proxyViewModel.tunnelMode.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
     var displayTunnelMode by remember { mutableStateOf(tunnelMode) }
-    val singleNodeTest by proxyViewModel.singleNodeTest.collectAsStateWithLifecycle()
+    val singleNodeTest by proxyViewModel.singleNodeTest.collectAsStateWithLifecycle(lifecycleOwner = dataLifecycleOwner)
     val groupScrollBehavior = MiuixScrollBehavior(snapAnimationSpec = null)
 
     var showSortPopup by remember { mutableStateOf(false) }
