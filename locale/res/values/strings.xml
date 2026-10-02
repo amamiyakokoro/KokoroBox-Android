@@ -8,38 +8,52 @@
     <string name="about_license_agpl_description" formatted="false">本程序是自由软件：您可以依照 GNU Affero 通用公共许可证的条款重新分发和/或修改本程序。</string>
     <string name="about_license_agpl_name" formatted="false">GNU Affero General Public License v3.0</string>
     <string name="about_license_check_update" formatted="false">检查更新</string>
-    <string name="about_license_check_update_summary" formatted="false">手动检查 GitHub Release 更新</string>
+    <string name="about_license_check_update_summary" formatted="false">查看是否有新版本可用</string>
     <string name="about_license_libraries" formatted="false">引用库</string>
     <string name="about_license_libraries_summary" formatted="false">查看本应用使用的所有第三方引用库</string>
     <string name="about_section_license" formatted="false">许可证</string>
     <string name="about_section_project_links" formatted="false">项目链接</string>
     <string name="about_title" formatted="false">关于</string>
-    <string name="about_update_available" formatted="false">有可用更新</string>
-    <string name="about_update_browser_download" formatted="false">将通过浏览器下载最新 APK。</string>
-    <string name="about_update_checking" formatted="false">正在检查 GitHub Releases…</string>
-    <string name="about_update_continue_install" formatted="false">继续</string>
-    <string name="about_update_download" formatted="false">下载 APK</string>
+    <string name="about_update_available" formatted="false">发现新版本</string>
+    <string name="about_update_browser_download" formatted="false">请通过浏览器下载安装包，再打开文件安装更新。</string>
+    <string name="about_update_check_failed" formatted="false">无法检查更新</string>
+    <string name="about_update_checking" formatted="false">正在检查更新…</string>
+    <string name="about_update_confirmation_notification_failed" formatted="false">无法显示安装通知，请允许 KokoroBox 发送通知后重试更新。</string>
+    <string name="about_update_confirmation_unavailable" formatted="false">无法打开系统安装窗口，请重试更新。</string>
+    <string name="about_update_continue_install" formatted="false">继续安装</string>
+    <string name="about_update_download" formatted="false">通过浏览器下载</string>
+    <string name="about_update_download_failed" formatted="false">无法下载更新，请检查网络连接和可用存储空间后重试。</string>
     <string name="about_update_downloading" formatted="false">正在下载更新…</string>
-    <string name="about_update_in_app_download" formatted="false">下载并更新</string>
-    <string name="about_update_in_app_download_summary" formatted="false">APK 会先下载并验证，再交由 Android 系统安装程序处理。</string>
-    <string name="about_update_install_permission_required" formatted="false">请允许 KokoroBox 安装更新后再继续。</string>
-    <string name="about_update_installed" formatted="false">更新安装已完成。</string>
-    <string name="about_update_invalid_response" formatted="false">GitHub 返回的版本信息不受支持，请稍后再试。</string>
-    <string name="about_update_network_error" formatted="false">无法检查更新，请确认网络连接后重试。</string>
-    <string name="about_update_no_apk" formatted="false">兼容的 APK 尚未就绪，请查看 Release 页面或稍后再检查。</string>
-    <string name="about_update_no_browser" formatted="false">没有可打开此下载的应用。</string>
-    <string name="about_update_no_release" formatted="false">目前尚无已发布的正式版本。</string>
-    <string name="about_update_ok" formatted="false">确定</string>
-    <string name="about_update_open_install_settings" formatted="false">打开设置</string>
-    <string name="about_update_open_release" formatted="false">查看 Release</string>
-    <string name="about_update_preparing_install" formatted="false">正在准备系统安装程序…</string>
-    <string name="about_update_rate_limited" formatted="false">GitHub 已限制请求次数，请稍后再检查。</string>
-    <string name="about_update_retry" formatted="false">重试</string>
-    <string name="about_update_unknown_version" formatted="false">无法比较此构建的版本，请手动查看 GitHub Releases。</string>
-    <string name="about_update_up_to_date" formatted="false">当前已是此版本或更新的版本。</string>
+    <string name="about_update_in_app_download" formatted="false">下载并安装</string>
+    <string name="about_update_in_app_download_summary" formatted="false">下载完成后会自动验证文件并开始安装。</string>
+    <string name="about_update_install_complete" formatted="false">更新完成</string>
+    <string name="about_update_install_failed" formatted="false">无法安装更新，请检查可用存储空间和安装权限后重试。</string>
+    <string name="about_update_install_permission_required" formatted="false">请在设置中允许 KokoroBox 安装未知应用，然后返回并点按「继续安装」。</string>
+    <string name="about_update_installed" formatted="false">已安装更新。</string>
+    <string name="about_update_invalid_response" formatted="false">暂时无法读取更新信息，请稍后再试。</string>
+    <string name="about_update_later" formatted="false">稍后</string>
+    <string name="about_update_network_error" formatted="false">无法连接更新服务器，请检查网络连接后重试。</string>
+    <string name="about_update_nightly_version">%1$s 测试版（构建 %2$d）</string>
+    <string name="about_update_no_apk" formatted="false">此版本的安装包暂时无法下载，请查看版本页面或稍后再试。</string>
+    <string name="about_update_no_browser" formatted="false">找不到可打开链接的应用，请安装浏览器后再试。</string>
+    <string name="about_update_no_release" formatted="false">所选更新通道暂无可用版本，请稍后再试。</string>
+    <string name="about_update_notification_summary" formatted="false">点按查看版本详情并下载更新。</string>
+    <string name="about_update_ok" formatted="false">关闭</string>
+    <string name="about_update_open_install_settings" formatted="false">允许安装</string>
+    <string name="about_update_open_release" formatted="false">查看版本页面</string>
+    <string name="about_update_preparing_install" formatted="false">正在安装更新…</string>
+    <string name="about_update_privileged_install_failed" formatted="false">无法安装更新，请确认 Shizuku 或 Root 已授权，或改用系统安装。</string>
+    <string name="about_update_rate_limited" formatted="false">检查更新过于频繁，请稍后再试。</string>
+    <string name="about_update_ready_to_install" formatted="false">更新已下载，可以开始安装。</string>
+    <string name="about_update_retry" formatted="false">重试更新</string>
+    <string name="about_update_title" formatted="false">应用更新</string>
+    <string name="about_update_unknown_version" formatted="false">无法识别当前版本，请前往版本页面检查更新。</string>
+    <string name="about_update_up_to_date" formatted="false">目前没有可用更新。</string>
     <string name="about_update_update_failed" formatted="false">更新失败</string>
-    <string name="about_update_verifying" formatted="false">正在验证下载的 APK…</string>
-    <string name="about_update_waiting_for_install_confirmation" formatted="false">请在 Android 安装对话框中继续。</string>
+    <string name="about_update_verification_failed" formatted="false">更新文件未通过验证，请重新下载，或前往版本页面查看详情。</string>
+    <string name="about_update_verifying" formatted="false">正在验证更新文件…</string>
+    <string name="about_update_version_available">新版本：%1$s</string>
+    <string name="about_update_waiting_for_install_confirmation" formatted="false">请在系统安装窗口中确认安装。</string>
     <string name="access_control_app_list_loading" formatted="false">加载中...</string>
     <string name="access_control_app_list_title" formatted="false">应用列表 (%d 已选择)</string>
     <string name="access_control_button_cancel" formatted="false">取消</string>
@@ -112,17 +126,17 @@
     <string name="app_settings_behavior_auto_start_title" formatted="false">自动启动</string>
     <string name="app_settings_behavior_auto_update_on_start_summary" formatted="false">启动时自动更新当前订阅配置</string>
     <string name="app_settings_behavior_auto_update_on_start_title" formatted="false">启动更新配置</string>
-    <string name="app_settings_behavior_automatic_update_check_summary" formatted="false">打开应用时每天检查一次 GitHub Release</string>
+    <string name="app_settings_behavior_automatic_update_check_summary" formatted="false">每天检查一次更新，有新版本时提醒</string>
     <string name="app_settings_behavior_automatic_update_check_title" formatted="false">自动检查更新</string>
-    <string name="app_settings_behavior_update_channel_nightly" formatted="false">测试版（nightly）</string>
+    <string name="app_settings_behavior_update_channel_nightly" formatted="false">测试版（Nightly）</string>
     <string name="app_settings_behavior_update_channel_stable" formatted="false">正式版</string>
-    <string name="app_settings_behavior_update_channel_summary" formatted="false">选择正式版或开发中的 nightly 测试版</string>
+    <string name="app_settings_behavior_update_channel_summary" formatted="false">选择正式版或开发中的测试版</string>
     <string name="app_settings_behavior_update_channel_title" formatted="false">更新通道</string>
     <string name="app_settings_behavior_update_install_method_root" formatted="false">Root</string>
     <string name="app_settings_behavior_update_install_method_shizuku" formatted="false">Shizuku</string>
-    <string name="app_settings_behavior_update_install_method_summary" formatted="false">高级设置：推荐系统安装。Shizuku 和 Root 会跳过 Android 安装确认。</string>
-    <string name="app_settings_behavior_update_install_method_system" formatted="false">系统</string>
-    <string name="app_settings_behavior_update_install_method_title" formatted="false">更新安装方式</string>
+    <string name="app_settings_behavior_update_install_method_summary" formatted="false">建议使用系统安装。Shizuku 和 Root 安装需要授权，且无需系统确认。</string>
+    <string name="app_settings_behavior_update_install_method_system" formatted="false">系统安装</string>
+    <string name="app_settings_behavior_update_install_method_title" formatted="false">安装方式</string>
     <string name="app_settings_button_apply" formatted="false">应用</string>
     <string name="app_settings_experimental_acg_home_summary" formatted="false">启用新的 ACG 风格首页布局</string>
     <string name="app_settings_experimental_acg_home_title" formatted="false">ACG 实验首页</string>
@@ -283,30 +297,30 @@
     <string name="component_selector_prepend" formatted="false">前置</string>
     <string name="component_selector_replace" formatted="false">替换</string>
     <string name="component_update_action_download_now" formatted="false">立即下载</string>
-    <string name="component_update_message_available" formatted="false">检测到可用更新</string>
-    <string name="component_update_message_check_failed" formatted="false">检查更新失败：%s</string>
-    <string name="component_update_message_checking" formatted="false">正在检查更新...</string>
-    <string name="component_update_message_close" formatted="false">知道了</string>
+    <string name="component_update_message_available" formatted="false">有新版本可用</string>
+    <string name="component_update_message_check_failed">无法检查更新：%1$s</string>
+    <string name="component_update_message_checking" formatted="false">正在检查更新…</string>
+    <string name="component_update_message_close" formatted="false">关闭</string>
     <string name="component_update_message_cover_desc" formatted="false">更新封面</string>
     <string name="component_update_message_current_version" formatted="false">当前版本</string>
-    <string name="component_update_message_download_already_running" formatted="false">更新包仍在下载中</string>
-    <string name="component_update_message_download_error_with_code" formatted="false">下载失败 (%d): %s</string>
+    <string name="component_update_message_download_already_running" formatted="false">正在下载更新，请稍候</string>
+    <string name="component_update_message_download_error_with_code">下载失败（%1$d）：%2$s</string>
     <string name="component_update_message_download_ready" formatted="false">下载完成，准备安装</string>
-    <string name="component_update_message_downloading" formatted="false">正在下载更新包...</string>
-    <string name="component_update_message_downloading_with_progress" formatted="false">正在下载更新包 %d%%</string>
+    <string name="component_update_message_downloading" formatted="false">正在下载更新…</string>
+    <string name="component_update_message_downloading_with_progress">正在下载更新：%1$d%%</string>
     <string name="component_update_message_error" formatted="false">下载失败，请稍后重试</string>
     <string name="component_update_message_finished" formatted="false">下载完成，等待安装确认</string>
-    <string name="component_update_message_install_failed" formatted="false">打开安装器失败：%s</string>
-    <string name="component_update_message_install_prompt_opened" formatted="false">下载完成，已打开安装器</string>
-    <string name="component_update_message_missing_release_metadata" formatted="false">最新发布缺少版本元数据</string>
-    <string name="component_update_message_no_compatible_asset" formatted="false">最新发布中没有找到适合当前设备的 APK</string>
-    <string name="component_update_message_no_update" formatted="false">当前已经是最新版本</string>
-    <string name="component_update_message_preparing" formatted="false">正在准备下载...</string>
-    <string name="component_update_message_remote_version" formatted="false">推送版本</string>
+    <string name="component_update_message_install_failed">无法开始安装：%1$s</string>
+    <string name="component_update_message_install_prompt_opened" formatted="false">下载完成，请在系统安装窗口中确认安装</string>
+    <string name="component_update_message_missing_release_metadata" formatted="false">无法读取此版本的更新信息</string>
+    <string name="component_update_message_no_compatible_asset" formatted="false">此版本没有适合当前设备的安装包</string>
+    <string name="component_update_message_no_update" formatted="false">目前没有可用更新</string>
+    <string name="component_update_message_preparing" formatted="false">正在准备下载…</string>
+    <string name="component_update_message_remote_version" formatted="false">新版本</string>
     <string name="component_update_message_updating" formatted="false">正在更新</string>
-    <string name="component_update_message_verify_failed" formatted="false">安装包校验失败，请重试</string>
-    <string name="component_update_message_verifying" formatted="false">正在校验安装包...</string>
-    <string name="component_update_message_waiting" formatted="false">等待下载开始...</string>
+    <string name="component_update_message_verify_failed" formatted="false">更新文件未通过验证，请重新下载</string>
+    <string name="component_update_message_verifying" formatted="false">正在验证更新文件…</string>
+    <string name="component_update_message_waiting" formatted="false">等待开始下载…</string>
     <string name="component_update_title_available" formatted="false">发现新版本</string>
     <string name="component_web_view_invalid_url" formatted="false">无效的 URL</string>
     <string name="connection_chain_count" formatted="false">x%d</string>

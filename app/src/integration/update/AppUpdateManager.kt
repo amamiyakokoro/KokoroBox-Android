@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Build
+import androidx.annotation.StringRes
 import com.amamiyakokoro.box.common.update.ApkUpdateVerifier
 import com.amamiyakokoro.box.common.update.PackageUpdateInstaller
 import com.amamiyakokoro.box.common.update.VerifiedUpdateApk
@@ -16,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.amamiyakokoro.box.core.locale.R as LocaleR
 
 sealed interface AppUpdateInstallState {
     data object Idle : AppUpdateInstallState
@@ -35,7 +37,7 @@ sealed interface AppUpdateInstallState {
     data class Installing(val release: ReleaseCheck.Published) : AppUpdateInstallState
     data class WaitingForUserConfirmation(val release: ReleaseCheck.Published) : AppUpdateInstallState
     data object Installed : AppUpdateInstallState
-    data class Failed(val message: String) : AppUpdateInstallState
+    data class Failed(@StringRes val messageResId: Int, val details: String? = null) : AppUpdateInstallState
 }
 
 /** Coordinates the update transport, verification, and Android's system installation confirmation. */
@@ -78,7 +80,12 @@ class AppUpdateManager(
             } catch (error: Exception) {
                 verifiedUpdate = null
                 mutableState.value = AppUpdateInstallState.Failed(
-                    error.message ?: "Unable to prepare app update",
+                    if (mutableState.value is AppUpdateInstallState.Verifying) {
+                        LocaleR.string.about_update_verification_failed
+                    } else {
+                        LocaleR.string.about_update_download_failed
+                    },
+                    error.message,
                 )
             }
         }
@@ -114,7 +121,8 @@ class AppUpdateManager(
             )
         } catch (error: Exception) {
             mutableState.value = AppUpdateInstallState.Failed(
-                error.message ?: "Unable to start app update installation",
+                LocaleR.string.about_update_install_failed,
+                error.message,
             )
         }
     }
@@ -133,7 +141,8 @@ class AppUpdateManager(
                 throw error
             } catch (error: Exception) {
                 mutableState.value = AppUpdateInstallState.Failed(
-                    error.message ?: "Privileged app update installation failed",
+                    LocaleR.string.about_update_privileged_install_failed,
+                    error.message,
                 )
             }
         }
@@ -144,7 +153,7 @@ class AppUpdateManager(
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 val confirmationIntent = intent.intentExtra(Intent.EXTRA_INTENT)
                 if (confirmationIntent == null) {
-                    mutableState.value = AppUpdateInstallState.Failed("System installation confirmation is unavailable")
+                    mutableState.value = AppUpdateInstallState.Failed(LocaleR.string.about_update_confirmation_unavailable)
                     return
                 }
                 val release = state.value.releaseOrNull()
@@ -156,7 +165,7 @@ class AppUpdateManager(
                     context.startActivity(confirmationIntent)
                 } else if (!installNotifier.showConfirmation(confirmationIntent)) {
                     mutableState.value = AppUpdateInstallState.Failed(
-                        "Open KokoroBox to continue the Android installation confirmation",
+                        LocaleR.string.about_update_confirmation_notification_failed,
                     )
                 }
             }
@@ -169,8 +178,8 @@ class AppUpdateManager(
             else -> {
                 verifiedUpdate = null
                 mutableState.value = AppUpdateInstallState.Failed(
-                    intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-                        ?: "System installation failed",
+                    LocaleR.string.about_update_install_failed,
+                    intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE),
                 )
             }
         }

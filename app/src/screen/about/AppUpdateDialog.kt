@@ -24,6 +24,7 @@ import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
 import com.amamiyakokoro.box.data.integration.update.ReleaseVersion
 import com.amamiyakokoro.box.data.integration.update.isNewerThan
 import com.amamiyakokoro.box.integration.update.AppUpdateInstallState
+import com.amamiyakokoro.box.integration.update.versionLabel
 
 @Composable
 fun AppUpdateDialog(
@@ -43,7 +44,7 @@ fun AppUpdateDialog(
     val message = installState.messageOrNull() ?: when (result) {
         is ReleaseCheck.Published -> when {
             currentVersion == null -> stringResource(LocaleR.string.about_update_unknown_version)
-            newer -> "${stringResource(LocaleR.string.about_update_available)}: ${result.tag}"
+            newer -> stringResource(LocaleR.string.about_update_version_available, result.versionLabel(context))
             else -> stringResource(LocaleR.string.about_update_up_to_date)
         }
         ReleaseCheck.Failure.NoRelease -> stringResource(LocaleR.string.about_update_no_release)
@@ -51,9 +52,21 @@ fun AppUpdateDialog(
         ReleaseCheck.Failure.Network -> stringResource(LocaleR.string.about_update_network_error)
         ReleaseCheck.Failure.InvalidResponse -> stringResource(LocaleR.string.about_update_invalid_response)
     }
+    val title = when (installState) {
+        is AppUpdateInstallState.Failed -> LocaleR.string.about_update_update_failed
+        AppUpdateInstallState.Installed -> LocaleR.string.about_update_install_complete
+        is AppUpdateInstallState.InstallPermissionRequired -> LocaleR.string.about_update_open_install_settings
+        AppUpdateInstallState.Idle -> when {
+            result == ReleaseCheck.Failure.NoRelease -> LocaleR.string.about_license_check_update
+            result is ReleaseCheck.Failure -> LocaleR.string.about_update_check_failed
+            newer -> LocaleR.string.about_update_available
+            else -> LocaleR.string.about_license_check_update
+        }
+        else -> LocaleR.string.about_update_title
+    }
     AlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
-        title = { Text(stringResource(LocaleR.string.about_license_check_update)) },
+        title = { Text(stringResource(title)) },
         text = {
             Column {
                 Text(message)
@@ -70,15 +83,14 @@ fun AppUpdateDialog(
                         LinearProgressIndicator()
                     }
                 }
-                if (installState is AppUpdateInstallState.Failed) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(installState.message)
-                }
                 if (installState is AppUpdateInstallState.Idle && newer) {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        if (canInstallInApp) stringResource(LocaleR.string.about_update_in_app_download_summary)
-                        else stringResource(LocaleR.string.about_update_no_apk),
+                        when {
+                            canInstallInApp -> stringResource(LocaleR.string.about_update_in_app_download_summary)
+                            release.apkUrl != null -> stringResource(LocaleR.string.about_update_browser_download)
+                            else -> stringResource(LocaleR.string.about_update_no_apk)
+                        },
                     )
                 }
             }
@@ -106,15 +118,15 @@ fun AppUpdateDialog(
                     TextButton(onClick = { onDownloadAndInstall(release) }) { Text(stringResource(LocaleR.string.about_update_retry)) }
                 }
 
-                newer && !busy -> {
+                installState is AppUpdateInstallState.Idle && release != null && (newer || currentVersion == null) -> {
                     TextButton(
                         onClick = {
-                            if (canInstallInApp) {
+                            if (newer && canInstallInApp) {
                                 onDownloadAndInstall(release)
                                 return@TextButton
                             }
                             try {
-                                openUrl(context, release.apkUrl ?: release.releaseUrl)
+                                openUrl(context, if (newer) release.apkUrl ?: release.releaseUrl else release.releaseUrl)
                                 onDismiss()
                             } catch (_: ActivityNotFoundException) {
                                 Toast.makeText(context, noBrowserMessage, Toast.LENGTH_LONG).show()
@@ -122,9 +134,11 @@ fun AppUpdateDialog(
                         },
                     ) {
                         Text(
-                            if (canInstallInApp) stringResource(LocaleR.string.about_update_in_app_download)
-                            else if (release.apkUrl != null) stringResource(LocaleR.string.about_update_download)
-                            else stringResource(LocaleR.string.about_update_open_release),
+                            when {
+                                newer && canInstallInApp -> stringResource(LocaleR.string.about_update_in_app_download)
+                                newer && release.apkUrl != null -> stringResource(LocaleR.string.about_update_download)
+                                else -> stringResource(LocaleR.string.about_update_open_release)
+                            },
                         )
                     }
                 }
@@ -141,8 +155,11 @@ fun AppUpdateDialog(
                 is AppUpdateInstallState.Failed, -> {
                     if (!busy) TextButton(onClick = onDismiss) { Text(stringResource(LocaleR.string.about_update_ok)) }
                 }
-                AppUpdateInstallState.Installed,
-                AppUpdateInstallState.Idle, -> Unit
+                AppUpdateInstallState.Idle -> {
+                    if (release != null && (newer || currentVersion == null)) {
+                        TextButton(onClick = onDismiss) { Text(stringResource(LocaleR.string.about_update_later)) }
+                    }
+                }
                 else -> Unit
             }
         },
@@ -164,11 +181,11 @@ private fun AppUpdateInstallState.isBusy(): Boolean = when (this) {
 private fun AppUpdateInstallState.messageOrNull(): String? = when (this) {
     is AppUpdateInstallState.Downloading -> stringResource(LocaleR.string.about_update_downloading)
     is AppUpdateInstallState.Verifying -> stringResource(LocaleR.string.about_update_verifying)
-    is AppUpdateInstallState.ReadyToInstall,
-    is AppUpdateInstallState.Installing, -> stringResource(LocaleR.string.about_update_preparing_install)
+    is AppUpdateInstallState.ReadyToInstall -> stringResource(LocaleR.string.about_update_ready_to_install)
+    is AppUpdateInstallState.Installing -> stringResource(LocaleR.string.about_update_preparing_install)
     is AppUpdateInstallState.InstallPermissionRequired -> stringResource(LocaleR.string.about_update_install_permission_required)
     is AppUpdateInstallState.WaitingForUserConfirmation -> stringResource(LocaleR.string.about_update_waiting_for_install_confirmation)
     AppUpdateInstallState.Installed -> stringResource(LocaleR.string.about_update_installed)
-    is AppUpdateInstallState.Failed -> stringResource(LocaleR.string.about_update_update_failed)
+    is AppUpdateInstallState.Failed -> stringResource(messageResId)
     AppUpdateInstallState.Idle -> null
 }

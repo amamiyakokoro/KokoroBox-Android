@@ -8,38 +8,52 @@
     <string name="about_license_agpl_description" formatted="false">This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License.</string>
     <string name="about_license_agpl_name" formatted="false">GNU Affero General Public License v3.0</string>
     <string name="about_license_check_update" formatted="false">Check for Updates</string>
-    <string name="about_license_check_update_summary" formatted="false">Check the latest GitHub release manually</string>
+    <string name="about_license_check_update_summary" formatted="false">Check whether a new version is available</string>
     <string name="about_license_libraries" formatted="false">Libraries</string>
     <string name="about_license_libraries_summary" formatted="false">View all third-party libraries used in this app</string>
     <string name="about_section_license" formatted="false">License</string>
     <string name="about_section_project_links" formatted="false">Project Links</string>
     <string name="about_title" formatted="false">About</string>
     <string name="about_update_available" formatted="false">Update available</string>
-    <string name="about_update_browser_download" formatted="false">Download the latest APK in your browser.</string>
-    <string name="about_update_checking" formatted="false">Checking GitHub Releases…</string>
-    <string name="about_update_continue_install" formatted="false">Continue</string>
-    <string name="about_update_download" formatted="false">Download APK</string>
+    <string name="about_update_browser_download" formatted="false">Download the APK in your browser, then open it to install the update.</string>
+    <string name="about_update_check_failed" formatted="false">Could not check for updates</string>
+    <string name="about_update_checking" formatted="false">Checking for updates…</string>
+    <string name="about_update_confirmation_notification_failed" formatted="false">The installation notification could not be shown. Allow notifications for KokoroBox, then try the update again.</string>
+    <string name="about_update_confirmation_unavailable" formatted="false">The system installer could not be opened. Try the update again.</string>
+    <string name="about_update_continue_install" formatted="false">Continue installation</string>
+    <string name="about_update_download" formatted="false">Download in browser</string>
+    <string name="about_update_download_failed" formatted="false">Could not download the update. Check your internet connection and available storage, then try again.</string>
     <string name="about_update_downloading" formatted="false">Downloading update…</string>
-    <string name="about_update_in_app_download" formatted="false">Download and update</string>
-    <string name="about_update_in_app_download_summary" formatted="false">The APK will be downloaded, verified, and handed to Android’s package installer.</string>
-    <string name="about_update_install_permission_required" formatted="false">Allow KokoroBox to install updates, then continue.</string>
-    <string name="about_update_installed" formatted="false">Update installation completed.</string>
-    <string name="about_update_invalid_response" formatted="false">GitHub returned unsupported release information. Please try again later.</string>
-    <string name="about_update_network_error" formatted="false">Unable to check for updates. Check your connection and try again.</string>
-    <string name="about_update_no_apk" formatted="false">The compatible APK is not available yet. View the release page or check again later.</string>
-    <string name="about_update_no_browser" formatted="false">No app is available to open this download.</string>
-    <string name="about_update_no_release" formatted="false">No published stable release is available yet.</string>
-    <string name="about_update_ok" formatted="false">OK</string>
-    <string name="about_update_open_install_settings" formatted="false">Open settings</string>
-    <string name="about_update_open_release" formatted="false">View release</string>
-    <string name="about_update_preparing_install" formatted="false">Preparing the system installer…</string>
-    <string name="about_update_rate_limited" formatted="false">GitHub is limiting requests. Please wait before checking again.</string>
-    <string name="about_update_retry" formatted="false">Retry</string>
-    <string name="about_update_unknown_version" formatted="false">Cannot compare this build’s version. Check GitHub Releases manually.</string>
-    <string name="about_update_up_to_date" formatted="false">You are already using this version or a newer version.</string>
+    <string name="about_update_in_app_download" formatted="false">Download and install</string>
+    <string name="about_update_in_app_download_summary" formatted="false">The download will be verified before installation starts.</string>
+    <string name="about_update_install_complete" formatted="false">Update installed</string>
+    <string name="about_update_install_failed" formatted="false">Could not install the update. Check available storage and installation permissions, then try again.</string>
+    <string name="about_update_install_permission_required" formatted="false">Allow KokoroBox to install unknown apps in Settings, then return and tap “Continue installation”.</string>
+    <string name="about_update_installed" formatted="false">The update has been installed.</string>
+    <string name="about_update_invalid_response" formatted="false">Update information could not be read. Please try again later.</string>
+    <string name="about_update_later" formatted="false">Later</string>
+    <string name="about_update_network_error" formatted="false">Could not connect to the update server. Check your internet connection and try again.</string>
+    <string name="about_update_nightly_version">%1$s nightly (build %2$d)</string>
+    <string name="about_update_no_apk" formatted="false">The APK for this release is not available yet. View the release page or try again later.</string>
+    <string name="about_update_no_browser" formatted="false">No app can open this link. Install a browser and try again.</string>
+    <string name="about_update_no_release" formatted="false">No release is available on the selected update channel yet. Please try again later.</string>
+    <string name="about_update_notification_summary" formatted="false">Tap to view release details and download the update.</string>
+    <string name="about_update_ok" formatted="false">Close</string>
+    <string name="about_update_open_install_settings" formatted="false">Allow installation</string>
+    <string name="about_update_open_release" formatted="false">View release page</string>
+    <string name="about_update_preparing_install" formatted="false">Installing update…</string>
+    <string name="about_update_privileged_install_failed" formatted="false">Could not install the update. Check Shizuku or Root access, or switch to system installation.</string>
+    <string name="about_update_rate_limited" formatted="false">Too many update requests. Please try again later.</string>
+    <string name="about_update_ready_to_install" formatted="false">The update is downloaded and ready to install.</string>
+    <string name="about_update_retry" formatted="false">Retry update</string>
+    <string name="about_update_title" formatted="false">App updates</string>
+    <string name="about_update_unknown_version" formatted="false">The installed version could not be identified. Check the release page for updates.</string>
+    <string name="about_update_up_to_date" formatted="false">No updates are available.</string>
     <string name="about_update_update_failed" formatted="false">Update failed</string>
-    <string name="about_update_verifying" formatted="false">Verifying the downloaded APK…</string>
-    <string name="about_update_waiting_for_install_confirmation" formatted="false">Continue in the Android installation dialog.</string>
+    <string name="about_update_verification_failed" formatted="false">The update could not be verified. Download it again or visit the release page for details.</string>
+    <string name="about_update_verifying" formatted="false">Verifying update…</string>
+    <string name="about_update_version_available">New version: %1$s</string>
+    <string name="about_update_waiting_for_install_confirmation" formatted="false">Confirm installation in the system installer.</string>
     <string name="access_control_app_list_loading" formatted="false">Loading...</string>
     <string name="access_control_app_list_title" formatted="false">App List (%d selected)</string>
     <string name="access_control_button_cancel" formatted="false">Cancel</string>
@@ -112,17 +126,17 @@
     <string name="app_settings_behavior_auto_start_title" formatted="false">Auto Start</string>
     <string name="app_settings_behavior_auto_update_on_start_summary" formatted="false">Auto-update the active subscription profile on start</string>
     <string name="app_settings_behavior_auto_update_on_start_title" formatted="false">Update on Start</string>
-    <string name="app_settings_behavior_automatic_update_check_summary" formatted="false">Check GitHub Releases once a day when the app opens</string>
+    <string name="app_settings_behavior_automatic_update_check_summary" formatted="false">Check once a day and notify you when an update is available</string>
     <string name="app_settings_behavior_automatic_update_check_title" formatted="false">Automatically Check for Updates</string>
     <string name="app_settings_behavior_update_channel_nightly" formatted="false">Nightly</string>
     <string name="app_settings_behavior_update_channel_stable" formatted="false">Stable</string>
-    <string name="app_settings_behavior_update_channel_summary" formatted="false">Choose stable releases or development nightly builds</string>
-    <string name="app_settings_behavior_update_channel_title" formatted="false">Update Channel</string>
+    <string name="app_settings_behavior_update_channel_summary" formatted="false">Choose stable releases or nightly development builds</string>
+    <string name="app_settings_behavior_update_channel_title" formatted="false">Update channel</string>
     <string name="app_settings_behavior_update_install_method_root" formatted="false">Root</string>
     <string name="app_settings_behavior_update_install_method_shizuku" formatted="false">Shizuku</string>
-    <string name="app_settings_behavior_update_install_method_summary" formatted="false">Advanced: System installation is recommended. Shizuku and Root may bypass Android’s installation confirmation.</string>
-    <string name="app_settings_behavior_update_install_method_system" formatted="false">System</string>
-    <string name="app_settings_behavior_update_install_method_title" formatted="false">Update Installation Method</string>
+    <string name="app_settings_behavior_update_install_method_summary" formatted="false">System installation is recommended. Shizuku and Root require authorization and install without a system confirmation prompt.</string>
+    <string name="app_settings_behavior_update_install_method_system" formatted="false">System installer</string>
+    <string name="app_settings_behavior_update_install_method_title" formatted="false">Installation method</string>
     <string name="app_settings_button_apply" formatted="false">Apply</string>
     <string name="app_settings_experimental_acg_home_summary" formatted="false">Enable the new ACG-inspired home layout</string>
     <string name="app_settings_experimental_acg_home_title" formatted="false">ACG Experimental Home</string>
@@ -283,31 +297,31 @@
     <string name="component_selector_prepend" formatted="false">Prepend</string>
     <string name="component_selector_replace" formatted="false">Replace</string>
     <string name="component_update_action_download_now" formatted="false">Download Now</string>
-    <string name="component_update_message_available" formatted="false">A new update is available</string>
-    <string name="component_update_message_check_failed" formatted="false">Failed to check updates: %s</string>
-    <string name="component_update_message_checking" formatted="false">Checking for updates...</string>
-    <string name="component_update_message_close" formatted="false">Got it</string>
+    <string name="component_update_message_available" formatted="false">A new version is available</string>
+    <string name="component_update_message_check_failed">Could not check for updates: %1$s</string>
+    <string name="component_update_message_checking" formatted="false">Checking for updates…</string>
+    <string name="component_update_message_close" formatted="false">Close</string>
     <string name="component_update_message_cover_desc" formatted="false">Update cover</string>
     <string name="component_update_message_current_version" formatted="false">Current Version</string>
-    <string name="component_update_message_download_already_running" formatted="false">The update package is still downloading</string>
-    <string name="component_update_message_download_error_with_code" formatted="false">Download failed (%d): %s</string>
+    <string name="component_update_message_download_already_running" formatted="false">An update is already downloading. Please wait.</string>
+    <string name="component_update_message_download_error_with_code">Download failed (%1$d): %2$s</string>
     <string name="component_update_message_download_ready" formatted="false">Download complete, ready to install</string>
-    <string name="component_update_message_downloading" formatted="false">Downloading update package...</string>
-    <string name="component_update_message_downloading_with_progress" formatted="false">Downloading update package %d%%</string>
-    <string name="component_update_message_error" formatted="false">Download failed, please try again later</string>
+    <string name="component_update_message_downloading" formatted="false">Downloading update…</string>
+    <string name="component_update_message_downloading_with_progress">Downloading update: %1$d%%</string>
+    <string name="component_update_message_error" formatted="false">Download failed. Please try again later.</string>
     <string name="component_update_message_finished" formatted="false">Download complete, waiting for install confirmation</string>
-    <string name="component_update_message_install_failed" formatted="false">Failed to open installer: %s</string>
-    <string name="component_update_message_install_prompt_opened" formatted="false">Download complete, installer opened</string>
-    <string name="component_update_message_missing_release_metadata" formatted="false">The latest release is missing update metadata</string>
-    <string name="component_update_message_no_compatible_asset" formatted="false">No compatible APK was found in the latest release</string>
-    <string name="component_update_message_no_update" formatted="false">Already on the latest version</string>
-    <string name="component_update_message_preparing" formatted="false">Preparing download...</string>
-    <string name="component_update_message_remote_version" formatted="false">Target Version</string>
+    <string name="component_update_message_install_failed">Could not start installation: %1$s</string>
+    <string name="component_update_message_install_prompt_opened" formatted="false">Download complete. Confirm installation in the system installer.</string>
+    <string name="component_update_message_missing_release_metadata" formatted="false">Update information for this release could not be read</string>
+    <string name="component_update_message_no_compatible_asset" formatted="false">This release has no APK compatible with your device</string>
+    <string name="component_update_message_no_update" formatted="false">No updates are available</string>
+    <string name="component_update_message_preparing" formatted="false">Preparing download…</string>
+    <string name="component_update_message_remote_version" formatted="false">New version</string>
     <string name="component_update_message_updating" formatted="false">Updating</string>
-    <string name="component_update_message_verify_failed" formatted="false">Package verification failed, please retry</string>
-    <string name="component_update_message_verifying" formatted="false">Verifying update package...</string>
-    <string name="component_update_message_waiting" formatted="false">Waiting for download...</string>
-    <string name="component_update_title_available" formatted="false">New Version Available</string>
+    <string name="component_update_message_verify_failed" formatted="false">The update could not be verified. Please download it again.</string>
+    <string name="component_update_message_verifying" formatted="false">Verifying update…</string>
+    <string name="component_update_message_waiting" formatted="false">Waiting to download…</string>
+    <string name="component_update_title_available" formatted="false">Update available</string>
     <string name="component_web_view_invalid_url" formatted="false">Invalid URL</string>
     <string name="connection_chain_count" formatted="false">x%d</string>
     <string name="connection_detail_action_interrupt" formatted="false">Interrupt connection</string>

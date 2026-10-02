@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.runtime.service.R as ServiceR
 
@@ -29,7 +30,7 @@ class AppUpdateInstallNotifier(
         )
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(ServiceR.drawable.ic_notification_furin)
-            .setContentTitle(context.getString(LocaleR.string.about_license_check_update))
+            .setContentTitle(context.getString(LocaleR.string.about_update_title))
             .setContentText(context.getString(LocaleR.string.about_update_waiting_for_install_confirmation))
             .setStyle(
                 NotificationCompat.BigTextStyle()
@@ -43,21 +44,27 @@ class AppUpdateInstallNotifier(
         return postNotification(NOTIFICATION_ID, notification)
     }
 
-    fun showAvailableUpdate(tag: String, releaseUrl: String): Boolean {
+    fun showAvailableUpdate(release: ReleaseCheck.Published): Boolean {
         if (!canPostNotifications()) return false
         createChannel()
+        val versionText = context.getString(LocaleR.string.about_update_version_available, release.versionLabel(context))
         val contentIntent = PendingIntent.getActivity(
             context,
             NOTIFICATION_ID + 1,
-            Intent(Intent.ACTION_VIEW, android.net.Uri.parse(releaseUrl)),
+            Intent(Intent.ACTION_VIEW, android.net.Uri.parse(release.releaseUrl)),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         return postNotification(
             NOTIFICATION_ID + 1,
             NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(ServiceR.drawable.ic_notification_furin)
-                .setContentTitle("${context.getString(LocaleR.string.about_update_available)}: $tag")
-                .setContentText(context.getString(LocaleR.string.about_license_check_update_summary))
+                .setContentTitle(context.getString(LocaleR.string.about_update_available))
+                .setContentText(versionText)
+                .setStyle(
+                    NotificationCompat.BigTextStyle().bigText(
+                        versionText + "\n" + context.getString(LocaleR.string.about_update_notification_summary),
+                    ),
+                )
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
@@ -83,7 +90,7 @@ class AppUpdateInstallNotifier(
         manager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
-                context.getString(LocaleR.string.about_license_check_update),
+                context.getString(LocaleR.string.about_update_title),
                 NotificationManager.IMPORTANCE_HIGH,
             ),
         )
