@@ -97,6 +97,8 @@ class HomeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RuntimeStateMapper.isActuallyRunning(runtimeSnapshot.value))
     val currentProfile = proxyFacade.currentProfile
     val trafficNow = proxyFacade.trafficNow
+    val trafficTotal = proxyFacade.trafficTotal
+    val activeConnectionCount = proxyFacade.activeConnectionCount
     val tunnelMode: StateFlow<com.amamiyakokoro.box.core.model.TunnelState.Mode> = proxyFacade.preferredTunnelMode
 
     private val _proxyMode = MutableStateFlow(ProxyMode.Tun)

@@ -48,7 +48,6 @@ import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
 import com.amamiyakokoro.box.presentation.component.TopBar
 import com.amamiyakokoro.box.presentation.component.combinePaddingValues
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
-import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
@@ -71,6 +70,8 @@ fun HomePager(
     val controlState by homeViewModel.controlState.collectAsStateWithLifecycle()
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val trafficNow by homeViewModel.trafficNow.collectAsStateWithLifecycle()
+    val trafficTotal by homeViewModel.trafficTotal.collectAsStateWithLifecycle()
+    val activeConnectionCount by homeViewModel.activeConnectionCount.collectAsStateWithLifecycle()
     val profilesLoaded by homeViewModel.profilesLoaded.collectAsStateWithLifecycle()
     val ipMonitoringState by homeViewModel.ipMonitoringState.collectAsStateWithLifecycle()
     val recommendedProfile by homeViewModel.recommendedProfile.collectAsStateWithLifecycle()
@@ -126,8 +127,6 @@ fun HomePager(
         }
     }
     val destructiveActionColors = yumeDestructiveActionColors()
-    val spacing = AppTheme.spacing
-    val componentSizes = AppTheme.sizes
     val fabContainerColor = when {
         !isProxyEnabled -> MaterialTheme.colorScheme.surfaceVariant
         isRunning -> destructiveActionColors.containerColor
@@ -143,32 +142,6 @@ fun HomePager(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopBar(title = stringResource(LocaleR.string.home_title))
-        },
-        floatingActionButton = {
-            if (useFabProxyControl) {
-                FloatingActionButton(
-                    modifier = Modifier.padding(
-                        end = spacing.space20,
-                        bottom = componentSizes.floatingActionButtonBottomInset,
-                    ),
-                    onClick = onProxyToggle,
-                    containerColor = fabContainerColor,
-                    contentColor = fabContentColor,
-                ) {
-                    Icon(
-                        imageVector = if (isRunning) {
-                            AppMd3Icons.Shell.StopProxy
-                        } else {
-                            AppMd3Icons.Shell.StartProxy
-                        },
-                        contentDescription = if (isRunning) {
-                            stringResource(LocaleR.string.home_control_stop)
-                        } else {
-                            stringResource(LocaleR.string.home_control_start)
-                        },
-                    )
-                }
-            }
         },
     ) { innerPadding ->
         ScreenLazyColumn(
@@ -224,16 +197,33 @@ fun HomePager(
                             }
                         )
                         HomeNetworkShortcuts(
+                            modifier = Modifier.fillMaxWidth(),
+                            totalTrafficBytes = if (isRunning) {
+                                TrafficData.from(trafficTotal).let { it.upload + it.download }
+                            } else 0L,
+                            activeConnectionCount = if (isRunning) activeConnectionCount else 0,
                             onTrafficClick = {
-                                navigator.navigate(TrafficStatisticsScreenDestination) {
-                                    launchSingleTop = true
-                                }
+                                navigator.navigate(TrafficStatisticsScreenDestination) { launchSingleTop = true }
                             },
                             onConnectionsClick = {
-                                navigator.navigate(ConnectionScreenDestination) {
-                                    launchSingleTop = true
-                                }
+                                navigator.navigate(ConnectionScreenDestination) { launchSingleTop = true }
                             },
+                            controlAction = if (useFabProxyControl) {
+                                {
+                                    FloatingActionButton(
+                                        onClick = onProxyToggle,
+                                        containerColor = fabContainerColor,
+                                        contentColor = fabContentColor,
+                                    ) {
+                                        Icon(
+                                            imageVector = if (isRunning) AppMd3Icons.Shell.StopProxy else AppMd3Icons.Shell.StartProxy,
+                                            contentDescription = stringResource(
+                                                if (isRunning) LocaleR.string.home_control_stop else LocaleR.string.home_control_start,
+                                            ),
+                                        )
+                                    }
+                                }
+                            } else null,
                         )
                     }
                 }

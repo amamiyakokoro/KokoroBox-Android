@@ -136,6 +136,9 @@ class ProxyFacade(
     private val _trafficTotal = MutableStateFlow(0L)
     val trafficTotal: StateFlow<Traffic> = _trafficTotal.asStateFlow()
 
+    private val _activeConnectionCount = MutableStateFlow<Int?>(null)
+    val activeConnectionCount: StateFlow<Int?> = _activeConnectionCount.asStateFlow()
+
     private var trafficPollingJob: Job? = null
     private var proxyGroupSyncJob: Job? = null
     private var previewWarmupJob: Job? = null
@@ -515,19 +518,23 @@ class ProxyFacade(
 
     suspend fun queryConnections(): ConnectionSnapshot {
         if (!_runtimeSnapshot.value.running) {
+            _activeConnectionCount.value = 0
             return ConnectionSnapshot()
         }
-        return if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
+        val snapshot = if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
             RootTunController.queryConnections(appContext)
         } else {
             connectCurrentBackend()
             ServiceClient.clash().queryConnections()
         }
+        _activeConnectionCount.value = snapshot.connections.size.takeIf { _runtimeSnapshot.value.running }
+        return snapshot
     }
 
     suspend fun queryTrafficTotal(): Long {
         if (!_runtimeSnapshot.value.running) {
             _trafficTotal.value = 0L
+            _activeConnectionCount.value = null
             return 0L
         }
         val traffic = if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
@@ -708,6 +715,7 @@ class ProxyFacade(
         } else {
             _trafficNow.value = 0L
             _trafficTotal.value = 0L
+            _activeConnectionCount.value = null
         }
     }
 
@@ -834,13 +842,24 @@ class ProxyFacade(
                             return@collect
                         }
 
+                        val homeVisible = screenOnFlow.value &&
+                            trafficPriorityRequests.value["home"] == TrafficPollingPriority.FAST
                         runCatchingCancellable {
                             queryTrafficNow()
-                            if (tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
+                            if (homeVisible || tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
                                 queryTrafficTotal()
                             }
                         }.onFailure { error ->
                             Timber.d(error, "Traffic polling skipped")
+                        }
+                        // Share Home's existing one-second timer; no extra background polling job.
+                        if (homeVisible && screenOnFlow.value &&
+                            trafficPriorityRequests.value["home"] == TrafficPollingPriority.FAST
+                        ) {
+                            runCatchingCancellable { queryConnections() }.onFailure { error ->
+                                _activeConnectionCount.value = null
+                                Timber.d(error, "Home connection count refresh skipped")
+                            }
                         }
                         tick++
 
@@ -1675,6 +1694,7 @@ class ProxyFacade(
         _resolvedPrimaryNode.value = null
         _trafficNow.value = 0L
         _trafficTotal.value = 0L
+        _activeConnectionCount.value = null
     }
 
     private fun updateProfileReady(profile: Profile?) {
