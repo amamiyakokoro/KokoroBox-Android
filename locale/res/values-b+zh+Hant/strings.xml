@@ -1321,5 +1321,4 @@
     <string name="home_shortcut_traffic" formatted="false">流量</string>
     <string name="proxy_groups_title" formatted="false">代理群組</string>
     <string name="proxy_group_current_node" formatted="false">目前節點</string>
-    <string name="proxy_groups_swipe_hint" formatted="false">左右滑動 ↔</string>
 </resources>
