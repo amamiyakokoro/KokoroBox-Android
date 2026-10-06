@@ -321,11 +321,11 @@ internal fun NodeCard(
     NodeSelectableCard(
         isSelected = isSelected,
         onClick = onCardClick,
-        modifier = modifier.heightIn(min = 104.dp),
-        paddingVertical = 14.dp,
+        modifier = modifier,
+        paddingVertical = 12.dp,
         paddingHorizontal = 14.dp,
     ) {
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 presentation.countryCode?.takeIf { showCountryFlag }?.let { country ->
                     CountryFlagCircle(countryCode = country, size = 16.dp)
