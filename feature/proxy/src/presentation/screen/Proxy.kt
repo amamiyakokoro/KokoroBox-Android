@@ -386,8 +386,8 @@ private fun ProxySurfboardContent(
                         }
                     }
                 }
-                proxyGroups.chunked(columnCount).forEach { groupRow ->
-                    items(groupRow, key = { "group:${it.name}" }, contentType = { "group" }) { group ->
+                proxyGroups.forEach { group ->
+                    item(key = "group:${group.name}", span = { GridItemSpan(maxLineSpan) }, contentType = "group") {
                         ProxyGroupInfoCard(
                             group = group,
                             currentProxyName = if (group.name == selectedName) effectiveNow ?: group.now else group.now,
@@ -401,7 +401,7 @@ private fun ProxySurfboardContent(
                         )
                     }
                     if (selectedGroup != null && selectedGroup.name == expandedGroupName &&
-                        groupRow.any { it.name == expandedGroupName }
+                        group.name == expandedGroupName
                     ) {
                         item(key = "nodes_header:${selectedGroup.name}", span = { GridItemSpan(maxLineSpan) }) {
                             MdText(
@@ -441,12 +441,6 @@ private fun ProxySurfboardContent(
                                 showCountryFlag = true,
                                 singleNodeTestEnabled = singleNodeTestEnabled,
                             )
-                        }
-                        // Complete an odd node row so the next group row stays aligned.
-                        if (selectedGroup.proxies.size % columnCount != 0) {
-                            item(key = "nodes_padding:${selectedGroup.name}", contentType = "spacer") {
-                                Spacer(Modifier)
-                            }
                         }
                     }
                 }
