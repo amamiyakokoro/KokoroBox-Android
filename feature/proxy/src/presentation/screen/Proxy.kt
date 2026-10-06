@@ -21,24 +21,19 @@
 package com.amamiyakokoro.box.presentation.screen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,7 +46,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -147,7 +141,7 @@ fun ProxyPager(
         pendingTestProxyName?.let { testingProxyNames + it } ?: testingProxyNames
     }
     val gridState = rememberRetainedLazyGridState(
-        "main_proxy_${displayTunnelMode.name}_${effectiveSelectedGroupName.orEmpty()}"
+        "main_proxy_groups_${displayTunnelMode.name}"
     )
     val modes = remember { listOf(TunnelState.Mode.Rule, TunnelState.Mode.Global, TunnelState.Mode.Direct) }
 
@@ -165,15 +159,11 @@ fun ProxyPager(
     }
 
     var previousSortMode by rememberSaveable { mutableStateOf<ProxySortMode?>(null) }
-    var previousSortGroup by rememberSaveable { mutableStateOf<String?>(null) }
-    LaunchedEffect(sortMode, effectiveSelectedGroupName) {
-        if (sortMode == ProxySortMode.BY_LATENCY &&
-            (sortMode != previousSortMode || effectiveSelectedGroupName != previousSortGroup)
-        ) {
+    LaunchedEffect(sortMode, gridState) {
+        if (sortMode == ProxySortMode.BY_LATENCY && sortMode != previousSortMode) {
             gridState.scrollToItem(0)
         }
         previousSortMode = sortMode
-        previousSortGroup = effectiveSelectedGroupName
     }
 
     LaunchedEffect(isProxyRunning, pendingTestGroupName, pendingTestProxyName) {
@@ -343,6 +333,7 @@ private fun ProxySurfboardContent(
 
     var optimisticSelectedProxyName by remember(selectedGroup?.name) { mutableStateOf<String?>(null) }
     val effectiveNow = optimisticSelectedProxyName ?: selectedGroup?.now
+    var expandedGroupName by rememberSaveable(tunnelMode) { mutableStateOf<String?>(null) }
 
     LaunchedEffect(selectedGroup?.now) {
         if (selectedGroup?.now == optimisticSelectedProxyName) {
@@ -350,18 +341,19 @@ private fun ProxySurfboardContent(
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = innerPadding.calculateTopPadding()),
     ) {
+        val columnCount = if (maxWidth < 380.dp || LocalDensity.current.fontScale >= 1.3f) 1 else 2
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
             userScrollEnabled = false,
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Fixed(columnCount),
                 state = gridState,
                 modifier = Modifier
                     .fillMaxSize()
@@ -381,50 +373,88 @@ private fun ProxySurfboardContent(
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
                 verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    ProxyGroupTabSection(
-                        groups = proxyGroups,
-                        selectedGroupName = selectedName,
-                        onGroupSelected = onGroupSelected,
-                        isTesting = isTesting,
-                    )
+                item(key = "groups_header", span = { GridItemSpan(maxLineSpan) }) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        MdText(
+                            stringResource(LocaleR.string.proxy_groups_title),
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        AnimatedVisibility(visible = testingGroupNames.isNotEmpty()) {
+                            Md3ELoading(modifier = Modifier.size(20.dp))
+                        }
+                    }
                 }
-
-                if (selectedGroup == null) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
+                proxyGroups.chunked(columnCount).forEach { groupRow ->
+                    items(groupRow, key = { "group:${it.name}" }, contentType = { "group" }) { group ->
+                        ProxyGroupInfoCard(
+                            group = group,
+                            currentProxyName = if (group.name == selectedName) effectiveNow ?: group.now else group.now,
+                            isSelected = group.name == selectedName,
+                            isExpanded = group.name == expandedGroupName && group.name == selectedName,
+                            onClick = {
+                                expandedGroupName = group.name.takeUnless { it == expandedGroupName && it == selectedName }
+                                onGroupSelected(group.name)
+                            },
+                            isTesting = group.name in testingGroupNames,
+                        )
+                    }
+                    if (selectedGroup != null && selectedGroup.name == expandedGroupName &&
+                        groupRow.any { it.name == expandedGroupName }
+                    ) {
+                        item(key = "nodes_header:${selectedGroup.name}", span = { GridItemSpan(maxLineSpan) }) {
+                            MdText(
+                                stringResource(LocaleR.string.proxy_nodes_title),
+                                modifier = Modifier.padding(top = 4.dp),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        if (selectedGroup.proxies.isEmpty()) {
+                            item(key = "empty_nodes:${selectedGroup.name}", span = { GridItemSpan(maxLineSpan) }) {
+                                CenteredText(
+                                    firstLine = stringResource(LocaleR.string.proxy_empty_no_nodes),
+                                    secondLine = stringResource(LocaleR.string.proxy_empty_hint),
+                                )
+                            }
+                        }
+                        items(selectedGroup.proxies, key = { "node:${selectedGroup.name}:${it.name}" }, contentType = { "node" }) { proxy ->
+                            NodeCard(
+                                proxy = proxy,
+                                isSelected = proxy.name == effectiveNow,
+                                onClick = { proxyName ->
+                                    if (selectedGroup.type == com.amamiyakokoro.box.core.model.Proxy.Type.Selector) {
+                                        optimisticSelectedProxyName = proxyName
+                                        onSelectProxy(
+                                            selectedGroup.name,
+                                            proxyName,
+                                            { optimisticSelectedProxyName = null },
+                                        )
+                                    } else {
+                                        onTestDelay()
+                                    }
+                                },
+                                isDelayTesting = isTesting,
+                                isThisProxyTesting = proxy.name in testingProxyNames,
+                                onSingleNodeTestClick = onTestProxyDelay,
+                                showCountryFlag = true,
+                                singleNodeTestEnabled = singleNodeTestEnabled,
+                            )
+                        }
+                        // Complete an odd node row so the next group row stays aligned.
+                        if (selectedGroup.proxies.size % columnCount != 0) {
+                            item(key = "nodes_padding:${selectedGroup.name}", contentType = "spacer") {
+                                Spacer(Modifier)
+                            }
+                        }
+                    }
+                }
+                if (proxyGroups.isEmpty()) {
+                    item(key = "empty_groups", span = { GridItemSpan(maxLineSpan) }) {
                         CenteredText(
                             firstLine = stringResource(LocaleR.string.proxy_empty_no_nodes),
                             secondLine = stringResource(LocaleR.string.proxy_empty_hint),
-                        )
-                    }
-                } else {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        ProxyGroupInfoCard(
-                            group = selectedGroup,
-                            currentProxyName = effectiveNow ?: selectedGroup.now,
-                        )
-                    }
-                    items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
-                        NodeCard(
-                            proxy = proxy,
-                            isSelected = proxy.name == effectiveNow,
-                            onClick = { proxyName ->
-                                if (selectedGroup.type == com.amamiyakokoro.box.core.model.Proxy.Type.Selector) {
-                                    optimisticSelectedProxyName = proxyName
-                                    onSelectProxy(
-                                        selectedGroup.name,
-                                        proxyName,
-                                        { optimisticSelectedProxyName = null },
-                                    )
-                                } else {
-                                    onTestDelay()
-                                }
-                            },
-                            isDelayTesting = isTesting,
-                            isThisProxyTesting = proxy.name in testingProxyNames,
-                            onSingleNodeTestClick = onTestProxyDelay,
-                            showCountryFlag = true,
-                            singleNodeTestEnabled = singleNodeTestEnabled,
                         )
                     }
                 }
@@ -557,122 +587,7 @@ private fun TunnelState.Mode.displayName(): String = when (this) {
     TunnelState.Mode.Script -> "Script"
 }
 
-@Composable
-private fun ProxyGroupTabSection(
-    groups: List<ProxyGroupInfo>,
-    selectedGroupName: String?,
-    onGroupSelected: (String) -> Unit,
-    isTesting: Boolean = false,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            MdText(
-                stringResource(LocaleR.string.proxy_groups_title),
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            AnimatedVisibility(visible = isTesting) {
-                Md3ELoading(modifier = Modifier.size(20.dp))
-            }
-        }
-        ProxyGroupTabs(groups, selectedGroupName, onGroupSelected)
-    }
-}
-
-@Composable
-private fun ProxyGroupTabs(
-    groups: List<ProxyGroupInfo>,
-    selectedGroupName: String?,
-    onGroupSelected: (String) -> Unit,
-) {
-    val hapticFeedback = LocalHapticFeedback.current
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-        verticalAlignment = Alignment.CenterVertically,
-        contentPadding = PaddingValues(start = UiDp.dp4, end = UiDp.dp4),
-    ) {
-        items(items = groups, key = { it.name }) { group ->
-            ProxyGroupTab(
-                title = group.name,
-                selected = group.name == selectedGroupName,
-                modifier = Modifier.widthIn(min = 84.dp),
-                onClick = {
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                    onGroupSelected(group.name)
-                },
-            )
-        }
-    }
-}
-
-@Composable
-private fun ProxyGroupTab(
-    title: String,
-    selected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    val shape = RoundedCornerShape(18.dp)
-    val colorScheme = MaterialTheme.colorScheme
-    val activeColor = colorScheme.primary
-    val defaultColor = colorScheme.onSurface
-    val transition = updateTransition(targetState = selected, label = "proxy_group_tab_selection")
-    val fastEffectsSpec = AppMotion.fastEffects<Color>()
-    val fastSpatialSpec = AppMotion.fastSpatial<Float>()
-    val indicatorSpec = AppMotion.indicator<Float>()
-    val selectionScaleX = remember { Animatable(1f) }
-    val animatedContainerColor by transition.animateColor(
-        transitionSpec = { fastEffectsSpec },
-        label = "proxy_group_tab_container",
-    ) { isSelected ->
-        if (isSelected) activeColor.copy(alpha = 0.16f) else Color.Transparent
-    }
-    val animatedTextColor by transition.animateColor(
-        transitionSpec = { fastEffectsSpec },
-        label = "proxy_group_tab_text",
-    ) { isSelected ->
-        if (isSelected) activeColor else defaultColor
-    }
-    LaunchedEffect(selected) {
-        if (selected) {
-            selectionScaleX.snapTo(1f)
-            selectionScaleX.animateTo(1.06f, animationSpec = fastSpatialSpec)
-            selectionScaleX.animateTo(1f, animationSpec = indicatorSpec)
-        } else {
-            selectionScaleX.animateTo(1f, animationSpec = fastSpatialSpec)
-        }
-    }
-
-    Box(
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = selectionScaleX.value
-                scaleY = 1f
-            }
-            .height(UiDp.dp40)
-            .clip(shape)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(animatedContainerColor),
-        )
-        MdText(
-            text = title,
-            modifier = Modifier.padding(horizontal = UiDp.dp12),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-            color = animatedTextColor,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
+@Preview(name = "Proxy groups / grid", widthDp = 400, heightDp = 800)
 @Preview(name = "Compact proxies / narrow", widthDp = 320, heightDp = 720)
 @Preview(name = "Compact proxies / dark", widthDp = 320, heightDp = 720, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Compact proxies / large text", widthDp = 320, heightDp = 720, fontScale = 1.5f)
@@ -688,7 +603,13 @@ private fun ProxyUiPreview(themeMode: ThemeMode? = null) {
     }
     var groups by remember {
         mutableStateOf(listOf("Direct-JP", "Direct-US", "Direct-SG", "Direct+", "A very long proxy group name")
-            .map { ProxyGroupInfo(it, Proxy.Type.Selector, nodes, nodes.first().name) })
+            .mapIndexed { index, name ->
+                val groupTypes = listOf(Proxy.Type.Selector, Proxy.Type.Fallback, Proxy.Type.LoadBalance, Proxy.Type.URLTest, Proxy.Type.Smart)
+                val groupNodes = nodes.take(if (index == 0) 7 else nodes.size).map { node ->
+                    node.copy(name = node.name.replace("Direct-JP", name), title = node.title.replace("Direct-JP", name))
+                }
+                ProxyGroupInfo(name, groupTypes[index], groupNodes, groupNodes.first().name)
+            })
     }
     var selectedName by remember { mutableStateOf(groups.first().name) }
     var mode by remember { mutableStateOf(TunnelState.Mode.Rule) }
