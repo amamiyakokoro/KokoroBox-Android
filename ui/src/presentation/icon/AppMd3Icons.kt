@@ -137,6 +137,8 @@ object AppMd3Icons {
     }
 
     object Home {
+        val Traffic: ImageVector = Icons.AutoMirrored.Rounded.ShowChart
+        val Connections: ImageVector = Icons.Rounded.Hub
         val ProxyModeVpn: ImageVector = Icons.Rounded.FlightTakeoff
         val ProxyModeTun: ImageVector = Icons.Rounded.VpnKey
         val ProxyModeHttp: ImageVector = Icons.Rounded.Wifi

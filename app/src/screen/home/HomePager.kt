@@ -50,6 +50,7 @@ import com.amamiyakokoro.box.presentation.component.combinePaddingValues
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
+import com.ramcosta.composedestinations.generated.destinations.ConnectionScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.TrafficStatisticsScreenDestination
 import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.core.locale.R as LocaleR
@@ -211,16 +212,30 @@ fun HomePager(
                         )
                     }
 
-                    SpeedChart(
-                        speedHistory = speedHistory,
-                        isRunning = isRunning,
-                        animateIdle = isActive,
-                        onClick = {
-                            navigator.navigate(TrafficStatisticsScreenDestination) {
-                                launchSingleTop = true
+                    Column(verticalArrangement = Arrangement.spacedBy(UiDp.dp8)) {
+                        SpeedChart(
+                            speedHistory = speedHistory,
+                            isRunning = isRunning,
+                            animateIdle = isActive,
+                            onClick = {
+                                navigator.navigate(TrafficStatisticsScreenDestination) {
+                                    launchSingleTop = true
+                                }
                             }
-                        }
-                    )
+                        )
+                        HomeNetworkShortcuts(
+                            onTrafficClick = {
+                                navigator.navigate(TrafficStatisticsScreenDestination) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onConnectionsClick = {
+                                navigator.navigate(ConnectionScreenDestination) {
+                                    launchSingleTop = true
+                                }
+                            },
+                        )
+                    }
                 }
             }
 

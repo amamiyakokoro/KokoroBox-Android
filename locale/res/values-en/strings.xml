@@ -1318,4 +1318,5 @@
     <string name="meta_feature_custom_rules_type_domain_suffix" formatted="false">Domain Suffix</string>
     <string name="meta_feature_custom_rules_type_domain_keyword" formatted="false">Domain Keyword</string>
     <string name="meta_feature_custom_rules_type_match" formatted="false">Fallback</string>
+    <string name="home_shortcut_traffic" formatted="false">Traffic</string>
 </resources>
