@@ -51,7 +51,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -74,7 +73,6 @@ import com.amamiyakokoro.box.core.model.TunnelState
 import com.amamiyakokoro.box.data.model.ProxySortMode
 import com.amamiyakokoro.box.data.model.ThemeMode
 import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
-import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.CenteredText
 import com.amamiyakokoro.box.presentation.component.LocalBottomBarScrollBehavior
 import com.amamiyakokoro.box.presentation.component.Md3ELoading
@@ -82,7 +80,7 @@ import com.amamiyakokoro.box.presentation.component.TopBar
 import com.amamiyakokoro.box.presentation.component.rememberRetainedLazyGridState
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.screen.node.NodeCard
-import com.amamiyakokoro.box.presentation.screen.node.NodeGroupCard
+import com.amamiyakokoro.box.presentation.screen.node.ProxyGroupInfoCard
 import com.amamiyakokoro.box.presentation.screen.node.NodeSortPopup
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.LocalSpacing
@@ -90,9 +88,7 @@ import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.theme.YumeTheme
 import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
@@ -402,6 +398,12 @@ private fun ProxySurfboardContent(
                         )
                     }
                 } else {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        ProxyGroupInfoCard(
+                            group = selectedGroup,
+                            currentProxyName = effectiveNow ?: selectedGroup.now,
+                        )
+                    }
                     items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
                         NodeCard(
                             proxy = proxy,
@@ -584,96 +586,23 @@ private fun ProxyGroupTabs(
     selectedGroupName: String?,
     onGroupSelected: (String) -> Unit,
 ) {
-    var showAllGroups by remember { mutableStateOf(false) }
-    val allGroupsArrowRotation by animateFloatAsState(
-        targetValue = if (showAllGroups) 180f else 0f,
-        animationSpec = tween(durationMillis = 180),
-        label = "proxy_group_all_groups_arrow_rotation",
-    )
-    val coroutineScope = rememberCoroutineScope()
     val hapticFeedback = LocalHapticFeedback.current
-
-    Row(
+    LazyRow(
         modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(UiDp.dp8),
+        contentPadding = PaddingValues(start = UiDp.dp4, end = UiDp.dp4),
     ) {
-        LazyRow(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-            verticalAlignment = Alignment.CenterVertically,
-            contentPadding = PaddingValues(start = UiDp.dp4, end = UiDp.dp4),
-        ) {
-            items(items = groups, key = { it.name }) { group ->
-                ProxyGroupTab(
-                    title = group.name,
-                    selected = group.name == selectedGroupName,
-                    modifier = Modifier.widthIn(min = 84.dp),
-                    onClick = {
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                        onGroupSelected(group.name)
-                    },
-                )
-            }
-        }
-        Box(
-            modifier = Modifier
-                .size(UiDp.dp36)
-                .clip(RoundedCornerShape(999.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .clickable(onClick = {
+        items(items = groups, key = { it.name }) { group ->
+            ProxyGroupTab(
+                title = group.name,
+                selected = group.name == selectedGroupName,
+                modifier = Modifier.widthIn(min = 84.dp),
+                onClick = {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                    showAllGroups = true
-                }),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = AppMd3Icons.Navigation.DownAngle,
-                contentDescription = stringResource(LocaleR.string.proxy_title),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier
-                    .size(UiDp.dp20)
-                    .rotate(allGroupsArrowRotation),
+                    onGroupSelected(group.name)
+                },
             )
-        }
-    }
-
-    AppActionBottomSheet(
-        show = showAllGroups,
-        title = stringResource(LocaleR.string.proxy_title),
-        onDismissRequest = { showAllGroups = false },
-        contentScrollEnabled = false,
-        contentHandlesBottomInset = true,
-    ) {
-        val bottomInset = maxOf(
-            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
-            WindowInsets.systemGestures.asPaddingValues().calculateBottomPadding(),
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 420.dp),
-            horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-            verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
-            contentPadding = PaddingValues(bottom = UiDp.dp16 + bottomInset),
-        ) {
-            items(items = groups, key = { it.name }) { group ->
-                NodeGroupCard(
-                    group = group,
-                    isDelayTesting = false,
-                    isSelected = group.name == selectedGroupName,
-                    showTrailingIndicator = false,
-                    onClick = {
-                        onGroupSelected(group.name)
-                        coroutineScope.launch {
-                            delay(180)
-                            showAllGroups = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
         }
     }
 }

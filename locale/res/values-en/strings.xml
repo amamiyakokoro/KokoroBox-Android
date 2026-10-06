@@ -1320,4 +1320,5 @@
     <string name="meta_feature_custom_rules_type_match" formatted="false">Fallback</string>
     <string name="home_shortcut_traffic" formatted="false">Traffic</string>
     <string name="proxy_groups_title" formatted="false">Proxy Groups</string>
+    <string name="proxy_group_current_node" formatted="false">Current node</string>
 </resources>
