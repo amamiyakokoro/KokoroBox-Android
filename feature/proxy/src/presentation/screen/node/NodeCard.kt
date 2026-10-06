@@ -404,10 +404,16 @@ private fun NodeLatency(
     supportingColor: Color,
     modifier: Modifier = Modifier,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier.widthIn(min = 40.dp).heightIn(min = 40.dp).let { base ->
-            if (onTestClick != null) base.clickable(role = Role.Button,
-                onClickLabel = stringResource(LocaleR.string.proxy_action_test), onClick = onTestClick) else base
+            if (onTestClick != null) base.clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Button,
+                onClickLabel = stringResource(LocaleR.string.proxy_action_test),
+                onClick = onTestClick,
+            ) else base
         },
         contentAlignment = Alignment.CenterEnd,
     ) {
