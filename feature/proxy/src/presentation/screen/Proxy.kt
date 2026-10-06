@@ -20,11 +20,6 @@
 
 package com.amamiyakokoro.box.presentation.screen
 
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.compose.LifecycleStartEffect
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.LocalLifecycleOwner
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
@@ -33,21 +28,17 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,7 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -72,16 +62,22 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.amamiyakokoro.box.core.model.TunnelState
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LifecycleStartEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.model.Proxy
+import com.amamiyakokoro.box.core.model.TunnelState
 import com.amamiyakokoro.box.data.model.ProxySortMode
+import com.amamiyakokoro.box.data.model.ThemeMode
 import com.amamiyakokoro.box.domain.model.ProxyGroupInfo
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
 import com.amamiyakokoro.box.presentation.component.CenteredText
-import com.amamiyakokoro.box.presentation.component.Md3ELoading
 import com.amamiyakokoro.box.presentation.component.LocalBottomBarScrollBehavior
+import com.amamiyakokoro.box.presentation.component.Md3ELoading
 import com.amamiyakokoro.box.presentation.component.TopBar
 import com.amamiyakokoro.box.presentation.component.rememberRetainedLazyGridState
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
@@ -91,12 +87,12 @@ import com.amamiyakokoro.box.presentation.screen.node.NodeSortPopup
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.LocalSpacing
 import com.amamiyakokoro.box.presentation.theme.UiDp
+import com.amamiyakokoro.box.presentation.theme.YumeTheme
 import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.ScrollBehavior
@@ -283,25 +279,21 @@ private fun ProxyTopBar(
         titlePadding = UiDp.dp12,
         actions = {
             if (onTestDelay != null) {
-                IconButton(
-                    modifier = Modifier.padding(end = UiDp.dp12),
-                    onClick = onTestDelay,
-                ) {
-                    Icon(AppMd3Icons.Action.SpeedTest, contentDescription = stringResource(LocaleR.string.proxy_action_test))
+                MdIconButton(onClick = onTestDelay, modifier = Modifier.size(48.dp)) {
+                    MdIcon(AppMd3Icons.Action.SpeedTest, stringResource(LocaleR.string.proxy_action_test),
+                        modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             if (onNavigateToProviders != null) {
-                IconButton(onClick = onNavigateToProviders) {
-                    Icon(AppMd3Icons.Proxy.Profiles, contentDescription = stringResource(LocaleR.string.providers_title))
+                MdIconButton(onClick = onNavigateToProviders, modifier = Modifier.size(48.dp)) {
+                    MdIcon(AppMd3Icons.Proxy.Profiles, stringResource(LocaleR.string.providers_title),
+                        modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Box {
-                MdIconButton(onClick = { onShowSortPopupChange(true) }) {
-                    MdIcon(
-                        imageVector = AppMd3Icons.Action.Sort,
-                        contentDescription = stringResource(LocaleR.string.proxy_action_sort),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
+                MdIconButton(onClick = { onShowSortPopupChange(true) }, modifier = Modifier.size(48.dp)) {
+                    MdIcon(AppMd3Icons.Action.Sort, stringResource(LocaleR.string.proxy_action_sort),
+                        modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 NodeSortPopup(
                     show = showSortPopup,
@@ -385,9 +377,9 @@ private fun ProxySurfboardContent(
                         }
                     },
                 contentPadding = PaddingValues(
-                    start = UiDp.dp12,
-                    end = UiDp.dp12,
-                    top = UiDp.dp64,
+                    start = UiDp.dp16,
+                    end = UiDp.dp16,
+                    top = 72.dp,
                     bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
                 ),
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
@@ -401,28 +393,6 @@ private fun ProxySurfboardContent(
                     )
                 }
 
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                    AnimatedVisibility(
-                        visible = isTesting,
-                        enter = expandVertically(
-                            animationSpec = AppMotion.fastSpatial<IntSize>(),
-                            expandFrom = Alignment.Top,
-                        ) + fadeIn(animationSpec = tween(durationMillis = AppMotion.Proxy.RefreshIndicatorFadeDuration)),
-                        exit = shrinkVertically(
-                            animationSpec = AppMotion.fastSpatial<IntSize>(),
-                            shrinkTowards = Alignment.Top,
-                        ) + fadeOut(animationSpec = tween(durationMillis = AppMotion.Proxy.RefreshIndicatorFadeDuration)),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = UiDp.dp2, bottom = UiDp.dp4),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Md3ELoading()
-                        }
-                    }
-                }
 
                 if (selectedGroup == null) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
@@ -432,6 +402,20 @@ private fun ProxySurfboardContent(
                         )
                     }
                 } else {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                MdText(selectedGroup.name, style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                MdText(stringResource(LocaleR.string.proxy_node_count).format(selectedGroup.proxies.size),
+                                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            AnimatedVisibility(visible = isTesting) {
+                                Md3ELoading(modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
                     items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
                         NodeCard(
                             proxy = proxy,
@@ -462,7 +446,8 @@ private fun ProxySurfboardContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = UiDp.dp8, start = UiDp.dp12, end = UiDp.dp12),
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(top = UiDp.dp12, bottom = UiDp.dp12, start = UiDp.dp16, end = UiDp.dp16),
             contentAlignment = Alignment.Center,
         ) {
             ProxyModeSelector(
@@ -498,11 +483,6 @@ private fun ProxyModeSelector(
 
     Box(
         modifier = modifier
-            .shadow(
-                elevation = UiDp.dp8,
-                shape = shape,
-                clip = false,
-            )
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .padding(UiDp.dp4),
@@ -765,5 +745,44 @@ private fun ProxyGroupTab(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+}
+
+@Preview(name = "Compact proxies / narrow", widthDp = 320, heightDp = 720)
+@Preview(name = "Compact proxies / dark", widthDp = 320, heightDp = 720, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Compact proxies / large text", widthDp = 320, heightDp = 720, fontScale = 1.5f)
+@Composable
+private fun ProxyUiPreview(themeMode: ThemeMode? = null) {
+    val types = listOf(Proxy.Type.Vmess, Proxy.Type.Vless, Proxy.Type.Trojan, Proxy.Type.Hysteria2,
+        Proxy.Type.Shadowsocks, Proxy.Type.WireGuard, Proxy.Type.TrustTunnel, Proxy.Type.Unknown)
+    val nodes = remember {
+        types.mapIndexed { index, type ->
+            val name = if (index == 0) "Direct-JP.ririmu" else "Direct-JP.a-very-long-node-name-$index"
+            Proxy(name, name, "", type, if (index == 7) -1 else 911 + index * 71)
+        }
+    }
+    var groups by remember {
+        mutableStateOf(listOf("Direct-JP", "Direct-US", "Direct-SG", "Direct+", "A very long proxy group name")
+            .map { ProxyGroupInfo(it, Proxy.Type.Selector, nodes, nodes.first().name) })
+    }
+    var selectedName by remember { mutableStateOf(groups.first().name) }
+    var mode by remember { mutableStateOf(TunnelState.Mode.Rule) }
+    var testing by remember { mutableStateOf(false) }
+    val selectedGroup = groups.first { it.name == selectedName }
+    val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    val scrollBehavior = MiuixScrollBehavior(snapAnimationSpec = null)
+    YumeTheme(themeMode = themeMode) {
+        Scaffold(topBar = {
+            ProxyTopBar("Proxy", scrollBehavior, {}, { testing = !testing }, false, {}, ProxySortMode.BY_LATENCY, {})
+        }) { padding ->
+            ProxySurfboardContent(groups, selectedGroup, selectedName,
+                if (testing) setOf(selectedName) else emptySet(), emptySet(), gridState,
+                listOf(TunnelState.Mode.Rule, TunnelState.Mode.Global, TunnelState.Mode.Direct),
+                mode, { mode = it }, padding, PaddingValues(0.dp), { selectedName = it },
+                { groupName, nodeName, success ->
+                    groups = groups.map { if (it.name == groupName) it.copy(now = nodeName) else it }
+                    success?.invoke()
+                }, null, true, { testing = !testing }, {}, true)
+        }
     }
 }

@@ -29,23 +29,26 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ripple
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -55,24 +58,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.amamiyakokoro.box.core.model.Proxy
 import com.amamiyakokoro.box.core.locale.R as LocaleR
+import com.amamiyakokoro.box.core.model.Proxy
 import com.amamiyakokoro.box.presentation.component.CountryFlagCircle
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.appPressSink
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 internal fun nodeLatencyLabel(delay: Int?): Pair<String, Color>? = when {
@@ -213,7 +219,7 @@ internal fun rememberProxySelectionPalette(
 internal fun RotatingRefreshIcon(
     isRotating: Boolean,
     modifier: Modifier = Modifier,
-    tint: Color = MiuixTheme.colorScheme.primary,
+    tint: Color = MaterialTheme.colorScheme.primary,
     contentDescription: String? = null,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "node_delay_test_rotation")
@@ -240,10 +246,10 @@ internal fun NodeSelectableCard(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     paddingVertical: Dp,
+    paddingHorizontal: Dp? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val radii = AppTheme.radii
-    val sizes = AppTheme.sizes
     val interactionSource = remember { MutableInteractionSource() }
     val hapticFeedback = LocalHapticFeedback.current
     val shape = RoundedCornerShape(radii.radius18)
@@ -254,10 +260,6 @@ internal fun NodeSelectableCard(
         transitionSpec = { fastEffectsSpec },
         label = "node_card_background_color",
     ) { it.containerColor }
-    val borderColor by transition.animateColor(
-        transitionSpec = { fastEffectsSpec },
-        label = "node_card_border_color",
-    ) { it.borderColor }
     val cardRipple = ripple(
         bounded = true,
         color = MaterialTheme.colorScheme.primary,
@@ -270,14 +272,15 @@ internal fun NodeSelectableCard(
                 enabled = onClick != null,
             )
             .fillMaxWidth()
+            .semantics { selected = isSelected }
             .clip(shape)
             .background(backgroundColor)
-            .border(sizes.nodeCardBorderWidth, borderColor, shape)
             .let { cardModifier ->
                 if (onClick != null) {
                     cardModifier.clickable(
                         interactionSource = interactionSource,
                         indication = cardRipple,
+                        role = Role.RadioButton,
                         onClick = {
                             hapticFeedback.performHapticFeedback(HapticFeedbackType.VirtualKey)
                             onClick()
@@ -287,7 +290,7 @@ internal fun NodeSelectableCard(
                     cardModifier
                 }
             }
-            .padding(horizontal = sizes.nodeCardPaddingHorizontal, vertical = paddingVertical),
+            .padding(horizontal = paddingHorizontal ?: AppTheme.sizes.nodeCardPaddingHorizontal, vertical = paddingVertical),
         content = content,
     )
 }
@@ -304,8 +307,6 @@ internal fun NodeCard(
     showCountryFlag: Boolean = true,
     singleNodeTestEnabled: Boolean = true,
 ) {
-    val spacing = AppTheme.spacing
-    val sizes = AppTheme.sizes
     val palette = rememberProxySelectionPalette(selected = isSelected)
     val onCardClick = remember(proxy.name, onClick) {
         onClick?.let { click -> { click(proxy.name) } }
@@ -313,125 +314,57 @@ internal fun NodeCard(
     val onNodeTestClick = remember(proxy.name, onSingleNodeTestClick) {
         onSingleNodeTestClick?.let { click -> { click(proxy.name) } }
     }
-    val delayInteractionSource = remember { MutableInteractionSource() }
-    val iconInteractionSource = remember { MutableInteractionSource() }
-
+    val presentation = remember(proxy.name, proxy.title) {
+        resolveProxyDisplayPresentation(name = proxy.name, title = proxy.title)
+    }
+    val delayLabel = nodeLatencyLabel(proxy.delay)
     NodeSelectableCard(
         isSelected = isSelected,
         onClick = onCardClick,
-        modifier = modifier.heightIn(min = 144.dp),
-        paddingVertical = spacing.space12,
+        modifier = modifier.heightIn(min = 104.dp),
+        paddingVertical = 14.dp,
+        paddingHorizontal = 14.dp,
     ) {
-        val presentation = remember(proxy.name, proxy.title) {
-            resolveProxyDisplayPresentation(name = proxy.name, title = proxy.title)
-        }
-        val delayLabel = nodeLatencyLabel(proxy.delay)
-        val iconLabel = remember(proxy.type) { proxy.type.iconLabel() }
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(spacing.space10),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top,
-            ) {
-                NodeLargeIcon(
-                    countryCode = presentation.countryCode.takeIf { showCountryFlag },
-                    typeName = iconLabel,
-                    selected = isSelected,
-                )
-
-                when {
-                    delayLabel != null -> {
-                        val (delayText, delayColor) = delayLabel
-                        Text(
-                            text = delayText,
-                            style = MiuixTheme.textStyles.footnote1,
-                            color = delayColor,
-                            maxLines = 1,
-                            modifier = Modifier.let { base ->
-                                if (onNodeTestClick != null && singleNodeTestEnabled) {
-                                    base.clickable(
-                                        interactionSource = delayInteractionSource,
-                                        indication = null,
-                                        onClick = onNodeTestClick,
-                                    )
-                                } else {
-                                    base
-                                }
-                            },
-                        )
-                    }
-
-                    onNodeTestClick != null && singleNodeTestEnabled -> {
-                        if (isThisProxyTesting || isDelayTesting) {
-                            RotatingRefreshIcon(
-                                isRotating = true,
-                                modifier = Modifier.size(spacing.space18),
-                                tint = palette.supportingColor,
-                            )
-                        } else {
-                            Icon(
-                                imageVector = AppMd3Icons.Proxy.CloudTest,
-                                contentDescription = stringResource(LocaleR.string.proxy_action_test),
-                                tint = palette.supportingColor,
-                                modifier = Modifier
-                                    .size(spacing.space18)
-                                    .clickable(
-                                        interactionSource = iconInteractionSource,
-                                        indication = null,
-                                        onClick = onNodeTestClick,
-                                    ),
-                            )
-                        }
-                    }
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                presentation.countryCode?.takeIf { showCountryFlag }?.let { country ->
+                    CountryFlagCircle(countryCode = country, size = 16.dp)
                 }
-            }
-
-            Text(
-                text = presentation.displayName,
-                style = MiuixTheme.textStyles.body2,
-                fontWeight = FontWeight.SemiBold,
-                color = palette.contentColor,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom,
-            ) {
                 Text(
-                    text = iconLabel,
-                    style = MiuixTheme.textStyles.footnote1.copy(fontSize = 11.sp),
+                    text = presentation.displayName,
+                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 15.sp),
                     fontWeight = FontWeight.SemiBold,
-                    color = palette.chipContentColor,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(AppTheme.radii.full))
-                        .background(palette.chipBackgroundColor)
-                        .padding(horizontal = spacing.space8, vertical = spacing.space4),
+                    color = palette.contentColor,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
-
-                if (isSelected) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(AppTheme.radii.full))
-                            .background(palette.trailingBadgeBackgroundColor)
-                            .padding(horizontal = spacing.space6, vertical = spacing.space6),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = AppMd3Icons.Action.Check,
-                            contentDescription = null,
-                            tint = palette.trailingBadgeContentColor,
-                            modifier = Modifier.size(spacing.space14),
-                        )
+            }
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val measurer = rememberTextMeasurer()
+                val density = LocalDensity.current
+                val typeStyle = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp)
+                val latencyStyle = MaterialTheme.typography.labelMedium.copy(fontSize = 13.sp)
+                val badgeWidth = measurer.measure(proxy.type.iconLabel(), style = typeStyle, maxLines = 1).size.width
+                val latencyWidth = delayLabel?.let {
+                    measurer.measure(it.first.replace(Regex("\\s*ms$"), " ms"), style = latencyStyle, maxLines = 1).size.width
+                } ?: 0
+                val minimumRowWidth = with(density) {
+                    badgeWidth.toDp() + 12.dp + maxOf(latencyWidth.toDp(), 40.dp) + 6.dp
+                }
+                val onTestClick = onNodeTestClick.takeIf { singleNodeTestEnabled }
+                if (maxWidth < minimumRowWidth) {
+                    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        ProtocolBadge(proxy.type, modifier = Modifier.widthIn(max = 120.dp))
+                        NodeLatency(delayLabel, onTestClick, isThisProxyTesting || isDelayTesting,
+                            palette.supportingColor, Modifier.align(Alignment.End))
                     }
                 } else {
-                    Spacer(modifier = Modifier.size(26.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        ProtocolBadge(proxy.type, modifier = Modifier.weight(1f))
+                        NodeLatency(delayLabel, onTestClick, isThisProxyTesting || isDelayTesting, palette.supportingColor)
+                    }
                 }
             }
         }
@@ -439,31 +372,51 @@ internal fun NodeCard(
 }
 
 @Composable
-internal fun NodeLargeIcon(
-    countryCode: String?,
-    typeName: String,
-    selected: Boolean,
+private fun ProtocolBadge(type: Proxy.Type, modifier: Modifier = Modifier) {
+    val style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp)
+    val measurer = rememberTextMeasurer()
+    val fullLabel = type.displayName()
+    val fullWidth = remember(fullLabel, style, LocalDensity.current) {
+        measurer.measure(fullLabel, style = style, maxLines = 1).size.width
+    }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.heightIn(min = 28.dp).semantics { contentDescription = fullLabel },
+    ) {
+        BoxWithConstraints(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
+            val label = if (with(LocalDensity.current) { maxWidth.toPx() } >= fullWidth) fullLabel else type.iconLabel()
+            Text(label, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+private fun NodeLatency(
+    delayLabel: Pair<String, Color>?,
+    onTestClick: (() -> Unit)?,
+    testing: Boolean,
+    supportingColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    val sizes = AppTheme.sizes
-    val palette = rememberProxySelectionPalette(selected = selected)
-
     Box(
-        modifier = modifier
-            .size(sizes.nodeLargeIconSize)
-            .clip(RoundedCornerShape(sizes.nodeLargeIconCornerRadius))
-            .background(palette.iconBackgroundColor),
-        contentAlignment = Alignment.Center,
+        modifier = modifier.widthIn(min = 40.dp).heightIn(min = 40.dp).let { base ->
+            if (onTestClick != null) base.clickable(role = Role.Button,
+                onClickLabel = stringResource(LocaleR.string.proxy_action_test), onClick = onTestClick) else base
+        },
+        contentAlignment = Alignment.CenterEnd,
     ) {
-        if (countryCode != null) {
-            CountryFlagCircle(countryCode = countryCode, size = sizes.nodeLargeIconFlagSize - 2.dp)
-        } else {
-            Text(
-                text = typeName.take(2),
-                style = MiuixTheme.textStyles.footnote1,
-                fontWeight = FontWeight.Bold,
-                color = palette.iconContentColor,
-            )
+        when {
+            delayLabel != null -> Text(delayLabel.first.replace(Regex("\\s*ms$"), " ms"),
+                style = MaterialTheme.typography.labelMedium.copy(fontSize = 13.sp),
+                color = delayLabel.second, maxLines = 1)
+            onTestClick != null -> if (testing) {
+                RotatingRefreshIcon(true, modifier = Modifier.size(20.dp), tint = supportingColor)
+            } else {
+                Icon(AppMd3Icons.Proxy.CloudTest, stringResource(LocaleR.string.proxy_action_test),
+                    tint = supportingColor, modifier = Modifier.size(20.dp))
+            }
         }
     }
 }
