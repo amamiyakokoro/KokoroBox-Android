@@ -1321,7 +1321,6 @@
     <string name="home_shortcut_traffic" formatted="false">流量</string>
     <string name="proxy_groups_title" formatted="false">代理群組</string>
     <string name="proxy_group_current_node" formatted="false">目前節點</string>
-    <string name="proxy_nodes_title" formatted="false">代理節點</string>
     <string name="proxy_group_expanded" formatted="false">已展開</string>
     <string name="proxy_group_collapsed" formatted="false">已收起</string>
 </resources>

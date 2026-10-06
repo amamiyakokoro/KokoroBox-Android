@@ -22,6 +22,11 @@ package com.amamiyakokoro.box.presentation.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -33,7 +38,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,6 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -314,8 +319,9 @@ private fun ProxySurfboardContent(
     singleNodeTestEnabled: Boolean,
 ) {
     val spacing = LocalSpacing.current
+    val expansionAnimation = AppMotion.defaultSpatial<IntSize>()
+    val visibilityAnimation = AppMotion.fastEffects<Float>()
     val selectedName = selectedGroupName ?: selectedGroup?.name
-    val isTesting = selectedName?.let(testingGroupNames::contains) == true
     val currentPage = modes.indexOf(tunnelMode).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { modes.size })
     val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
@@ -334,6 +340,18 @@ private fun ProxySurfboardContent(
     var optimisticSelectedProxyName by remember(selectedGroup?.name) { mutableStateOf<String?>(null) }
     val effectiveNow = optimisticSelectedProxyName ?: selectedGroup?.now
     var expandedGroupName by rememberSaveable(tunnelMode) { mutableStateOf<String?>(null) }
+    val nodeTransitions = proxyGroups.associate { group ->
+        group.name to key(group.name) {
+            updateTransition(
+                targetState = group.name == expandedGroupName && group.name == selectedName,
+                label = "proxy_group_nodes:${group.name}",
+            )
+        }
+    }
+    val nodeEnter = expandVertically(animationSpec = expansionAnimation, expandFrom = Alignment.Top) +
+        fadeIn(animationSpec = visibilityAnimation)
+    val nodeExit = shrinkVertically(animationSpec = expansionAnimation, shrinkTowards = Alignment.Top) +
+        fadeOut(animationSpec = visibilityAnimation)
 
     LaunchedEffect(selectedGroup?.now) {
         if (selectedGroup?.now == optimisticSelectedProxyName) {
@@ -371,10 +389,9 @@ private fun ProxySurfboardContent(
                     bottom = mainInnerPadding.calculateBottomPadding() + spacing.space12,
                 ),
                 horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
-                verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
             ) {
                 item(key = "groups_header", span = { GridItemSpan(maxLineSpan) }) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         MdText(
                             stringResource(LocaleR.string.proxy_groups_title),
                             modifier = Modifier.weight(1f),
@@ -390,6 +407,7 @@ private fun ProxySurfboardContent(
                     item(key = "group:${group.name}", span = { GridItemSpan(maxLineSpan) }, contentType = "group") {
                         ProxyGroupInfoCard(
                             group = group,
+                            modifier = Modifier.padding(bottom = 12.dp),
                             currentProxyName = if (group.name == selectedName) effectiveNow ?: group.now else group.now,
                             isSelected = group.name == selectedName,
                             isExpanded = group.name == expandedGroupName && group.name == selectedName,
@@ -400,47 +418,57 @@ private fun ProxySurfboardContent(
                             isTesting = group.name in testingGroupNames,
                         )
                     }
-                    if (selectedGroup != null && selectedGroup.name == expandedGroupName &&
-                        group.name == expandedGroupName
-                    ) {
-                        item(key = "nodes_header:${selectedGroup.name}", span = { GridItemSpan(maxLineSpan) }) {
-                            MdText(
-                                stringResource(LocaleR.string.proxy_nodes_title),
-                                modifier = Modifier.padding(top = 4.dp),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (selectedGroup.proxies.isEmpty()) {
-                            item(key = "empty_nodes:${selectedGroup.name}", span = { GridItemSpan(maxLineSpan) }) {
-                                CenteredText(
-                                    firstLine = stringResource(LocaleR.string.proxy_empty_no_nodes),
-                                    secondLine = stringResource(LocaleR.string.proxy_empty_hint),
-                                )
+                    val nodeTransition = nodeTransitions.getValue(group.name)
+                    // Keep exiting rows until their transition completes, including rapid group switches.
+                    if (nodeTransition.currentState || nodeTransition.targetState || nodeTransition.isRunning) {
+                        if (group.proxies.isEmpty()) {
+                            item(key = "empty_nodes:${group.name}", span = { GridItemSpan(maxLineSpan) }) {
+                                nodeTransition.AnimatedVisibility(visible = { it }, enter = nodeEnter, exit = nodeExit) {
+                                    CenteredText(
+                                        modifier = Modifier.padding(bottom = 12.dp),
+                                        firstLine = stringResource(LocaleR.string.proxy_empty_no_nodes),
+                                        secondLine = stringResource(LocaleR.string.proxy_empty_hint),
+                                    )
+                                }
                             }
                         }
-                        items(selectedGroup.proxies, key = { "node:${selectedGroup.name}:${it.name}" }, contentType = { "node" }) { proxy ->
-                            NodeCard(
-                                proxy = proxy,
-                                isSelected = proxy.name == effectiveNow,
-                                onClick = { proxyName ->
-                                    if (selectedGroup.type == com.amamiyakokoro.box.core.model.Proxy.Type.Selector) {
-                                        optimisticSelectedProxyName = proxyName
-                                        onSelectProxy(
-                                            selectedGroup.name,
-                                            proxyName,
-                                            { optimisticSelectedProxyName = null },
-                                        )
-                                    } else {
-                                        onTestDelay()
+                        group.proxies.chunked(columnCount).forEach { nodeRow ->
+                            item(
+                                key = "node_row:${group.name}:${nodeRow.first().name}",
+                                span = { GridItemSpan(maxLineSpan) },
+                                contentType = "node_row",
+                            ) {
+                                nodeTransition.AnimatedVisibility(visible = { it }, enter = nodeEnter, exit = nodeExit) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    ) {
+                                        nodeRow.forEach { proxy ->
+                                            key(proxy.name) {
+                                                NodeCard(
+                                                    proxy = proxy,
+                                                    modifier = Modifier.weight(1f),
+                                                    isSelected = proxy.name == if (group.name == selectedName) effectiveNow else group.now,
+                                                    onClick = if (nodeTransition.targetState) { proxyName ->
+                                                        if (group.type == Proxy.Type.Selector) {
+                                                            optimisticSelectedProxyName = proxyName
+                                                            onSelectProxy(group.name, proxyName, { optimisticSelectedProxyName = null })
+                                                        } else {
+                                                            onTestDelay()
+                                                        }
+                                                    } else null,
+                                                    isDelayTesting = group.name in testingGroupNames,
+                                                    isThisProxyTesting = proxy.name in testingProxyNames,
+                                                    onSingleNodeTestClick = onTestProxyDelay.takeIf { nodeTransition.targetState },
+                                                    showCountryFlag = true,
+                                                    singleNodeTestEnabled = singleNodeTestEnabled,
+                                                )
+                                            }
+                                        }
+                                        if (nodeRow.size < columnCount) Spacer(Modifier.weight(1f))
                                     }
-                                },
-                                isDelayTesting = isTesting,
-                                isThisProxyTesting = proxy.name in testingProxyNames,
-                                onSingleNodeTestClick = onTestProxyDelay,
-                                showCountryFlag = true,
-                                singleNodeTestEnabled = singleNodeTestEnabled,
-                            )
+                                }
+                            }
                         }
                     }
                 }

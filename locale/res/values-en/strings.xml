@@ -1321,7 +1321,6 @@
     <string name="home_shortcut_traffic" formatted="false">Traffic</string>
     <string name="proxy_groups_title" formatted="false">Proxy Groups</string>
     <string name="proxy_group_current_node" formatted="false">Current node</string>
-    <string name="proxy_nodes_title" formatted="false">Proxy Nodes</string>
     <string name="proxy_group_expanded" formatted="false">Expanded</string>
     <string name="proxy_group_collapsed" formatted="false">Collapsed</string>
 </resources>
