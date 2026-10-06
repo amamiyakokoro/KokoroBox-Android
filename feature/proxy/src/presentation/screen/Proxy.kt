@@ -32,7 +32,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -564,19 +566,37 @@ private fun ProxyGroupTabSection(
     onGroupSelected: (String) -> Unit,
     isTesting: Boolean = false,
 ) {
+    val listState = rememberLazyListState()
+    val canScroll by remember(listState) {
+        derivedStateOf { listState.canScrollBackward || listState.canScrollForward }
+    }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             MdText(
                 stringResource(LocaleR.string.proxy_groups_title),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
+            if (canScroll) {
+                MdText(
+                    text = stringResource(LocaleR.string.proxy_groups_swipe_hint),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
+            }
             AnimatedVisibility(visible = isTesting) {
                 Md3ELoading(modifier = Modifier.size(20.dp))
             }
         }
-        ProxyGroupTabs(groups, selectedGroupName, onGroupSelected)
+        ProxyGroupTabs(groups, selectedGroupName, onGroupSelected, listState)
     }
 }
 
@@ -585,10 +605,12 @@ private fun ProxyGroupTabs(
     groups: List<ProxyGroupInfo>,
     selectedGroupName: String?,
     onGroupSelected: (String) -> Unit,
+    listState: LazyListState,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
+        state = listState,
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
         verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(start = UiDp.dp4, end = UiDp.dp4),
