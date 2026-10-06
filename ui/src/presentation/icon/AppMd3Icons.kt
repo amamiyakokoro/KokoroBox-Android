@@ -67,6 +67,7 @@ import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.SwapVert
 import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Wifi
@@ -95,6 +96,7 @@ object AppMd3Icons {
         val Delete: ImageVector = Icons.Rounded.Delete
         val Edit: ImageVector = Icons.Rounded.Edit
         val List: ImageVector = Icons.AutoMirrored.Rounded.ViewList
+        val More: ImageVector = Icons.Rounded.MoreVert
         val MoveDown: ImageVector = Icons.Rounded.KeyboardArrowDown
         val MoveUp: ImageVector = Icons.Rounded.KeyboardArrowUp
         val Refresh: ImageVector = Icons.Rounded.Refresh

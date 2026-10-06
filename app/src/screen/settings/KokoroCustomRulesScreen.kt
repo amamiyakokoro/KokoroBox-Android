@@ -12,6 +12,19 @@ package com.amamiyakokoro.box.screen.settings
 import android.content.Intent
 import androidx.core.net.toUri
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.amamiyakokoro.box.data.model.ThemeMode
+import com.amamiyakokoro.box.presentation.theme.YumeTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -271,7 +284,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator, initialHost: Strin
                                 )
                             }
                         }
-                        item("bottom-space") { Spacer(Modifier.height(UiDp.dp32)) }
+                        item("bottom-space") { Spacer(Modifier.height(UiDp.dp16)) }
                     }
                 }
             } else if (!state.loading) {
@@ -356,58 +369,136 @@ private fun RuleCard(
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit,
 ) {
-    Card {
+    var menuExpanded by remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
+    val typeLabel = ruleTypeLabel(rule.type)
+    Card(modifier = Modifier.fillMaxWidth(), cornerRadius = 20) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
-            verticalArrangement = Arrangement.spacedBy(UiDp.dp8),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
             ) {
-                Text(
-                    text = rule.type,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                if (canMoveUp) {
-                    IconButton(onClick = onMoveUp) {
-                        Icon(AppMd3Icons.Action.MoveUp, stringResource(LocaleR.string.meta_feature_custom_rules_move_up))
+                Column(
+                    modifier = Modifier.weight(1f).padding(end = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(
+                        text = rule.payload?.takeIf(String::isNotBlank)
+                            ?: if (rule.type == "MATCH") {
+                                stringResource(LocaleR.string.meta_feature_custom_rules_all_traffic)
+                            } else typeLabel,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = 18.sp, fontWeight = FontWeight.SemiBold,
+                        ),
+                        color = colors.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = typeLabel,
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
+                        color = colors.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                // Keep the standard 48dp touch targets, with restrained 20dp icons.
+                IconButton(onClick = onEdit, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        AppMd3Icons.Action.Edit,
+                        stringResource(LocaleR.string.meta_feature_custom_rules_edit_rule),
+                        modifier = Modifier.size(20.dp),
+                        tint = colors.onSurfaceVariant,
+                    )
+                }
+                Box {
+                    IconButton(onClick = { menuExpanded = true }, modifier = Modifier.size(48.dp)) {
+                        Icon(
+                            AppMd3Icons.Action.More,
+                            stringResource(LocaleR.string.meta_feature_custom_rules_more_actions),
+                            modifier = Modifier.size(20.dp),
+                            tint = colors.onSurfaceVariant,
+                        )
+                    }
+                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                        if (canMoveUp) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(LocaleR.string.meta_feature_custom_rules_move_up)) },
+                                leadingIcon = { Icon(AppMd3Icons.Action.MoveUp, null) },
+                                onClick = { menuExpanded = false; onMoveUp() },
+                            )
+                        }
+                        if (canMoveDown) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(LocaleR.string.meta_feature_custom_rules_move_down)) },
+                                leadingIcon = { Icon(AppMd3Icons.Action.MoveDown, null) },
+                                onClick = { menuExpanded = false; onMoveDown() },
+                            )
+                        }
+                        DropdownMenuItem(
+                            text = { Text(stringResource(LocaleR.string.meta_feature_custom_rules_delete_rule), color = colors.error) },
+                            leadingIcon = { Icon(AppMd3Icons.Action.Delete, null, tint = colors.error) },
+                            onClick = { menuExpanded = false; onDelete() },
+                        )
                     }
                 }
-                if (canMoveDown) {
-                    IconButton(onClick = onMoveDown) {
-                        Icon(AppMd3Icons.Action.MoveDown, stringResource(LocaleR.string.meta_feature_custom_rules_move_down))
-                    }
-                }
-                IconButton(onClick = onEdit) {
-                    Icon(AppMd3Icons.Action.Edit, stringResource(LocaleR.string.meta_feature_custom_rules_edit_rule))
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(AppMd3Icons.Action.Delete, stringResource(LocaleR.string.meta_feature_custom_rules_delete_rule))
-                }
             }
-            rule.payload?.takeIf { it.isNotEmpty() }?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
+            // A non-interactive chip avoids implying that the target is a separate action.
             Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                shape = MaterialTheme.shapes.small,
+                color = colors.surfaceContainerHigh,
+                contentColor = colors.onSurfaceVariant,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.heightIn(min = 28.dp),
             ) {
                 Text(
                     text = rule.target,
-                    modifier = Modifier.padding(horizontal = UiDp.dp8, vertical = UiDp.dp4),
-                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
     }
-    Spacer(Modifier.height(UiDp.dp8))
+    Spacer(Modifier.height(8.dp))
+}
+
+@Composable
+private fun ruleTypeLabel(type: String): String = when (type) {
+    "RULE-SET" -> stringResource(LocaleR.string.meta_feature_custom_rules_type_rule_set)
+    "DOMAIN" -> stringResource(LocaleR.string.meta_feature_custom_rules_type_domain)
+    "DOMAIN-SUFFIX" -> stringResource(LocaleR.string.meta_feature_custom_rules_type_domain_suffix)
+    "DOMAIN-KEYWORD" -> stringResource(LocaleR.string.meta_feature_custom_rules_type_domain_keyword)
+    "MATCH" -> stringResource(LocaleR.string.meta_feature_custom_rules_type_match)
+    "IP-CIDR" -> "IP CIDR"
+    "IP-CIDR6" -> "IPv6 CIDR"
+    "GEOIP" -> "GeoIP"
+    "GEOSITE" -> "GeoSite"
+    else -> type.replace('-', ' ').lowercase().replaceFirstChar { it.titlecase() }
+}
+
+@Preview(name = "Compact rules / light / narrow", widthDp = 320, showBackground = true)
+@Preview(name = "Compact rules / dark / narrow", widthDp = 320, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "Compact rules / large text", widthDp = 320, fontScale = 1.5f, showBackground = true)
+@Composable
+private fun RuleCardsPreview(themeMode: ThemeMode? = null) {
+    YumeTheme(themeMode = themeMode) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(modifier = Modifier.padding(vertical = 12.dp)) {
+                listOf(
+                    KokoroCustomRuleInput("RULE-SET", "osu", "TW"),
+                    KokoroCustomRuleInput("DOMAIN", "reject-ads", "REJECT"),
+                    KokoroCustomRuleInput("DOMAIN-SUFFIX", "a-very-long-rule-name.example.co.uk", "A very long target name"),
+                    KokoroCustomRuleInput("MATCH", null, "DIRECT"),
+                ).forEachIndexed { index, rule ->
+                    RuleCard(rule, index > 0, index < 3, {}, {}, {}, {})
+                }
+            }
+        }
+    }
 }
 
 @Composable

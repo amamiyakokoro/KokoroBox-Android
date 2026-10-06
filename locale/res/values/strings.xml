@@ -1311,4 +1311,11 @@
     <string name="connection_detail_add_kokoro_rule" formatted="false">加入 Kokoro 自定义规则</string>
     <string name="meta_feature_custom_rules_connection_hint" formatted="false">DOMAIN-SUFFIX 自动填入主域名，匹配主域名及其子域名；DOMAIN 使用完整域名。储存后请更新 Kokoro 订阅以套用。</string>
     <string name="meta_feature_custom_rules_limit_reached" formatted="false">规则数量已达上限，请先删除现有规则。</string>
+    <string name="meta_feature_custom_rules_more_actions" formatted="false">更多规则操作</string>
+    <string name="meta_feature_custom_rules_all_traffic" formatted="false">所有流量</string>
+    <string name="meta_feature_custom_rules_type_rule_set" formatted="false">规则集</string>
+    <string name="meta_feature_custom_rules_type_domain" formatted="false">域名</string>
+    <string name="meta_feature_custom_rules_type_domain_suffix" formatted="false">域名后缀</string>
+    <string name="meta_feature_custom_rules_type_domain_keyword" formatted="false">域名关键词</string>
+    <string name="meta_feature_custom_rules_type_match" formatted="false">兜底规则</string>
 </resources>
