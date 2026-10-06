@@ -390,9 +390,9 @@ private fun ProxySurfboardContent(
                         groups = proxyGroups,
                         selectedGroupName = selectedName,
                         onGroupSelected = onGroupSelected,
+                        isTesting = isTesting,
                     )
                 }
-
 
                 if (selectedGroup == null) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
@@ -402,20 +402,6 @@ private fun ProxySurfboardContent(
                         )
                     }
                 } else {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                MdText(selectedGroup.name, style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface,
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                MdText(stringResource(LocaleR.string.proxy_node_count).format(selectedGroup.proxies.size),
-                                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            AnimatedVisibility(visible = isTesting) {
-                                Md3ELoading(modifier = Modifier.size(20.dp))
-                            }
-                        }
-                    }
                     items(items = selectedGroup.proxies, key = { it.name }) { proxy ->
                         NodeCard(
                             proxy = proxy,
@@ -574,12 +560,22 @@ private fun ProxyGroupTabSection(
     groups: List<ProxyGroupInfo>,
     selectedGroupName: String?,
     onGroupSelected: (String) -> Unit,
+    isTesting: Boolean = false,
 ) {
-    ProxyGroupTabs(
-        groups = groups,
-        selectedGroupName = selectedGroupName,
-        onGroupSelected = onGroupSelected,
-    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            MdText(
+                stringResource(LocaleR.string.proxy_groups_title),
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            AnimatedVisibility(visible = isTesting) {
+                Md3ELoading(modifier = Modifier.size(20.dp))
+            }
+        }
+        ProxyGroupTabs(groups, selectedGroupName, onGroupSelected)
+    }
 }
 
 @Composable

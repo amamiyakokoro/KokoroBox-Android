@@ -379,15 +379,19 @@ private fun ProtocolBadge(type: Proxy.Type, modifier: Modifier = Modifier) {
     val fullWidth = remember(fullLabel, style, LocalDensity.current) {
         measurer.measure(fullLabel, style = style, maxLines = 1).size.width
     }
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        shape = RoundedCornerShape(8.dp),
-        modifier = modifier.heightIn(min = 28.dp).semantics { contentDescription = fullLabel },
-    ) {
-        BoxWithConstraints(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
-            val label = if (with(LocalDensity.current) { maxWidth.toPx() } >= fullWidth) fullLabel else type.iconLabel()
-            Text(label, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    // The weighted slot reserves room for latency; the Surface wraps only its label.
+    BoxWithConstraints(modifier = modifier) {
+        val label = if (with(LocalDensity.current) { (maxWidth - 12.dp).toPx() } >= fullWidth) {
+            fullLabel
+        } else type.iconLabel()
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.heightIn(min = 28.dp).semantics { contentDescription = fullLabel },
+        ) {
+            Text(label, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
         }
     }
 }
