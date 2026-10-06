@@ -1319,7 +1319,6 @@
     <string name="meta_feature_custom_rules_type_domain_keyword" formatted="false">網域關鍵字</string>
     <string name="meta_feature_custom_rules_type_match" formatted="false">兜底規則</string>
     <string name="home_shortcut_traffic" formatted="false">流量</string>
-    <string name="proxy_groups_title" formatted="false">代理群組</string>
     <string name="proxy_group_current_node" formatted="false">目前節點</string>
     <string name="proxy_group_expanded" formatted="false">已展開</string>
     <string name="proxy_group_collapsed" formatted="false">已收起</string>
