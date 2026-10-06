@@ -1308,4 +1308,7 @@
     <string name="traffic_statistics_time_range_week" formatted="false">This Week</string>
     <string name="traffic_statistics_title" formatted="false">Traffic Statistics</string>
     <string name="util_error_unknown_error" formatted="false">Unknown error</string>
+    <string name="connection_detail_add_kokoro_rule" formatted="false">Add to Kokoro Custom Rules</string>
+    <string name="meta_feature_custom_rules_connection_hint" formatted="false">DOMAIN-SUFFIX fills in the base domain and matches its subdomains. DOMAIN uses the full host. After saving, update your Kokoro subscription to apply the rule.</string>
+    <string name="meta_feature_custom_rules_limit_reached" formatted="false">Rule limit reached. Delete an existing rule before adding another.</string>
 </resources>

@@ -9,6 +9,8 @@
 
 package com.amamiyakokoro.box.screen.settings
 
+import android.content.Intent
+import androidx.core.net.toUri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,12 +33,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.amamiyakokoro.box.MainActivity
+import com.amamiyakokoro.box.screen.profiles.KokoroAccountCard
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
+import com.amamiyakokoro.box.data.integration.kokoro.kokoroConnectionRulePayload
+import com.amamiyakokoro.box.data.integration.kokoro.kokoroConnectionRuleHost
+import com.amamiyakokoro.box.data.integration.kokoro.preferredKokoroDomainRuleType
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRuleInput
@@ -70,13 +81,36 @@ private sealed interface PendingRulesAction {
 
 @Composable
 @Destination<RootGraph>
-fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
+fun KokoroCustomRulesScreen(navigator: DestinationsNavigator, initialHost: String? = null) {
     val viewModel = koinViewModel<KokoroCustomRulesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var pendingAction by remember { mutableStateOf<PendingRulesAction?>(null) }
-    var editingRuleIndex by remember { mutableIntStateOf(-1) }
-    var showRuleSheet by remember { mutableStateOf(false) }
+    var editingRuleIndex by rememberSaveable { mutableIntStateOf(-1) }
+    var showRuleSheet by rememberSaveable { mutableStateOf(false) }
+    var connectionSeedConsumed by rememberSaveable { mutableStateOf(false) }
+    var useConnectionSeed by rememberSaveable { mutableStateOf(false) }
+    val seedHost = remember(initialHost) { initialHost?.let(::kokoroConnectionRuleHost).orEmpty() }
+    val loginViewModel = koinViewModel<KokoroSettingsViewModel>()
+    val loginState by loginViewModel.authState.collectAsStateWithLifecycle()
+    val authResult by MainActivity.kokoroAuthResult.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    fun beginLogin() {
+        scope.launch {
+            var loginUrl: String? = null
+            try {
+                loginUrl = loginViewModel.beginLogin()
+                context.startActivity(Intent(Intent.ACTION_VIEW, loginUrl.toUri()).apply {
+                    addCategory(Intent.CATEGORY_BROWSABLE)
+                })
+            } catch (error: Exception) {
+                loginUrl?.let { loginViewModel.cancelLogin(it) }
+                if (error is CancellationException) throw error
+                loginViewModel.reportLoginFailure()
+            }
+        }
+    }
     val savedMessage = stringResource(LocaleR.string.meta_feature_custom_rules_saved)
     val validationMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_validation)
     val validationGeneralMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_validation_general)
@@ -86,6 +120,22 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     val requestFailedMessage = stringResource(LocaleR.string.meta_feature_custom_rules_error_request)
 
     LaunchedEffect(Unit) { viewModel.load() }
+    LaunchedEffect(authResult) {
+        if (authResult == true) viewModel.refresh()
+        if (authResult == false) loginViewModel.reportLoginFailure()
+        if (authResult != null) MainActivity.clearKokoroAuthResult()
+    }
+    LaunchedEffect(state.loading, state.defaultRuleSet, state.authState) {
+        if (initialHost != null && !connectionSeedConsumed && !state.loading &&
+            state.defaultRuleSet != null && state.authState is KokoroAuthState.Authenticated &&
+            state.status != KokoroRulesStatus.LOAD_FAILED
+        ) {
+            connectionSeedConsumed = true
+            useConnectionSeed = true
+            editingRuleIndex = -1
+            showRuleSheet = true
+        }
+    }
     LaunchedEffect(state.status) {
         val message = when (state.status) {
             KokoroRulesStatus.SAVED -> savedMessage
@@ -139,6 +189,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             !state.loading && !state.saving,
                         onClick = {
                             editingRuleIndex = -1
+                            useConnectionSeed = false
                             showRuleSheet = true
                         },
                     ) {
@@ -210,6 +261,7 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                                     canMoveUp = index > 0,
                                     canMoveDown = index < state.draftRules.lastIndex,
                                     onEdit = {
+                                        useConnectionSeed = false
                                         editingRuleIndex = index
                                         showRuleSheet = true
                                     },
@@ -229,10 +281,12 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
                             verticalArrangement = Arrangement.spacedBy(UiDp.dp12),
                         ) {
-                            Text(stringResource(LocaleR.string.profiles_page_kokoro_login_required))
-                            Button(onClick = navigator::navigateUp, modifier = Modifier.fillMaxWidth()) {
-                                Text(stringResource(LocaleR.string.meta_feature_custom_rules_back_to_kokoro_settings))
-                            }
+                            KokoroAccountCard(
+                                authState = if (loginState is KokoroAuthState.Error) loginState else state.authState,
+                                onLogin = ::beginLogin,
+                                onLogout = {},
+                                onRetry = viewModel::refresh,
+                            )
                         }
                     }
                 }
@@ -243,10 +297,17 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator) {
     RuleEditorSheet(
         show = showRuleSheet,
         options = state.options,
-        initialRule = state.draftRules.getOrNull(editingRuleIndex),
+        initialRule = if (useConnectionSeed) KokoroCustomRuleInput(
+            type = preferredKokoroDomainRuleType(state.options.ruleTypes),
+            payload = seedHost,
+            target = state.options.targets.firstOrNull().orEmpty(),
+        ) else state.draftRules.getOrNull(editingRuleIndex),
+        fromConnection = useConnectionSeed,
+        canAdd = editingRuleIndex >= 0 || state.draftRules.size < state.options.maxRulesPerSet,
         onDismiss = { showRuleSheet = false },
         onConfirm = { rule ->
             if (editingRuleIndex >= 0) viewModel.updateRule(editingRuleIndex, rule)
+            else if (useConnectionSeed) viewModel.addConnectionRule(rule)
             else viewModel.addRule(rule)
             showRuleSheet = false
         },
@@ -354,34 +415,39 @@ private fun RuleEditorSheet(
     show: Boolean,
     options: KokoroCustomRulesOptions,
     initialRule: KokoroCustomRuleInput?,
+    fromConnection: Boolean = false,
+    canAdd: Boolean = true,
     onDismiss: () -> Unit,
     onConfirm: (KokoroCustomRuleInput) -> Unit,
 ) {
-    val defaultType = options.ruleTypes.firstOrNull() ?: "DOMAIN-SUFFIX"
+    val defaultType = preferredKokoroDomainRuleType(options.ruleTypes)
     val defaultTarget = options.targets.firstOrNull() ?: "DIRECT"
-    val types = options.ruleTypes.ifEmpty { listOf(defaultType) }
+    val types = (listOf("DOMAIN-SUFFIX", "DOMAIN").filter { it in options.ruleTypes } +
+        options.ruleTypes.filterNot { it == "DOMAIN-SUFFIX" || it == "DOMAIN" })
+        .ifEmpty { listOf(defaultType) }
     val targets = options.targets.ifEmpty { listOf(defaultTarget) }
     val providers = options.ruleProviders.filter { it.behavior == "domain" }.map { it.name }
-    var type by remember(show, initialRule, types) {
+    var type by rememberSaveable(show, initialRule?.type, types) {
         mutableStateOf(initialRule?.type?.takeIf { it in types } ?: defaultType)
     }
-    var payload by remember(show, initialRule, providers) {
+    var payload by rememberSaveable(show, initialRule?.payload, providers) {
         mutableStateOf(
             initialRule?.payload
+                ?.let { if (fromConnection) kokoroConnectionRulePayload(it, initialRule.type) else it }
                 ?.takeUnless { initialRule.type == "RULE-SET" && it !in providers }
                 ?: if (initialRule?.type == "RULE-SET") providers.firstOrNull().orEmpty() else "",
         )
     }
-    var target by remember(show, initialRule, targets) {
+    var target by rememberSaveable(show, initialRule?.target, targets) {
         mutableStateOf(initialRule?.target?.takeIf { it in targets } ?: defaultTarget)
     }
-    val canConfirm = type in options.ruleTypes && target in options.targets &&
+    val canConfirm = canAdd && type in options.ruleTypes && target in options.targets &&
         (type == "MATCH" || payload.isNotEmpty()) &&
         (type != "RULE-SET" || payload in providers)
 
     AppActionBottomSheet(
         show = show,
-        title = if (initialRule == null) {
+        title = if (initialRule == null || fromConnection) {
             stringResource(LocaleR.string.meta_feature_custom_rules_add_rule)
         } else {
             stringResource(LocaleR.string.meta_feature_custom_rules_edit_rule)
@@ -409,6 +475,17 @@ private fun RuleEditorSheet(
             )
         },
     ) {
+        if (fromConnection) {
+            Text(
+                stringResource(LocaleR.string.meta_feature_custom_rules_connection_hint),
+                modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (!canAdd) {
+            Text(stringResource(LocaleR.string.meta_feature_custom_rules_limit_reached),
+                modifier = Modifier.fillMaxWidth().padding(UiDp.dp16))
+        }
         Card {
             YumeMd3DropdownPreference(
                 title = stringResource(LocaleR.string.meta_feature_custom_rules_type),
@@ -417,6 +494,9 @@ private fun RuleEditorSheet(
                 onSelectedIndexChange = { index ->
                     type = types.getOrElse(index) { defaultType }
                     when (type) {
+                        "DOMAIN-SUFFIX", "DOMAIN" -> if (fromConnection) {
+                            payload = kokoroConnectionRulePayload(initialRule?.payload.orEmpty(), type).orEmpty()
+                        }
                         "MATCH" -> payload = ""
                         "RULE-SET" -> if (payload !in providers) {
                             payload = providers.firstOrNull().orEmpty()

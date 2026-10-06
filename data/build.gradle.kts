@@ -47,3 +47,11 @@ dependencies {
 
     implementation("com.tencent:mmkv:${libs.versions.mmkv.get()}")
 }
+
+// Local JVM tests have no Android Context or assets; use OkHttp's JVM suffix resource.
+configurations.matching { it.name.endsWith("UnitTestRuntimeClasspath") }.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("com.squareup.okhttp3:okhttp-android"))
+            .using(module("com.squareup.okhttp3:okhttp-jvm:${libs.versions.okhttp.get()}"))
+    }
+}

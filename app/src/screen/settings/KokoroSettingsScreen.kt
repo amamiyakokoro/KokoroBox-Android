@@ -115,7 +115,7 @@ fun KokoroSettingsScreen(navigator: DestinationsNavigator) {
                         summary = stringResource(LocaleR.string.settings_kokoro_custom_rules_summary),
                         enabled = authState is KokoroAuthState.Authenticated,
                         onClick = {
-                            navigator.navigate(KokoroCustomRulesScreenDestination) {
+                            navigator.navigate(KokoroCustomRulesScreenDestination()) {
                                 launchSingleTop = true
                             }
                         },

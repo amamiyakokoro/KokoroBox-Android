@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.locale.UiText
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroAuthenticationRequiredException
+import com.amamiyakokoro.box.data.integration.kokoro.insertKokoroConnectionRule
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRuleInput
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroCustomRulesOptions
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
@@ -72,7 +73,7 @@ internal class KokoroCustomRulesViewModel(
     fun refresh() = load(forceRefresh = true)
 
     private fun load(forceRefresh: Boolean) {
-        if (_state.value.loading && _state.value.defaultRuleSet != null) return
+        if (!forceRefresh && _state.value.defaultRuleSet != null) return
         viewModelScope.launch {
             _state.update {
                 it.copy(
@@ -148,6 +149,17 @@ internal class KokoroCustomRulesViewModel(
         _state.update { it.copy(draftRules = it.draftRules + rule, dirty = true, status = KokoroRulesStatus.IDLE) }
     }
 
+    fun addConnectionRule(rule: KokoroCustomRuleInput) {
+        _state.update { current ->
+            if (current.saving || current.draftRules.size >= current.options.maxRulesPerSet) current
+            else {
+                // Move an identical rule to the front instead of creating a duplicate.
+                val rules = insertKokoroConnectionRule(current.draftRules, rule)
+                current.copy(draftRules = rules, dirty = true, status = KokoroRulesStatus.IDLE)
+            }
+        }
+    }
+
     fun updateRule(index: Int, rule: KokoroCustomRuleInput) {
         _state.update { current ->
             if (index !in current.draftRules.indices) current else current.copy(
@@ -184,6 +196,7 @@ internal class KokoroCustomRulesViewModel(
     }
 
     fun save() {
+        if (_state.value.saving || _state.value.loading) return
         val selected = _state.value.defaultRuleSet ?: return
         val localRules = _state.value.draftRules
         viewModelScope.launch {

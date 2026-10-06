@@ -17,6 +17,24 @@ The bearer allowlist accepts only the fixed read endpoints and the ordered-rules
 with a positive numeric set ID on the canonical HTTPS host. Access tokens, Authorization headers,
 callback URLs, rule payloads, and response bodies are not logged.
 
+## Adding a rule from a connection
+
+Connection details offer **Add to Kokoro Custom Rules** for active and closed connections.
+The editor receives the raw host (without a port), loads the account's default set and capabilities,
+and opens a prefilled draft once. `DOMAIN-SUFFIX` is preferred over `DOMAIN` when supported;
+the payload uses the registrable base domain from OkHttp’s bundled public suffix list (for example,
+`api.ip.sb` becomes `ip.sb`, while `api.example.co.uk` becomes `example.co.uk`). Private suffixes
+such as `github.io` retain the tenant domain. Switching to `DOMAIN` restores the complete connection
+host; switching back derives the base domain again. Hosts without a registrable base domain retain
+their normalized host. The payload remains editable. IP-only and missing hosts
+leave the payload empty for manual entry. Login can be completed on the editor page before opening
+the prefilled draft.
+
+Confirming inserts the rule at the front of the local draft, moving an identical existing rule instead
+of duplicating it. A `MATCH` rule is kept last and replaces any existing `MATCH`. The user must still
+press Save to write to Kokoro. After saving, update the Kokoro subscription to apply server-side rules
+to the running configuration. This action does not create local overrides.
+
 ## Conflict and failure handling
 
 On `409`, KokoroBox reloads `default` and asks the user to use remote rules or keep the local draft. Keeping the draft adopts the new revision but requires another explicit Save.

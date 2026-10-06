@@ -64,6 +64,8 @@ import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.generated.destinations.KokoroCustomRulesScreenDestination
+import kotlinx.serialization.json.jsonPrimitive
 import org.koin.androidx.compose.koinViewModel
 
 private val SortModes = listOf(
@@ -284,6 +286,11 @@ fun ConnectionScreen(
             onInterruptConnection = { id -> viewModel.closeConnection(id) },
             onDismiss = { showDetailSheet = false },
             onDismissFinished = { selectedConnection = null },
+            onAddKokoroRule = { connection ->
+                val host = connection.metadata["host"]?.jsonPrimitive?.content.orEmpty()
+                showDetailSheet = false
+                navigator.navigate(KokoroCustomRulesScreenDestination(initialHost = host))
+            },
         )
     }
 }

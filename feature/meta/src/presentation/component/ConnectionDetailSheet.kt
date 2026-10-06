@@ -61,6 +61,7 @@ fun ConnectionDetailSheet(
     onInterruptConnection: suspend (String) -> Boolean,
     onDismiss: () -> Unit,
     onDismissFinished: () -> Unit = {},
+    onAddKokoroRule: ((ConnectionInfo) -> Unit)? = null,
 ) {
     val spacing = AppTheme.spacing
     val scope = rememberCoroutineScope()
@@ -98,6 +99,17 @@ fun ConnectionDetailSheet(
                             rule = info.rule,
                             rulePayload = info.rulePayload,
                         )
+                    }
+                }
+
+                if (onAddKokoroRule != null) {
+                    item {
+                        Button(
+                            onClick = { onAddKokoroRule(info) },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(stringResource(LocaleR.string.connection_detail_add_kokoro_rule))
+                        }
                     }
                 }
 
