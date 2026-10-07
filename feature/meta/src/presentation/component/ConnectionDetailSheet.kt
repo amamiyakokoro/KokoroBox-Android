@@ -77,8 +77,8 @@ fun ConnectionDetailSheet(
     val spacing = AppTheme.spacing
     val scope = rememberCoroutineScope()
     var isInterrupting by remember(connectionInfo?.id, show) { mutableStateOf(false) }
-    var editingRule by rememberSaveable(connectionInfo?.id, show) { mutableStateOf(false) }
-    var editorSaving by remember(connectionInfo?.id, show) { mutableStateOf(false) }
+    var editingRule by rememberSaveable(connectionInfo?.id) { mutableStateOf(false) }
+    var editorSaving by remember(connectionInfo?.id) { mutableStateOf(false) }
     val slideAnimation = AppMotion.defaultSpatial<IntOffset>()
     val sizeAnimation = AppMotion.defaultSpatial<IntSize>()
     val backToDetail = { if (!editorSaving) editingRule = false }
@@ -101,7 +101,12 @@ fun ConnectionDetailSheet(
                 ))
             }
         } else null,
-        onDismissFinished = onDismissFinished,
+        onDismissFinished = {
+            // Keep the current pane during dismissal; resetting it earlier starts a back slide.
+            editingRule = false
+            editorSaving = false
+            onDismissFinished()
+        },
         contentScrollEnabled = false,
     ) {
         val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
