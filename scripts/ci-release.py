@@ -67,6 +67,44 @@ def metadata(tag):
         output(name, value)
 
 
+def release_notes(tag, repository, destination):
+    validate_tag(tag)
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9_.-]+", repository):
+        raise ValueError("Invalid GitHub repository for release notes")
+    if subprocess.check_output(
+        ["git", "rev-parse", "--is-shallow-repository"], text=True,
+    ).strip() == "true":
+        raise ValueError("Release notes require complete Git history and tags")
+
+    version = tuple(int(part) for part in tag[1:].split("."))
+    tags = subprocess.check_output([
+        "git", "tag", "--merged", f"refs/tags/{tag}^{{commit}}", "--list", "v*",
+    ], text=True).splitlines()
+    candidates = []
+    for candidate in tags:
+        if re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", candidate):
+            candidate_version = tuple(int(part) for part in candidate[1:].split("."))
+            if candidate_version < version:
+                candidates.append((candidate_version, candidate))
+    previous = max(candidates)[1] if candidates else None
+    revision = f"{previous}..{tag}" if previous else f"refs/tags/{tag}"
+    commits = subprocess.check_output([
+        "git", "log", "--reverse", "--topo-order", "--format=%H%x09%s", revision, "--",
+    ], text=True).splitlines()
+    base_url = f"https://github.com/{repository}"
+    lines = ["## What's Changed", ""]
+    for commit in commits:
+        sha, subject = commit.split("\t", 1)
+        # Preserve commit subjects as text instead of letting them create Markdown markup.
+        subject = re.sub(r"([\\`*_{}\[\]<>])", r"\\\1", subject)
+        lines.append(f"- {subject} ([{sha[:7]}]({base_url}/commit/{sha}))")
+    changelog = f"{base_url}/compare/{previous}...{tag}" if previous else f"{base_url}/commits/{tag}"
+    lines.extend(["", f"**Full Changelog**: {changelog}", ""])
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text("\n".join(lines), encoding="utf-8")
+
+
 def check_secrets(env):
     missing = [name for name in SIGNING_NAMES if not env.get(name)]
     if missing:
@@ -258,6 +296,9 @@ def main():
         output("tag", validate_tag(os.environ["RELEASE_TAG"]))
     elif command == "metadata":
         metadata(os.environ["RELEASE_TAG"])
+    elif command == "release-notes":
+        release_notes(os.environ["RELEASE_TAG"], os.environ["GITHUB_REPOSITORY"],
+                      os.environ.get("RELEASE_NOTES_FILE", "publish/RELEASE_NOTES.md"))
     elif command == "check-secrets":
         check_secrets(os.environ)
     elif command == "restore":

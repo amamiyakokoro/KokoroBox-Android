@@ -312,5 +312,115 @@ class ReleaseTests(unittest.TestCase):
         self.assertNotIn(secret_path, rendered)
 
 
+class ReleaseNotesTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        original = Path.cwd()
+        os.chdir(self.root)
+        self.addCleanup(os.chdir, original)
+        self.git("init", "-q", "-b", "main")
+        self.git("config", "user.name", "Release test")
+        self.git("config", "user.email", "release@example.com")
+        self.git("config", "commit.gpgsign", "false")
+        self.git("config", "tag.gpgsign", "false")
+        self.sequence = 0
+        self.initial = self.commit("initial commit")
+
+    def git(self, *args):
+        return subprocess.check_output(["git", *args], text=True).strip()
+
+    def commit(self, subject):
+        self.sequence += 1
+        path = Path(f"file-{self.sequence}")
+        path.write_text(subject)
+        self.git("add", str(path))
+        self.git("commit", "-q", "-m", subject)
+        return self.git("rev-parse", "HEAD")
+
+    def notes(self, tag):
+        ci.release_notes(tag, "owner/project", "publish/RELEASE_NOTES.md")
+        return Path("publish/RELEASE_NOTES.md").read_text()
+
+    def test_lists_direct_branch_and_merge_commits_with_links(self):
+        self.git("tag", "v0.8.3")
+        self.git("checkout", "-q", "-b", "feature")
+        feature = self.commit("feat: no pull request")
+        self.git("checkout", "-q", "main")
+        direct = self.commit("fix: direct commit")
+        self.git("merge", "-q", "--no-ff", "feature", "-m", "Merge feature")
+        merge = self.git("rev-parse", "HEAD")
+        self.git("tag", "-a", "v0.8.4", "-m", "Release")
+        notes = self.notes("v0.8.4")
+        self.assertEqual(len([line for line in notes.splitlines() if line.startswith("- ")]), 3)
+        for sha, subject in ((feature, "feat: no pull request"), (direct, "fix: direct commit"),
+                             (merge, "Merge feature")):
+            self.assertIn(f"- {subject} ([{sha[:7]}](https://github.com/owner/project/commit/{sha}))", notes)
+        self.assertNotIn(self.initial, notes)
+        self.assertIn("/compare/v0.8.3...v0.8.4", notes)
+
+    def test_selects_previous_stable_version_numerically(self):
+        self.git("tag", "v0.8.9")
+        self.commit("previous release")
+        for tag in ("v0.8.10", "v0.9.0", "v0.8.11-rc1", "nightly"):
+            self.git("tag", tag)
+        latest = self.commit("new change")
+        self.git("tag", "v0.8.11")
+        notes = self.notes("v0.8.11")
+        self.assertIn("/compare/v0.8.10...v0.8.11", notes)
+        self.assertIn(latest, notes)
+        self.assertNotIn("previous release", notes)
+
+    def test_ignores_unmerged_version_tags_and_commits_after_selected_tag(self):
+        self.git("tag", "v0.8.3")
+        self.git("checkout", "-q", "-b", "unrelated")
+        self.commit("unrelated branch")
+        self.git("tag", "v0.8.99")
+        self.git("checkout", "-q", "main")
+        self.commit("selected release change")
+        self.git("tag", "v0.9.0")
+        self.commit("later development")
+        notes = self.notes("v0.9.0")
+        self.assertIn("selected release change", notes)
+        self.assertIn("/compare/v0.8.3...v0.9.0", notes)
+        self.assertNotIn("unrelated branch", notes)
+        self.assertNotIn("later development", notes)
+
+    def test_first_release_lists_full_history(self):
+        latest = self.commit("first release change")
+        self.git("tag", "v0.1.0")
+        notes = self.notes("v0.1.0")
+        self.assertIn(self.initial, notes)
+        self.assertIn(latest, notes)
+        self.assertIn("**Full Changelog**: https://github.com/owner/project/commits/v0.1.0", notes)
+
+    def test_subject_markdown_is_displayed_as_text(self):
+        self.git("tag", "v0.8.3")
+        self.commit("fix: [tag] *value* `host` <details>")
+        self.git("tag", "v0.8.4")
+        notes = self.notes("v0.8.4")
+        self.assertIn(r"fix: \[tag\] \*value\* \`host\` \<details\>", notes)
+
+    def test_shallow_history_is_rejected(self):
+        with patch.object(ci.subprocess, "check_output", return_value="true\n"), \
+                self.assertRaisesRegex(ValueError, "complete Git history"):
+            self.notes("v0.8.4")
+
+    def test_invalid_tag_or_repository_is_rejected(self):
+        for tag, repository in (("dev", "owner/project"), ("v0.8.4", "../project"),
+                                ("v0.8.4", "owner/project\n")):
+            with self.subTest(tag=tag, repository=repository), self.assertRaises(ValueError):
+                ci.release_notes(tag, repository, "notes.md")
+
+    def test_command_writes_requested_notes_file(self):
+        self.git("tag", "v0.1.0")
+        with patch.dict(os.environ, {"RELEASE_TAG": "v0.1.0", "GITHUB_REPOSITORY": "owner/project",
+                                     "RELEASE_NOTES_FILE": "notes/output.md"}), \
+                patch.object(ci.sys, "argv", ["ci-release.py", "release-notes"]):
+            ci.main()
+        self.assertIn(self.initial, Path("notes/output.md").read_text())
+
+
 if __name__ == "__main__":
     unittest.main()

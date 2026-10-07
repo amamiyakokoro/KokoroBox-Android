@@ -66,6 +66,11 @@ jobs:
           RELEASE_TAG: ${{ steps.tag.outputs.tag }}
         run: python3 "$RUNNER_TEMP/kokoro-release.py" metadata
 
+      - name: Generate release notes from every commit
+        env:
+          RELEASE_TAG: ${{ steps.source.outputs.tag }}
+        run: python3 "$RUNNER_TEMP/kokoro-release.py" release-notes
+
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
@@ -166,6 +171,7 @@ jobs:
             publish/*.apk
             publish/SHA256SUMS
             publish/SIGNING-CERT-SHA256.txt
+            publish/RELEASE_NOTES.md
           if-no-files-found: error
           retention-days: 14
 
@@ -199,8 +205,9 @@ jobs:
             exit 1
           fi
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --notes-file RELEASE_NOTES.md
             gh release upload "$RELEASE_TAG" ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt
           else
-            gh release create "$RELEASE_TAG" --verify-tag --generate-notes \
+            gh release create "$RELEASE_TAG" --verify-tag --notes-file RELEASE_NOTES.md \
               --title "KokoroBox $RELEASE_TAG" ./*.apk SHA256SUMS SIGNING-CERT-SHA256.txt
           fi
