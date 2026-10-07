@@ -136,15 +136,15 @@ fun ConnectionCard(
                         )
                     }
 
+                    if (route.isNotEmpty()) {
+                        ConnectionTagChip(label = route)
+                    }
+
                     if (relativeTime.isNotEmpty()) {
                         ConnectionTagChip(
                             label = relativeTime,
                             backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                    }
-
-                    if (route.isNotEmpty()) {
-                        ConnectionTagChip(label = route)
                     }
                 }
             },
