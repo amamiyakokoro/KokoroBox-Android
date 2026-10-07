@@ -20,7 +20,6 @@
 
 package com.amamiyakokoro.box.feature.meta.presentation.component
 import android.content.res.Resources
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +49,6 @@ fun ConnectionCard(
 ) {
     val spacing = AppTheme.spacing
     val sizes = AppTheme.sizes
-    val opacity = AppTheme.opacity
 
     val host = remember(connectionInfo.metadata) {
         connectionInfo.metadata["host"]?.jsonPrimitive?.content ?: ""
@@ -87,6 +85,9 @@ fun ConnectionCard(
     }
 
     val relativeTime = formatRelativeTime(connectionInfo.start, LocalResources.current)
+    val route = remember(connectionInfo.chains) {
+        connectionInfo.chains.filter(String::isNotBlank).joinToString(" → ")
+    }
     val summaryText = remember(sourceIP, sourcePort, destinationIp, destinationPort) {
         val source = listOf(sourceIP, sourcePort).filter(String::isNotBlank).joinToString(":")
         val destination = listOf(destinationIp, destinationPort).filter(String::isNotBlank).joinToString(":")
@@ -109,14 +110,13 @@ fun ConnectionCard(
                 ConnectionLeadingIcon(
                     metadata = connectionInfo.metadata,
                     network = network,
-                    modifier = Modifier.padding(end = spacing.space12),
                 )
             },
             bottomAction = {
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = sizes.connectionLeadingIconSize + spacing.space12),
+                        .padding(start = sizes.connectionLeadingIconSize + spacing.space16),
                     horizontalArrangement = Arrangement.spacedBy(sizes.listItemVerticalMinimal),
                     verticalArrangement = Arrangement.spacedBy(spacing.space4),
                 ) {
@@ -142,6 +142,10 @@ fun ConnectionCard(
                             backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+
+                    if (route.isNotEmpty()) {
+                        ConnectionTagChip(label = route)
+                    }
                 }
             },
             onClick = onClick,
@@ -161,6 +165,8 @@ private fun ConnectionTagChip(
         text = label,
         style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
         color = backgroundColor,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .clip(RoundedCornerShape(radii.full))
             .background(backgroundColor.copy(alpha = opacity.subtle))
