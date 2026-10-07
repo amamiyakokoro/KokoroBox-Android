@@ -29,6 +29,7 @@ import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
 import com.amamiyakokoro.box.core.model.CompileRequest
 import com.amamiyakokoro.box.core.model.CompileResult
 import com.amamiyakokoro.box.core.model.ConfigurationOverride
+import com.amamiyakokoro.box.core.model.DnsPresetMode
 import com.amamiyakokoro.box.core.model.ProxyGroup
 import com.amamiyakokoro.box.core.model.buildOfficialMrsConfigurationOverride
 import com.amamiyakokoro.box.core.model.defaultSystemOfficialMrsPresetSelection
@@ -85,6 +86,7 @@ class CompiledConfigPipeline(
                 builtinPresetPath = null,
                 runtimeInternalOverridePath = null,
                 antiPollutionDnsPresetPath = null,
+                overseasDnsPresetPath = null,
                 paths = emptyList(),
             )
         }
@@ -127,8 +129,18 @@ class CompiledConfigPipeline(
             ?.also { file -> logger?.invoke(describeOverrideFile(file, "__runtime__")) }
             ?.absolutePath
 
-        val antiPollutionDnsPresetPath = resolveAntiPollutionDnsPresetFile(overridesDir)
+        val dnsPresetMode = DnsPresetMode.fromFlags(serviceStore.antiPollutionDns, serviceStore.overseasDns)
+        val antiPollutionDnsPresetPath = resolveDnsPresetFile(
+            overridesDir, dnsPresetMode == DnsPresetMode.AntiPollution,
+            ANTI_POLLUTION_DNS_PRESET_FILE_NAME, ANTI_POLLUTION_DNS_OVERRIDE,
+        )
             ?.also { file -> logger?.invoke(describeOverrideFile(file, ANTI_POLLUTION_DNS_PRESET_ID)) }
+            ?.absolutePath
+        val overseasDnsPresetPath = resolveDnsPresetFile(
+            overridesDir, dnsPresetMode == DnsPresetMode.Overseas,
+            OVERSEAS_DNS_PRESET_FILE_NAME, OVERSEAS_DNS_OVERRIDE,
+        )
+            ?.also { file -> logger?.invoke(describeOverrideFile(file, OVERSEAS_DNS_PRESET_ID)) }
             ?.absolutePath
 
         val paths = mutableListOf<String>()
@@ -136,6 +148,7 @@ class CompiledConfigPipeline(
         paths += userOverridePaths
         runtimeInternalOverridePath?.let(paths::add)
         antiPollutionDnsPresetPath?.let(paths::add)
+        overseasDnsPresetPath?.let(paths::add)
 
         logger?.invoke(
             "override resolve: profile=$profileUuid resolved=${paths.size} " +
@@ -148,6 +161,7 @@ class CompiledConfigPipeline(
             builtinPresetPath = builtinPresetPath,
             runtimeInternalOverridePath = runtimeInternalOverridePath,
             antiPollutionDnsPresetPath = antiPollutionDnsPresetPath,
+            overseasDnsPresetPath = overseasDnsPresetPath,
             paths = paths,
         )
     }
@@ -295,16 +309,16 @@ class CompiledConfigPipeline(
         return file
     }
 
-    private fun resolveAntiPollutionDnsPresetFile(overridesDir: File): File? {
-        val file = overridesDir.resolve("$INTERNAL_OVERRIDE_DIR_NAME/$ANTI_POLLUTION_DNS_PRESET_FILE_NAME")
-        if (!serviceStore.antiPollutionDns) {
+    private fun resolveDnsPresetFile(overridesDir: File, enabled: Boolean, fileName: String, content: String): File? {
+        val file = overridesDir.resolve("$INTERNAL_OVERRIDE_DIR_NAME/$fileName")
+        if (!enabled) {
             runCatching { file.delete() }
             return null
         }
 
         file.parentFile?.mkdirs()
-        if (!file.exists() || file.readText() != ANTI_POLLUTION_DNS_OVERRIDE) {
-            file.writeText(ANTI_POLLUTION_DNS_OVERRIDE)
+        if (!file.exists() || file.readText() != content) {
+            file.writeText(content)
         }
         return file
     }
@@ -379,6 +393,7 @@ class CompiledConfigPipeline(
         val builtinPresetPath: String?,
         val runtimeInternalOverridePath: String?,
         val antiPollutionDnsPresetPath: String?,
+        val overseasDnsPresetPath: String?,
         val paths: List<String>,
     )
 
@@ -403,6 +418,8 @@ class CompiledConfigPipeline(
         const val BUILTIN_PRESET_FILE_NAME = "builtin-preset.json"
         const val ANTI_POLLUTION_DNS_PRESET_ID = "__anti_pollution_dns__"
         const val ANTI_POLLUTION_DNS_PRESET_FILE_NAME = "anti-pollution-dns.json"
+        const val OVERSEAS_DNS_PRESET_ID = "__overseas_dns__"
+        const val OVERSEAS_DNS_PRESET_FILE_NAME = "overseas-dns.json"
         const val INTERNAL_OVERRIDE_DIR_NAME = "internal"
         const val OBSOLETE_STANDALONE_ROUTING_ID = "__custom_routing__"
 

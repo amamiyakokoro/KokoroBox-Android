@@ -31,6 +31,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import com.amamiyakokoro.box.core.model.RootTunDnsMode
+import com.amamiyakokoro.box.core.model.DnsPresetMode
 import com.amamiyakokoro.box.core.model.TunnelState
 import com.amamiyakokoro.box.data.model.AccessControlMode
 import com.amamiyakokoro.box.data.model.AppColorTheme
@@ -245,6 +246,7 @@ class UserSettingsBackupController(
         put("bypassPrivateNetwork", networkSettingsStore.bypassPrivateNetwork.value)
         put("dnsHijack", networkSettingsStore.dnsHijack.value)
         put("antiPollutionDns", networkSettingsStore.antiPollutionDns.value)
+        put("overseasDns", networkSettingsStore.overseasDns.value)
         put("allowBypass", networkSettingsStore.allowBypass.value)
         put("enableIPv6", networkSettingsStore.enableIPv6.value)
         put("systemProxy", networkSettingsStore.systemProxy.value)
@@ -268,7 +270,13 @@ class UserSettingsBackupController(
         obj.enumValue<ProxyMode>("proxyMode")?.let(networkSettingsStore.proxyMode::set)
         obj.bool("bypassPrivateNetwork")?.let(networkSettingsStore.bypassPrivateNetwork::set)
         obj.bool("dnsHijack")?.let(networkSettingsStore.dnsHijack::set)
-        obj.bool("antiPollutionDns")?.let(networkSettingsStore.antiPollutionDns::set)
+        val antiPollutionDns = obj.bool("antiPollutionDns")
+        val overseasDns = obj.bool("overseasDns")
+        if (antiPollutionDns != null || overseasDns != null) {
+            networkSettingsStore.selectDnsPreset(
+                DnsPresetMode.fromFlags(antiPollutionDns == true, overseasDns == true),
+            )
+        }
         obj.bool("allowBypass")?.let(networkSettingsStore.allowBypass::set)
         obj.bool("enableIPv6")?.let(networkSettingsStore.enableIPv6::set)
         obj.bool("systemProxy")?.let(networkSettingsStore.systemProxy::set)

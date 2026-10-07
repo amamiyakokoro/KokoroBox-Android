@@ -63,6 +63,7 @@ class NetworkSettingsViewModel(
     val bypassPrivateNetwork: Preference<Boolean> = settings.bypassPrivateNetwork
     val dnsHijack: Preference<Boolean> = settings.dnsHijack
     val antiPollutionDns: Preference<Boolean> = settings.antiPollutionDns
+    val overseasDns: Preference<Boolean> = settings.overseasDns
     val allowBypass: Preference<Boolean> = settings.allowBypass
     val enableIPv6: Preference<Boolean> = settings.enableIPv6
     val systemProxy: Preference<Boolean> = settings.systemProxy
@@ -248,7 +249,11 @@ class NetworkSettingsViewModel(
     }
 
     fun onAntiPollutionDnsChange(enabled: Boolean) {
-        controller.setAndRestartIfNeeded(antiPollutionDns, enabled)
+        controller.setAntiPollutionDns(enabled)
+    }
+
+    fun onOverseasDnsChange(enabled: Boolean) {
+        controller.setOverseasDns(enabled)
     }
 
     fun onAllowBypassChange(enabled: Boolean) {

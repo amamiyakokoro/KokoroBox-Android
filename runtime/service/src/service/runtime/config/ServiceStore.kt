@@ -158,8 +158,21 @@ class ServiceStore {
             defaultValue = false,
         )
         set(value) {
+            if (value) overseasDns = false
             networkSettings.encode("antiPollutionDns", value)
             store.provider.setBoolean("anti_pollution_dns", value)
+        }
+
+    var overseasDns: Boolean
+        get() = readBoolean(
+            newKey = "overseasDns",
+            legacyKey = "overseas_dns",
+            defaultValue = false,
+        )
+        set(value) {
+            if (value) antiPollutionDns = false
+            networkSettings.encode("overseasDns", value)
+            store.provider.setBoolean("overseas_dns", value)
         }
 
     var systemProxy: Boolean

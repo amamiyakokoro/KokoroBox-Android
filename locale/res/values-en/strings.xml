@@ -1330,4 +1330,6 @@
     <string name="log_level_error" formatted="false">Error</string>
     <string name="log_level_silent" formatted="false">Silent</string>
     <string name="log_level_unknown" formatted="false">Unknown</string>
+    <string name="network_settings_experimental_overseas_dns_title" formatted="false">Overseas DNS</string>
+    <string name="network_settings_experimental_overseas_dns_summary" formatted="false">Use 1.1.1.1 and 8.8.8.8 for all DNS queries without domain policies; mutually exclusive with DNS Pollution Protection</string>
 </resources>

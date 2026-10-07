@@ -1330,4 +1330,6 @@
     <string name="log_level_error" formatted="false">錯誤</string>
     <string name="log_level_silent" formatted="false">靜默</string>
     <string name="log_level_unknown" formatted="false">未知</string>
+    <string name="network_settings_experimental_overseas_dns_title" formatted="false">海外 DNS</string>
+    <string name="network_settings_experimental_overseas_dns_summary" formatted="false">統一使用 1.1.1.1 與 8.8.8.8，不依網域分流；與抗污染 DNS 擇一啟用</string>
 </resources>

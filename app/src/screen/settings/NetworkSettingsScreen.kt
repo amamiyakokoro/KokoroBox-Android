@@ -319,6 +319,7 @@ private fun NetworkHttpSettingsSection(viewModel: NetworkSettingsViewModel) {
 @Composable
 private fun NetworkExperimentalSettingsSection(viewModel: NetworkSettingsViewModel) {
     val antiPollutionDns by viewModel.antiPollutionDns.state.collectAsStateWithLifecycle()
+    val overseasDns by viewModel.overseasDns.state.collectAsStateWithLifecycle()
 
     Title(stringResource(LocaleR.string.network_settings_section_experimental))
     Card {
@@ -327,6 +328,12 @@ private fun NetworkExperimentalSettingsSection(viewModel: NetworkSettingsViewMod
             summary = stringResource(LocaleR.string.network_settings_experimental_anti_pollution_dns_summary),
             checked = antiPollutionDns,
             onCheckedChange = viewModel::onAntiPollutionDnsChange,
+        )
+        PreferenceSwitchItem(
+            title = stringResource(LocaleR.string.network_settings_experimental_overseas_dns_title),
+            summary = stringResource(LocaleR.string.network_settings_experimental_overseas_dns_summary),
+            checked = overseasDns,
+            onCheckedChange = viewModel::onOverseasDnsChange,
         )
     }
 }

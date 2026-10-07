@@ -23,6 +23,7 @@
 package com.amamiyakokoro.box.data.store
 
 import com.amamiyakokoro.box.core.model.RootTunDnsMode
+import com.amamiyakokoro.box.core.model.DnsPresetMode
 import com.amamiyakokoro.box.data.model.AccessControlMode
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.data.model.TunStack
@@ -35,6 +36,7 @@ class NetworkSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = e
     val bypassPrivateNetwork by boolFlow(true)
     val dnsHijack by boolFlow(true)
     val antiPollutionDns by boolFlow(false)
+    val overseasDns by boolFlow(false)
     val allowBypass by boolFlow(true)
     val enableIPv6 by boolFlow(false)
     val systemProxy by boolFlow(true)
@@ -53,4 +55,27 @@ class NetworkSettingsStore(externalMmkv: MMKV) : MMKVPreference(externalMmkv = e
     val rootTunFakeIpRange6 by strFlow("fc00::/18")
     val accessControlMode by enumFlow(AccessControlMode.ALLOW_ALL)
     val accessControlPackages by stringSetFlow(emptySet())
+
+    init {
+        selectDnsPreset(DnsPresetMode.fromFlags(antiPollutionDns.value, overseasDns.value))
+    }
+
+    fun selectDnsPreset(mode: DnsPresetMode): Boolean =
+        setDnsPresetPreferences(antiPollutionDns, overseasDns, mode)
+}
+
+internal fun setDnsPresetPreferences(
+    antiPollution: Preference<Boolean>,
+    overseas: Preference<Boolean>,
+    mode: DnsPresetMode,
+): Boolean {
+    val antiEnabled = mode == DnsPresetMode.AntiPollution
+    val overseasEnabled = mode == DnsPresetMode.Overseas
+    if (antiPollution.value == antiEnabled && overseas.value == overseasEnabled) return false
+    // Disable the old preset before enabling the new one, including across service reads.
+    if (!antiEnabled) antiPollution.set(false)
+    if (!overseasEnabled) overseas.set(false)
+    if (antiEnabled) antiPollution.set(true)
+    if (overseasEnabled) overseas.set(true)
+    return true
 }

@@ -21,6 +21,7 @@
 package com.amamiyakokoro.box.data.controller
 
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.model.DnsPresetMode
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.data.store.NetworkSettingsStore
@@ -43,6 +44,18 @@ class NetworkSettingsController(
 
     fun setProxyMode(mode: ProxyMode) {
         store.proxyMode.set(mode)
+    }
+
+    fun setAntiPollutionDns(enabled: Boolean) {
+        val mode = if (enabled) DnsPresetMode.AntiPollution else
+            DnsPresetMode.fromFlags(false, store.overseasDns.value)
+        if (store.selectDnsPreset(mode)) scheduleRestart()
+    }
+
+    fun setOverseasDns(enabled: Boolean) {
+        val mode = if (enabled) DnsPresetMode.Overseas else
+            DnsPresetMode.fromFlags(store.antiPollutionDns.value, false)
+        if (store.selectDnsPreset(mode)) scheduleRestart()
     }
 
     fun <T> setAndRestartIfNeeded(
