@@ -24,6 +24,7 @@ class AppUpdateViewModel(
 
     fun check() {
         if (mutableState.value.checking) return
+        updateManager.dismiss()
         mutableState.value = AppUpdateState(checking = true)
         viewModelScope.launch {
             try {
@@ -36,7 +37,10 @@ class AppUpdateViewModel(
         }
     }
 
-    fun dismiss() { mutableState.value = AppUpdateState() }
+    fun dismiss() {
+        updateManager.dismiss()
+        mutableState.value = AppUpdateState()
+    }
 
     fun downloadAndInstall(release: ReleaseCheck.Published) = updateManager.downloadAndPrepare(release)
 
