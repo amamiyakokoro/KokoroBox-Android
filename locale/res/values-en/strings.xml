@@ -1324,4 +1324,10 @@
     <string name="meta_feature_custom_rules_subscription_update_failed" formatted="false">Rules saved, but subscription update failed</string>
     <string name="meta_feature_custom_rules_retry_subscription_update" formatted="false">Retry update</string>
     <string name="meta_feature_custom_rules_updating_subscription" formatted="false">Updating…</string>
+    <string name="log_level_debug" formatted="false">Debug</string>
+    <string name="log_level_info" formatted="false">Info</string>
+    <string name="log_level_warning" formatted="false">Warning</string>
+    <string name="log_level_error" formatted="false">Error</string>
+    <string name="log_level_silent" formatted="false">Silent</string>
+    <string name="log_level_unknown" formatted="false">Unknown</string>
 </resources>

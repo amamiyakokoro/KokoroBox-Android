@@ -1324,4 +1324,10 @@
     <string name="meta_feature_custom_rules_subscription_update_failed" formatted="false">規則已儲存，但訂閱更新失敗</string>
     <string name="meta_feature_custom_rules_retry_subscription_update" formatted="false">重試更新</string>
     <string name="meta_feature_custom_rules_updating_subscription" formatted="false">更新訂閱中…</string>
+    <string name="log_level_debug" formatted="false">偵錯</string>
+    <string name="log_level_info" formatted="false">資訊</string>
+    <string name="log_level_warning" formatted="false">警告</string>
+    <string name="log_level_error" formatted="false">錯誤</string>
+    <string name="log_level_silent" formatted="false">靜默</string>
+    <string name="log_level_unknown" formatted="false">未知</string>
 </resources>

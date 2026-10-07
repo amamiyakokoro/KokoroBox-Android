@@ -30,13 +30,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
@@ -44,7 +38,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,18 +51,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.common.util.toast
-import com.amamiyakokoro.box.core.model.LogMessage
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
-import com.amamiyakokoro.box.data.store.LogStore
-import com.amamiyakokoro.box.presentation.component.Card
 import com.amamiyakokoro.box.presentation.component.CenteredText
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
 import com.amamiyakokoro.box.presentation.component.TopBar
@@ -247,63 +234,8 @@ fun LogScreen(navigator: DestinationsNavigator) {
                 items = reversed,
                 key = { index, item -> "${item.time}_${item.level}_${item.message}_$index" }
             ) { _, entry ->
-                LogEntryRow(entry = entry)
+                LogEntryCard(entry = entry)
             }
-        }
-    }
-}
-
-@Composable
-private fun LogEntryRow(entry: LogStore.LogEntry) {
-    val spacing = AppTheme.spacing
-    val semanticColors = AppTheme.colors
-
-    val levelColor = when (entry.level) {
-        LogMessage.Level.Debug -> semanticColors.logLevel.debug
-        LogMessage.Level.Info -> MaterialTheme.colorScheme.primary
-        LogMessage.Level.Warning -> semanticColors.logLevel.warning
-        LogMessage.Level.Error -> semanticColors.logLevel.error
-        LogMessage.Level.Silent -> semanticColors.logLevel.neutral
-        LogMessage.Level.Unknown -> semanticColors.logLevel.neutral
-    }
-
-    Card(modifier = Modifier.padding(vertical = spacing.space4)) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = spacing.space12, vertical = spacing.space10)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.space8),
-            ) {
-                Text(
-                    text = entry.time,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = entry.level.name.uppercase().take(1),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                    ),
-                    color = levelColor,
-                )
-            }
-            Spacer(modifier = Modifier.size(spacing.space6))
-            Text(
-                text = entry.message,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 12.sp,
-                    fontFamily = FontFamily.Monospace,
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
     }
 }

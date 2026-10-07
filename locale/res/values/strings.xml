@@ -1324,4 +1324,10 @@
     <string name="meta_feature_custom_rules_subscription_update_failed" formatted="false">规则已保存，但订阅更新失败</string>
     <string name="meta_feature_custom_rules_retry_subscription_update" formatted="false">重试更新</string>
     <string name="meta_feature_custom_rules_updating_subscription" formatted="false">更新订阅中…</string>
+    <string name="log_level_debug" formatted="false">调试</string>
+    <string name="log_level_info" formatted="false">信息</string>
+    <string name="log_level_warning" formatted="false">警告</string>
+    <string name="log_level_error" formatted="false">错误</string>
+    <string name="log_level_silent" formatted="false">静默</string>
+    <string name="log_level_unknown" formatted="false">未知</string>
 </resources>
