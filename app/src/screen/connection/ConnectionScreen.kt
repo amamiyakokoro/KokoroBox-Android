@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.feature.meta.presentation.component.ConnectionCard
-import com.amamiyakokoro.box.feature.meta.presentation.component.ConnectionDetailSheet
 import com.amamiyakokoro.box.feature.meta.presentation.component.TabRowWithContour
 import com.amamiyakokoro.box.feature.meta.presentation.viewmodel.ConnectionSort
 import com.amamiyakokoro.box.feature.meta.presentation.viewmodel.ConnectionTab
@@ -64,8 +63,6 @@ import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.generated.destinations.KokoroCustomRulesScreenDestination
-import kotlinx.serialization.json.jsonPrimitive
 import org.koin.androidx.compose.koinViewModel
 
 private val SortModes = listOf(
@@ -279,18 +276,13 @@ fun ConnectionScreen(
             }
         }
 
-        ConnectionDetailSheet(
+        ConnectionRuleDetailSheet(
             show = showDetailSheet,
             connectionInfo = selectedConnection,
             canInterrupt = state.selectedTab == ConnectionTab.ACTIVE,
             onInterruptConnection = { id -> viewModel.closeConnection(id) },
             onDismiss = { showDetailSheet = false },
             onDismissFinished = { selectedConnection = null },
-            onAddKokoroRule = { connection ->
-                val host = connection.metadata["host"]?.jsonPrimitive?.content.orEmpty()
-                showDetailSheet = false
-                navigator.navigate(KokoroCustomRulesScreenDestination(initialHost = host))
-            },
         )
     }
 }

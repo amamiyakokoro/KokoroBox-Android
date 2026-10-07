@@ -58,7 +58,6 @@ import com.amamiyakokoro.box.MainActivity
 import com.amamiyakokoro.box.screen.profiles.KokoroAccountCard
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import com.amamiyakokoro.box.data.integration.kokoro.kokoroConnectionRulePayload
 import com.amamiyakokoro.box.data.integration.kokoro.kokoroConnectionRuleHost
 import com.amamiyakokoro.box.data.integration.kokoro.preferredKokoroDomainRuleType
 import com.amamiyakokoro.box.common.util.toast
@@ -77,8 +76,6 @@ import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
 import com.amamiyakokoro.box.presentation.component.Title
 import com.amamiyakokoro.box.presentation.component.TopBar
 import com.amamiyakokoro.box.presentation.component.combinePaddingValues
-import com.amamiyakokoro.box.presentation.component.md3.YumeMd3DropdownPreference
-import com.amamiyakokoro.box.presentation.component.md3.YumeMd3OutlinedTextField
 import com.amamiyakokoro.box.presentation.component.rememberStandalonePageMainPadding
 import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.theme.UiDp
@@ -229,6 +226,27 @@ fun KokoroCustomRulesScreen(navigator: DestinationsNavigator, initialHost: Strin
         ) {
             if (state.authState is KokoroAuthState.Authenticated) {
                 item("rules-title") { Title(stringResource(LocaleR.string.meta_feature_custom_rules_rules)) }
+                if (state.subscriptionUpdatePending) {
+                    item("subscription-update") {
+                        Card {
+                            Column(Modifier.padding(UiDp.dp16), verticalArrangement = Arrangement.spacedBy(UiDp.dp8)) {
+                                if (state.saving) {
+                                    Row(verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(UiDp.dp12)) {
+                                        Md3EIndeterminateCircularWavyProgressIndicator(modifier = Modifier.size(20.dp))
+                                        Text(stringResource(LocaleR.string.meta_feature_custom_rules_updating_subscription))
+                                    }
+                                } else {
+                                    Text(stringResource(LocaleR.string.meta_feature_custom_rules_subscription_update_failed),
+                                        color = MaterialTheme.colorScheme.error)
+                                    Button(onClick = viewModel::retrySubscriptionUpdate, enabled = !state.loading) {
+                                        Text(stringResource(LocaleR.string.meta_feature_custom_rules_retry_subscription_update))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 when {
                     state.loading -> item("loading") {
                         Row(
@@ -511,30 +529,7 @@ private fun RuleEditorSheet(
     onDismiss: () -> Unit,
     onConfirm: (KokoroCustomRuleInput) -> Unit,
 ) {
-    val defaultType = preferredKokoroDomainRuleType(options.ruleTypes)
-    val defaultTarget = options.targets.firstOrNull() ?: "DIRECT"
-    val types = (listOf("DOMAIN-SUFFIX", "DOMAIN").filter { it in options.ruleTypes } +
-        options.ruleTypes.filterNot { it == "DOMAIN-SUFFIX" || it == "DOMAIN" })
-        .ifEmpty { listOf(defaultType) }
-    val targets = options.targets.ifEmpty { listOf(defaultTarget) }
-    val providers = options.ruleProviders.filter { it.behavior == "domain" }.map { it.name }
-    var type by rememberSaveable(show, initialRule?.type, types) {
-        mutableStateOf(initialRule?.type?.takeIf { it in types } ?: defaultType)
-    }
-    var payload by rememberSaveable(show, initialRule?.payload, providers) {
-        mutableStateOf(
-            initialRule?.payload
-                ?.let { if (fromConnection) kokoroConnectionRulePayload(it, initialRule.type) else it }
-                ?.takeUnless { initialRule.type == "RULE-SET" && it !in providers }
-                ?: if (initialRule?.type == "RULE-SET") providers.firstOrNull().orEmpty() else "",
-        )
-    }
-    var target by rememberSaveable(show, initialRule?.target, targets) {
-        mutableStateOf(initialRule?.target?.takeIf { it in targets } ?: defaultTarget)
-    }
-    val canConfirm = canAdd && type in options.ruleTypes && target in options.targets &&
-        (type == "MATCH" || payload.isNotEmpty()) &&
-        (type != "RULE-SET" || payload in providers)
+    val editor = rememberKokoroRuleEditorState(options, initialRule, fromConnection, canAdd, resetKey = show)
 
     AppActionBottomSheet(
         show = show,
@@ -552,77 +547,14 @@ private fun RuleEditorSheet(
         },
         endAction = {
             AppBottomSheetConfirmAction(
-                enabled = canConfirm,
+                enabled = editor.canConfirm,
                 contentDescription = stringResource(LocaleR.string.meta_feature_custom_rules_confirm),
                 onClick = {
-                    onConfirm(
-                        KokoroCustomRuleInput(
-                            type = type,
-                            payload = if (type == "MATCH") null else payload,
-                            target = target,
-                        ),
-                    )
+                    onConfirm(editor.rule)
                 },
             )
         },
     ) {
-        if (fromConnection) {
-            Text(
-                stringResource(LocaleR.string.meta_feature_custom_rules_connection_hint),
-                modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        if (!canAdd) {
-            Text(stringResource(LocaleR.string.meta_feature_custom_rules_limit_reached),
-                modifier = Modifier.fillMaxWidth().padding(UiDp.dp16))
-        }
-        Card {
-            YumeMd3DropdownPreference(
-                title = stringResource(LocaleR.string.meta_feature_custom_rules_type),
-                items = types,
-                selectedIndex = types.indexOf(type).coerceAtLeast(0),
-                onSelectedIndexChange = { index ->
-                    type = types.getOrElse(index) { defaultType }
-                    when (type) {
-                        "DOMAIN-SUFFIX", "DOMAIN" -> if (fromConnection) {
-                            payload = kokoroConnectionRulePayload(initialRule?.payload.orEmpty(), type).orEmpty()
-                        }
-                        "MATCH" -> payload = ""
-                        "RULE-SET" -> if (payload !in providers) {
-                            payload = providers.firstOrNull().orEmpty()
-                        }
-                    }
-                },
-            )
-            when (type) {
-                "MATCH" -> Text(
-                    text = stringResource(LocaleR.string.meta_feature_custom_rules_match_payload_hint),
-                    modifier = Modifier.fillMaxWidth().padding(UiDp.dp16),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                "RULE-SET" -> YumeMd3DropdownPreference(
-                    title = stringResource(LocaleR.string.meta_feature_custom_rules_provider),
-                    items = providers,
-                    selectedIndex = providers.indexOf(payload).coerceAtLeast(0),
-                    onSelectedIndexChange = { index -> payload = providers.getOrNull(index).orEmpty() },
-                    enabled = providers.isNotEmpty(),
-                )
-                else -> YumeMd3OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth().padding(UiDp.dp12),
-                    value = payload,
-                    onValueChange = { if (it.length <= options.maxPayloadLength) payload = it },
-                    label = stringResource(LocaleR.string.meta_feature_custom_rules_payload),
-                    singleLine = true,
-                )
-            }
-            YumeMd3DropdownPreference(
-                title = stringResource(LocaleR.string.meta_feature_custom_rules_target),
-                items = targets,
-                selectedIndex = targets.indexOf(target).coerceAtLeast(0),
-                onSelectedIndexChange = { index -> target = targets.getOrElse(index) { defaultTarget } },
-            )
-        }
-        Spacer(Modifier.height(UiDp.dp16))
+        KokoroRuleEditorContent(editor, canAdd)
     }
 }

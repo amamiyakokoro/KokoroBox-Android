@@ -21,6 +21,10 @@
 
 package com.amamiyakokoro.box.feature.meta.presentation.component
 
+import androidx.compose.animation.*
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,21 +34,27 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.core.model.ConnectionInfo
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.common.util.formatBytes
 import com.amamiyakokoro.box.presentation.component.AppActionBottomSheet
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetAction
+import com.amamiyakokoro.box.presentation.component.AppBottomSheetIconAction
+import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
+import com.amamiyakokoro.box.presentation.theme.AppMotion
 import com.amamiyakokoro.box.presentation.theme.AppTheme
 import com.amamiyakokoro.box.presentation.theme.yumeDestructiveActionColors
 import kotlinx.coroutines.launch
@@ -62,80 +72,120 @@ fun ConnectionDetailSheet(
     onDismiss: () -> Unit,
     onDismissFinished: () -> Unit = {},
     onAddKokoroRule: ((ConnectionInfo) -> Unit)? = null,
+    ruleEditor: (@Composable (ConnectionInfo, onBack: () -> Unit, onSavingChanged: (Boolean) -> Unit) -> Unit)? = null,
 ) {
     val spacing = AppTheme.spacing
     val scope = rememberCoroutineScope()
     var isInterrupting by remember(connectionInfo?.id, show) { mutableStateOf(false) }
+    var editingRule by rememberSaveable(connectionInfo?.id, show) { mutableStateOf(false) }
+    var editorSaving by remember(connectionInfo?.id, show) { mutableStateOf(false) }
+    val slideAnimation = AppMotion.defaultSpatial<IntOffset>()
+    val sizeAnimation = AppMotion.defaultSpatial<IntSize>()
+    val backToDetail = { if (!editorSaving) editingRule = false }
     val detailState = remember(connectionInfo) {
         connectionInfo?.toDetailState()
     }
 
     AppActionBottomSheet(
         show = show,
-        title = detailState?.displayHost.orEmpty(),
+        title = if (editingRule) stringResource(LocaleR.string.meta_feature_custom_rules_add_rule) else detailState?.displayHost.orEmpty(),
         onDismissRequest = onDismiss,
+        allowDismiss = !editorSaving,
+        startAction = if (editingRule) {
+            {
+                AppBottomSheetIconAction(AppBottomSheetAction(
+                    icon = AppMd3Icons.Navigation.Back,
+                    contentDescription = stringResource(LocaleR.string.component_navigation_back),
+                    enabled = !editorSaving,
+                    onClick = backToDetail,
+                ))
+            }
+        } else null,
         onDismissFinished = onDismissFinished,
         contentScrollEnabled = false,
     ) {
+        val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
+        NavigationBackHandler(
+            state = backState,
+            isBackEnabled = show && editingRule,
+            onBackCompleted = { backToDetail() },
+        )
         val info = connectionInfo
         val state = detailState
         if (info != null && state != null) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(spacing.space16),
-            ) {
-                item {
-                    ConnectionInfoSection(
-                        state = state,
-                        upload = info.upload,
-                        download = info.download,
-                        chains = info.chains,
-                    )
-                }
+            AnimatedContent(
+                targetState = editingRule,
+                modifier = Modifier.fillMaxWidth().clipToBounds(),
+                transitionSpec = {
+                    val direction = if (targetState) AnimatedContentTransitionScope.SlideDirection.Start
+                        else AnimatedContentTransitionScope.SlideDirection.End
+                    (slideIntoContainer(direction, animationSpec = slideAnimation) togetherWith
+                        slideOutOfContainer(direction, animationSpec = slideAnimation))
+                        .using(SizeTransform(sizeAnimationSpec = { _, _ -> sizeAnimation }))
+                },
+                label = "connection_rule_editor",
+            ) { editorVisible ->
+                if (editorVisible && ruleEditor != null) {
+                    ruleEditor(info, backToDetail) { editorSaving = it }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(spacing.space16),
+                    ) {
+                        item {
+                            ConnectionInfoSection(
+                                state = state,
+                                upload = info.upload,
+                                download = info.download,
+                                chains = info.chains,
+                            )
+                        }
 
-                if (info.rule.isNotEmpty()) {
-                    item {
-                        RuleInfoSection(
-                            rule = info.rule,
-                            rulePayload = info.rulePayload,
-                        )
-                    }
-                }
+                        if (info.rule.isNotEmpty()) {
+                            item {
+                                RuleInfoSection(
+                                    rule = info.rule,
+                                    rulePayload = info.rulePayload,
+                                )
+                            }
+                        }
 
-                if (onAddKokoroRule != null) {
-                    item {
-                        Button(
-                            onClick = { onAddKokoroRule(info) },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(stringResource(LocaleR.string.connection_detail_add_kokoro_rule))
+                        if (ruleEditor != null || onAddKokoroRule != null) {
+                            item {
+                                Button(
+                                    onClick = { if (ruleEditor != null) editingRule = true else onAddKokoroRule?.invoke(info) },
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Text(stringResource(LocaleR.string.connection_detail_add_kokoro_rule))
+                                }
+                            }
+                        }
+
+                        if (canInterrupt) {
+                            item {
+                                InterruptConnectionButton(
+                                    isInterrupting = isInterrupting,
+                                    onInterrupt = {
+                                        if (editingRule || isInterrupting) return@InterruptConnectionButton
+                                        isInterrupting = true
+                                        scope.launch {
+                                            val closed = runCatching {
+                                                onInterruptConnection(info.id)
+                                            }.getOrDefault(false)
+                                            isInterrupting = false
+                                            if (closed) {
+                                                onDismiss()
+                                            }
+                                        }
+                                    },
+                                )
+                            }
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(spacing.space16))
                         }
                     }
-                }
-
-                if (canInterrupt) {
-                    item {
-                        InterruptConnectionButton(
-                            isInterrupting = isInterrupting,
-                            onInterrupt = {
-                                if (isInterrupting) return@InterruptConnectionButton
-                                isInterrupting = true
-                                scope.launch {
-                                    val closed = runCatching {
-                                        onInterruptConnection(info.id)
-                                    }.getOrDefault(false)
-                                    isInterrupting = false
-                                    if (closed) {
-                                        onDismiss()
-                                    }
-                                }
-                            },
-                        )
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(spacing.space16))
                 }
             }
         }

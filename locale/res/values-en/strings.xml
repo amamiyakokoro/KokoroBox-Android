@@ -1309,7 +1309,6 @@
     <string name="traffic_statistics_title" formatted="false">Traffic Statistics</string>
     <string name="util_error_unknown_error" formatted="false">Unknown error</string>
     <string name="connection_detail_add_kokoro_rule" formatted="false">Add to Kokoro Custom Rules</string>
-    <string name="meta_feature_custom_rules_connection_hint" formatted="false">DOMAIN-SUFFIX fills in the base domain and matches its subdomains. DOMAIN uses the full host. After saving, update your Kokoro subscription to apply the rule.</string>
     <string name="meta_feature_custom_rules_limit_reached" formatted="false">Rule limit reached. Delete an existing rule before adding another.</string>
     <string name="meta_feature_custom_rules_more_actions" formatted="false">More rule actions</string>
     <string name="meta_feature_custom_rules_all_traffic" formatted="false">All traffic</string>
@@ -1322,4 +1321,7 @@
     <string name="proxy_group_current_node" formatted="false">Current node</string>
     <string name="proxy_group_expanded" formatted="false">Expanded</string>
     <string name="proxy_group_collapsed" formatted="false">Collapsed</string>
+    <string name="meta_feature_custom_rules_subscription_update_failed" formatted="false">Rules saved, but subscription update failed</string>
+    <string name="meta_feature_custom_rules_retry_subscription_update" formatted="false">Retry update</string>
+    <string name="meta_feature_custom_rules_updating_subscription" formatted="false">Updating…</string>
 </resources>

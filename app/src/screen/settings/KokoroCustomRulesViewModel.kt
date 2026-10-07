@@ -23,12 +23,17 @@ import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesApiException
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesSaveOutcomeUnknownException
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesValidationException
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesValidationReason
+import com.amamiyakokoro.box.data.integration.kokoro.KokoroRulesSubscriptionUpdater
 import com.amamiyakokoro.box.screen.profiles.KokoroAuthState
+import com.amamiyakokoro.box.screen.profiles.KokoroApi
+import com.amamiyakokoro.box.runtime.client.ProfilesRepository
+import com.amamiyakokoro.box.service.runtime.entity.Profile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 internal data class KokoroRulesConflict(
     val remoteSet: KokoroRuleSet,
@@ -38,6 +43,7 @@ internal data class KokoroRulesConflict(
 internal enum class KokoroRulesStatus {
     IDLE,
     SAVED,
+    SUBSCRIPTION_UPDATE_FAILED,
     AUTH_REQUIRED,
     LOAD_FAILED,
     VALIDATION_FAILED,
@@ -50,6 +56,7 @@ internal enum class KokoroRulesStatus {
 internal data class KokoroCustomRulesUiState(
     val loading: Boolean = true,
     val saving: Boolean = false,
+    val subscriptionUpdatePending: Boolean = false,
     val authState: KokoroAuthState = KokoroAuthState.Checking,
     val options: KokoroCustomRulesOptions = KokoroCustomRulesOptions(),
     val defaultRuleSet: KokoroRuleSet? = null,
@@ -64,9 +71,19 @@ internal data class KokoroCustomRulesUiState(
 
 internal class KokoroCustomRulesViewModel(
     private val repository: KokoroRepository,
+    profilesRepository: ProfilesRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(KokoroCustomRulesUiState())
     val state = _state.asStateFlow()
+    private val subscriptionUpdater = KokoroRulesSubscriptionUpdater(
+        querySubscriptions = {
+            profilesRepository.queryAllProfiles()
+                .filter { it.type == Profile.Type.Url && KokoroApi.isManagedConfigUrl(it.source) }
+                .sortedByDescending { it.active }
+                .map { it.uuid }
+        },
+        updateSubscription = { profilesRepository.updateProfile(it) },
+    )
 
     fun load() = load(forceRefresh = false)
 
@@ -160,6 +177,18 @@ internal class KokoroCustomRulesViewModel(
         }
     }
 
+    // The connection editor owns one new rule; retries must not accumulate failed drafts.
+    fun saveConnectionRule(rule: KokoroCustomRuleInput) {
+        val current = _state.value
+        val baseline = current.defaultRuleSet ?: return
+        if (current.loading || current.saving || current.conflict != null || current.subscriptionUpdatePending) return
+        _state.update {
+            it.copy(draftRules = baseline.rules.map { saved -> saved.asInput() }, dirty = false)
+        }
+        addConnectionRule(rule)
+        if (_state.value.dirty) save()
+    }
+
     fun updateRule(index: Int, rule: KokoroCustomRuleInput) {
         _state.update { current ->
             if (index !in current.draftRules.indices) current else current.copy(
@@ -207,11 +236,33 @@ internal class KokoroCustomRulesViewModel(
                 _state.update { it.copy(options = freshOptions) }
                 val updated = repository.replaceRules(selected.id, selected.revision, localRules, freshOptions)
                 replaceDefaultRuleSet(updated, preserveDraft = false)
-                _state.update { it.copy(saving = false, dirty = false, status = KokoroRulesStatus.SAVED) }
+                _state.update { it.copy(dirty = false, subscriptionUpdatePending = true) }
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
                 handleSaveFailure(error, selected.id, localRules)
+                return@launch
             }
+            updateSubscriptions(newRevision = true)
+        }
+    }
+
+    fun retrySubscriptionUpdate() {
+        val current = _state.value
+        if (!current.subscriptionUpdatePending || current.saving || current.loading) return
+        viewModelScope.launch { updateSubscriptions() }
+    }
+
+    private suspend fun updateSubscriptions(newRevision: Boolean = false) {
+        _state.update { it.copy(saving = true, status = KokoroRulesStatus.IDLE) }
+        try {
+            subscriptionUpdater.refresh(newRevision)
+            _state.update {
+                it.copy(saving = false, subscriptionUpdatePending = false, status = KokoroRulesStatus.SAVED)
+            }
+        } catch (error: Exception) {
+            if (error is CancellationException) throw error
+            Timber.w(error, "Kokoro rules were saved, but subscription refresh failed")
+            _state.update { it.copy(saving = false, status = KokoroRulesStatus.SUBSCRIPTION_UPDATE_FAILED) }
         }
     }
 

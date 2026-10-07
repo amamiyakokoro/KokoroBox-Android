@@ -110,7 +110,7 @@ val appViewModelModule = module {
     viewModel { AppDataManagementViewModel(get(), get()) }
     viewModel { LabViewModel(androidApplication(), get()) }
     viewModel { LogViewModel(get()) }
-    viewModel { KokoroCustomRulesViewModel(get()) }
+    viewModel { KokoroCustomRulesViewModel(get(), get()) }
     viewModel { KokoroSettingsViewModel(get()) }
     viewModel { CloudflareSpeedTestViewModel(get()) }
 }
