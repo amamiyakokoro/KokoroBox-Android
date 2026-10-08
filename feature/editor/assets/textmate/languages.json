@@ -7,6 +7,31 @@
       "languageConfiguration": "textmate/yaml/language-configuration.json"
     },
     {
+      "grammar": "textmate/yaml/syntaxes/yaml-1.0.tmLanguage.json",
+      "name": "yaml-1.0",
+      "scopeName": "source.yaml.1.0"
+    },
+    {
+      "grammar": "textmate/yaml/syntaxes/yaml-1.1.tmLanguage.json",
+      "name": "yaml-1.1",
+      "scopeName": "source.yaml.1.1"
+    },
+    {
+      "grammar": "textmate/yaml/syntaxes/yaml-1.2.tmLanguage.json",
+      "name": "yaml-1.2",
+      "scopeName": "source.yaml.1.2"
+    },
+    {
+      "grammar": "textmate/yaml/syntaxes/yaml-1.3.tmLanguage.json",
+      "name": "yaml-1.3",
+      "scopeName": "source.yaml.1.3"
+    },
+    {
+      "grammar": "textmate/yaml/syntaxes/yaml-embedded.tmLanguage.json",
+      "name": "yaml-embedded",
+      "scopeName": "source.yaml.embedded"
+    },
+    {
       "grammar": "textmate/json/syntaxes/json.tmLanguage.json",
       "name": "json",
       "scopeName": "source.json",

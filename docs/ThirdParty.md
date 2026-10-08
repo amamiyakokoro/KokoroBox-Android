@@ -23,6 +23,7 @@
 - [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization)
 - [mmkv](https://github.com/Tencent/mmkv)
 - [sora-editor](https://github.com/Rosemoe/sora-editor)
+- [YAML Syntax Highlighter](https://github.com/RedCMD/YAML-Syntax-Highlighter) — bundled MIT-licensed TextMate grammars from commit `c42cf86959ba238dc8a825bdd07bed6f5e97c978`; license included in `feature/editor/assets/textmate/yaml/LICENSE.md`
 - [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
 - [sketch](https://github.com/panpf/sketch)
 - [Apache Commons Compress](https://commons.apache.org/proper/commons-compress/)

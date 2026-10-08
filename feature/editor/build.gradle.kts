@@ -58,6 +58,8 @@ dependencies {
     implementation("io.github.rosemoe:editor")
     implementation("io.github.rosemoe:editor-lsp")
     implementation("io.github.rosemoe:language-textmate")
+    // The YAML grammar uses variable-length lookbehind unsupported by Joni.
+    implementation("io.github.rosemoe:oniguruma-native")
     implementation("io.github.rosemoe:language-treesitter")
 
     val composeBom = platform("androidx.compose:compose-bom:${libs.versions.composeBom.get()}")
