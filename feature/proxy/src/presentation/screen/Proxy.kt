@@ -33,6 +33,8 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -91,7 +93,7 @@ import com.amamiyakokoro.box.presentation.theme.YumeTheme
 import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
+import kotlin.math.abs
 import org.koin.androidx.compose.koinViewModel
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
@@ -388,7 +390,14 @@ private data class ProxyModeContent(
     val gridState: LazyGridState,
 )
 
-private class ProxyNodesRevealRequest(val groupName: String)
+private class ProxyNodesRevealRequest(val groupName: String, val groupSize: IntSize) {
+    var firstRowSize by mutableStateOf(IntSize.Zero)
+}
+
+private fun Modifier.revealProxyNodes(request: ProxyNodesRevealRequest?): Modifier =
+    if (request == null) this else onSizeChanged {
+        request.firstRowSize = it
+    }
 
 @Composable
 private fun ProxyGroupModeContent(
@@ -443,6 +452,7 @@ private fun ProxyGroupModeContent(
     val nodeExit = shrinkVertically(animationSpec = expansionAnimation, shrinkTowards = Alignment.Top) +
         fadeOut(animationSpec = visibilityAnimation)
 
+    val revealAnimation = AppMotion.defaultSpatial<Float>()
     val currentGroups by rememberUpdatedState(proxyGroups)
     val currentNodeTransitions by rememberUpdatedState(nodeTransitions)
     LaunchedEffect(gridState, isPageActive) {
@@ -450,36 +460,61 @@ private fun ProxyGroupModeContent(
             if (isPageActive && interaction is DragInteraction.Start) nodesRevealRequest = null
         }
     }
-    LaunchedEffect(nodesRevealRequest, selectedName, expandedGroupName, isPageActive, gridState, columnCount) {
+    // Selection arrives through AnimatedContent's page data; it must not restart this request.
+    LaunchedEffect(nodesRevealRequest, expandedGroupName, isPageActive, gridState, columnCount) {
         val request = nodesRevealRequest ?: return@LaunchedEffect
         try {
-            if (!isPageActive || request.groupName != selectedName || request.groupName != expandedGroupName) {
+            if (!isPageActive || request.groupName != expandedGroupName) {
                 return@LaunchedEffect
             }
-            // Let newly inserted rows register their animation before observing completion.
-            withFrameNanos { }
-            snapshotFlow {
-                val group = currentGroups.firstOrNull { it.name == request.groupName }
-                val rowCount = group?.let { if (it.proxies.isEmpty()) 1 else (it.proxies.size + columnCount - 1) / columnCount }
-                group != null && currentNodeTransitions[request.groupName]?.currentState == true &&
-                    currentNodeTransitions.values.all { !it.isRunning && it.currentState == it.targetState } &&
-                    gridState.layoutInfo.totalItemsCount == currentGroups.size + (rowCount ?: 0)
-            }.first { it }
-
-            val groups = currentGroups
-            val groupIndex = groups.indexOfFirst { it.name == request.groupName }
-            if (groupIndex < 0) return@LaunchedEffect
-            val group = groups[groupIndex]
-            val firstRowKey = group.proxies.firstOrNull()?.let { "node_row:${group.name}:${it.name}" }
-                ?: "empty_nodes:${group.name}"
-            val layout = gridState.layoutInfo
-            val firstRow = layout.visibleItemsInfo.firstOrNull { it.key == firstRowKey }
-            val visibleTop = layout.viewportStartOffset + layout.beforeContentPadding
-            val visibleBottom = layout.viewportEndOffset - layout.afterContentPadding
-            if (firstRow == null || firstRow.offset.y < visibleTop ||
-                firstRow.offset.y + firstRow.size.height > visibleBottom) {
-                // Exiting rows are gone, so preceding full-width groups each occupy one item.
-                gridState.animateScrollToItem(groupIndex)
+            val spring = revealAnimation.vectorize(Float.VectorConverter)
+            val zero = AnimationVector1D(0f)
+            var velocity = AnimationVector1D(0f)
+            var lastFrame = withFrameNanos { it }
+            gridState.scroll {
+                while (true) {
+                    val frame = withFrameNanos { it }
+                    val layout = gridState.layoutInfo
+                    val group = currentGroups.firstOrNull { it.name == request.groupName } ?: break
+                    val groupItem = layout.visibleItemsInfo.firstOrNull { it.key == "group:${group.name}" }
+                    val rowKey = group.proxies.firstOrNull()?.let { "node_row:${group.name}:${it.name}" }
+                        ?: "empty_nodes:${group.name}"
+                    val rowItem = layout.visibleItemsInfo.firstOrNull { it.key == rowKey }
+                    val groupHeight = groupItem?.size?.height ?: request.groupSize.height
+                    val groupTop = groupItem?.offset?.y ?: rowItem?.offset?.y?.minus(groupHeight) ?: break
+                    val visibleTop = layout.viewportStartOffset + layout.beforeContentPadding
+                    val visibleBottom = layout.viewportEndOffset - layout.afterContentPadding
+                    val rowHeight = request.firstRowSize.height.coerceAtLeast(1)
+                    // If both cannot fit, prioritize the first node row over the group header.
+                    val targetTop = if (groupHeight + rowHeight <= visibleBottom - visibleTop) groupTop
+                        else groupTop + groupHeight
+                    val targetBottom = groupTop + groupHeight + rowHeight
+                    val distance = when {
+                        targetTop < visibleTop -> (targetTop - visibleTop).toFloat()
+                        targetBottom > visibleBottom -> (targetBottom - visibleBottom).toFloat()
+                        else -> 0f
+                    }
+                    val rowCount = if (group.proxies.isEmpty()) 1 else (group.proxies.size + columnCount - 1) / columnCount
+                    val settled = currentNodeTransitions[group.name]?.currentState == true &&
+                        currentNodeTransitions.values.all { !it.isRunning && it.currentState == it.targetState } &&
+                        layout.totalItemsCount == currentGroups.size + rowCount
+                    if (abs(distance) < 0.5f) {
+                        if (settled && request.firstRowSize.height > 0) break
+                        velocity = zero
+                    } else {
+                        val elapsed = frame - lastFrame
+                        val initial = AnimationVector1D(distance)
+                        val next = spring.getValueFromNanos(elapsed, initial, zero, velocity).value
+                        val nextVelocity = spring.getVelocityFromNanos(elapsed, initial, zero, velocity).value
+                        val delta = (distance - next).coerceIn(minOf(0f, distance), maxOf(0f, distance))
+                        val consumed = scrollBy(delta)
+                        // Expansion creates more scroll range each frame. Hitting its current
+                        // edge must not terminate the animation before that content is available.
+                        velocity = AnimationVector1D(if (abs(consumed - delta) < 0.5f) nextVelocity else 0f)
+                        if (settled && abs(consumed) < 0.5f && abs(delta) >= 0.5f) break
+                    }
+                    lastFrame = frame
+                }
             }
         } finally {
             // An older request must not clear a rapid re-expansion of the same group.
@@ -514,6 +549,7 @@ private fun ProxyGroupModeContent(
         horizontalArrangement = Arrangement.spacedBy(UiDp.dp12),
     ) {
         proxyGroups.forEach { group ->
+            val revealRequest = nodesRevealRequest?.takeIf { it.groupName == group.name }
             item(key = "group:${group.name}", span = { GridItemSpan(maxLineSpan) }, contentType = "group") {
                 ProxyGroupInfoCard(
                     group = group,
@@ -525,7 +561,11 @@ private fun ProxyGroupModeContent(
                         if (isPageActive) {
                             val expanding = group.name != expandedGroupName || group.name != selectedName
                             expandedGroupName = group.name.takeIf { expanding }
-                            nodesRevealRequest = if (expanding) ProxyNodesRevealRequest(group.name) else null
+                            nodesRevealRequest = if (expanding) {
+                                val groupSize = gridState.layoutInfo.visibleItemsInfo
+                                    .firstOrNull { it.key == "group:${group.name}" }?.size ?: IntSize.Zero
+                                ProxyNodesRevealRequest(group.name, groupSize)
+                            } else null
                             onGroupSelected(group.name)
                         }
                     },
@@ -539,7 +579,7 @@ private fun ProxyGroupModeContent(
                     item(key = "empty_nodes:${group.name}", span = { GridItemSpan(maxLineSpan) }) {
                         nodeTransition.AnimatedVisibility(visible = { it }, enter = nodeEnter, exit = nodeExit) {
                             CenteredText(
-                                modifier = Modifier.padding(bottom = 12.dp),
+                                modifier = Modifier.padding(bottom = 12.dp).revealProxyNodes(revealRequest),
                                 firstLine = stringResource(LocaleR.string.proxy_empty_no_nodes),
                                 secondLine = stringResource(LocaleR.string.proxy_empty_hint),
                             )
@@ -554,7 +594,8 @@ private fun ProxyGroupModeContent(
                     ) {
                         nodeTransition.AnimatedVisibility(visible = { it }, enter = nodeEnter, exit = nodeExit) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                                    .revealProxyNodes(revealRequest.takeIf { nodeRow.first() == group.proxies.first() }),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
                                 nodeRow.forEach { proxy ->
