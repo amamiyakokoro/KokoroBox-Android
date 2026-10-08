@@ -11,6 +11,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.amamiyakokoro.box.MainActivity
+import com.amamiyakokoro.box.data.model.AppUpdateChannel
 import com.amamiyakokoro.box.data.integration.update.ReleaseCheck
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.runtime.service.R as ServiceR
@@ -51,7 +53,11 @@ class AppUpdateInstallNotifier(
         val contentIntent = PendingIntent.getActivity(
             context,
             NOTIFICATION_ID + 1,
-            Intent(Intent.ACTION_VIEW, android.net.Uri.parse(release.releaseUrl)),
+            Intent(context, MainActivity::class.java)
+                .setAction(MainActivity.ACTION_OPEN_APP_UPDATE)
+                .putExtra(MainActivity.EXTRA_APP_UPDATE_CHANNEL,
+                    if (release.tag == "nightly") AppUpdateChannel.Nightly.name else AppUpdateChannel.Stable.name)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         return postNotification(

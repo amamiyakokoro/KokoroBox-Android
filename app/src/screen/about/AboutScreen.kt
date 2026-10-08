@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,6 +51,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import com.amamiyakokoro.box.BuildConfig
+import com.amamiyakokoro.box.MainActivity
 import com.amamiyakokoro.box.common.util.openUrl
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.presentation.component.Card
@@ -72,6 +74,13 @@ fun AboutScreen(navigator: DestinationsNavigator) {
     val updateViewModel = koinViewModel<AppUpdateViewModel>()
     val updateState by updateViewModel.state.collectAsStateWithLifecycle()
     val updateInstallState by updateViewModel.installState.collectAsStateWithLifecycle()
+    val pendingUpdateChannel by MainActivity.pendingAppUpdateChannel.collectAsStateWithLifecycle()
+    LaunchedEffect(pendingUpdateChannel) {
+        pendingUpdateChannel?.let { channel ->
+            updateViewModel.check(channel)
+            MainActivity.clearPendingAppUpdateChannel()
+        }
+    }
     updateState.result?.let { result ->
         AppUpdateDialog(
             result = result,

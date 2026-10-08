@@ -49,12 +49,14 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.lifecycleScope
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.amamiyakokoro.box.common.util.AppLanguageManager
 import com.amamiyakokoro.box.common.util.ProxyAutoStartHelper
 import com.amamiyakokoro.box.core.util.AutoStartSessionGate
 import com.amamiyakokoro.box.core.util.StartupTaskCoordinator
 import com.amamiyakokoro.box.di.APPLICATION_SCOPE_NAME
 import com.amamiyakokoro.box.data.model.AppColorTheme
+import com.amamiyakokoro.box.data.model.AppUpdateChannel
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroPreloadCoordinator
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
 import com.amamiyakokoro.box.data.integration.update.AutomaticAppUpdateChecker
@@ -75,6 +77,7 @@ import com.amamiyakokoro.box.screen.about.AppUpdateDialog
 import com.amamiyakokoro.box.screen.settings.AppSettingsViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.AboutScreenDestination
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +92,13 @@ import org.koin.core.qualifier.named
 class MainActivity : FragmentActivity() {
 
     companion object {
+        const val ACTION_OPEN_APP_UPDATE = "com.amamiyakokoro.box.action.OPEN_APP_UPDATE"
+        const val EXTRA_APP_UPDATE_CHANNEL = "com.amamiyakokoro.box.extra.APP_UPDATE_CHANNEL"
+        private val _pendingAppUpdateChannel = MutableStateFlow<AppUpdateChannel?>(null)
+        val pendingAppUpdateChannel = _pendingAppUpdateChannel.asStateFlow()
+        fun clearPendingAppUpdateChannel() {
+            _pendingAppUpdateChannel.value = null
+        }
         private const val REQUEST_NOTIFICATION_PERMISSION = 1001
         private const val EXTRA_EXIT_UI_WHEN_BACKGROUND = "exit_ui_when_background"
         private val _pendingImportUrl = MutableStateFlow<String?>(null)
@@ -117,7 +127,7 @@ class MainActivity : FragmentActivity() {
     override fun onStart() {
         super.onStart()
         kokoroPreloadCoordinator.preloadIfAuthenticated()
-        automaticAppUpdateChecker.checkIfDue()
+        if (_pendingAppUpdateChannel.value == null) automaticAppUpdateChecker.checkIfDue()
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -177,6 +187,7 @@ class MainActivity : FragmentActivity() {
             val appUpdateChannel by appSettingsViewModel.appUpdateChannel.state.collectAsStateWithLifecycle()
             val availableUpdate by automaticAppUpdateChecker.availableUpdate.collectAsStateWithLifecycle()
             val updateInstallState by appUpdateManager.state.collectAsStateWithLifecycle()
+            val pendingUpdateChannel by pendingAppUpdateChannel.collectAsStateWithLifecycle()
 
             val biometricGateState = rememberStartupBiometricGateState(
                 activity = this@MainActivity,
@@ -192,7 +203,9 @@ class MainActivity : FragmentActivity() {
             }
 
             LaunchedEffect(automaticUpdateCheckEnabled, appUpdateChannel) {
-                automaticAppUpdateChecker.onEnabledChanged(automaticUpdateCheckEnabled)
+                if (pendingUpdateChannel == null) {
+                    automaticAppUpdateChecker.onEnabledChanged(automaticUpdateCheckEnabled)
+                }
                 AppUpdateWorkScheduler.sync(this@MainActivity, automaticUpdateCheckEnabled)
             }
 
@@ -230,6 +243,12 @@ class MainActivity : FragmentActivity() {
                                 }
                             } else {
                                 val navController = rememberNavController()
+                                val currentEntry by navController.currentBackStackEntryAsState()
+                                LaunchedEffect(pendingUpdateChannel) {
+                                    if (pendingUpdateChannel != null) {
+                                        navController.navigate(AboutScreenDestination.route) { launchSingleTop = true }
+                                    }
+                                }
 
                                 Surface(
                                     modifier = Modifier.fillMaxSize(),
@@ -244,7 +263,9 @@ class MainActivity : FragmentActivity() {
                                         ToastDialogHost()
                                     }
                                 }
-                                availableUpdate?.let { release ->
+                                availableUpdate?.takeUnless {
+                                    currentEntry?.destination?.route == AboutScreenDestination.route
+                                }?.let { release ->
                                     var installationRequested by rememberSaveable(release.tag, release.versionCode) {
                                         mutableStateOf(false)
                                     }
@@ -316,6 +337,15 @@ class MainActivity : FragmentActivity() {
         intent?.let { safeIntent ->
             if (safeIntent.getBooleanExtra(EXTRA_EXIT_UI_WHEN_BACKGROUND, false)) {
                 finishAndRemoveTask()
+                return
+            }
+            if (safeIntent.action == ACTION_OPEN_APP_UPDATE) {
+                val channel = safeIntent.getStringExtra(EXTRA_APP_UPDATE_CHANNEL)
+                _pendingAppUpdateChannel.value = AppUpdateChannel.entries.firstOrNull { it.name == channel }
+                    ?: appSettingsStorage.appUpdateChannel.value
+                safeIntent.action = null
+                safeIntent.removeExtra(EXTRA_APP_UPDATE_CHANNEL)
+                automaticAppUpdateChecker.dismiss()
                 return
             }
             safeIntent.data?.let { uri ->
