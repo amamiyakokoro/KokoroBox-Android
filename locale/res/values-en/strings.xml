@@ -1171,10 +1171,8 @@
     <string name="profiles_vm_progress_import_preparing" formatted="false">Preparing to import file...</string>
     <string name="profiles_vm_progress_preparing" formatted="false">Preparing download...</string>
     <string name="profiles_vm_progress_verifying" formatted="false">Verifying configuration...</string>
-    <string name="providers_action_operation" formatted="false">Operation</string>
     <string name="providers_action_update" formatted="false">Update</string>
     <string name="providers_action_update_all" formatted="false">Update All</string>
-    <string name="providers_action_upload" formatted="false">Upload</string>
     <string name="providers_empty_no_providers" formatted="false">No external resources</string>
     <string name="providers_empty_no_providers_hint" formatted="false">Current profile doesnt contain external resourcest contain external resources</string>
     <string name="providers_empty_not_running" formatted="false">Proxy not running</string>
@@ -1185,8 +1183,6 @@
     <string name="providers_message_fetch_failed" formatted="false">Failed to fetch resources: %s</string>
     <string name="providers_message_update_failed" formatted="false">Update failed: %s</string>
     <string name="providers_message_update_success" formatted="false">%s updated successfully</string>
-    <string name="providers_message_upload_failed" formatted="false">Upload failed: %s</string>
-    <string name="providers_message_upload_success" formatted="false">%s uploaded successfully</string>
     <string name="providers_provider_path" formatted="false">Resource path: %s</string>
     <string name="providers_title" formatted="false">External Resources</string>
     <string name="providers_type_proxy_providers" formatted="false">Proxy Providers (%d)</string>

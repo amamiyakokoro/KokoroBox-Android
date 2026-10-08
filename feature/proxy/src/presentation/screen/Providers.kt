@@ -23,10 +23,7 @@ package com.amamiyakokoro.box.presentation.screen
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amamiyakokoro.box.presentation.theme.UiDp
-import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -38,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.model.Provider
@@ -55,17 +51,10 @@ import com.amamiyakokoro.box.presentation.icon.AppMd3Icons
 import com.amamiyakokoro.box.presentation.viewmodel.ProvidersViewModel
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
-import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.ListPopupColumn
-import top.yukonga.miuix.kmp.basic.ListPopupDefaults
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.window.WindowListPopup
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Edit
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -182,9 +171,6 @@ fun ProvidersContent(navigator: DestinationsNavigator) {
                         section = section,
                         isUpdating = { providerKey -> uiState.updatingProviders.contains(providerKey) },
                         onUpdate = { provider -> viewModel.updateProvider(provider) },
-                        onUpload = { provider, uri ->
-                            viewModel.uploadProviderFile(context, provider, uri)
-                        },
                     )
                 }
             }
@@ -197,18 +183,10 @@ private fun ProviderCard(
     provider: Provider,
     isUpdating: Boolean,
     onUpdate: () -> Unit,
-    onUpload: (Uri) -> Unit
 ) {
-    val showPopup = remember { mutableStateOf(false) }
     val colorScheme = MiuixTheme.colorScheme
     val updateBg = remember(colorScheme) { colorScheme.primary.copy(alpha = 0.1f) }
     val updateTint = remember(colorScheme) { colorScheme.primary }
-
-    val filePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { onUpload(it) }
-    }
 
     Card(modifier = Modifier.padding(vertical = UiDp.dp4)) {
         Row(
@@ -252,63 +230,31 @@ private fun ProviderCard(
             Spacer(modifier = Modifier.width(UiDp.dp8))
 
             if (provider.path.isNotBlank()) {
-                Box {
-                    IconButton(
-                        backgroundColor = updateBg,
-                        minHeight = UiDp.dp35,
-                        minWidth = UiDp.dp35,
-                        enabled = !isUpdating,
-                        onClick = { showPopup.value = true }
+                IconButton(
+                    backgroundColor = updateBg,
+                    minHeight = UiDp.dp35,
+                    minWidth = UiDp.dp35,
+                    enabled = !isUpdating,
+                    onClick = onUpdate,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = UiDp.dp10),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(UiDp.dp2),
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = UiDp.dp10),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(UiDp.dp2),
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(UiDp.dp20),
-                                imageVector = MiuixIcons.Edit,
-                                tint = updateTint,
-                                contentDescription = stringResource(LocaleR.string.providers_action_operation),
-                            )
-                            Text(
-                                modifier = Modifier.padding(end = UiDp.dp3),
-                                text = stringResource(LocaleR.string.providers_action_operation),
-                                color = updateTint,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 15.sp
-                            )
-                        }
-                    }
-
-                    val popupItems = listOf(
-                        stringResource(LocaleR.string.providers_action_update),
-                        stringResource(LocaleR.string.providers_action_upload),
-                    )
-
-                    WindowListPopup  (
-                        show = showPopup.value,
-                        popupPositionProvider = ListPopupDefaults.DropdownPositionProvider,
-                        alignment = PopupPositionProvider.Align.End,
-                        onDismissRequest = { showPopup.value = false }
-                    ) {
-                        ListPopupColumn {
-                            popupItems.forEachIndexed { index, item ->
-                                DropdownImpl(
-                                    text = item,
-                                    optionSize = popupItems.size,
-                                    isSelected = false,
-                                    onSelectedIndexChange = {
-                                        showPopup.value = false
-                                        when (index) {
-                                            0 -> onUpdate()
-                                            1 -> filePicker.launch("*/*")
-                                        }
-                                    },
-                                    index = index
-                                )
-                            }
-                        }
+                        Icon(
+                            modifier = Modifier.size(UiDp.dp20),
+                            imageVector = AppMd3Icons.Action.Sync,
+                            tint = updateTint,
+                            contentDescription = null,
+                        )
+                        Text(
+                            modifier = Modifier.padding(end = UiDp.dp3),
+                            text = stringResource(LocaleR.string.providers_action_update),
+                            color = updateTint,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 15.sp,
+                        )
                     }
                 }
             }
@@ -320,7 +266,6 @@ private fun LazyListScope.providerSection(
     section: ProviderSection,
     isUpdating: (String) -> Boolean,
     onUpdate: (Provider) -> Unit,
-    onUpload: (Provider, Uri) -> Unit,
 ) {
     item(key = "title_${section.title}") {
         Title(section.title)
@@ -335,7 +280,6 @@ private fun LazyListScope.providerSection(
             provider = provider,
             isUpdating = isUpdating(providerKey),
             onUpdate = { onUpdate(provider) },
-            onUpload = { uri -> onUpload(provider, uri) },
         )
     }
 }

@@ -1171,10 +1171,8 @@
     <string name="profiles_vm_progress_import_preparing" formatted="false">准备导入文件...</string>
     <string name="profiles_vm_progress_preparing" formatted="false">准备下载...</string>
     <string name="profiles_vm_progress_verifying" formatted="false">正在验证配置...</string>
-    <string name="providers_action_operation" formatted="false">操作</string>
     <string name="providers_action_update" formatted="false">更新</string>
     <string name="providers_action_update_all" formatted="false">更新全部</string>
-    <string name="providers_action_upload" formatted="false">上传</string>
     <string name="providers_empty_no_providers" formatted="false">暂无外部资源</string>
     <string name="providers_empty_no_providers_hint" formatted="false">当前配置未包含外部资源</string>
     <string name="providers_empty_not_running" formatted="false">代理未启动</string>
@@ -1185,8 +1183,6 @@
     <string name="providers_message_fetch_failed" formatted="false">获取外部资源失败: %s</string>
     <string name="providers_message_update_failed" formatted="false">更新失败: %s</string>
     <string name="providers_message_update_success" formatted="false">%s 更新成功</string>
-    <string name="providers_message_upload_failed" formatted="false">上传失败: %s</string>
-    <string name="providers_message_upload_success" formatted="false">%s 上传成功</string>
     <string name="providers_provider_path" formatted="false">资源路径：%s</string>
     <string name="providers_title" formatted="false">外部资源</string>
     <string name="providers_type_proxy_providers" formatted="false">代理提供者 (%d)</string>

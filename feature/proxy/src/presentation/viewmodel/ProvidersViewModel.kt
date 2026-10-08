@@ -22,8 +22,6 @@
 
 package com.amamiyakokoro.box.presentation.viewmodel
 
-import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.locale.R as LocaleR
@@ -127,25 +125,6 @@ class ProvidersViewModel(
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }
-    }
-
-    fun uploadProviderFile(context: Context, provider: Provider, uri: Uri) {
-        val providerKey = "${provider.type}_${provider.name}"
-        viewModelScope.launch {
-            _uiState.update { it.copy(updatingProviders = it.updatingProviders + providerKey) }
-
-            val result = providersRepository.uploadProviderFile(context, provider, uri)
-            result.onSuccess {
-                refreshProviders()
-                _uiState.update { it.copy(message = UiText.Resource(LocaleR.string.providers_message_upload_success, listOf(provider.name))) }
-            }.onFailure { e ->
-                _uiState.update {
-                    it.copy(error = UiText.Resource(LocaleR.string.providers_message_upload_failed, listOf(e.message ?: "Unknown error")))
-                }
-            }
-
-            _uiState.update { it.copy(updatingProviders = it.updatingProviders - providerKey) }
-        }
     }
 
     data class ProvidersUiState(

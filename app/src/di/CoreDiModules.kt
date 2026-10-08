@@ -142,7 +142,7 @@ val appDataRuntimeModule = module {
     }
     single {
         val appContext = androidContext()
-        ProvidersController(appContext) {
+        ProvidersController {
             com.amamiyakokoro.box.remote.ServiceClient.connect(appContext)
             com.amamiyakokoro.box.remote.ServiceClient.clash().queryProviders()
         }
