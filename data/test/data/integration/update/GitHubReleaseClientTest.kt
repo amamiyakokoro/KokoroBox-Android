@@ -127,6 +127,48 @@ class GitHubReleaseClientTest {
         assertTrue(GitHubReleaseClient(http).check(AppUpdateChannel.Nightly) is ReleaseCheck.Published)
     }
 
+    @Test fun manualCheckFetchesNewReleaseInsteadOfUsingAutomaticCheckCache() = runBlocking {
+        val requests = AtomicInteger()
+        val http = OkHttpClient.Builder().addInterceptor { chain ->
+            val requestNumber = requests.incrementAndGet()
+            if (requestNumber == 2) assertTrue(chain.request().cacheControl.noCache)
+            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                .code(200).message("OK")
+                .body(release(if (requestNumber == 1) "v0.8.5" else "v0.8.6").toResponseBody()).build()
+        }.build()
+        val client = GitHubReleaseClient(http) { 0L }
+        assertEquals("v0.8.5", (client.check() as ReleaseCheck.Published).tag)
+        assertEquals("v0.8.6", (client.check(forceRefresh = true) as ReleaseCheck.Published).tag)
+        assertEquals("v0.8.6", (client.check() as ReleaseCheck.Published).tag)
+        assertEquals(2, requests.get())
+    }
+
+    @Test fun manualCheckStillHonorsGitHubRateLimit() = runBlocking {
+        val requests = AtomicInteger()
+        val http = OkHttpClient.Builder().addInterceptor { chain ->
+            requests.incrementAndGet()
+            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                .code(429).message("Rate limited").header("Retry-After", "120")
+                .body("{}".toResponseBody()).build()
+        }.build()
+        val client = GitHubReleaseClient(http) { 0L }
+        assertEquals(ReleaseCheck.Failure.RateLimited, client.check())
+        assertEquals(ReleaseCheck.Failure.RateLimited, client.check(forceRefresh = true))
+        assertEquals(1, requests.get())
+    }
+
+    @Test fun manualCheckCanRetryImmediatelyAfterNetworkFailure() = runBlocking {
+        val requests = AtomicInteger()
+        val http = OkHttpClient.Builder().addInterceptor { chain ->
+            if (requests.incrementAndGet() == 1) throw IOException("offline")
+            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                .code(200).message("OK").body(release("v0.8.6").toResponseBody()).build()
+        }.build()
+        val client = GitHubReleaseClient(http) { 0L }
+        assertEquals(ReleaseCheck.Failure.Network, client.check())
+        assertEquals("v0.8.6", (client.check(forceRefresh = true) as ReleaseCheck.Published).tag)
+    }
+
     @Test fun reportsHttpFailuresAndHonorsRateLimitCooldown() = runBlocking {
         for ((status, expected) in listOf(404 to ReleaseCheck.Failure.NoRelease,
             429 to ReleaseCheck.Failure.RateLimited, 403 to ReleaseCheck.Failure.RateLimited,

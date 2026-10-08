@@ -58,8 +58,8 @@ class AppUpdateManager(
 
     private var verifiedUpdate: VerifiedUpdateApk? = null
 
-    fun downloadAndPrepare(release: ReleaseCheck.Published) {
-        if (state.value.isBusy()) return
+    fun downloadAndPrepare(release: ReleaseCheck.Published): Boolean {
+        if (state.value.isBusy()) return false
         verifiedUpdate = null
         mutableState.value = AppUpdateInstallState.Downloading(release, 0, release.apkSizeBytes ?: 0)
         applicationScope.launch {
@@ -89,6 +89,7 @@ class AppUpdateManager(
                 )
             }
         }
+        return true
     }
 
     fun installPreparedUpdate() {
@@ -149,7 +150,13 @@ class AppUpdateManager(
     }
 
     fun handleInstallResult(intent: Intent) {
-        when (intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)) {
+        val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
+        // Terminal callbacks can outlive the installation UI after app replacement/restart.
+        // Still deliver system confirmation if Android recreated the process for its callback.
+        if (status != PackageInstaller.STATUS_PENDING_USER_ACTION &&
+            state.value !is AppUpdateInstallState.Installing &&
+            state.value !is AppUpdateInstallState.WaitingForUserConfirmation) return
+        when (status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 val confirmationIntent = intent.intentExtra(Intent.EXTRA_INTENT)
                 if (confirmationIntent == null) {

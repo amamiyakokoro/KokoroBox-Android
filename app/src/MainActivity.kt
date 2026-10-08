@@ -38,6 +38,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -56,6 +59,7 @@ import com.amamiyakokoro.box.data.integration.kokoro.KokoroPreloadCoordinator
 import com.amamiyakokoro.box.data.integration.kokoro.KokoroRepository
 import com.amamiyakokoro.box.data.integration.update.AutomaticAppUpdateChecker
 import com.amamiyakokoro.box.integration.update.AppUpdateManager
+import com.amamiyakokoro.box.integration.update.AppUpdateInstallState
 import com.amamiyakokoro.box.integration.update.AppUpdateWorkScheduler
 import com.amamiyakokoro.box.presentation.component.StartupBiometricContent
 import com.amamiyakokoro.box.presentation.component.ToastDialogHost
@@ -241,10 +245,17 @@ class MainActivity : FragmentActivity() {
                                     }
                                 }
                                 availableUpdate?.let { release ->
+                                    var installationRequested by rememberSaveable(release.tag, release.versionCode) {
+                                        mutableStateOf(false)
+                                    }
                                     AppUpdateDialog(
                                         result = release,
-                                        installState = updateInstallState,
-                                        onDownloadAndInstall = appUpdateManager::downloadAndPrepare,
+                                        installState = if (installationRequested) updateInstallState else AppUpdateInstallState.Idle,
+                                        onDownloadAndInstall = { update ->
+                                            if (appUpdateManager.downloadAndPrepare(update)) {
+                                                installationRequested = true
+                                            }
+                                        },
                                         onContinueInstall = appUpdateManager::installPreparedUpdate,
                                         onDismiss = {
                                             appUpdateManager.dismiss()

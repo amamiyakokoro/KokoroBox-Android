@@ -190,6 +190,10 @@ android {
     }
 
     sourceSets {
+        getByName("test").kotlin.directories.apply {
+            clear()
+            add("test")
+        }
         getByName("main") {
             kotlin.directories.apply {
                 clear()
@@ -322,6 +326,7 @@ androidComponents {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:${libs.versions.desugarJdkLibs.get()}")
 
     implementation(project(":core"))

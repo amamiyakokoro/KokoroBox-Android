@@ -16,6 +16,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import okhttp3.Call
+import okhttp3.CacheControl
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -65,18 +66,24 @@ class GitHubReleaseClient(
 
     private val cache = mutableMapOf<AppUpdateChannel, CachedRelease>()
 
-    suspend fun check(channel: AppUpdateChannel = AppUpdateChannel.Stable): ReleaseCheck = mutex.withLock {
-        cache[channel]?.takeIf { nowMillis() < it.cacheUntil }?.let { return@withLock it.result }
-        val (result, cooldown) = fetch(channel)
+    suspend fun check(
+        channel: AppUpdateChannel = AppUpdateChannel.Stable,
+        forceRefresh: Boolean = false,
+    ): ReleaseCheck = mutex.withLock {
+        cache[channel]?.takeIf {
+            nowMillis() < it.cacheUntil && (!forceRefresh || it.result == ReleaseCheck.Failure.RateLimited)
+        }?.let { return@withLock it.result }
+        val (result, cooldown) = fetch(channel, forceRefresh)
         cache[channel] = CachedRelease(result, nowMillis() + cooldown)
         result
     }
 
-    private suspend fun fetch(channel: AppUpdateChannel): Pair<ReleaseCheck, Long> = suspendCancellableCoroutine { continuation ->
+    private suspend fun fetch(channel: AppUpdateChannel, forceRefresh: Boolean): Pair<ReleaseCheck, Long> = suspendCancellableCoroutine { continuation ->
         val request = Request.Builder().url(channel.apiUrl)
             .header("Accept", "application/vnd.github+json")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .header("User-Agent", "KokoroBox-Android-UpdateCheck")
+            .apply { if (forceRefresh) cacheControl(CacheControl.FORCE_NETWORK) }
             .build()
         val call = client.newCall(request)
         continuation.invokeOnCancellation { call.cancel() }

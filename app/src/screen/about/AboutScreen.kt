@@ -75,7 +75,7 @@ fun AboutScreen(navigator: DestinationsNavigator) {
     updateState.result?.let { result ->
         AppUpdateDialog(
             result = result,
-            installState = updateInstallState,
+            installState = updateState.installStateForDialog(updateInstallState),
             onDownloadAndInstall = updateViewModel::downloadAndInstall,
             onContinueInstall = updateViewModel::continueInstall,
             onDismiss = updateViewModel::dismiss,
