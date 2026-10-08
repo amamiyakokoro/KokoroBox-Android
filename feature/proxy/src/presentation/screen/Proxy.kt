@@ -37,6 +37,8 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.*
@@ -58,6 +60,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -92,6 +96,9 @@ import com.amamiyakokoro.box.presentation.theme.UiDp
 import com.amamiyakokoro.box.presentation.theme.YumeTheme
 import com.amamiyakokoro.box.presentation.viewmodel.ProxyViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.job
 import kotlinx.coroutines.flow.collect
 import kotlin.math.abs
 import org.koin.androidx.compose.koinViewModel
@@ -241,16 +248,22 @@ fun ProxyPager(
                 },
                 onProxyStartRequested = onProxyStartRequested,
                 isProxyRunning = isProxyRunning,
-                onTestDelay = onTestDelayAction,
-                onTestProxyDelay = { proxyName ->
+                onTestDelay = { groupName ->
+                    if (isProxyRunning) {
+                        proxyViewModel.testDelay(groupName)
+                    } else {
+                        pendingTestGroupName = groupName
+                        pendingTestProxyName = null
+                        onProxyStartRequested?.invoke()
+                    }
+                },
+                onTestProxyDelay = { groupName, proxyName ->
                     if (!isProxyRunning) {
-                        pendingTestGroupName = effectiveSelectedGroupName
+                        pendingTestGroupName = groupName
                         pendingTestProxyName = proxyName
                         onProxyStartRequested?.invoke()
                     } else {
-                        effectiveSelectedGroupName?.let { groupName ->
-                            proxyViewModel.testProxyDelay(groupName, proxyName)
-                        }
+                        proxyViewModel.testProxyDelay(groupName, proxyName)
                     }
                 },
                 singleNodeTestEnabled = singleNodeTest,
@@ -321,8 +334,8 @@ private fun ProxySurfboardContent(
     onSelectProxy: (String, String, (() -> Unit)?) -> Unit,
     onProxyStartRequested: (() -> Unit)?,
     isProxyRunning: Boolean,
-    onTestDelay: () -> Unit,
-    onTestProxyDelay: (String) -> Unit,
+    onTestDelay: (String) -> Unit,
+    onTestProxyDelay: (String, String) -> Unit,
     singleNodeTestEnabled: Boolean,
 ) {
     val slideAnimation = AppMotion.defaultSpatial<IntOffset>()
@@ -392,6 +405,7 @@ private data class ProxyModeContent(
 
 private class ProxyNodesRevealRequest(val groupName: String, val groupSize: IntSize) {
     var firstRowSize by mutableStateOf(IntSize.Zero)
+    var job: Job? = null
 }
 
 private fun Modifier.revealProxyNodes(request: ProxyNodesRevealRequest?): Modifier =
@@ -406,8 +420,8 @@ private fun ProxyGroupModeContent(
     mainInnerPadding: PaddingValues,
     onGroupSelected: (String) -> Unit,
     onSelectProxy: (String, String, (() -> Unit)?) -> Unit,
-    onTestDelay: () -> Unit,
-    onTestProxyDelay: (String) -> Unit,
+    onTestDelay: (String) -> Unit,
+    onTestProxyDelay: (String, String) -> Unit,
     singleNodeTestEnabled: Boolean,
     isPageActive: Boolean,
 ) {
@@ -435,14 +449,14 @@ private fun ProxyGroupModeContent(
         }
     }
 
-    var optimisticSelectedProxyName by remember(selectedGroup?.name) { mutableStateOf<String?>(null) }
-    val effectiveNow = optimisticSelectedProxyName ?: selectedGroup?.now
-    var expandedGroupName by rememberSaveable(tunnelMode) { mutableStateOf<String?>(null) }
+    val optimisticSelectedProxyNames = remember { mutableStateMapOf<String, String>() }
+    var expandedGroupNames by rememberSaveable(tunnelMode) { mutableStateOf(emptyList<String>()) }
     var nodesRevealRequest by remember { mutableStateOf<ProxyNodesRevealRequest?>(null) }
+    val currentRevealRequest by rememberUpdatedState(nodesRevealRequest)
     val nodeTransitions = proxyGroups.associate { group ->
         group.name to key(group.name) {
             updateTransition(
-                targetState = group.name == expandedGroupName && group.name == selectedName,
+                targetState = group.name in expandedGroupNames,
                 label = "proxy_group_nodes:${group.name}",
             )
         }
@@ -460,61 +474,63 @@ private fun ProxyGroupModeContent(
             if (isPageActive && interaction is DragInteraction.Start) nodesRevealRequest = null
         }
     }
-    // Selection arrives through AnimatedContent's page data; it must not restart this request.
-    LaunchedEffect(nodesRevealRequest, expandedGroupName, isPageActive, gridState, columnCount) {
+    LaunchedEffect(nodesRevealRequest, isPageActive, gridState, columnCount) {
         val request = nodesRevealRequest ?: return@LaunchedEffect
+        request.job = currentCoroutineContext().job
         try {
-            if (!isPageActive || request.groupName != expandedGroupName) {
+            if (!isPageActive || request.groupName !in expandedGroupNames) {
                 return@LaunchedEffect
             }
             val spring = revealAnimation.vectorize(Float.VectorConverter)
             val zero = AnimationVector1D(0f)
             var velocity = AnimationVector1D(0f)
             var lastFrame = withFrameNanos { it }
-            gridState.scroll {
-                while (true) {
-                    val frame = withFrameNanos { it }
-                    val layout = gridState.layoutInfo
-                    val group = currentGroups.firstOrNull { it.name == request.groupName } ?: break
-                    val groupItem = layout.visibleItemsInfo.firstOrNull { it.key == "group:${group.name}" }
-                    val rowKey = group.proxies.firstOrNull()?.let { "node_row:${group.name}:${it.name}" }
-                        ?: "empty_nodes:${group.name}"
-                    val rowItem = layout.visibleItemsInfo.firstOrNull { it.key == rowKey }
-                    val groupHeight = groupItem?.size?.height ?: request.groupSize.height
-                    val groupTop = groupItem?.offset?.y ?: rowItem?.offset?.y?.minus(groupHeight) ?: break
-                    val visibleTop = layout.viewportStartOffset + layout.beforeContentPadding
-                    val visibleBottom = layout.viewportEndOffset - layout.afterContentPadding
-                    val rowHeight = request.firstRowSize.height.coerceAtLeast(1)
-                    // If both cannot fit, prioritize the first node row over the group header.
-                    val targetTop = if (groupHeight + rowHeight <= visibleBottom - visibleTop) groupTop
-                        else groupTop + groupHeight
-                    val targetBottom = groupTop + groupHeight + rowHeight
-                    val distance = when {
-                        targetTop < visibleTop -> (targetTop - visibleTop).toFloat()
-                        targetBottom > visibleBottom -> (targetBottom - visibleBottom).toFloat()
-                        else -> 0f
-                    }
-                    val rowCount = if (group.proxies.isEmpty()) 1 else (group.proxies.size + columnCount - 1) / columnCount
-                    val settled = currentNodeTransitions[group.name]?.currentState == true &&
-                        currentNodeTransitions.values.all { !it.isRunning && it.currentState == it.targetState } &&
-                        layout.totalItemsCount == currentGroups.size + rowCount
-                    if (abs(distance) < 0.5f) {
-                        if (settled && request.firstRowSize.height > 0) break
-                        velocity = zero
-                    } else {
-                        val elapsed = frame - lastFrame
-                        val initial = AnimationVector1D(distance)
-                        val next = spring.getValueFromNanos(elapsed, initial, zero, velocity).value
-                        val nextVelocity = spring.getVelocityFromNanos(elapsed, initial, zero, velocity).value
-                        val delta = (distance - next).coerceIn(minOf(0f, distance), maxOf(0f, distance))
-                        val consumed = scrollBy(delta)
-                        // Expansion creates more scroll range each frame. Hitting its current
-                        // edge must not terminate the animation before that content is available.
-                        velocity = AnimationVector1D(if (abs(consumed - delta) < 0.5f) nextVelocity else 0f)
-                        if (settled && abs(consumed) < 0.5f && abs(delta) >= 0.5f) break
-                    }
-                    lastFrame = frame
+            while (true) {
+                val frame = withFrameNanos { it }
+                val layout = gridState.layoutInfo
+                val group = currentGroups.firstOrNull { it.name == request.groupName } ?: break
+                val groupItem = layout.visibleItemsInfo.firstOrNull { it.key == "group:${group.name}" }
+                val rowKey = group.proxies.firstOrNull()?.let { "node_row:${group.name}:${it.name}" }
+                    ?: "empty_nodes:${group.name}"
+                val rowItem = layout.visibleItemsInfo.firstOrNull { it.key == rowKey }
+                val groupHeight = groupItem?.size?.height ?: request.groupSize.height
+                val groupTop = groupItem?.offset?.y ?: rowItem?.offset?.y?.minus(groupHeight) ?: break
+                val visibleTop = layout.viewportStartOffset + layout.beforeContentPadding
+                val visibleBottom = layout.viewportEndOffset - layout.afterContentPadding
+                val rowHeight = request.firstRowSize.height.coerceAtLeast(1)
+                // If both cannot fit, prioritize the first node row over the group header.
+                val targetTop = if (groupHeight + rowHeight <= visibleBottom - visibleTop) groupTop
+                    else groupTop + groupHeight
+                val targetBottom = groupTop + groupHeight + rowHeight
+                val distance = when {
+                    targetTop < visibleTop -> (targetTop - visibleTop).toFloat()
+                    targetBottom > visibleBottom -> (targetBottom - visibleBottom).toFloat()
+                    else -> 0f
                 }
+                val rowCount = currentGroups.filter { currentNodeTransitions[it.name]?.targetState == true }
+                    .sumOf { if (it.proxies.isEmpty()) 1 else (it.proxies.size + columnCount - 1) / columnCount }
+                val settled = currentNodeTransitions[group.name]?.currentState == true &&
+                    currentNodeTransitions.values.all { !it.isRunning && it.currentState == it.targetState } &&
+                    layout.totalItemsCount == currentGroups.size + rowCount
+                if (abs(distance) < 0.5f) {
+                    if (settled && request.firstRowSize.height > 0) break
+                    velocity = zero
+                } else {
+                    val elapsed = frame - lastFrame
+                    val initial = AnimationVector1D(distance)
+                    val next = spring.getValueFromNanos(elapsed, initial, zero, velocity).value
+                    val nextVelocity = spring.getVelocityFromNanos(elapsed, initial, zero, velocity).value
+                    val delta = (distance - next).coerceIn(minOf(0f, distance), maxOf(0f, distance))
+                    // Keep the scrolling session brief; waiting for a layout frame must not
+                    // make Scrollable intercept another card's tap as a fling-stop gesture.
+                    var consumed = 0f
+                    gridState.scroll { consumed = scrollBy(delta) }
+                    // Expansion creates more scroll range each frame. Hitting its current
+                    // edge must not terminate the animation before that content is available.
+                    velocity = AnimationVector1D(if (abs(consumed - delta) < 0.5f) nextVelocity else 0f)
+                    if (settled && abs(consumed) < 0.5f && abs(delta) >= 0.5f) break
+                }
+                lastFrame = frame
             }
         } finally {
             // An older request must not clear a rapid re-expansion of the same group.
@@ -522,9 +538,12 @@ private fun ProxyGroupModeContent(
         }
     }
 
-    LaunchedEffect(selectedGroup?.now) {
-        if (selectedGroup?.now == optimisticSelectedProxyName) {
-            optimisticSelectedProxyName = null
+    LaunchedEffect(proxyGroups) {
+        optimisticSelectedProxyNames.keys.toList().forEach { name ->
+            val group = proxyGroups.firstOrNull { it.name == name }
+            if (group == null || group.now == optimisticSelectedProxyNames[name]) {
+                optimisticSelectedProxyNames.remove(name)
+            }
         }
     }
 
@@ -533,6 +552,14 @@ private fun ProxyGroupModeContent(
         state = gridState,
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(gridState) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                    // A touch takes priority without consuming it, so the same tap can open
+                    // another group or select a node while the reveal animation is running.
+                    currentRevealRequest?.job?.cancel()
+                }
+            }
             .let { modifier ->
                 if (bottomBarScrollBehavior != null) {
                     modifier.nestedScroll(bottomBarScrollBehavior.nestedScrollConnection)
@@ -554,13 +581,14 @@ private fun ProxyGroupModeContent(
                 ProxyGroupInfoCard(
                     group = group,
                     modifier = Modifier.padding(bottom = 12.dp),
-                    currentProxyName = if (group.name == selectedName) effectiveNow ?: group.now else group.now,
+                    currentProxyName = optimisticSelectedProxyNames[group.name] ?: group.now,
                     isSelected = group.name == selectedName,
-                    isExpanded = group.name == expandedGroupName && group.name == selectedName,
+                    isExpanded = group.name in expandedGroupNames,
                     onClick = {
                         if (isPageActive) {
-                            val expanding = group.name != expandedGroupName || group.name != selectedName
-                            expandedGroupName = group.name.takeIf { expanding }
+                            val expanding = group.name !in expandedGroupNames
+                            expandedGroupNames = if (expanding) expandedGroupNames + group.name
+                                else expandedGroupNames - group.name
                             nodesRevealRequest = if (expanding) {
                                 val groupSize = gridState.layoutInfo.visibleItemsInfo
                                     .firstOrNull { it.key == "group:${group.name}" }?.size ?: IntSize.Zero
@@ -603,18 +631,24 @@ private fun ProxyGroupModeContent(
                                         NodeCard(
                                             proxy = proxy,
                                             modifier = Modifier.weight(1f),
-                                            isSelected = proxy.name == if (group.name == selectedName) effectiveNow else group.now,
+                                            isSelected = proxy.name == (optimisticSelectedProxyNames[group.name] ?: group.now),
                                             onClick = if (isPageActive && nodeTransition.targetState) { proxyName ->
                                                 if (group.type == Proxy.Type.Selector) {
-                                                    optimisticSelectedProxyName = proxyName
-                                                    onSelectProxy(group.name, proxyName, { optimisticSelectedProxyName = null })
+                                                    optimisticSelectedProxyNames[group.name] = proxyName
+                                                    onSelectProxy(group.name, proxyName, {
+                                                        if (optimisticSelectedProxyNames[group.name] == proxyName) {
+                                                            optimisticSelectedProxyNames.remove(group.name)
+                                                        }
+                                                    })
                                                 } else {
-                                                    onTestDelay()
+                                                    onTestDelay(group.name)
                                                 }
                                             } else null,
                                             isDelayTesting = group.name in testingGroupNames,
                                             isThisProxyTesting = proxy.name in testingProxyNames,
-                                            onSingleNodeTestClick = onTestProxyDelay.takeIf { isPageActive && nodeTransition.targetState },
+                                            onSingleNodeTestClick = if (isPageActive && nodeTransition.targetState) {
+                                                { proxyName -> onTestProxyDelay(group.name, proxyName) }
+                                            } else null,
                                             showCountryFlag = true,
                                             singleNodeTestEnabled = singleNodeTestEnabled,
                                         )
@@ -800,7 +834,7 @@ private fun ProxyUiPreview(themeMode: ThemeMode? = null) {
                     groups = groups.map { if (it.name == groupName) it.copy(now = nodeName) else it }
                     if (groupName == globalGroup.name) globalGroup = globalGroup.copy(now = nodeName)
                     success?.invoke()
-                }, null, true, { testing = !testing }, {}, true)
+                }, null, true, { testing = !testing }, { _, _ -> }, true)
         }
     }
 }
