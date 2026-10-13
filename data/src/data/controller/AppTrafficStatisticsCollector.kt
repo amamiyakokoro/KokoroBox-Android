@@ -23,7 +23,8 @@ package com.amamiyakokoro.box.data.controller
 import com.amamiyakokoro.box.core.model.ConnectionInfo
 import com.amamiyakokoro.box.core.model.ConnectionSnapshot
 import com.amamiyakokoro.box.core.domain.ConnectionHistoryManager
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.RuntimePowerState
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.data.model.AppTrafficDeltaRecord
 import com.amamiyakokoro.box.data.model.ConnectionTrafficBaseline
@@ -35,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -49,7 +51,7 @@ class AppTrafficStatisticsCollector(
     private val queryTrafficTotal: suspend () -> TrafficData,
     private val queryConnections: suspend () -> ConnectionSnapshot,
     private val queryActiveProfileId: suspend () -> String?,
-    private val screenOnFlow: Flow<Boolean>,
+    private val powerStateFlow: Flow<RuntimePowerState>,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
 ) {
     private var collectionJob: Job? = null
@@ -83,14 +85,10 @@ class AppTrafficStatisticsCollector(
             lastTotalDownload = trafficStatisticsStore.getLastTrafficDownload()
             lastProfileId = trafficStatisticsStore.getLastProfileId()
             connectionBaselines.clear()
-            screenOnFlow
+            powerStateFlow
+                .map(RuntimePowerPolicy::statisticsTimer)
                 .distinctUntilChanged()
-                .collectLatest { screenOn ->
-                    val timer = if (screenOn) {
-                        PollingTimerSpecs.TrafficStatsCollection
-                    } else {
-                        PollingTimerSpecs.TrafficStatsCollectionScreenOff
-                    }
+                .collectLatest { timer ->
                     PollingTimers.ticks(timer).collect {
                         runCatching { collectTrafficData() }
                             .onFailure { error ->

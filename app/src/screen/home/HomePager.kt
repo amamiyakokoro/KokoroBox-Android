@@ -83,6 +83,7 @@ fun HomePager(
     val proxyMode by homeViewModel.proxyMode.collectAsStateWithLifecycle()
     val tunnelMode by homeViewModel.tunnelMode.collectAsStateWithLifecycle()
     val useFabProxyControl by appSettings.homeUseFabProxyControl.state.collectAsStateWithLifecycle()
+    val powerState by homeViewModel.powerState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val resources = LocalResources.current
     val hapticFeedback = LocalHapticFeedback.current
@@ -189,7 +190,7 @@ fun HomePager(
                         SpeedChart(
                             speedHistory = speedHistory,
                             isRunning = isRunning,
-                            animateIdle = isActive,
+                            animateIdle = isActive && com.amamiyakokoro.box.core.util.RuntimePowerPolicy.animateDecorations(powerState),
                             onClick = {
                                 navigator.navigate(TrafficStatisticsScreenDestination) {
                                     launchSingleTop = true

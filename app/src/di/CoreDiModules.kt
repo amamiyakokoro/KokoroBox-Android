@@ -173,7 +173,7 @@ val appDataRuntimeModule = module {
     }
 
     single { ServicePowerController(androidContext()).also(ServicePowerController::start) }
-    single { ProxyFacade(androidContext(), get<ServicePowerController>().screenOn) }
+    single { ProxyFacade(androidContext(), get<ServicePowerController>().powerState) }
     single { AppIdentityResolver(androidContext()) }
     single { ProfilesRepository(androidContext()) }
     single {
@@ -193,7 +193,7 @@ val appDataRuntimeModule = module {
                 proxyFacade.refreshCurrentProfile()
                 proxyFacade.currentProfile.value?.uuid?.toString()
             },
-            screenOnFlow = get<ServicePowerController>().screenOn,
+            powerStateFlow = get<ServicePowerController>().powerState,
         )
     }
 }

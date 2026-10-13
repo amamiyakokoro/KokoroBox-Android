@@ -27,13 +27,17 @@ import androidx.lifecycle.viewModelScope
 import com.amamiyakokoro.box.core.domain.ConnectionHistoryManager
 import com.amamiyakokoro.box.core.model.ConnectionInfo
 import com.amamiyakokoro.box.core.model.ConnectionSnapshot
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
+import com.amamiyakokoro.box.core.util.RuntimePowerState
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.remote.ServiceClient
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
@@ -68,7 +72,7 @@ data class ConnectionState(
     val totalConnections: Int get() = snapshot?.connections?.size ?: 0
 }
 
-class ConnectionViewModel : ViewModel() {
+class ConnectionViewModel(private val powerState: StateFlow<RuntimePowerState>) : ViewModel() {
 
     private val _state = MutableStateFlow(ConnectionState())
     val state: StateFlow<ConnectionState> = _state.asStateFlow()
@@ -89,13 +93,16 @@ class ConnectionViewModel : ViewModel() {
         _isPolling = true
 
         pollingJob = viewModelScope.launch {
-            refreshConnections(showRefreshing = false)
-            PollingTimers.ticks(PollingTimerSpecs.ConnectionsPolling).collect {
-                try {
-                    refreshConnections(showRefreshing = true)
-                } catch (e: Exception) {
-                    Timber.w(e, "Failed to poll connections")
-                    _state.update { it.copy(error = e.message, isRefreshing = false) }
+            powerState.map(RuntimePowerPolicy::connectionsTimer).distinctUntilChanged().collectLatest { timer ->
+                if (timer == null) return@collectLatest
+                PollingTimers.ticks(timer).collect {
+                    try {
+                        refreshConnections(showRefreshing = true)
+                    } catch (e: Exception) {
+                        if (e is CancellationException) throw e
+                        Timber.w(e, "Failed to poll connections")
+                        _state.update { it.copy(error = e.message, isRefreshing = false) }
+                    }
                 }
             }
         }
@@ -154,6 +161,7 @@ class ConnectionViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 Timber.w(e, "Failed to query connections")
                 _state.update {
                     it.copy(

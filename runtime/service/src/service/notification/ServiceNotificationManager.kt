@@ -33,7 +33,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.amamiyakokoro.box.core.Clash
 import com.amamiyakokoro.box.core.locale.R as LocaleR
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.runtime.service.R
 import com.amamiyakokoro.box.service.ServicePowerController
@@ -44,6 +44,8 @@ import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ServiceNotificationManager(
     private val service: Service,
@@ -96,13 +98,10 @@ class ServiceNotificationManager(
             val powerController = ServicePowerController(service).also(ServicePowerController::start)
             var disabledRefreshTicks = 0
             try {
-                powerController.screenOn
-                    .collectLatest { screenOn ->
-                        val timer = if (screenOn) {
-                            PollingTimerSpecs.ForegroundNotificationRefresh
-                        } else {
-                            PollingTimerSpecs.ForegroundNotificationRefreshScreenOff
-                        }
+                powerController.powerState
+                    .map(RuntimePowerPolicy::notificationTimer)
+                    .distinctUntilChanged()
+                    .collectLatest { timer ->
                         PollingTimers.ticks(timer).collect {
                             val showTraffic = shouldShowTrafficNotification()
                             if (!showTraffic && lastTrafficDisplayEnabled == false) {

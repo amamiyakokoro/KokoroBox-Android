@@ -52,12 +52,6 @@ object PollingTimerSpecs {
     val HomeSpeedSampling = PollingTimerSpec("home_speed_sampling", 1_000L, 0L)
     val LogScreenRefresh = PollingTimerSpec("log_screen_refresh", 500L, 0L)
     val ConnectionsPolling = PollingTimerSpec("connections_polling", 1_000L, 0L)
-    val RuntimeTrafficPollingFast = PollingTimerSpec("runtime_traffic_polling_fast", 1_000L, 0L)
-    val RuntimeTrafficPollingForeground =
-        PollingTimerSpec("runtime_traffic_polling_foreground", 3_000L, 3_000L)
-    // Screen-off values are only used by background persistence and notifications. Keeping these
-    // at one-minute granularity avoids waking the process twice as often for data the user cannot see.
-    val RuntimeTrafficPollingScreenOff = PollingTimerSpec("runtime_traffic_polling_screen_off", 60_000L, 60_000L)
     // Notification traffic is informational; keep it fresh without duplicating the UI's live polling.
     val ForegroundNotificationRefresh = PollingTimerSpec("foreground_notification_refresh", 10_000L, 10_000L)
     val ForegroundNotificationRefreshScreenOff =

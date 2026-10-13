@@ -33,6 +33,7 @@ import com.amamiyakokoro.box.service.runtime.session.SessionRuntime
 import com.amamiyakokoro.box.service.runtime.session.SessionRuntimeSpecFactory
 import com.tencent.mmkv.MMKV
 import com.topjohnwu.superuser.ipc.RootService
+import android.os.RemoteCallbackList
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -44,7 +45,31 @@ class RootTunRootService : RootService() {
     private lateinit var runtimeSpecFactory: SessionRuntimeSpecFactory
     private lateinit var runtimeHost: RootTunRuntimeHost
 
+    private val statusObservers = RemoteCallbackList<IRootTunStatusObserver>()
+
+    internal fun publishStatusChanged() {
+        synchronized(statusObservers) {
+            val count = statusObservers.beginBroadcast()
+            try {
+                for (index in 0 until count) {
+                    runCatching { statusObservers.getBroadcastItem(index).onStatusChanged() }
+                }
+            } finally {
+                statusObservers.finishBroadcast()
+            }
+        }
+    }
+
     private val binder = object : IRootTunService.Stub() {
+        override fun registerStatusObserver(observer: IRootTunStatusObserver) {
+            statusObservers.register(observer)
+            observer.onStatusChanged()
+        }
+
+        override fun unregisterStatusObserver(observer: IRootTunStatusObserver) {
+            statusObservers.unregister(observer)
+        }
+
         override fun startRootTun(requestJson: String): String {
             val request = decodeRequest(requestJson)
             startupLogStore.append("ROOT_TUN root-service: binder branch=start source=${request.source}")
@@ -234,6 +259,7 @@ class RootTunRootService : RootService() {
             runtime.requestStop("runtime destroyed")
             runtime.destroy()
         }
+        statusObservers.kill()
         super.onDestroy()
     }
 

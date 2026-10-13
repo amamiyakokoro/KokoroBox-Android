@@ -36,6 +36,12 @@ import com.amamiyakokoro.box.service.RootTunService
 import com.amamiyakokoro.box.service.common.util.appContextOrSelf
 import com.topjohnwu.superuser.ipc.RootService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
+import timber.log.Timber
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -53,6 +59,34 @@ internal object RootTunServiceBridge {
 
     @Volatile
     private var connection: ServiceConnection? = null
+    @Volatile
+    private var deathRecipient: IBinder.DeathRecipient? = null
+
+    private fun clearDeathRecipient() {
+        deathRecipient?.let { recipient -> runCatching { binder?.asBinder()?.unlinkToDeath(recipient, 0) } }
+        deathRecipient = null
+    }
+
+    fun statusChanges(context: Context): Flow<Unit> = callbackFlow {
+        val observer = object : IRootTunStatusObserver.Stub() {
+            override fun onStatusChanged() { trySend(Unit) }
+        }
+        var remote: IRootTunService? = null
+        try {
+            withContext(Dispatchers.IO) {
+                remote = bind(context)
+                remote!!.registerStatusObserver(observer)
+            }
+            awaitCancellation()
+        } finally {
+            withContext(NonCancellable + Dispatchers.IO) {
+                runCatching { remote?.unregisterStatusObserver(observer) }
+            }
+        }
+    }.catch { error ->
+        Timber.w(error, "Root status observer unavailable; periodic verification remains active")
+        emit(Unit)
+    }
 
     private suspend fun <T> remoteCall(
         context: Context,
@@ -176,15 +210,25 @@ internal object RootTunServiceBridge {
                             return
                         }
 
+                        clearDeathRecipient()
                         binder = remote
                         connection = this
+                        val recipient = IBinder.DeathRecipient {
+                            if (binder === remote) invalidateConnection(appContext, "RootTun binder died")
+                        }
+                        deathRecipient = recipient
+                        runCatching { remote.asBinder().linkToDeath(recipient, 0) }.onFailure {
+                            invalidateConnection(appContext, "RootTun binder died while connecting")
+                            if (continuation.isActive) continuation.resumeWithException(it)
+                            return
+                        }
                         if (continuation.isActive) {
                             continuation.resume(remote)
                         }
                     }
 
                     override fun onServiceDisconnected(name: ComponentName?) {
-                        invalidateConnection(appContext, null)
+                        if (connection === this) invalidateConnection(appContext, null)
                     }
 
                     override fun onNullBinding(name: ComponentName?) {
@@ -195,7 +239,7 @@ internal object RootTunServiceBridge {
                     }
 
                     override fun onBindingDied(name: ComponentName?) {
-                        invalidateConnection(appContext, "RootTun binding died")
+                        if (connection === this) invalidateConnection(appContext, "RootTun binding died")
                     }
                 }
 
@@ -235,6 +279,7 @@ internal object RootTunServiceBridge {
             withContext(Dispatchers.Main) {
                 runCatching { RootService.unbind(current) }
             }
+            clearDeathRecipient()
             connection = null
             binder = null
         }
@@ -254,6 +299,7 @@ internal object RootTunServiceBridge {
     }
 
     private fun invalidateConnection(context: Context, reason: String?) {
+        clearDeathRecipient()
         binder = null
         connection = null
         RootTunRuntimeRecovery.handleBinderGone(context, reason)

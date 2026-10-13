@@ -60,6 +60,12 @@ object RuntimePowerPolicy {
         else -> PollingTimerSpecs.RuntimeProxyGroupSyncFast
     }
 
+    fun connectionsTimer(state: RuntimePowerState): PollingTimerSpec? = when {
+        !state.uiVisible -> null
+        state.powerSaveMode -> timer("connections_power_save", 2_000L, immediate = true)
+        else -> PollingTimerSpecs.ConnectionsPolling
+    }
+
     fun rootStatusTimer(state: RuntimePowerState, transitioning: Boolean): PollingTimerSpec = when {
         transitioning -> PollingTimerSpecs.RootTunStatusPolling
         state.deviceIdle -> timer("root_status_idle", 120_000L)

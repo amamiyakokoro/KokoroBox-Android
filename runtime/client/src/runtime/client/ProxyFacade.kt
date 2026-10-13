@@ -31,7 +31,8 @@ import android.net.VpnService
 import android.os.Build
 import com.amamiyakokoro.box.core.Clash
 import com.amamiyakokoro.box.core.model.*
-import com.amamiyakokoro.box.core.util.PollingTimerSpec
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
+import com.amamiyakokoro.box.core.util.RuntimePowerState
 import com.amamiyakokoro.box.core.util.PollingTimerSpecs
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.core.util.runCatchingCancellable
@@ -75,7 +76,7 @@ enum class TrafficPollingPriority {
 
 class ProxyFacade(
     private val context: Context,
-    private val screenOnFlow: StateFlow<Boolean>,
+    val powerState: StateFlow<RuntimePowerState>,
 ) {
     private companion object {
         const val TRAFFIC_TOTAL_POLL_TICKS = 10
@@ -832,8 +833,8 @@ class ProxyFacade(
         if (trafficPollingJob?.isActive == true) return
         trafficPollingJob = scope.launch {
             var tick = 0
-            combine(screenOnFlow, trafficPriorityRequests) { screenOn, requests ->
-                resolveTrafficPollingTimer(screenOn, requests)
+            combine(powerState, trafficPriorityRequests) { power, requests ->
+                RuntimePowerPolicy.trafficTimer(power, requests.values.any { it == TrafficPollingPriority.FAST })
             }.distinctUntilChanged()
                 .collectLatest { timer ->
                     PollingTimers.ticks(timer).collect {
@@ -842,18 +843,18 @@ class ProxyFacade(
                             return@collect
                         }
 
-                        val homeVisible = screenOnFlow.value &&
+                        val homeVisible = powerState.value.uiVisible &&
                             trafficPriorityRequests.value["home"] == TrafficPollingPriority.FAST
                         runCatchingCancellable {
                             queryTrafficNow()
-                            if (homeVisible || tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
+                            if (homeVisible || !powerState.value.uiVisible || tick % TRAFFIC_TOTAL_POLL_TICKS == 0) {
                                 queryTrafficTotal()
                             }
                         }.onFailure { error ->
                             Timber.d(error, "Traffic polling skipped")
                         }
                         // Share Home's existing one-second timer; no extra background polling job.
-                        if (homeVisible && screenOnFlow.value &&
+                        if (homeVisible && powerState.value.uiVisible &&
                             trafficPriorityRequests.value["home"] == TrafficPollingPriority.FAST
                         ) {
                             runCatchingCancellable { queryConnections() }.onFailure { error ->
@@ -868,19 +869,6 @@ class ProxyFacade(
                         }
                     }
                 }
-        }
-    }
-
-    private fun resolveTrafficPollingTimer(
-        screenOn: Boolean,
-        requests: Map<String, TrafficPollingPriority>,
-    ): PollingTimerSpec {
-        if (!screenOn) {
-            return PollingTimerSpecs.RuntimeTrafficPollingScreenOff
-        }
-        return when (requests.values.maxByOrNull { it.ordinal } ?: TrafficPollingPriority.OFF) {
-            TrafficPollingPriority.FAST -> PollingTimerSpecs.RuntimeTrafficPollingFast
-            TrafficPollingPriority.OFF -> PollingTimerSpecs.RuntimeTrafficPollingForeground
         }
     }
 
@@ -1167,13 +1155,11 @@ class ProxyFacade(
             return
         }
 
-        val timerSpec = when (priority) {
-            ProxyGroupSyncPriority.FAST -> PollingTimerSpecs.RuntimeProxyGroupSyncFast
-            ProxyGroupSyncPriority.OFF -> return
-        }
         proxyGroupSyncJob = scope.launch {
-            PollingTimers.ticks(timerSpec).collect {
-                refreshRuntimeProxyGroupsSafely()
+            powerState.map(RuntimePowerPolicy::proxyGroupTimer).distinctUntilChanged().collectLatest { timer ->
+                if (timer != null) PollingTimers.ticks(timer).collect {
+                    refreshRuntimeProxyGroupsSafely()
+                }
             }
         }
     }

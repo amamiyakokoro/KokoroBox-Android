@@ -35,6 +35,11 @@ class RuntimePowerPolicyTest {
         assertEquals(60_000L, RuntimePowerPolicy.notificationTimer(visible.copy(screenOn = false)).intervalMillis)
         assertEquals(120_000L, RuntimePowerPolicy.notificationTimer(visible.copy(deviceIdle = true)).intervalMillis)
     }
+    @Test fun connectionPageStopsWithoutVisibleUI() {
+        assertNull(RuntimePowerPolicy.connectionsTimer(visible.copy(appVisible = false)))
+        assertEquals(2_000L, RuntimePowerPolicy.connectionsTimer(visible.copy(powerSaveMode = true))!!.intervalMillis)
+        assertEquals(0L, RuntimePowerPolicy.connectionsTimer(visible)!!.initialDelayMillis)
+    }
     @Test fun rootRecoveryIsFastEvenInDoze() {
         val idle = visible.copy(screenOn = false, deviceIdle = true)
         assertEquals(2_000L, RuntimePowerPolicy.rootStatusTimer(idle, true).intervalMillis)

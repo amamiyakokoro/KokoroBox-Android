@@ -78,6 +78,8 @@ class HomeViewModel(
     application,
     HomeUiState(),
 ) {
+    val powerState = proxyFacade.powerState
+
     private val _profiles = MutableStateFlow<List<Profile>>(emptyList())
     val profiles: StateFlow<List<Profile>> = _profiles.asStateFlow()
 

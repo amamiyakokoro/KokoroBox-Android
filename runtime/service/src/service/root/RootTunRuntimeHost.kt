@@ -68,6 +68,7 @@ internal class RootTunRuntimeHost(
 
     override fun onSnapshotChanged(snapshot: RuntimeSnapshot) {
         stateStore.updateStatus(snapshot.toRootTunStatus(lastRuntimeSpec))
+        service.publishStatusChanged()
         if (snapshot.phase == RuntimePhase.Running && !startedBroadcastSent) {
             service.sendClashStarted()
             startedBroadcastSent = true
@@ -96,6 +97,7 @@ internal class RootTunRuntimeHost(
                 runtimeReady = false,
             ),
         )
+        service.publishStatusChanged()
         service.sendClashStopped(error)
     }
 

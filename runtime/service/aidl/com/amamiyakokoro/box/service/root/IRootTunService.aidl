@@ -1,5 +1,7 @@
 package com.amamiyakokoro.box.service.root;
 
+import com.amamiyakokoro.box.service.root.IRootTunStatusObserver;
+
 interface IRootTunService {
     String startRootTun(String requestJson);
     String restartRootTun(String requestJson);
@@ -25,4 +27,7 @@ interface IRootTunService {
     void requestStop();
     void setLogCollectionEnabled(boolean enabled);
     String queryRecentLogsJson(long sinceSeq);
+    // Append new methods to preserve transaction IDs for a still-running older root service.
+    void registerStatusObserver(IRootTunStatusObserver observer);
+    void unregisterStatusObserver(IRootTunStatusObserver observer);
 }

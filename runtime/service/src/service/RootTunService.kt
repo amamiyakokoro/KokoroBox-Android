@@ -31,12 +31,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
-import android.os.PowerManager
 import android.os.SystemClock
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.ProxyMode
@@ -56,7 +55,7 @@ import com.amamiyakokoro.box.service.runtime.util.sendClashStarted
 import com.amamiyakokoro.box.service.runtime.util.sendClashStopped
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 
 class RootTunService : BaseService() {
     private val stateStore by lazy { RootTunStateStore(appContextOrSelf) }
@@ -66,7 +65,6 @@ class RootTunService : BaseService() {
     private var lastTodayTrafficRefreshAt: Long = 0L
     private var notificationJob: Job? = null
     private val settingsStore by lazy { MMKV.mmkvWithID("settings", MMKV.MULTI_PROCESS_MODE) }
-    private val powerManager by lazy { getSystemService(PowerManager::class.java) }
     private var lastNotificationFingerprint: String? = null
     private var lastTrafficDisplayEnabled: Boolean? = null
     private var lastTrafficNotificationAt: Long = 0L
@@ -118,103 +116,111 @@ class RootTunService : BaseService() {
                         var unreachableCount = 0
                         var lastStatus = cachedStatus
 
-                        PollingTimers.ticks(PollingTimerSpecs.RootTunStatusPolling).collect {
-                            val snapshotResult = runCatching {
-                                RootTunServiceBridge.queryStatus(appContextOrSelf)
+                        val powerController = ServicePowerController(this@RootTunService).also(ServicePowerController::start)
+                        val observedStatus = MutableStateFlow(cachedStatus)
+                        try {
+                            val periodic = combine(powerController.powerState, observedStatus) { power, status ->
+                                RuntimePowerPolicy.rootStatusTimer(power, status.state.isRecovering)
+                            }.distinctUntilChanged().flatMapLatest { timer ->
+                                PollingTimers.ticks(timer).map { Unit }.onStart { emit(Unit) }
                             }
-                            val snapshot = snapshotResult.getOrNull()
-                            if (snapshot == null) {
-                                unreachableCount++
-                                val error = snapshotResult.exceptionOrNull()
-                                val fallbackStatus = stateStore.snapshot().takeIf {
-                                    it.state != RootTunState.Idle || !it.profileName.isNullOrBlank() || !it.lastError.isNullOrBlank()
-                                } ?: lastStatus
-                                val title = fallbackStatus.profileName
-                                    ?: getString(LocaleR.string.service_notification_unknown_profile)
-                                val content = if (unreachableCount >= 3) {
-                                    describeStatus(
-                                        fallbackStatus.copy(
-                                            lastError = fallbackStatus.lastError ?: error?.message
-                                                ?: getString(LocaleR.string.service_notification_state_unavailable),
+                            merge(periodic, RootTunServiceBridge.statusChanges(appContextOrSelf)).conflate().collect {
+                                val snapshotResult = runCatching {
+                                    RootTunServiceBridge.queryStatus(appContextOrSelf)
+                                }
+                                val snapshot = snapshotResult.getOrNull()
+                                if (snapshot == null) {
+                                    unreachableCount++
+                                    val error = snapshotResult.exceptionOrNull()
+                                    val fallbackStatus = stateStore.snapshot().takeIf {
+                                        it.state != RootTunState.Idle || !it.profileName.isNullOrBlank() || !it.lastError.isNullOrBlank()
+                                    } ?: lastStatus
+                                    val title = fallbackStatus.profileName
+                                        ?: getString(LocaleR.string.service_notification_unknown_profile)
+                                    val content = if (unreachableCount >= 3) {
+                                        describeStatus(
+                                            fallbackStatus.copy(
+                                                lastError = fallbackStatus.lastError ?: error?.message
+                                                    ?: getString(LocaleR.string.service_notification_state_unavailable),
+                                            ),
+                                        )
+                                    } else {
+                                        error?.message
+                                            ?: getString(LocaleR.string.service_notification_waiting_for_reconnect)
+                                    }
+                                    notifyIfChanged(
+                                        buildNotification(
+                                            NotificationPresentationFactory.createStatus(
+                                                profileName = title,
+                                                status = content,
+                                            ),
                                         ),
                                     )
-                                } else {
-                                    error?.message
-                                        ?: getString(LocaleR.string.service_notification_waiting_for_reconnect)
+                                    if (!fallbackStatus.state.isActive && !fallbackStatus.state.isRecovering) {
+                                        stopSelf()
+                                        return@collect
+                                    }
+                                    return@collect
                                 }
-                                notifyIfChanged(
-                                    buildNotification(
-                                        NotificationPresentationFactory.createStatus(
-                                            profileName = title,
-                                            status = content,
+
+                                unreachableCount = 0
+                                observedStatus.value = snapshot
+                                val statusPresentationChanged =
+                                    snapshot.state != lastStatus.state || snapshot.profileName != lastStatus.profileName
+                                lastStatus = snapshot
+                                syncStatus(snapshot)
+
+                                if (snapshot.state == RootTunState.Running && !startedBroadcastSent) {
+                                    sendClashStarted()
+                                    startedBroadcastSent = true
+                                }
+
+                                if (snapshot.state == RootTunState.Idle || snapshot.state == RootTunState.Failed) {
+                                    notifyIfChanged(
+                                        buildNotification(
+                                            NotificationPresentationFactory.createStatus(
+                                                profileName = snapshot.profileName
+                                                    ?: getString(LocaleR.string.service_notification_unknown_profile),
+                                                status = describeStatus(snapshot),
+                                            ),
                                         ),
-                                    ),
-                                )
-                                if (!fallbackStatus.state.isActive && !fallbackStatus.state.isRecovering) {
+                                    )
                                     stopSelf()
                                     return@collect
                                 }
-                                return@collect
-                            }
 
-                            unreachableCount = 0
-                            val statusPresentationChanged =
-                                snapshot.state != lastStatus.state || snapshot.profileName != lastStatus.profileName
-                            lastStatus = snapshot
-                            syncStatus(snapshot)
-
-                            if (snapshot.state == RootTunState.Running && !startedBroadcastSent) {
-                                sendClashStarted()
-                                startedBroadcastSent = true
-                            }
-
-                            if (snapshot.state == RootTunState.Idle || snapshot.state == RootTunState.Failed) {
-                                notifyIfChanged(
-                                    buildNotification(
+                                val profileName = snapshot.profileName
+                                    ?: getString(LocaleR.string.service_notification_unknown_profile)
+                                val showTraffic = shouldShowTrafficNotification()
+                                val now = SystemClock.elapsedRealtime()
+                                val trafficDisplayChanged = showTraffic != lastTrafficDisplayEnabled
+                                val trafficRefreshInterval = RuntimePowerPolicy.notificationTimer(powerController.powerState.value).intervalMillis
+                                val trafficRefreshDue = showTraffic &&
+                                    now - lastTrafficNotificationAt >= trafficRefreshInterval
+                                if (!statusPresentationChanged && !trafficDisplayChanged && !trafficRefreshDue) {
+                                    return@collect
+                                }
+                                val presentation = if (snapshot.state == RootTunState.Running) {
+                                    if (showTraffic) {
+                                        lastTrafficNotificationAt = now
+                                        buildTrafficPresentation(profileName)
+                                    } else {
                                         NotificationPresentationFactory.createStatus(
-                                            profileName = snapshot.profileName
-                                                ?: getString(LocaleR.string.service_notification_unknown_profile),
-                                            status = describeStatus(snapshot),
-                                        ),
-                                    ),
-                                )
-                                stopSelf()
-                                return@collect
-                            }
-
-                            val profileName = snapshot.profileName
-                                ?: getString(LocaleR.string.service_notification_unknown_profile)
-                            val showTraffic = shouldShowTrafficNotification()
-                            val now = SystemClock.elapsedRealtime()
-                            val trafficDisplayChanged = showTraffic != lastTrafficDisplayEnabled
-                            val trafficRefreshInterval = if (powerManager?.isInteractive != false) {
-                                TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS
-                            } else {
-                                TRAFFIC_NOTIFICATION_SCREEN_OFF_REFRESH_INTERVAL_MS
-                            }
-                            val trafficRefreshDue = showTraffic &&
-                                now - lastTrafficNotificationAt >= trafficRefreshInterval
-                            if (!statusPresentationChanged && !trafficDisplayChanged && !trafficRefreshDue) {
-                                return@collect
-                            }
-                            val presentation = if (snapshot.state == RootTunState.Running) {
-                                if (showTraffic) {
-                                    lastTrafficNotificationAt = now
-                                    buildTrafficPresentation(profileName)
+                                            profileName = profileName,
+                                            status = getString(LocaleR.string.service_notification_running),
+                                        )
+                                    }
                                 } else {
                                     NotificationPresentationFactory.createStatus(
                                         profileName = profileName,
-                                        status = getString(LocaleR.string.service_notification_running),
+                                        status = describeStatus(snapshot),
                                     )
                                 }
-                            } else {
-                                NotificationPresentationFactory.createStatus(
-                                    profileName = profileName,
-                                    status = describeStatus(snapshot),
-                                )
+                                lastTrafficDisplayEnabled = showTraffic
+                                notifyIfChanged(buildNotification(presentation))
                             }
-                            lastTrafficDisplayEnabled = showTraffic
-                            notifyIfChanged(buildNotification(presentation))
+                        } finally {
+                            powerController.stop()
                         }
                     }
                 }
@@ -386,8 +392,6 @@ class RootTunService : BaseService() {
         private const val NOTIFICATION_ID = 1003
         private const val CHANNEL_ID = "clash_root_tun_service"
         private const val CHANNEL_NAME = "Clash RootTun Service"
-        private const val TRAFFIC_NOTIFICATION_REFRESH_INTERVAL_MS = 10_000L
-        private const val TRAFFIC_NOTIFICATION_SCREEN_OFF_REFRESH_INTERVAL_MS = 30_000L
         private const val TODAY_TRAFFIC_REFRESH_INTERVAL_MS = 30_000L
 
         fun start(context: Context) {

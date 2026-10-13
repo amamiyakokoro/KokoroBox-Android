@@ -29,7 +29,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val featureMetaViewModelModule = module {
-    viewModel { ConnectionViewModel() }
+    viewModel { ConnectionViewModel(get<com.amamiyakokoro.box.runtime.client.ProxyFacade>().powerState) }
     viewModel { TrafficStatisticsViewModel(get<TrafficStatisticsStore>()) }
 }
 
