@@ -25,17 +25,23 @@ package com.amamiyakokoro.box.screen.log
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amamiyakokoro.box.core.util.RuntimePowerState
 import com.amamiyakokoro.box.data.store.LogStore
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class LogViewModel(
     private val repository: LogStore,
+    val powerState: StateFlow<RuntimePowerState>,
 ) : ViewModel() {
 
     private val _isRecording = MutableStateFlow(repository.isRecording())
@@ -44,22 +50,46 @@ class LogViewModel(
     private val _tempLogEntries = MutableStateFlow<List<LogStore.LogEntry>>(emptyList())
     val tempLogEntries: StateFlow<List<LogStore.LogEntry>> = _tempLogEntries.asStateFlow()
 
+    private var refreshJob: Job? = null
+    private var stopJob: Job? = null
+
     fun startRecording() {
+        stopJob?.cancel()
         repository.startRecording()
         _isRecording.value = true
         _tempLogEntries.value = emptyList()
     }
 
     fun stopRecording() {
+        val fileName = repository.currentRecordingFileName
         repository.stopRecording()
         _isRecording.value = false
+        stopRefreshing()
+        stopJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val entries = repository.readStoppedRecordingEntries(fileName)
+                currentCoroutineContext().ensureActive()
+                if (!_isRecording.value) _tempLogEntries.value = entries
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                _isRecording.value = repository.isRecording()
+                Timber.w(error, "Reading stopped log failed")
+            }
+        }
     }
 
     fun refreshTempLogEntries() {
-        if (!_isRecording.value) return
-        viewModelScope.launch(Dispatchers.IO) {
-            _tempLogEntries.value = repository.readTempLogEntries()
+        if (!_isRecording.value || refreshJob?.isActive == true) return
+        refreshJob = viewModelScope.launch(Dispatchers.IO) {
+            val entries = repository.readTempLogEntries()
+            currentCoroutineContext().ensureActive()
+            if (_isRecording.value) _tempLogEntries.value = entries
         }
+    }
+
+    fun stopRefreshing() {
+        refreshJob?.cancel()
+        refreshJob = null
     }
 
     fun clearTempLog() {
@@ -67,6 +97,7 @@ class LogViewModel(
     }
 
     suspend fun saveTempLog(targetUri: Uri): Boolean = withContext(Dispatchers.IO) {
+        stopJob?.join()
         val entries = _tempLogEntries.value
         if (entries.isEmpty()) return@withContext false
         try {

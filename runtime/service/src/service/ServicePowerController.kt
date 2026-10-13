@@ -48,7 +48,8 @@ class ServicePowerController(private val context: Context) {
     val powerState: StateFlow<RuntimePowerState> = _powerState.asStateFlow()
 
     fun setAppVisible(visible: Boolean) {
-        _powerState.update { it.copy(appVisible = visible) }
+        // Reconcile device state when returning to an Activity, even after deferred broadcasts.
+        updateState(visible)
     }
 
     private fun readPowerState() = RuntimePowerState(
@@ -78,9 +79,9 @@ class ServicePowerController(private val context: Context) {
         unregister()
     }
 
-    private fun updateState() {
+    private fun updateState(appVisible: Boolean? = null) {
         val physicalState = readPowerState()
-        _powerState.update { physicalState.copy(appVisible = it.appVisible) }
+        _powerState.update { physicalState.copy(appVisible = appVisible ?: it.appVisible) }
         _screenOn.value = physicalState.screenOn
         _deviceIdle.value = physicalState.deviceIdle
     }

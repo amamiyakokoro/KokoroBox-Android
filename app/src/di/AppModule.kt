@@ -111,7 +111,7 @@ val appViewModelModule = module {
     viewModel { AccessControlViewModel(androidApplication(), get(), get()) }
     viewModel { AppDataManagementViewModel(get(), get()) }
     viewModel { LabViewModel(androidApplication(), get()) }
-    viewModel { LogViewModel(get()) }
+    viewModel { LogViewModel(get(), get<com.amamiyakokoro.box.runtime.client.ProxyFacade>().powerState) }
     viewModel { KokoroCustomRulesViewModel(get(), get()) }
     viewModel { KokoroSettingsViewModel(get()) }
     viewModel { CloudflareSpeedTestViewModel(get()) }

@@ -55,7 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.amamiyakokoro.box.common.util.toast
 import com.amamiyakokoro.box.core.locale.R as LocaleR
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.presentation.component.CenteredText
 import com.amamiyakokoro.box.presentation.component.ScreenLazyColumn
@@ -72,6 +72,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -118,8 +120,14 @@ fun LogScreen(navigator: DestinationsNavigator) {
     LaunchedEffect(isRecording, lifecycleOwner) {
         if (!isRecording) return@LaunchedEffect
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            PollingTimers.ticks(PollingTimerSpecs.LogScreenRefresh).collect {
-                viewModel.refreshTempLogEntries()
+            try {
+                viewModel.powerState.map(RuntimePowerPolicy::logScreenTimer).distinctUntilChanged().collectLatest { timer ->
+                    if (timer != null) PollingTimers.ticks(timer).collect {
+                        viewModel.refreshTempLogEntries()
+                    }
+                }
+            } finally {
+                viewModel.stopRefreshing()
             }
         }
     }

@@ -36,6 +36,7 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
+import com.amamiyakokoro.box.core.util.runCatchingCancellable
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.core.locale.R as LocaleR
 import com.amamiyakokoro.box.data.model.ProxyMode
@@ -118,18 +119,22 @@ class RootTunService : BaseService() {
 
                         val powerController = ServicePowerController(this@RootTunService).also(ServicePowerController::start)
                         val observedStatus = MutableStateFlow(cachedStatus)
+                        val verificationFailed = MutableStateFlow(false)
                         try {
-                            val periodic = combine(powerController.powerState, observedStatus) { power, status ->
-                                RuntimePowerPolicy.rootStatusTimer(power, status.state.isRecovering)
+                            val periodic = combine(powerController.powerState, observedStatus, verificationFailed) { power, status, failed ->
+                                RuntimePowerPolicy.rootStatusTimer(power, status.state.isRecovering || failed)
                             }.distinctUntilChanged().flatMapLatest { timer ->
-                                PollingTimers.ticks(timer).map { Unit }.onStart { emit(Unit) }
+                                PollingTimers.ticks(timer).map { Unit }.onStart {
+                                    if (timer.initialDelayMillis > 0L) emit(Unit)
+                                }
                             }
                             merge(periodic, RootTunServiceBridge.statusChanges(appContextOrSelf)).conflate().collect {
-                                val snapshotResult = runCatching {
+                                val snapshotResult = runCatchingCancellable {
                                     RootTunServiceBridge.queryStatus(appContextOrSelf)
                                 }
                                 val snapshot = snapshotResult.getOrNull()
                                 if (snapshot == null) {
+                                    verificationFailed.value = true
                                     unreachableCount++
                                     val error = snapshotResult.exceptionOrNull()
                                     val fallbackStatus = stateStore.snapshot().takeIf {
@@ -164,6 +169,7 @@ class RootTunService : BaseService() {
                                 }
 
                                 unreachableCount = 0
+                                verificationFailed.value = false
                                 observedStatus.value = snapshot
                                 val statusPresentationChanged =
                                     snapshot.state != lastStatus.state || snapshot.profileName != lastStatus.profileName
@@ -249,8 +255,8 @@ class RootTunService : BaseService() {
     }
 
     private suspend fun buildTrafficPresentation(profileName: String): NotificationPresentation {
-        val now = runCatching { RootTunServiceBridge.queryTrafficNow(appContextOrSelf) }.getOrDefault(0L)
-        val total = runCatching { RootTunServiceBridge.queryTrafficTotal(appContextOrSelf) }.getOrDefault(0L)
+        val now = runCatchingCancellable { RootTunServiceBridge.queryTrafficNow(appContextOrSelf) }.getOrDefault(0L)
+        val total = runCatchingCancellable { RootTunServiceBridge.queryTrafficTotal(appContextOrSelf) }.getOrDefault(0L)
         return NotificationPresentationFactory.createRunning(
             resources = resources,
             profileName = profileName,

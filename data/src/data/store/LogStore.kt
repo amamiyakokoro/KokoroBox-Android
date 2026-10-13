@@ -43,6 +43,9 @@ class LogStore(
         private val LOG_LEVELS = enumEntries<LogMessage.Level>().associateBy { it.name }
     }
 
+    private val liveTail = IncrementalLogTail(::parseLogLine)
+    val currentRecordingFileName: String? get() = logRecordGateway.currentLogFileName
+
     private val logDir: File
         get() = logRecordGateway.getLogDir(application)
 
@@ -115,7 +118,26 @@ class LogStore(
         if (!currentlyRecording || currentFileName == null) {
             return@withContext emptyList()
         }
-        readLogEntries(currentFileName, maxEntries)
+        val file = resolveLogFile(currentFileName) ?: return@withContext emptyList()
+        try {
+            liveTail.read(file, maxEntries)
+        } catch (_: IOException) {
+            emptyList()
+        } catch (_: SecurityException) {
+            emptyList()
+        }
+    }
+
+    suspend fun readStoppedRecordingEntries(fileName: String?): List<LogEntry> = withContext(Dispatchers.IO) {
+        if (fileName == null) return@withContext emptyList()
+        // The service clears the filename only after closing/flushing its writer.
+        val stopped = kotlinx.coroutines.withTimeoutOrNull(5_000L) {
+            while (currentRecordingFileName == fileName) kotlinx.coroutines.delay(50L)
+            true
+        } == true
+        if (!stopped) throw IOException("Log recording did not stop")
+        val file = resolveLogFile(fileName) ?: return@withContext emptyList()
+        liveTail.read(file, DEFAULT_MAX_ENTRIES)
     }
 
     suspend fun writeLogEntries(targetUri: Uri, entries: List<LogEntry>): Boolean = withContext(Dispatchers.IO) {

@@ -34,6 +34,10 @@ import com.amamiyakokoro.box.service.common.constants.Components
 import com.amamiyakokoro.box.service.remote.ILogObserver
 import kotlinx.coroutines.*
 import timber.log.Timber
+import com.amamiyakokoro.box.service.common.log.BufferedLogWriter
+import com.amamiyakokoro.box.core.util.PollingTimerSpec
+import com.amamiyakokoro.box.core.util.PollingTimers
+import kotlinx.coroutines.flow.collect
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -88,7 +92,8 @@ class LogRecordService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private var logWriter: BufferedWriter? = null
+    private var logWriter: BufferedLogWriter? = null
+    private var flushJob: Job? = null
     private var logCollectJob: Job? = null
     private var logFile: File? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
@@ -124,22 +129,27 @@ class LogRecordService : Service() {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val fileName = "$LOG_PREFIX$timestamp$LOG_SUFFIX"
             logFile = File(logDir, fileName)
-            logWriter = BufferedWriter(FileWriter(logFile, true))
+            logWriter = BufferedLogWriter(BufferedWriter(FileWriter(logFile, true)))
 
             currentLogFileName = fileName
             isRecording = true
 
             startForeground(NOTIFICATION_ID, createNotification())
 
+            flushJob = serviceScope.launch {
+                PollingTimers.ticks(PollingTimerSpec("log_record_flush", 2_000L)).collect {
+                    runCatching { logWriter?.flushPending() }.onFailure { Timber.tag(TAG).e(it, "Log flush failed") }
+                }
+            }
             logCollectJob = serviceScope.launch {
                 try {
                     val observer = object : ILogObserver {
                         override fun newItem(log: LogMessage) {
                             if (isRecording) {
                                 runCatching {
-                                    val line = "[${dateFormat.format(log.time)}] [${log.level.name}] ${log.message}\n"
-                                    logWriter?.write(line)
-                                    logWriter?.flush()
+                                    logWriter?.append {
+                                        "[${dateFormat.format(log.time)}] [${log.level.name}] ${log.message}\n"
+                                    }
                                 }.onFailure { e ->
                                     Timber.tag(TAG).e(e, "Log write failed")
                                 }
@@ -167,6 +177,7 @@ class LogRecordService : Service() {
     }
 
     private fun stopRecording() {
+        isRecording = false
         logCollectJob?.cancel()
         logCollectJob = null
         closeLogWriter()
@@ -179,10 +190,12 @@ class LogRecordService : Service() {
     }
 
     private fun closeLogWriter() {
+        flushJob?.cancel()
+        flushJob = null
+        val writer = logWriter
+        logWriter = null
         runCatching {
-            logWriter?.flush()
-            logWriter?.close()
-            logWriter = null
+            writer?.close()
             logFile = null
         }.onFailure { e ->
             Timber.tag(TAG).e(e, "Log writer close failed")

@@ -66,6 +66,18 @@ object RuntimePowerPolicy {
         else -> PollingTimerSpecs.ConnectionsPolling
     }
 
+    fun logScreenTimer(state: RuntimePowerState): PollingTimerSpec? = when {
+        !state.uiVisible -> null
+        state.powerSaveMode -> timer("log_screen_power_save", 2_000L, immediate = true)
+        else -> PollingTimerSpecs.LogScreenRefresh
+    }
+
+    fun elapsedClockTimer(state: RuntimePowerState): PollingTimerSpec? = when {
+        !state.uiVisible -> null
+        state.powerSaveMode -> timer("elapsed_clock_power_save", 2_000L, immediate = true)
+        else -> PollingTimerSpecs.AcgElapsedClock
+    }
+
     fun rootStatusTimer(state: RuntimePowerState, transitioning: Boolean): PollingTimerSpec = when {
         transitioning -> PollingTimerSpecs.RootTunStatusPolling
         state.deviceIdle -> timer("root_status_idle", 120_000L)

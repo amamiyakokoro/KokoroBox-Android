@@ -64,7 +64,7 @@ import com.github.panpf.sketch.request.ImageRequest
 import com.github.panpf.sketch.resize.Precision
 import com.github.panpf.sketch.resize.Scale
 import com.amamiyakokoro.box.common.util.toast
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
+import com.amamiyakokoro.box.core.util.RuntimePowerPolicy
 import com.amamiyakokoro.box.core.util.PollingTimers
 import com.amamiyakokoro.box.data.model.ProxyMode
 import com.amamiyakokoro.box.data.model.ThemeMode
@@ -148,18 +148,21 @@ fun AcgHomePage(
         onPauseOrDispose { }
     }
 
+    val powerState by homeViewModel.powerState.collectAsStateWithLifecycle()
+    val clockTimer = RuntimePowerPolicy.elapsedClockTimer(powerState).takeIf { isActive }
     val visualControlState = controlState
     val now by produceState(
         initialValue = System.currentTimeMillis(),
         visualControlState,
         runtimeSnapshot.startedAt,
+        clockTimer,
     ) {
-        if (visualControlState != HomeProxyControlState.Running || runtimeSnapshot.startedAt == null) {
+        if (visualControlState != HomeProxyControlState.Running || runtimeSnapshot.startedAt == null || clockTimer == null) {
             value = System.currentTimeMillis()
             return@produceState
         }
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            PollingTimers.ticks(PollingTimerSpecs.AcgElapsedClock).collect {
+            PollingTimers.ticks(clockTimer).collect {
                 value = System.currentTimeMillis()
             }
         }

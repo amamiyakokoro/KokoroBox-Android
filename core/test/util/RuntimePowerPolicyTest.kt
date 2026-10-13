@@ -40,6 +40,16 @@ class RuntimePowerPolicyTest {
         assertEquals(2_000L, RuntimePowerPolicy.connectionsTimer(visible.copy(powerSaveMode = true))!!.intervalMillis)
         assertEquals(0L, RuntimePowerPolicy.connectionsTimer(visible)!!.initialDelayMillis)
     }
+    @Test fun logPageUsesSlowerUpdatesInBatterySaver() {
+        assertNull(RuntimePowerPolicy.logScreenTimer(visible.copy(appVisible = false)))
+        assertEquals(2_000L, RuntimePowerPolicy.logScreenTimer(visible.copy(powerSaveMode = true))!!.intervalMillis)
+        assertEquals(500L, RuntimePowerPolicy.logScreenTimer(visible)!!.intervalMillis)
+    }
+    @Test fun hiddenElapsedClockStopsAndResumesImmediately() {
+        assertNull(RuntimePowerPolicy.elapsedClockTimer(visible.copy(appVisible = false)))
+        assertEquals(0L, RuntimePowerPolicy.elapsedClockTimer(visible)!!.initialDelayMillis)
+        assertEquals(2_000L, RuntimePowerPolicy.elapsedClockTimer(visible.copy(powerSaveMode = true))!!.intervalMillis)
+    }
     @Test fun rootRecoveryIsFastEvenInDoze() {
         val idle = visible.copy(screenOn = false, deviceIdle = true)
         assertEquals(2_000L, RuntimePowerPolicy.rootStatusTimer(idle, true).intervalMillis)
