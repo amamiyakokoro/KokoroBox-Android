@@ -20,8 +20,8 @@
 
 package com.amamiyakokoro.box.data.store
 
-import com.amamiyakokoro.box.core.util.PollingTimerSpecs
-import com.amamiyakokoro.box.core.util.PollingTimers
+import com.amamiyakokoro.box.core.util.ScheduledFlush
+import com.amamiyakokoro.box.data.model.TodayTrafficSummary
 import com.amamiyakokoro.box.data.model.AppTrafficDeltaRecord
 import com.amamiyakokoro.box.data.model.AppRouteTrafficUsage
 import com.amamiyakokoro.box.data.model.AppTrafficUsage
@@ -33,12 +33,10 @@ import com.amamiyakokoro.box.data.model.TrafficStatisticsBuckets
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.Calendar
 
@@ -50,7 +48,10 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
 
     private val storeScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val lock = Any()
-    private var flushJob: Job? = null
+    private val persistenceLock = Any()
+    private val pendingFlush = ScheduledFlush(storeScope, FLUSH_INTERVAL_MS) {
+        flushPendingData()
+    }
     private var dailyAppDirty = false
     private var dailyRouteDirty = false
     private var lastTrafficDirty = false
@@ -199,8 +200,8 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
         )
     }
 
-    fun clearAll() {
-        flushJob?.cancel()
+    fun clearAll() = synchronized(persistenceLock) {
+        pendingFlush.cancelPending()
         _dailyAppSummaries.value = emptyMap()
         synchronized(lock) {
             dailyAppDirty = false
@@ -211,6 +212,7 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
             lastProfileId = null
         }
         _dailyRouteSummaries.value = emptyMap()
+        mmkv.removeValueForKey(TodayTrafficSummary.STORAGE_KEY)
         mmkv.removeValueForKey(KEY_DAILY_APP_SUMMARIES)
         mmkv.removeValueForKey(KEY_DAILY_ROUTE_SUMMARIES)
         mmkv.removeValueForKey(KEY_LAST_TRAFFIC_UPLOAD)
@@ -219,7 +221,7 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
     }
 
     fun flushNow() {
-        flushJob?.cancel()
+        pendingFlush.cancelPending()
         flushPendingData()
     }
 
@@ -279,6 +281,7 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
                 _dailyRouteSummaries.value = cleanOldDailyRouteData(summaries.toMutableMap())
             }
         }
+        persistTodaySummary(_dailyAppSummaries.value)
     }
 
     private fun aggregateAppUsages(days: Int): List<AppTrafficUsage> {
@@ -357,21 +360,17 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
         scheduleFlush()
     }
 
-    private fun scheduleFlush() {
-        flushJob?.cancel()
-        flushJob = storeScope.launch {
-            PollingTimers.awaitTick(
-                PollingTimerSpecs.dynamic(
-                    name = "traffic_store_flush_debounce",
-                    intervalMillis = FLUSH_DEBOUNCE_MS,
-                    initialDelayMillis = FLUSH_DEBOUNCE_MS,
-                ),
-            )
-            flushPendingData()
-        }
+    private fun scheduleFlush() = pendingFlush.request()
+
+    private fun persistTodaySummary(summaries: Map<Long, DailyAppTrafficSummary>) {
+        val day = getDayKey(System.currentTimeMillis())
+        val summary = TodayTrafficSummary(day, summaries[day]?.total ?: 0L)
+        val encoded = json.encodeToString(summary)
+        val key = TodayTrafficSummary.STORAGE_KEY
+        if (mmkv.decodeString(key) != encoded) mmkv.encode(key, encoded)
     }
 
-    private fun flushPendingData() {
+    private fun flushPendingData() = synchronized(persistenceLock) {
         val dailyAppSnapshot: Map<Long, DailyAppTrafficSummary>?
         val dailyRouteSnapshot: Map<Long, DailyRouteTrafficSummary>?
         val trafficSnapshot: Triple<Long, Long, String?>?
@@ -392,6 +391,7 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
         dailyAppSnapshot?.let { summaries ->
             runCatching {
                 mmkv.encode(KEY_DAILY_APP_SUMMARIES, json.encodeToString(summaries))
+                persistTodaySummary(summaries)
             }
         }
         dailyRouteSnapshot?.let { summaries ->
@@ -431,6 +431,7 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
             lastProfileId = null
         }
         _dailyRouteSummaries.value = emptyMap()
+        mmkv.removeValueForKey(TodayTrafficSummary.STORAGE_KEY)
         mmkv.removeValueForKey(KEY_DAILY_APP_SUMMARIES)
         mmkv.removeValueForKey(KEY_DAILY_ROUTE_SUMMARIES)
         mmkv.removeValueForKey(KEY_LAST_TRAFFIC_UPLOAD)
@@ -456,7 +457,7 @@ class TrafficStatisticsStore(private val mmkv: MMKV) {
         private const val LEGACY_KEY_LAST_TRAFFIC_DOWNLOAD = "last_traffic_download"
         private const val LEGACY_KEY_LAST_PROFILE_ID = "last_profile_id"
         private const val CURRENT_STATS_SCHEMA_VERSION = 3
-        private const val FLUSH_DEBOUNCE_MS = 30_000L
+        private const val FLUSH_INTERVAL_MS = 30_000L
         private const val DAY_MS = 24 * 60 * 60 * 1000L
         private const val MAX_APP_DAYS_TO_KEEP = 90
         private const val NO_PERSISTED_TRAFFIC = -1L

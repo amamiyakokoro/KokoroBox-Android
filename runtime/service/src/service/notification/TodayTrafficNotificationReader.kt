@@ -21,6 +21,7 @@
 package com.amamiyakokoro.box.service.notification
 
 import com.amamiyakokoro.box.data.model.DailyAppTrafficSummary
+import com.amamiyakokoro.box.data.model.TodayTrafficSummary
 import com.tencent.mmkv.MMKV
 import kotlinx.serialization.json.Json
 import java.util.Calendar
@@ -32,12 +33,27 @@ internal class TodayTrafficNotificationReader {
         encodeDefaults = true
     }
 
+    private var cachedLegacyRaw: String? = null
+    private var cachedLegacyDay: Long? = null
+    private var cachedLegacyTotal = 0L
+
     fun readTodayTotalBytes(): Long {
+        val today = getTodayKey()
+        mmkv.decodeString(TodayTrafficSummary.STORAGE_KEY)?.let { raw ->
+            runCatching { json.decodeFromString<TodayTrafficSummary>(raw) }.getOrNull()?.let { summary ->
+                cachedLegacyRaw = null
+                return summary.totalForDay(today)
+            }
+        }
         val raw = mmkv.decodeString(KEY_DAILY_APP_SUMMARIES) ?: return 0L
+        if (raw == cachedLegacyRaw && today == cachedLegacyDay) return cachedLegacyTotal
         val summaries = runCatching {
             json.decodeFromString<Map<Long, DailyAppTrafficSummary>>(raw)
         }.getOrNull() ?: return 0L
-        return summaries[getTodayKey()]?.total ?: 0L
+        cachedLegacyRaw = raw
+        cachedLegacyDay = today
+        cachedLegacyTotal = summaries[today]?.total ?: 0L
+        return cachedLegacyTotal
     }
 
     private fun getTodayKey(): Long {
