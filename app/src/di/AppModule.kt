@@ -66,7 +66,9 @@ val appIntegrationModule = module {
     single { PackageUpdateInstaller(androidApplication()) }
     single { ShizukuUpdateInstaller(androidApplication()) }
     single { RootUpdateInstaller() }
-    single { AppForegroundTracker(androidApplication()) }
+    single {
+        AppForegroundTracker(androidApplication(), get<com.amamiyakokoro.box.service.ServicePowerController>()::setAppVisible)
+    }
     single { AppUpdateInstallNotifier(androidApplication()) }
     single {
         AppUpdateManager(

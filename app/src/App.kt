@@ -70,6 +70,8 @@ class App : Application() {
             androidContext(this@App)
             modules(appModule)
         }
+        // Register before the first Activity starts, so telemetry never mistakes Home for background.
+        koinApp.koin.get<com.amamiyakokoro.box.integration.update.AppForegroundTracker>()
         val appSettingsStorage: AppSettingsStore = koinApp.koin.get()
         AppLanguageManager.apply(appSettingsStorage.appLanguage.value)
 

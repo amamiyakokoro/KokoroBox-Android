@@ -28,10 +28,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.PowerManager
+import com.amamiyakokoro.box.core.util.RuntimePowerState
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class ServicePowerController(private val context: Context) {
     private val powerManager = context.getSystemService(PowerManager::class.java)
@@ -41,6 +43,19 @@ class ServicePowerController(private val context: Context) {
 
     private val _deviceIdle = MutableStateFlow(isDeviceIdle())
     val deviceIdle: StateFlow<Boolean> = _deviceIdle.asStateFlow()
+
+    private val _powerState = MutableStateFlow(readPowerState())
+    val powerState: StateFlow<RuntimePowerState> = _powerState.asStateFlow()
+
+    fun setAppVisible(visible: Boolean) {
+        _powerState.update { it.copy(appVisible = visible) }
+    }
+
+    private fun readPowerState() = RuntimePowerState(
+        screenOn = isScreenOn(),
+        deviceIdle = isDeviceIdle(),
+        powerSaveMode = powerManager?.isPowerSaveMode == true,
+    )
 
     private var started = false
 
@@ -64,8 +79,10 @@ class ServicePowerController(private val context: Context) {
     }
 
     private fun updateState() {
-        _screenOn.value = isScreenOn()
-        _deviceIdle.value = isDeviceIdle()
+        val physicalState = readPowerState()
+        _powerState.update { physicalState.copy(appVisible = it.appVisible) }
+        _screenOn.value = physicalState.screenOn
+        _deviceIdle.value = physicalState.deviceIdle
     }
 
     private fun isScreenOn(): Boolean {
@@ -84,6 +101,7 @@ class ServicePowerController(private val context: Context) {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
             }
