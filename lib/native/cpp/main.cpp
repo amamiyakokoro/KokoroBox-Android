@@ -114,6 +114,12 @@ Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeQueryConnections(JNIEnv *env
     return new_string(response);
 }
 
+JNIEXPORT jint JNICALL
+Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeQueryConnectionCount(JNIEnv *env, jobject thiz) {
+    TRACE_METHOD();
+    return (jint) queryConnectionCount();
+}
+
 JNIEXPORT jboolean JNICALL
 Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeCloseConnection(JNIEnv *env, jobject thiz,
                                                                      jstring id) {

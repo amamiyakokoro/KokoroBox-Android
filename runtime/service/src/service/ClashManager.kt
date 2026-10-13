@@ -85,6 +85,8 @@ class ClashManager(private val context: Context) : IClashManager,
         return Clash.queryTrafficTotal()
     }
 
+    override fun queryConnectionCount(): Int = if (StatusProvider.serviceRunning) Clash.queryConnectionCount() else 0
+
     override fun queryConnections(): ConnectionSnapshot {
         return Clash.queryConnections()
     }

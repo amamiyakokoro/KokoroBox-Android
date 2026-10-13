@@ -111,6 +111,8 @@ object Clash {
         }
     }
 
+    fun queryConnectionCount(): Int = Bridge.nativeQueryConnectionCount().coerceAtLeast(0)
+
     fun queryConnections(): ConnectionSnapshot {
         return connectionsCache.getOrQuery(CONNECTION_QUERY_CACHE_MILLIS) {
             decodeConnectionSnapshot(Bridge.nativeQueryConnections())

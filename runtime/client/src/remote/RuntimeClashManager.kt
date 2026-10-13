@@ -86,6 +86,11 @@ class RuntimeClashManager(
         )
     }
 
+    override fun queryConnectionCount(): Int = queryWithRuntime(
+        rootCall = { rootBlockingCall { RootTunController.queryConnectionCount(appContext) } },
+        localCall = { local.queryConnectionCount() },
+    )
+
     override fun queryConnections(): ConnectionSnapshot {
         return queryWithRuntime(
             rootCall = { rootBlockingCall { RootTunController.queryConnections(appContext) } },

@@ -51,6 +51,11 @@ func queryConnections() *C.char {
 	return marshalJson(tunnel.QueryConnections())
 }
 
+//export queryConnectionCount
+func queryConnectionCount() C.int {
+	return C.int(tunnel.QueryConnectionCount())
+}
+
 //export closeConnection
 func closeConnection(id C.c_string) C.int {
 	if tunnel.CloseConnection(C.GoString(id)) {

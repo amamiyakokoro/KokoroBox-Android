@@ -242,6 +242,19 @@ object RootTunController {
         return remoteCall(context) { service -> service.queryTrafficTotal() }
     }
 
+    suspend fun queryConnectionCount(context: Context): Int {
+        return remoteCall(context) { service ->
+            try {
+                service.queryConnectionCount()
+            } catch (error: android.os.RemoteException) {
+                // A root daemon can outlive an app update. Preserve its older AIDL API until restart.
+                if (service.asBinder().isBinderAlive && error.message?.contains("unimplemented") == true) {
+                    RootTunJson.Default.decodeFromString(ConnectionSnapshot.serializer(), service.queryConnectionsJson()).connections.size
+                } else throw error
+            }
+        }
+    }
+
     suspend fun queryConnections(context: Context): ConnectionSnapshot {
         return remoteCall(context) { service ->
             RootTunJson.Default.decodeFromString(

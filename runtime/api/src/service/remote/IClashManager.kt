@@ -30,6 +30,7 @@ interface IClashManager {
     fun queryTrafficNow(): Long
     fun queryTrafficTotal(): Long
     fun queryConnections(): ConnectionSnapshot
+    fun queryConnectionCount(): Int
     fun queryProfileProxyGroupNames(excludeNotSelectable: Boolean): List<String>
     fun queryProfileProxyGroups(excludeNotSelectable: Boolean): List<ProxyGroup>
     fun queryAllProxyGroups(excludeNotSelectable: Boolean): List<ProxyGroup>

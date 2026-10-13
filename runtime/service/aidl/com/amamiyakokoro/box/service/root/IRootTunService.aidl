@@ -30,4 +30,5 @@ interface IRootTunService {
     // Append new methods to preserve transaction IDs for a still-running older root service.
     void registerStatusObserver(IRootTunStatusObserver observer);
     void unregisterStatusObserver(IRootTunStatusObserver observer);
+    int queryConnectionCount();
 }

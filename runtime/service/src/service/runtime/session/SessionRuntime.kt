@@ -179,6 +179,9 @@ class SessionRuntime(
         }
     }
 
+    fun queryConnectionCount(): Int =
+        if (currentSnapshot.phase.running) Clash.queryConnectionCount() else 0
+
     fun queryConnections(): ConnectionSnapshot {
         if (currentSnapshot.phase != RuntimePhase.Running) return ConnectionSnapshot()
         return Clash.queryConnections()

@@ -151,6 +151,8 @@ class RootTunRootService : RootService() {
 
         override fun queryTrafficTotal(): Long = runtime.queryTrafficTotal()
 
+        override fun queryConnectionCount(): Int = runtime.queryConnectionCount()
+
         override fun queryConnectionsJson(): String {
             return RootTunJson.Default.encodeToString(
                 com.amamiyakokoro.box.core.model.ConnectionSnapshot.serializer(),

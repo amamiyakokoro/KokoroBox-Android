@@ -517,6 +517,21 @@ class ProxyFacade(
         return ok
     }
 
+    suspend fun queryConnectionCount(): Int {
+        if (!_runtimeSnapshot.value.running) {
+            _activeConnectionCount.value = 0
+            return 0
+        }
+        val count = if (_runtimeSnapshot.value.owner == RuntimeOwner.RootTun) {
+            RootTunController.queryConnectionCount(appContext)
+        } else {
+            connectCurrentBackend()
+            ServiceClient.clash().queryConnectionCount()
+        }.coerceAtLeast(0)
+        _activeConnectionCount.value = count.takeIf { _runtimeSnapshot.value.running }
+        return count
+    }
+
     suspend fun queryConnections(): ConnectionSnapshot {
         if (!_runtimeSnapshot.value.running) {
             _activeConnectionCount.value = 0
@@ -857,7 +872,7 @@ class ProxyFacade(
                         if (homeVisible && powerState.value.uiVisible &&
                             trafficPriorityRequests.value["home"] == TrafficPollingPriority.FAST
                         ) {
-                            runCatchingCancellable { queryConnections() }.onFailure { error ->
+                            runCatchingCancellable { queryConnectionCount() }.onFailure { error ->
                                 _activeConnectionCount.value = null
                                 Timber.d(error, "Home connection count refresh skipped")
                             }

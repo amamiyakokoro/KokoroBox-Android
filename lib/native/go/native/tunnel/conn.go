@@ -9,6 +9,19 @@ func QueryConnections() *statistic.Snapshot {
 	return statistic.DefaultManager.Snapshot()
 }
 
+func QueryConnectionCount() int {
+	return connectionCount(statistic.DefaultManager)
+}
+
+func connectionCount(manager *statistic.Manager) int {
+	count := 0
+	manager.Range(func(_ statistic.Tracker) bool {
+		count++
+		return true
+	})
+	return count
+}
+
 func CloseConnection(id string) bool {
 	conn := statistic.DefaultManager.Get(id)
 	if conn == nil {
