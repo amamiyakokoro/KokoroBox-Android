@@ -125,6 +125,13 @@ func healthCheckProxy(completable unsafe.Pointer, proxyName C.c_string) {
 	}(C.GoString(proxyName))
 }
 
+//export diagnoseConnection
+func diagnoseConnection(completable unsafe.Pointer, host C.c_string, proxyName C.c_string) {
+	go func(host, name string) {
+		C.complete_with_string(completable, marshalJson(tunnel.DiagnoseConnection(host, name)))
+	}(C.GoString(host), C.GoString(proxyName))
+}
+
 //export patchSelector
 func patchSelector(selector, name C.c_string) C.int {
 	s := C.GoString(selector)

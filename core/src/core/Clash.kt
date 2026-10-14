@@ -264,6 +264,13 @@ object Clash {
         }
     }
 
+    suspend fun diagnoseConnection(host: String, proxyName: String): ConnectionDiagnostic {
+        val payload = CompletableDeferred<String>().apply {
+            Bridge.nativeDiagnoseConnection(this, host, proxyName)
+        }.await()
+        return Json.decodeFromString(ConnectionDiagnostic.serializer(), payload)
+    }
+
     fun healthCheckAll() {
         Bridge.nativeHealthCheckAll()
     }

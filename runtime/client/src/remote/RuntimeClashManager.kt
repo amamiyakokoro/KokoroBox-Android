@@ -184,6 +184,13 @@ class RuntimeClashManager(
         )
     }
 
+    override suspend fun diagnoseConnection(host: String, proxyName: String): ConnectionDiagnostic =
+        queryWithRuntimeSuspend(
+            rootCall = { RootTunController.diagnoseConnection(appContext, host, proxyName) },
+            localCall = { local.diagnoseConnection(host, proxyName) },
+            fallbackOnRootFailure = false,
+        )
+
     override suspend fun healthCheck(group: String) {
         queryWithRuntimeSuspend(
             rootCall = { RootTunController.healthCheck(appContext, group) },

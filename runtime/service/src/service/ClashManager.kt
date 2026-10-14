@@ -25,6 +25,7 @@ package com.amamiyakokoro.box.service
 import android.content.Context
 import android.content.Intent
 import com.amamiyakokoro.box.core.Clash
+import com.amamiyakokoro.box.core.model.ConnectionDiagnostic
 import com.amamiyakokoro.box.core.model.ConnectionSnapshot
 import com.amamiyakokoro.box.core.model.LogMessage
 import com.amamiyakokoro.box.core.model.Proxy
@@ -159,6 +160,11 @@ class ClashManager(private val context: Context) : IClashManager,
         // Stopping/resetting the native core here races with SessionRuntime.destroy() in the
         // service lifecycle and can leave the UI waiting forever for the terminal state event.
         context.sendBroadcastSelf(Intent(Intents.ACTION_CLASH_REQUEST_STOP))
+    }
+
+    override suspend fun diagnoseConnection(host: String, proxyName: String): ConnectionDiagnostic {
+        check(StatusProvider.serviceRunning) { "Runtime is not running" }
+        return Clash.diagnoseConnection(host, proxyName)
     }
 
     override suspend fun healthCheck(group: String) {

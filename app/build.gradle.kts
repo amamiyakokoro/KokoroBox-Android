@@ -327,6 +327,7 @@ androidComponents {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${libs.versions.coroutines.get()}")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:${libs.versions.desugarJdkLibs.get()}")
 
     implementation(project(":core"))

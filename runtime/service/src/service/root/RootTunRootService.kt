@@ -205,6 +205,9 @@ class RootTunRootService : RootService() {
             runtime.closeAllConnections()
         }
 
+        override fun diagnoseConnection(host: String, proxyName: String): String =
+            runBlocking { runtime.diagnoseConnection(host, proxyName) }
+
         override fun healthCheck(group: String): String? = runBlocking { runtime.healthCheck(group) }
 
         override fun healthCheckProxy(group: String, proxyName: String): String =

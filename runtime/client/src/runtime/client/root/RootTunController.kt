@@ -320,6 +320,26 @@ object RootTunController {
         remoteCall(context) { service -> service.closeAllConnections() }
     }
 
+    suspend fun diagnoseConnection(context: Context, host: String, proxyName: String): com.amamiyakokoro.box.core.model.ConnectionDiagnostic {
+        return remoteCall(context) { service ->
+            try {
+                RootTunJson.Default.decodeFromString(
+                    com.amamiyakokoro.box.core.model.ConnectionDiagnostic.serializer(),
+                    service.diagnoseConnection(host, proxyName),
+                )
+            } catch (error: android.os.RemoteException) {
+                // Older live root daemons do not implement this appended transaction.
+                // Report unsupported diagnostics without marking the healthy daemon as dead.
+                if (service.asBinder().isBinderAlive && error.message?.contains("unimplemented", ignoreCase = true) == true) {
+                    // Recovery examines the cause chain for RemoteException, so do not wrap
+                    // this live-daemon compatibility error as an IPC connection failure.
+                    throw UnsupportedOperationException("Restart the proxy service to enable connection diagnostics")
+                }
+                throw error
+            }
+        }
+    }
+
     suspend fun healthCheck(context: Context, group: String) {
         val error = remoteCall(context) { service -> service.healthCheck(group) }
         if (!error.isNullOrBlank()) {

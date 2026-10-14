@@ -260,6 +260,14 @@ class SessionRuntime(
         Clash.closeAllConnections()
     }
 
+    suspend fun diagnoseConnection(host: String, proxyName: String): String {
+        check(currentSnapshot.phase == RuntimePhase.Running) { "Runtime is not running" }
+        return com.amamiyakokoro.box.service.root.RootTunJson.Default.encodeToString(
+            com.amamiyakokoro.box.core.model.ConnectionDiagnostic.serializer(),
+            Clash.diagnoseConnection(host, proxyName),
+        )
+    }
+
     suspend fun healthCheck(group: String): String? {
         Timber.d("SessionRuntime healthCheck: group=%s phase=%s owner=%s", group, currentSnapshot.phase, currentSnapshot.owner)
         return runCatching {

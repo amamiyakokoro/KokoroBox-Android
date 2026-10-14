@@ -283,6 +283,17 @@ Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeHealthCheckProxy(JNIEnv *env
     healthCheckProxy(_completable, _proxy_name);
 }
 
+JNIEXPORT void JNICALL
+Java_com_amamiyakokoro_box_core_bridge_Bridge_nativeDiagnoseConnection(JNIEnv *env, jobject thiz,
+                                                                         jobject completable,
+                                                                         jstring host, jstring proxy_name) {
+    TRACE_METHOD();
+    jobject _completable = new_global(completable);
+    scoped_string _host = get_string(host);
+    scoped_string _proxy_name = get_string(proxy_name);
+    diagnoseConnection(_completable, _host, _proxy_name);
+}
+
 JNIEXPORT jboolean JNICALL
 Java_com_amamiyakokoro_box_core_bridge_Bridge_nativePatchSelector(JNIEnv *env, jobject thiz,
                                                                    jstring selector, jstring name) {

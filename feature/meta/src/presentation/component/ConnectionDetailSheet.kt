@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -62,6 +63,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 private const val CONNECTION_LEADING_ICON_BITMAP_SIZE = 96
+private enum class ConnectionPane { Detail, Rule, Diagnostics }
 
 @Composable
 fun ConnectionDetailSheet(
@@ -72,26 +74,31 @@ fun ConnectionDetailSheet(
     onDismiss: () -> Unit,
     onDismissFinished: () -> Unit = {},
     onAddKokoroRule: ((ConnectionInfo) -> Unit)? = null,
+    diagnostics: (@Composable (ConnectionInfo) -> Unit)? = null,
     ruleEditor: (@Composable (ConnectionInfo, onBack: () -> Unit, onSavingChanged: (Boolean) -> Unit) -> Unit)? = null,
 ) {
     val spacing = AppTheme.spacing
     val scope = rememberCoroutineScope()
     var isInterrupting by remember(connectionInfo?.id, show) { mutableStateOf(false) }
-    var editingRule by rememberSaveable(connectionInfo?.id) { mutableStateOf(false) }
+    var pane by rememberSaveable(connectionInfo?.id) { mutableStateOf(ConnectionPane.Detail) }
     var editorSaving by remember(connectionInfo?.id) { mutableStateOf(false) }
     val slideAnimation = AppMotion.defaultSpatial<IntOffset>()
     val sizeAnimation = AppMotion.defaultSpatial<IntSize>()
-    val backToDetail = { if (!editorSaving) editingRule = false }
+    val backToDetail = { if (!editorSaving) pane = ConnectionPane.Detail }
     val detailState = remember(connectionInfo) {
         connectionInfo?.toDetailState()
     }
 
     AppActionBottomSheet(
         show = show,
-        title = if (editingRule) stringResource(LocaleR.string.meta_feature_custom_rules_add_rule) else detailState?.displayHost.orEmpty(),
+        title = when (pane) {
+            ConnectionPane.Rule -> stringResource(LocaleR.string.meta_feature_custom_rules_add_rule)
+            ConnectionPane.Diagnostics -> stringResource(LocaleR.string.connection_diagnostics_title)
+            ConnectionPane.Detail -> detailState?.displayHost.orEmpty()
+        },
         onDismissRequest = onDismiss,
         allowDismiss = !editorSaving,
-        startAction = if (editingRule) {
+        startAction = if (pane != ConnectionPane.Detail) {
             {
                 AppBottomSheetIconAction(AppBottomSheetAction(
                     icon = AppMd3Icons.Navigation.Back,
@@ -103,7 +110,7 @@ fun ConnectionDetailSheet(
         } else null,
         onDismissFinished = {
             // Keep the current pane during dismissal; resetting it earlier starts a back slide.
-            editingRule = false
+            pane = ConnectionPane.Detail
             editorSaving = false
             onDismissFinished()
         },
@@ -112,26 +119,28 @@ fun ConnectionDetailSheet(
         val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
         NavigationBackHandler(
             state = backState,
-            isBackEnabled = show && editingRule,
+            isBackEnabled = show && pane != ConnectionPane.Detail,
             onBackCompleted = { backToDetail() },
         )
         val info = connectionInfo
         val state = detailState
         if (info != null && state != null) {
             AnimatedContent(
-                targetState = editingRule,
+                targetState = pane,
                 modifier = Modifier.fillMaxWidth().clipToBounds(),
                 transitionSpec = {
-                    val direction = if (targetState) AnimatedContentTransitionScope.SlideDirection.Start
+                    val direction = if (targetState != ConnectionPane.Detail) AnimatedContentTransitionScope.SlideDirection.Start
                         else AnimatedContentTransitionScope.SlideDirection.End
                     (slideIntoContainer(direction, animationSpec = slideAnimation) togetherWith
                         slideOutOfContainer(direction, animationSpec = slideAnimation))
                         .using(SizeTransform(sizeAnimationSpec = { _, _ -> sizeAnimation }))
                 },
-                label = "connection_rule_editor",
-            ) { editorVisible ->
-                if (editorVisible && ruleEditor != null) {
+                label = "connection_detail_pane",
+            ) { visiblePane ->
+                if (visiblePane == ConnectionPane.Rule && ruleEditor != null) {
                     ruleEditor(info, backToDetail) { editorSaving = it }
+                } else if (visiblePane == ConnectionPane.Diagnostics && diagnostics != null) {
+                    diagnostics(info)
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
@@ -155,10 +164,21 @@ fun ConnectionDetailSheet(
                             }
                         }
 
+                        if (diagnostics != null) {
+                            item {
+                                OutlinedButton(
+                                    onClick = { pane = ConnectionPane.Diagnostics },
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Text(stringResource(LocaleR.string.connection_diagnostics_action))
+                                }
+                            }
+                        }
+
                         if (ruleEditor != null || onAddKokoroRule != null) {
                             item {
                                 Button(
-                                    onClick = { if (ruleEditor != null) editingRule = true else onAddKokoroRule?.invoke(info) },
+                                    onClick = { if (ruleEditor != null) pane = ConnectionPane.Rule else onAddKokoroRule?.invoke(info) },
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     Text(stringResource(LocaleR.string.connection_detail_add_kokoro_rule))
@@ -171,7 +191,7 @@ fun ConnectionDetailSheet(
                                 InterruptConnectionButton(
                                     isInterrupting = isInterrupting,
                                     onInterrupt = {
-                                        if (editingRule || isInterrupting) return@InterruptConnectionButton
+                                        if (pane != ConnectionPane.Detail || isInterrupting) return@InterruptConnectionButton
                                         isInterrupting = true
                                         scope.launch {
                                             val closed = runCatching {

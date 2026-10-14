@@ -14,7 +14,7 @@ A Material 3 Android client for [Mihomo](https://github.com/MetaCubeX/mihomo), w
 
 - Rule, Global, Direct, VPN, and optional Root TUN modes
 - Local, remote, QR-code, and authenticated Kokoro subscription profiles
-- Proxy selection, connections, traffic statistics, logs, and Geo data updates
+- Proxy selection, connections, on-demand connection diagnostics, traffic statistics, logs, and Geo data updates
 - Kokoro Custom Rules, profile overrides, and configuration preview
 - Manual and optional daily checks for stable GitHub releases
 

@@ -1328,4 +1328,32 @@
     <string name="log_level_unknown" formatted="false">未知</string>
     <string name="network_settings_experimental_overseas_dns_title" formatted="false">海外 DNS</string>
     <string name="network_settings_experimental_overseas_dns_summary" formatted="false">统一使用 1.1.1.1 和 8.8.8.8，不按域名分流；与抗污染 DNS 二选一启用</string>
+    <string name="connection_diagnostics_title" formatted="false">连接诊断</string>
+    <string name="connection_diagnostics_action" formatted="false">连接诊断</string>
+    <string name="connection_diagnostics_host" formatted="false">域名</string>
+    <string name="connection_diagnostics_matched_rule" formatted="false">命中规则</string>
+    <string name="connection_diagnostics_route" formatted="false">连接记录的链路</string>
+    <string name="connection_diagnostics_run" formatted="false">开始诊断</string>
+    <string name="connection_diagnostics_running" formatted="false">正在诊断…</string>
+    <string name="connection_diagnostics_stopped" formatted="false">请先启动代理服务再进行诊断。</string>
+    <string name="connection_diagnostics_unsupported" formatted="false">请重新启动代理服务以启用诊断。</string>
+    <string name="connection_diagnostics_timeout" formatted="false">诊断超时，请重试。</string>
+    <string name="connection_diagnostics_failed" formatted="false">测试失败或超时。</string>
+    <string name="connection_diagnostics_dns" formatted="false">DNS 解析</string>
+    <string name="connection_diagnostics_dns_mode" formatted="false">核心 DNS 模式</string>
+    <string name="connection_diagnostics_dns_note" formatted="false">使用当前 Mihomo 解析器，结果可能来自其缓存。</string>
+    <string name="connection_diagnostics_latency" formatted="false">节点延迟</string>
+    <string name="connection_diagnostics_node" formatted="false">连接记录的出口节点</string>
+    <string name="connection_diagnostics_endpoint" formatted="false">测试端点</string>
+    <string name="connection_diagnostics_latency_note" formatted="false">延迟为连接测试端点的 HTTP 测试结果。</string>
+    <string name="connection_diagnostics_ok" formatted="false">成功</string>
+    <string name="connection_diagnostics_no_host" formatted="false">连接未记录域名，跳过 DNS 查询。</string>
+    <string name="connection_diagnostics_ip_literal" formatted="false">目标为 IP 地址，跳过 DNS 查询。</string>
+    <string name="connection_diagnostics_invalid_host" formatted="false">域名无效，跳过 DNS 查询。</string>
+    <string name="connection_diagnostics_dns_disabled" formatted="false">核心 DNS 未启用。</string>
+    <string name="connection_diagnostics_no_records" formatted="false">没有此类型的记录。</string>
+    <string name="connection_diagnostics_no_route" formatted="false">未记录出口节点，跳过延迟测试。</string>
+    <string name="connection_diagnostics_not_found" formatted="false">连接记录中的节点已不可用。</string>
+    <string name="connection_diagnostics_not_testable" formatted="false">此链路不支持延迟测试。</string>
+    <string name="connection_diagnostics_group_only" formatted="false">仅记录了代理组，跳过延迟测试。</string>
 </resources>

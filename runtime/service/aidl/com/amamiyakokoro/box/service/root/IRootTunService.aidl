@@ -31,4 +31,5 @@ interface IRootTunService {
     void registerStatusObserver(IRootTunStatusObserver observer);
     void unregisterStatusObserver(IRootTunStatusObserver observer);
     int queryConnectionCount();
+    String diagnoseConnection(String host, String proxyName);
 }

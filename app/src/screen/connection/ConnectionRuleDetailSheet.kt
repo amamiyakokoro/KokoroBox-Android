@@ -55,6 +55,7 @@ internal fun ConnectionRuleDetailSheet(
     DisposableEffect(owner) { onDispose { owner.viewModelStore.clear() } }
     val rules = koinViewModel<KokoroCustomRulesViewModel>(viewModelStoreOwner = owner)
     val login = koinViewModel<KokoroSettingsViewModel>(viewModelStoreOwner = owner)
+    val diagnostics = koinViewModel<ConnectionDiagnosticsViewModel>(viewModelStoreOwner = owner)
     ConnectionDetailSheet(
         show = show,
         connectionInfo = info,
@@ -62,6 +63,7 @@ internal fun ConnectionRuleDetailSheet(
         onInterruptConnection = onInterruptConnection,
         onDismiss = onDismiss,
         onDismissFinished = onDismissFinished,
+        diagnostics = { connection -> ConnectionDiagnosticsPane(connection, diagnostics, active = show) },
         ruleEditor = { connection, onBack, onSavingChanged ->
             ConnectionKokoroRuleEditor(connection, rules, login, onBack, onSavingChanged)
         },

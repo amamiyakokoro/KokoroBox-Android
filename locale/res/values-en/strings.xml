@@ -1328,4 +1328,32 @@
     <string name="log_level_unknown" formatted="false">Unknown</string>
     <string name="network_settings_experimental_overseas_dns_title" formatted="false">Overseas DNS</string>
     <string name="network_settings_experimental_overseas_dns_summary" formatted="false">Use 1.1.1.1 and 8.8.8.8 for all DNS queries without domain policies; mutually exclusive with DNS Pollution Protection</string>
+    <string name="connection_diagnostics_title" formatted="false">Diagnostics</string>
+    <string name="connection_diagnostics_action" formatted="false">Connection diagnostics</string>
+    <string name="connection_diagnostics_host" formatted="false">Domain</string>
+    <string name="connection_diagnostics_matched_rule" formatted="false">Matched rule</string>
+    <string name="connection_diagnostics_route" formatted="false">Recorded route</string>
+    <string name="connection_diagnostics_run" formatted="false">Run diagnostics</string>
+    <string name="connection_diagnostics_running" formatted="false">Diagnosing…</string>
+    <string name="connection_diagnostics_stopped" formatted="false">Start the proxy service to run diagnostics.</string>
+    <string name="connection_diagnostics_unsupported" formatted="false">Restart the proxy service to enable diagnostics.</string>
+    <string name="connection_diagnostics_timeout" formatted="false">Diagnostics timed out. Tap to retry.</string>
+    <string name="connection_diagnostics_failed" formatted="false">Test failed or timed out.</string>
+    <string name="connection_diagnostics_dns" formatted="false">DNS resolution</string>
+    <string name="connection_diagnostics_dns_mode" formatted="false">Core DNS mode</string>
+    <string name="connection_diagnostics_dns_note" formatted="false">Uses the current Mihomo resolver; results may come from its cache.</string>
+    <string name="connection_diagnostics_latency" formatted="false">Node latency</string>
+    <string name="connection_diagnostics_node" formatted="false">Recorded outbound node</string>
+    <string name="connection_diagnostics_endpoint" formatted="false">Test endpoint</string>
+    <string name="connection_diagnostics_latency_note" formatted="false">Latency measures an HTTP connection to the test endpoint.</string>
+    <string name="connection_diagnostics_ok" formatted="false">Successful</string>
+    <string name="connection_diagnostics_no_host" formatted="false">No domain recorded; DNS query skipped.</string>
+    <string name="connection_diagnostics_ip_literal" formatted="false">IP address; DNS query skipped.</string>
+    <string name="connection_diagnostics_invalid_host" formatted="false">Invalid domain; DNS query skipped.</string>
+    <string name="connection_diagnostics_dns_disabled" formatted="false">Core DNS is disabled.</string>
+    <string name="connection_diagnostics_no_records" formatted="false">No records of this type.</string>
+    <string name="connection_diagnostics_no_route" formatted="false">No outbound node recorded; latency test skipped.</string>
+    <string name="connection_diagnostics_not_found" formatted="false">Recorded node is no longer available.</string>
+    <string name="connection_diagnostics_not_testable" formatted="false">This route does not support latency testing.</string>
+    <string name="connection_diagnostics_group_only" formatted="false">Only a group was recorded; latency test skipped.</string>
 </resources>

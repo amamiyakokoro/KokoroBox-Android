@@ -43,6 +43,7 @@ interface IClashManager {
     fun closeConnection(id: String): Boolean
     fun closeAllConnections()
 
+    suspend fun diagnoseConnection(host: String, proxyName: String): ConnectionDiagnostic
     suspend fun healthCheck(group: String)
     suspend fun healthCheckProxy(group: String, proxyName: String): Int
     suspend fun updateProvider(type: Provider.Type, name: String)
