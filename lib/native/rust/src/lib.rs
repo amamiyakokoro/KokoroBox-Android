@@ -8,6 +8,9 @@ use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+#[cfg(test)]
+mod tests;
+
 const DEFAULT_NAME_SERVERS: &[&str] = &["223.5.5.5", "119.29.29.29", "8.8.4.4", "1.0.0.1"];
 const DEFAULT_FAKE_IP_FILTER: &[&str] = &[
     "+.stun.*.*",

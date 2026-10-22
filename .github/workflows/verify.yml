@@ -94,6 +94,12 @@ jobs:
       - name: Checkout configured Mihomo release
         run: python3 scripts/ci-release.py sync-kernel
 
+      - name: Test native configuration and connection diagnostics
+        run: |
+          cargo test --manifest-path lib/native/rust/Cargo.toml --locked
+          cd lib/native/go
+          go test -race -tags=foss,with_gvisor,cmfa ./native/config ./native/tunnel
+
       - name: Build native runtime and Geo assets
         shell: bash
         env:

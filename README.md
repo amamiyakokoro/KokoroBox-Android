@@ -45,6 +45,7 @@ Never commit a keystore or `signing.properties`.
 ## Documentation
 
 - [Release build and publishing guide](docs/ReleaseCI.md)
+- [Native regression tests](docs/NativeTesting.md)
 - [Kokoro OAuth](docs/KokoroOAuth.md)
 - [Kokoro Custom Rules](docs/KokoroCustomRules.md)
 - [Privacy policy](PRIVACY_POLICY.md)
