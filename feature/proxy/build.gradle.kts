@@ -45,7 +45,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.material3:material3:1.5.0-beta01")
+    implementation("androidx.compose.material3:material3:1.5.0-beta02")
     implementation("androidx.activity:activity-compose:${libs.versions.activityCompose.get()}")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:${libs.versions.lifecycle.get()}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${libs.versions.lifecycle.get()}")
