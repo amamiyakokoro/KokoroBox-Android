@@ -8,7 +8,7 @@ require (
 	github.com/miekg/dns v1.1.73
 	github.com/oschwald/maxminddb-golang v1.13.1
 	golang.org/x/net v0.62.0
-	golang.org/x/sync v0.24.0
+	golang.org/x/sync v0.25.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 )
