@@ -32,7 +32,9 @@ plugins {
     id("com.mikepenz.aboutlibraries.plugin.android") version "15.3.0" apply false
 }
 
-val androidCompileSdk = providers.gradleProperty("android.compileSdk").map(String::toInt).get()
+val androidCompileSdk = providers.gradleProperty("android.compileSdk").get().split('.', limit = 2)
+val androidCompileSdkMajor = androidCompileSdk.first().toInt()
+val androidCompileSdkMinor = androidCompileSdk.getOrNull(1)?.toInt()
 val androidMinSdk = providers.gradleProperty("android.minSdk").map(String::toInt).get()
 val androidJvm = providers.gradleProperty("android.jvm")
     .orElse(providers.gradleProperty("project.jvm"))
@@ -71,7 +73,8 @@ tasks.register<Sync>("packageReleaseArm64V8a") {
 subprojects {
     pluginManager.withPlugin("com.android.application") {
         extensions.configure<ApplicationExtension>("android") {
-            compileSdk = androidCompileSdk
+            compileSdk = androidCompileSdkMajor
+            compileSdkMinor = androidCompileSdkMinor
 
             if (androidNdkVersion.isNotBlank()) {
                 ndkVersion = androidNdkVersion
@@ -118,7 +121,8 @@ subprojects {
 
     pluginManager.withPlugin("com.android.library") {
         extensions.configure<LibraryExtension>("android") {
-            compileSdk = androidCompileSdk
+            compileSdk = androidCompileSdkMajor
+            compileSdkMinor = androidCompileSdkMinor
 
             if (androidNdkVersion.isNotBlank()) {
                 ndkVersion = androidNdkVersion

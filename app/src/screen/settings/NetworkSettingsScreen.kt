@@ -21,6 +21,7 @@
 
 package com.amamiyakokoro.box.screen.settings
 
+import android.content.Intent
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -64,7 +65,9 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AccessControlScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -142,10 +145,13 @@ fun NetworkSettingsScreen(
 private fun NetworkVpnServiceSection(
     viewModel: NetworkSettingsViewModel,
     configuredMode: ProxyMode,
-    vpnPermissionLauncher: androidx.activity.result.ActivityResultLauncher<android.content.Intent>,
+    vpnPermissionLauncher: androidx.activity.result.ActivityResultLauncher<Intent>,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val hotspotSharingIntent by produceState<Intent?>(null, context) {
+        value = withContext(Dispatchers.IO) { VpnHotspotSettings.resolve(context) }
+    }
 
     Title(stringResource(LocaleR.string.network_settings_section_vpn_service))
     Card {
@@ -188,6 +194,15 @@ private fun NetworkVpnServiceSection(
                     ProxyMode.Http -> {
                         viewModel.onProxyModeChange(mode)
                     }
+                }
+            },
+        )
+        PreferenceArrowItem(
+            title = stringResource(LocaleR.string.network_settings_vpn_service_hotspot_sharing_title),
+            enabled = configuredMode == ProxyMode.Tun && hotspotSharingIntent != null,
+            onClick = {
+                hotspotSharingIntent?.let { intent ->
+                    runCatching { context.startActivity(intent) }
                 }
             },
         )

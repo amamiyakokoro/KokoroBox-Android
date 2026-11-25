@@ -61,12 +61,7 @@ jobs:
             exit 1
           fi
           version_code="$((base_code + nightly_offset))"
-          sdk_major="$(sed -n 's/^android\.compileSdk=//p' gradle.properties)"
-          if [[ "$sdk_major" -ge 37 ]]; then
-            sdk="${sdk_major}.0"
-          else
-            sdk="$sdk_major"
-          fi
+          sdk="$(python3 scripts/ci-release.py sdk-platform)"
           sed -i "s/^project\.version\.name=.*/project.version.name=${version}/" gradle.properties
           sed -i "s/^project\.version\.code=.*/project.version.code=${version_code}/" gradle.properties
           {

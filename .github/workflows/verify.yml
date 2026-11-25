@@ -67,21 +67,11 @@ jobs:
       - name: Install native and Android build tools
         shell: bash
         run: |
-          sdk_major="$(sed -n 's/^android\.compileSdk=//p' gradle.properties)"
+          sdk_package="$(python3 scripts/ci-release.py sdk-platform)"
           ndk_version="$(sed -n 's/^android\.ndkVersion=//p' gradle.properties)"
-          if [[ ! "$sdk_major" =~ ^[0-9]+$ ]]; then
-            echo "Invalid android.compileSdk: $sdk_major" >&2
-            exit 1
-          fi
           if [[ -z "$ndk_version" ]]; then
             echo "Missing android.ndkVersion" >&2
             exit 1
-          fi
-
-          if (( sdk_major >= 37 )); then
-            sdk_package="${sdk_major}.0"
-          else
-            sdk_package="$sdk_major"
           fi
 
           sdkmanager \

@@ -40,6 +40,16 @@ def output(name, value):
         stream.write(f"{name}={value}\n")
 
 
+def sdk_platform(compile_sdk):
+    version = re.fullmatch(r"([0-9]+)(?:\.([0-9]+))?", compile_sdk.strip())
+    if version is None:
+        raise ValueError("android.compileSdk must be MAJOR or MAJOR.MINOR")
+    # API 37 and later use a dotted package name even for minor version zero.
+    major = int(version[1])
+    minor = int(version[2] or "0")
+    return f"{major}.{minor}" if minor or major >= 37 else str(major)
+
+
 def metadata(tag):
     validate_tag(tag)
     config = properties("gradle.properties")
@@ -57,12 +67,9 @@ def metadata(tag):
     tagged = subprocess.check_output(["git", "rev-parse", f"refs/tags/{tag}^{{commit}}"], text=True).strip()
     if head != tagged:
         raise ValueError("Checkout does not match the release tag")
-    sdk_major = int(config["android.compileSdk"])
-    # API 37 uses a dotted package name even for minor version zero.
-    sdk = f"{sdk_major}.0" if sdk_major >= 37 else str(sdk_major)
     for name, value in {
         "tag": tag, "sha": head, "version": config["project.version.name"],
-        "ndk": config["android.ndkVersion"], "sdk": sdk,
+        "ndk": config["android.ndkVersion"], "sdk": sdk_platform(config["android.compileSdk"]),
     }.items():
         output(name, value)
 
@@ -296,6 +303,8 @@ def main():
         output("tag", validate_tag(os.environ["RELEASE_TAG"]))
     elif command == "metadata":
         metadata(os.environ["RELEASE_TAG"])
+    elif command == "sdk-platform":
+        print(sdk_platform(properties("gradle.properties")["android.compileSdk"]))
     elif command == "release-notes":
         release_notes(os.environ["RELEASE_TAG"], os.environ["GITHUB_REPOSITORY"],
                       os.environ.get("RELEASE_NOTES_FILE", "publish/RELEASE_NOTES.md"))

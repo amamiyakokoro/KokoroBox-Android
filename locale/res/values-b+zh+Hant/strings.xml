@@ -567,6 +567,7 @@
     <string name="network_settings_vpn_options_enable_ipv6_title" formatted="false">啟用 IPv6</string>
     <string name="network_settings_vpn_options_system_proxy_summary" formatted="false">僅在 VPN 模式下，為未經由 TUN 的應用程式設定 HTTP 代理</string>
     <string name="network_settings_vpn_options_system_proxy_title" formatted="false">VPN 系統代理</string>
+    <string name="network_settings_vpn_service_hotspot_sharing_title" formatted="false">熱點 VPN 共享</string>
     <string name="network_settings_vpn_service_root_tun_mode" formatted="false">Root TUN</string>
     <string name="network_settings_vpn_service_route_traffic_summary" formatted="false">選擇目前用於接管系統流量的代理模式</string>
     <string name="network_settings_vpn_service_route_traffic_title" formatted="false">路由系統流量</string>

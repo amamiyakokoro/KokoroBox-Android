@@ -28,7 +28,7 @@ Download the latest signed APK from [GitHub Releases](https://github.com/amamiya
 
 ## Development
 
-Requirements: JDK 25, Android SDK 37, NDK `29.0.14206865`, CMake, Kotlin CLI, Go, Rust, and `cargo-ndk`.
+Requirements: JDK 25, Android SDK 37.2, NDK `29.0.14206865`, CMake, Kotlin CLI, Go, Rust, and `cargo-ndk`.
 
 ```bash
 git clone https://github.com/amamiyakokoro/KokoroBox-Android.git

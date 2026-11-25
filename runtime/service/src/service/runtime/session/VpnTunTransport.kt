@@ -100,6 +100,10 @@ class VpnTunTransport(
                 vpnService.resources.getStringArray(R.array.bypass_private_route).map(::parseCIDR).forEach {
                     addRoute(it.ip, it.prefix)
                 }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+                    // Android tethering looks up 0.0.0.0 to find the IPv4 upstream interface.
+                    addRoute(NET_ANY, 32)
+                }
                 if (store.allowIpv6) {
                     vpnService.resources.getStringArray(R.array.bypass_private_route6).map(::parseCIDR).forEach {
                         addRoute(it.ip, it.prefix)

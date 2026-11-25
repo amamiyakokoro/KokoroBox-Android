@@ -567,6 +567,7 @@
     <string name="network_settings_vpn_options_enable_ipv6_title" formatted="false">Enable IPv6</string>
     <string name="network_settings_vpn_options_system_proxy_summary" formatted="false">Only in VPN mode, set an HTTP proxy for apps outside the TUN path</string>
     <string name="network_settings_vpn_options_system_proxy_title" formatted="false">VPN Built-in System Proxy</string>
+    <string name="network_settings_vpn_service_hotspot_sharing_title" formatted="false">VPN hotspot sharing</string>
     <string name="network_settings_vpn_service_root_tun_mode" formatted="false">Root TUN</string>
     <string name="network_settings_vpn_service_route_traffic_summary" formatted="false">Select which proxy mode should take over system traffic</string>
     <string name="network_settings_vpn_service_route_traffic_title" formatted="false">Route System Traffic</string>

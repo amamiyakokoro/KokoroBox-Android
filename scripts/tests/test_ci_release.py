@@ -127,12 +127,19 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("sha=" + "a" * 40, Path("outputs").read_text())
         self.assertIn("sdk=37.0\n", Path("outputs").read_text())
 
-    def test_metadata_sdk_package_uses_api_37_dotted_name(self):
+    def test_metadata_sdk_package_preserves_minor_versions(self):
         original = Path("gradle.properties").read_text()
-        for major, expected in ((36, "36"), (37, "37.0"), (38, "38.0")):
-            with self.subTest(major=major):
+        for compile_sdk, expected in (
+            ("36", "36"),
+            ("36.0", "36"),
+            ("36.1", "36.1"),
+            ("37", "37.0"),
+            ("37.2", "37.2"),
+            ("38", "38.0"),
+        ):
+            with self.subTest(compile_sdk=compile_sdk):
                 Path("gradle.properties").write_text(
-                    original.replace("android.compileSdk=37", f"android.compileSdk={major}")
+                    original.replace("android.compileSdk=37", f"android.compileSdk={compile_sdk}")
                 )
                 with patch.object(ci.subprocess, "check_output", return_value="a" * 40), \
                         patch.object(ci, "output") as output:
