@@ -18,8 +18,6 @@
  *
  */
 
-@file:DependsOn("org.tukaani:xz:1.12")
-
 import java.io.File
 import java.net.URL
 import java.nio.file.AtomicMoveNotSupportedException
@@ -28,8 +26,6 @@ import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.thread
-import org.tukaani.xz.LZMA2Options
-import org.tukaani.xz.XZOutputStream
 
 class ProjectConfig {
     private val properties = Properties()
@@ -591,6 +587,9 @@ class CppBuilder(private val config: ProjectConfig, private val ndkTools: NdkToo
 
 class ResourceDownloader(private val config: ProjectConfig) {
     private val outputDir = File("build/generated/assets/geo")
+    private val pythonExecutable by lazy {
+        if (SystemDetector.os == "windows" && !SystemDetector.checkCommandExists("python3")) "python" else "python3"
+    }
 
     fun downloadGeoFiles() {
         outputDir.mkdirs()
@@ -641,17 +640,23 @@ class ResourceDownloader(private val config: ProjectConfig) {
     }
 
     private fun compressToXz(sourceFile: File, outputFile: File) {
-        val tempOutputFile = File(outputFile.parentFile, ".${outputFile.name}.${System.currentTimeMillis()}.tmp")
-        if (tempOutputFile.exists()) {
-            tempOutputFile.delete()
-        }
+        val tempOutputFile = Files.createTempFile(outputFile.parentFile.toPath(), ".${outputFile.name}.", ".tmp").toFile()
         try {
-            sourceFile.inputStream().buffered().use { input ->
-                tempOutputFile.outputStream().buffered().use { fileOutput ->
-                    XZOutputStream(fileOutput, LZMA2Options()).use { xzOutput ->
-                        input.copyTo(xzOutput)
-                    }
-                }
+            val script = """
+                import lzma
+                import shutil
+                import sys
+
+                with open(sys.argv[1], "rb") as source, lzma.open(sys.argv[2], "wb") as output:
+                    shutil.copyfileobj(source, output)
+            """.trimIndent()
+            val result = executeCommand(
+                listOf(pythonExecutable, "-c", script, sourceFile.absolutePath, tempOutputFile.absolutePath),
+                printStdout = false,
+                printStderr = false,
+            )
+            check(result.success) {
+                "Python 3 XZ compression failed: ${result.error.trim()}"
             }
             replaceWithTemp(tempOutputFile, outputFile)
         } finally {
@@ -688,7 +693,7 @@ fun printUsage() {
           --go       Build Go native libraries
           --rust     Build Rust config compiler
           --cpp      Generate CMake/git info
-          --geo      Download and compress GeoIP/GeoSite/Country/ASN assets into app/assets with XZ
+          --geo      Download and compress Geo assets with Python 3 into build/generated/assets/geo
           --clean    Clean build outputs
           --all      Build everything (default)
           --help     Show this help
@@ -743,7 +748,6 @@ fun main(args: Array<String>) {
     println("NDK: ${ndkTools.ndkDir.absolutePath}")
     println("Go: ${if (SystemDetector.checkCommandExists("go")) "OK" else "NOT FOUND"}")
     println("Rust: ${if (SystemDetector.checkCommandExists("cargo")) "OK" else "NOT FOUND"}")
-    println("XZ library: org.tukaani:xz:1.12")
 
     val buildGo = args.isEmpty() || args.contains("--all") || args.contains("--go")
     val buildRust = args.isEmpty() || args.contains("--all") || args.contains("--rust")
